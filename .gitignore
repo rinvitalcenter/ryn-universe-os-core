@@ -1,0 +1,105 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+Thumbs.db
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code local/user state
+.vscode/*
+!.vscode/extensions.json
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Desktop generated files
+**/windows/flutter/ephemeral/
+**/windows/flutter/generated_plugin_registrant.cc
+**/windows/flutter/generated_plugin_registrant.h
+**/windows/flutter/generated_plugins.cmake
+**/macos/Flutter/ephemeral/
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+**/Pods/
+**/xcuserdata/
+
+# Symbolication related
+app.*.symbols
+
+# Obfuscation related
+app.*.map.json
+
+# Android Studio will place build artifacts here
+/android/app/debug
+/android/app/profile
+/android/app/release
+
+# Ryn OS Core local runtime DB / Drift / SQLite artifacts
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Ryn OS Core local-first runtime data and recovery workspaces
+local_data/
+app_data/
+runtime_data/
+data/local/
+backups/
+backup/
+snapshots/
+exports/private/
+restore_sandbox/
+restore_tmp/
+quarantine/
+
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+secrets/
+tokens/
+credentials/
+*.pem
+*.key
+*.p12
+*.jks
+*.crt
+*.cer
+
+# Obsidian machine-local state
+.obsidian/workspace*.json
+.obsidian/cache/
+.obsidian/graph.json
+.obsidian/hotkeys.json
+.obsidian/community-plugins.json
