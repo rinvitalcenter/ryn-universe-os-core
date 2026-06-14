@@ -41,6 +41,10 @@ abstract final class AppText {
   static const cmdDbBlueprintDoc = 'DB Blueprint 문서';
   static const cmdDbBlueprintDocId = 'RYN-CORE-DB-SCHEMA-BLUEPRINT-DOC1';
   static const cmdDbBlueprintHold = 'DB 구현 HOLD';
+  static const cmdExternalAutomationPolicyDoc = 'External Automation Policy 문서';
+  static const cmdExternalAutomationPolicyDocId =
+      'RYN-CORE-EXTERNAL-AUTOMATION-POLICY1';
+  static const cmdExternalAutomationHold = '외부 자동화 HOLD';
   static const cmdDbClosedNoWrite = 'DB CLOSED / NO WRITE';
   static const cmdSchemaHold = 'Schema HOLD';
   static const cmdGitPushHold = 'Git PUSH HOLD';

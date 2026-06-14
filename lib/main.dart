@@ -602,6 +602,14 @@ class _NextPermitQueue extends StatelessWidget {
               AppText.cmdDbBlueprintHold,
             ],
           ),
+          SizedBox(height: 10),
+          _StaticShellWrap(
+            items: [
+              AppText.cmdExternalAutomationPolicyDoc,
+              AppText.cmdExternalAutomationPolicyDocId,
+              AppText.cmdExternalAutomationHold,
+            ],
+          ),
         ],
       ),
     );

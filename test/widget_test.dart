@@ -58,6 +58,12 @@ void main() {
       findsAtLeastNWidgets(1),
     );
     expect(find.text('DB 구현 HOLD'), findsOneWidget);
+    expect(find.text('External Automation Policy 문서'), findsOneWidget);
+    expect(
+      find.text('RYN-CORE-EXTERNAL-AUTOMATION-POLICY1'),
+      findsAtLeastNWidgets(1),
+    );
+    expect(find.text('외부 자동화 HOLD'), findsOneWidget);
     expect(find.text('IA1: PASS WITH GUARDS'), findsAtLeastNWidgets(1));
     expect(find.text('Council Sessions'), findsOneWidget);
     expect(find.text('Obsidian Links'), findsOneWidget);
