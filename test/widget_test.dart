@@ -42,6 +42,9 @@ void main() {
     expect(find.text('Safety Status Strip'), findsOneWidget);
     expect(find.text('DB CLOSED / NO WRITE'), findsAtLeastNWidgets(1));
     expect(find.text('Gateway OFF'), findsAtLeastNWidgets(1));
+    expect(find.text('Construction Stage Map'), findsOneWidget);
+    expect(find.text('공사 장부: GitHub 보관'), findsOneWidget);
+    expect(find.text('다음 허가: Command Center UI 공사'), findsOneWidget);
     expect(find.text('IA1: PASS WITH GUARDS'), findsAtLeastNWidgets(1));
     expect(find.text('Council Sessions'), findsOneWidget);
     expect(find.text('Obsidian Links'), findsOneWidget);

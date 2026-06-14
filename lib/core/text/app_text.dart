@@ -27,6 +27,10 @@ abstract final class AppText {
   static const cmdScopeStaticShellOnly = 'Static shell only';
   static const cmdNextGateSourcePatchVerification =
       'Next gate: source patch verification';
+  static const cmdConstructionStageMap = 'Construction Stage Map';
+  static const cmdConstructionLedgerFiled = '공사 장부: GitHub 보관';
+  static const cmdConstructionNextPermit = '다음 허가: Command Center UI 공사';
+  static const cmdConstructionFenceInstalled = '.hermes 안전 펜스 설치';
   static const cmdDbClosedNoWrite = 'DB CLOSED / NO WRITE';
   static const cmdSchemaHold = 'Schema HOLD';
   static const cmdGitPushHold = 'Git PUSH HOLD';

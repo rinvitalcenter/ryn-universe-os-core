@@ -497,6 +497,8 @@ class _CommandSurface extends StatelessWidget {
         children: [
           const _CommandStatusStrip(),
           SizedBox(height: compact ? 10 : 12),
+          const _ConstructionStageBanner(),
+          SizedBox(height: compact ? 10 : 12),
           const _CommandSurfaceHeader(),
           SizedBox(height: compact ? 12 : 16),
           const _CommandCenterStaticShell(),
@@ -511,6 +513,41 @@ class _CommandSurface extends StatelessWidget {
                     : const _WideCommandObject();
               },
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ConstructionStageBanner extends StatelessWidget {
+  const _ConstructionStageBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: RynPalette.gold.withValues(alpha: 0.24)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          _MiniHeading(
+            icon: Icons.apartment_rounded,
+            title: AppText.cmdConstructionStageMap,
+            caption: '비개발자도 현재 공사 단계를 바로 이해하는 현장판입니다.',
+            onDark: true,
+          ),
+          SizedBox(height: 10),
+          _StaticShellWrap(
+            items: [
+              AppText.cmdConstructionLedgerFiled,
+              AppText.cmdConstructionFenceInstalled,
+              AppText.cmdConstructionNextPermit,
+            ],
           ),
         ],
       ),
@@ -3042,10 +3079,12 @@ class _MiniHeading extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.caption,
+    this.onDark = false,
   });
   final IconData icon;
   final String title;
   final String caption;
+  final bool onDark;
 
   @override
   Widget build(BuildContext context) {
@@ -3068,8 +3107,8 @@ class _MiniHeading extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  color: RynPalette.ink,
+                style: TextStyle(
+                  color: onDark ? const Color(0xFFEDE7D9) : RynPalette.ink,
                   fontWeight: FontWeight.w900,
                   fontSize: 14,
                 ),
@@ -3077,8 +3116,8 @@ class _MiniHeading extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 caption,
-                style: const TextStyle(
-                  color: RynPalette.muted,
+                style: TextStyle(
+                  color: onDark ? const Color(0xFFB9C2D5) : RynPalette.muted,
                   fontWeight: FontWeight.w700,
                   fontSize: 11,
                   height: 1.3,
