@@ -1,3 +1,5 @@
+import 'dart:ui' show Size;
+
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ryn_universe_os_core/core/text/app_text.dart';
@@ -23,11 +25,30 @@ void main() {
     expect(find.text('AI 전략 보고서 작성'), findsAtLeastNWidgets(1));
     expect(find.text('Mission Control Decision Surface'), findsOneWidget);
     expect(find.text(AppText.cmdStatusStaticMvpMode), findsAtLeastNWidgets(1));
-    expect(find.text(AppText.cmdNextActionSpecAlignedPatch), findsAtLeastNWidgets(1));
-    expect(find.text(AppText.cmdApprovalRiskBoundedSource), findsAtLeastNWidgets(1));
+    expect(
+      find.text(AppText.cmdNextActionSpecAlignedPatch),
+      findsAtLeastNWidgets(1),
+    );
+    expect(
+      find.text(AppText.cmdApprovalRiskBoundedSource),
+      findsAtLeastNWidgets(1),
+    );
     expect(find.text('Obsidian 보고 중심'), findsAtLeastNWidgets(1));
     expect(find.text(AppText.markerSpecMvpBaseline), findsAtLeastNWidgets(1));
-    expect(find.text(AppText.markerApprovalPacketOnly), findsAtLeastNWidgets(1));
+    expect(
+      find.text(AppText.markerApprovalPacketOnly),
+      findsAtLeastNWidgets(1),
+    );
+    expect(find.text('Safety Status Strip'), findsOneWidget);
+    expect(find.text('DB CLOSED / NO WRITE'), findsAtLeastNWidgets(1));
+    expect(find.text('Gateway OFF'), findsAtLeastNWidgets(1));
+    expect(find.text('IA1: PASS WITH GUARDS'), findsAtLeastNWidgets(1));
+    expect(find.text('Council Sessions'), findsOneWidget);
+    expect(find.text('Obsidian Links'), findsOneWidget);
+    expect(
+      find.text('RYN-CORE-COMMAND-CENTER-IA1-spec'),
+      findsAtLeastNWidgets(1),
+    );
 
     expect(find.text('Hermes'), findsAtLeastNWidgets(1));
     expect(find.text('AI 운영 비서'), findsAtLeastNWidgets(1));
@@ -55,13 +76,85 @@ void main() {
     expect(find.text('자동화'), findsAtLeastNWidgets(1));
   });
 
+  testWidgets('renders compact 364px client layout without overflow', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(364, 1129);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppText.cmdAiCommandCenter), findsAtLeastNWidgets(1));
+    expect(find.text(AppText.markerNoTelegram), findsAtLeastNWidgets(1));
+    expect(tester.takeException(), isNull);
+
+    await tester.ensureVisible(find.text(AppText.kanbanTitleOrchestra));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppText.kanbanTitleOrchestra), findsOneWidget);
+    expect(find.text(AppText.kanbanSnapshotTitle), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('keeps desktop capture content inside 1280 capture area', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1500, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Governance / Record / Boundary'));
+    await tester.pumpAndSettle();
+
+    final commandSurfaceRect = tester.getRect(
+      find
+          .byWidgetPredicate(
+            (widget) => widget.runtimeType.toString() == '_CommandSurface',
+          )
+          .first,
+    );
+    final governanceSurfaceRect = tester.getRect(
+      find
+          .byWidgetPredicate(
+            (widget) => widget.runtimeType.toString() == '_GovernanceSurface',
+          )
+          .first,
+    );
+
+    expect(commandSurfaceRect.right, lessThanOrEqualTo(1280));
+    expect(governanceSurfaceRect.right, lessThanOrEqualTo(1280));
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('selects a static Kanban card and shows inspection-only detail', (
     WidgetTester tester,
   ) async {
+    tester.view.physicalSize = const Size(1440, 1100);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
     await tester.pumpWidget(const RynUniverseApp());
 
     await tester.ensureVisible(find.text(AppText.kanbanTitleOrchestra));
     await tester.pumpAndSettle();
+
+    expect(find.text(AppText.kanbanSnapshotTitle), findsOneWidget);
+    expect(find.text(AppText.kanbanSnapshotBaselineValue), findsOneWidget);
+    expect(find.text(AppText.kanbanSnapshotNextSliceValue), findsOneWidget);
+    expect(find.text(AppText.kanbanSnapshotBoundaryValue), findsOneWidget);
 
     expect(find.text(AppText.kanbanSelectionNoneSelected), findsOneWidget);
     expect(find.text(AppText.kanbanMsgSelectCardToPreview), findsOneWidget);
@@ -71,8 +164,16 @@ void main() {
     await tester.tap(find.text('KANBAN-ORCH3'));
     await tester.pumpAndSettle();
 
-    expect(find.text(AppText.kanbanSelectionCardSelected), findsAtLeastNWidgets(1));
+    expect(
+      find.text(AppText.kanbanSelectionCardSelected),
+      findsAtLeastNWidgets(1),
+    );
     expect(find.text(AppText.kanbanDetailTaskSummary), findsOneWidget);
+    expect(find.text(AppText.kanbanDetailRecordStatus), findsOneWidget);
+    expect(
+      find.text(AppText.kanbanDetailBoundarySignal),
+      findsAtLeastNWidgets(1),
+    );
     expect(find.text(AppText.kanbanDetailInspectionOnlyNote), findsOneWidget);
     expect(find.text(AppText.markerNoLaneMovement), findsAtLeastNWidgets(1));
     expect(find.text(AppText.markerNoDragDrop), findsAtLeastNWidgets(1));

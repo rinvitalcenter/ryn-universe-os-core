@@ -19,6 +19,35 @@ abstract final class AppText {
   static const cmdStatusStaticMvpMode = '정적 MVP 검토 모드';
   static const cmdNextActionSpecAlignedPatch = 'SPEC 기준 소스 정렬';
   static const cmdApprovalRiskBoundedSource = '중간 · 승인 범위 한정';
+  static const cmdSafetyStatusStrip = 'Safety Status Strip';
+  static const cmdCurrentVerdict = 'Current Verdict';
+  static const cmdCouncilSessions = 'Council Sessions';
+  static const cmdObsidianLinks = 'Obsidian Links';
+  static const cmdIa1VerdictPassWithGuards = 'IA1: PASS WITH GUARDS';
+  static const cmdScopeStaticShellOnly = 'Static shell only';
+  static const cmdNextGateSourcePatchVerification =
+      'Next gate: source patch verification';
+  static const cmdDbClosedNoWrite = 'DB CLOSED / NO WRITE';
+  static const cmdSchemaHold = 'Schema HOLD';
+  static const cmdGitPushHold = 'Git PUSH HOLD';
+  static const cmdExternalLocked = 'External LOCKED';
+  static const cmdGatewayOff = 'Gateway OFF';
+  static const cmdAutomationLocked = 'Automation LOCKED';
+  static const cmdImplementationHold = 'Implementation HOLD';
+  static const cmdCouncilIa1SpecSaved =
+      'IA1 · Spec saved · Implementation HOLD';
+  static const cmdCouncilGraph1Pass =
+      'GRAPH1 · PASS WITH GUARDS · Implementation HOLD';
+  static const cmdCouncilObsidianBackbone =
+      'Obsidian Graph Backbone · PASS · Mass patch HOLD';
+  static const cmdCouncilKanbanRuntimeHold =
+      'Kanban Orchestra Static1 · Runtime QA HOLD';
+  static const cmdObsidianProjectHome = 'PROJECT-HOME_Ryn_Universe_OS_Core';
+  static const cmdObsidianMocCommandCenter = 'MOC-AI-Command-Center';
+  static const cmdObsidianReportsIndex = 'INDEX-AI-Command-Center-Reports';
+  static const cmdObsidianIa1Spec = 'RYN-CORE-COMMAND-CENTER-IA1-spec';
+  static const cmdObsidianGraph1Index = 'INDEX-GRAPH1-Series';
+  static const cmdObsidianKanbanIndex = 'INDEX-Kanban-Orch-Series';
   static const personaHermesName = 'Hermes';
   static const personaHermesRole = 'AI 운영 비서';
   static const agentCodex = 'Codex';
@@ -40,7 +69,8 @@ abstract final class AppText {
   static const markerStaticPrototypeInteraction = '정적 프로토타입 상호작용';
   static const markerNoLiveAgentExecution = '실시간 에이전트 실행 없음';
   static const markerNoExternalSending = '외부 전송 없음';
-  static const markerNoTelegramApiProviderCronjob = 'Telegram/API/Provider/Cronjob 연동 없음';
+  static const markerNoTelegramApiProviderCronjob =
+      'Telegram/API/Provider/Cronjob 연동 없음';
   static const markerNoRealStatusTransition = '실제 작업 상태 변경 없음';
   static const markerNoLaneMovement = '레인 이동 없음';
   static const markerNoDragDrop = '드래그 앤 드롭 없음';
@@ -49,12 +79,21 @@ abstract final class AppText {
 
   // Marker composites that preserve current visible wording exactly.
   static const markerStaticNoAutomationSummary = '정적 미리보기 · 실제 자동화 없음';
-  static const markerStaticAutomationTelegramSummary = '정적 미리보기 · 실제 자동화 없음 · 실제 Telegram 연동 없음';
+  static const markerStaticAutomationTelegramSummary =
+      '정적 미리보기 · 실제 자동화 없음 · 실제 Telegram 연동 없음';
   static const markerPortraitAssetSummary = '전문 역할 칩 · 초상 asset 없음';
 
   // Kanban core
   static const kanbanTitleOrchestra = 'Kanban Orchestra';
-  static const kanbanCaptionStaticOperationsLane = 'AI 작업 흐름을 정적으로 미리 보는 운영 레인입니다.';
+  static const kanbanCaptionStaticOperationsLane =
+      'AI 작업 흐름을 정적으로 미리 보는 운영 레인입니다.';
+  static const kanbanSnapshotTitle = '운영 스냅샷';
+  static const kanbanSnapshotBaseline = '계약 기준선';
+  static const kanbanSnapshotBaselineValue = 'Mission/TaskCard fake PASS';
+  static const kanbanSnapshotNextSlice = '다음 구현';
+  static const kanbanSnapshotNextSliceValue = '정적 오케스트라 개선';
+  static const kanbanSnapshotBoundary = '금지 경계';
+  static const kanbanSnapshotBoundaryValue = 'DB·실행·외부연동 HOLD';
   static const kanbanEmptyStaticSample = '정적 샘플 없음';
   static const kanbanColumnReady = 'Ready';
   static const kanbanColumnRunning = 'Running';
@@ -93,6 +132,8 @@ abstract final class AppText {
   static const kanbanDetailRiskLevel = '위험도';
   static const kanbanDetailApprovalState = '승인 상태';
   static const kanbanDetailCurrentState = '현재 상태';
+  static const kanbanDetailRecordStatus = '기록 상태';
+  static const kanbanDetailBoundarySignal = '경계 신호';
   static const kanbanDetailInspectionOnlyNote = '이 동작은 확인용이며 작업을 실행하지 않습니다';
   static const approvalRequired = '승인 필요';
   static const approvalNotRequired = '승인 불필요';

@@ -175,7 +175,7 @@ class CoreOsShell extends StatelessWidget {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final useRail = constraints.maxWidth >= 1500;
+            final useRail = constraints.maxWidth >= 2200;
             return Container(
               color: RynPalette.ivoryCanvas,
               child: useRail
@@ -205,15 +205,39 @@ class _ScrollableShellCanvas extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final padding = width < 720 ? 12.0 : 20.0;
+        final ultraCompact = width < 420;
+        final padding = ultraCompact
+            ? 6.0
+            : width < 720
+            ? 12.0
+            : 20.0;
+        // Windows runtime screenshots at 390px still lose practical edge room
+        // to the native frame/capture boundary. Keep the ultra-compact shell
+        // intentionally narrower than the reported Flutter max width so the
+        // premium command surface stays fully inside the visible client area.
+        final railMode = !showCompactNav;
+        final railCaptureGuard = railMode && width < 1400;
+        final desktopCaptureGuard =
+            showCompactNav && width >= 1200 && width < 2200;
+        final maxContentWidth = ultraCompact
+            ? 260.0
+            : desktopCaptureGuard
+            ? 900.0
+            : railCaptureGuard
+            ? 1060.0
+            : RynMetrics.maxWidth;
+        final runtimeEdgeReserve = ultraCompact ? 64.0 : 0.0;
         final contentWidth = math.max(
           0.0,
-          math.min(width - (padding * 2), RynMetrics.maxWidth),
+          math.min(width - (padding * 2) - runtimeEdgeReserve, maxContentWidth),
         );
         return SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.fromLTRB(padding, 16, padding, 28),
-            child: Center(
+            child: Align(
+              alignment: railMode || desktopCaptureGuard
+                  ? Alignment.centerLeft
+                  : Alignment.center,
               child: SizedBox(
                 width: contentWidth,
                 child: Column(
@@ -343,40 +367,56 @@ class _TopSystemBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _LightCard(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final tight = constraints.maxWidth < 1240;
-          final content = [
-            const _BrandBlock(),
-            if (!tight) const SizedBox(width: 16),
-            if (!tight) const Expanded(child: _CommandSearchPlaceholder()),
-            if (!tight) const SizedBox(width: 12),
-            const _StaticMarkers(),
-            const SizedBox(width: 10),
-            const _OwnerChip(),
-          ];
-          if (tight) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: const [
-                    Expanded(child: _BrandBlock()),
-                    _OwnerChip(),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                const _CommandSearchPlaceholder(),
-                const SizedBox(height: 10),
+    return LayoutBuilder(
+      builder: (context, outerConstraints) {
+        final ultraCompact = outerConstraints.maxWidth < 360;
+        return _LightCard(
+          padding: ultraCompact
+              ? const EdgeInsets.fromLTRB(12, 12, 12, 12)
+              : const EdgeInsets.fromLTRB(16, 14, 16, 14),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final tight = constraints.maxWidth < 1240;
+              final veryTight = constraints.maxWidth < 360;
+              final content = [
+                const _BrandBlock(),
+                if (!tight) const SizedBox(width: 16),
+                if (!tight) const Expanded(child: _CommandSearchPlaceholder()),
+                if (!tight) const SizedBox(width: 12),
                 const _StaticMarkers(),
-              ],
-            );
-          }
-          return Row(children: content);
-        },
-      ),
+                const SizedBox(width: 10),
+                const _OwnerChip(),
+              ];
+              if (tight) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (veryTight) ...[
+                      const _BrandBlock(compact: true),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: const _OwnerChip(),
+                      ),
+                    ] else
+                      Row(
+                        children: const [
+                          Expanded(child: _BrandBlock()),
+                          _OwnerChip(),
+                        ],
+                      ),
+                    SizedBox(height: veryTight ? 8 : 10),
+                    const _CommandSearchPlaceholder(),
+                    SizedBox(height: veryTight ? 8 : 10),
+                    const _StaticMarkers(),
+                  ],
+                );
+              }
+              return Row(children: content);
+            },
+          ),
+        );
+      },
     );
   }
 }
@@ -459,8 +499,10 @@ class _CommandSurface extends StatelessWidget {
           SizedBox(height: compact ? 10 : 12),
           const _CommandSurfaceHeader(),
           SizedBox(height: compact ? 12 : 16),
+          const _CommandCenterStaticShell(),
+          SizedBox(height: compact ? 12 : 16),
           SizedBox(
-            height: compact ? 500 : 420,
+            height: compact ? 620 : 420,
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final orbitAsGrid = constraints.maxWidth < 980;
@@ -518,6 +560,266 @@ class _CommandSurfaceHeader extends StatelessWidget {
               text: AppText.markerNoTelegram,
             ),
           ],
+        ),
+      ],
+    );
+  }
+}
+
+class _CommandCenterStaticShell extends StatelessWidget {
+  const _CommandCenterStaticShell();
+
+  static const safetyItems = [
+    AppText.cmdDbClosedNoWrite,
+    AppText.cmdSchemaHold,
+    AppText.cmdGitPushHold,
+    AppText.cmdExternalLocked,
+    AppText.cmdGatewayOff,
+    AppText.cmdAutomationLocked,
+    AppText.cmdImplementationHold,
+  ];
+
+  static const councilSessions = [
+    AppText.cmdCouncilIa1SpecSaved,
+    AppText.cmdCouncilGraph1Pass,
+    AppText.cmdCouncilObsidianBackbone,
+    AppText.cmdCouncilKanbanRuntimeHold,
+  ];
+
+  static const obsidianLinks = [
+    AppText.cmdObsidianProjectHome,
+    AppText.cmdObsidianMocCommandCenter,
+    AppText.cmdObsidianReportsIndex,
+    AppText.cmdObsidianIa1Spec,
+    AppText.cmdObsidianGraph1Index,
+    AppText.cmdObsidianKanbanIndex,
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final stack = constraints.maxWidth < 1080;
+        final children = [
+          const _StaticShellPanel(
+            icon: Icons.health_and_safety_rounded,
+            title: AppText.cmdSafetyStatusStrip,
+            child: _StaticShellWrap(items: safetyItems),
+          ),
+          const _StaticShellPanel(
+            icon: Icons.gavel_rounded,
+            title: AppText.cmdCurrentVerdict,
+            child: _StaticVerdictBody(),
+          ),
+          const _StaticShellPanel(
+            icon: Icons.groups_2_rounded,
+            title: AppText.cmdCouncilSessions,
+            child: _StaticShellList(items: councilSessions),
+          ),
+          const _StaticShellPanel(
+            icon: Icons.menu_book_rounded,
+            title: AppText.cmdObsidianLinks,
+            child: _StaticShellList(items: obsidianLinks),
+          ),
+        ];
+
+        if (stack) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var index = 0; index < children.length; index++) ...[
+                children[index],
+                if (index != children.length - 1) const SizedBox(height: 10),
+              ],
+            ],
+          );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: children[0]),
+                const SizedBox(width: 10),
+                Expanded(child: children[1]),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: children[2]),
+                const SizedBox(width: 10),
+                Expanded(child: children[3]),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _StaticShellPanel extends StatelessWidget {
+  const _StaticShellPanel({
+    required this.icon,
+    required this.title,
+    required this.child,
+  });
+
+  final IconData icon;
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: RynPalette.gold.withValues(alpha: 0.24)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 16, color: RynPalette.gold),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFFEDE7D9),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _StaticShellWrap extends StatelessWidget {
+  const _StaticShellWrap({required this.items});
+
+  final List<String> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 7,
+      runSpacing: 7,
+      children: [for (final item in items) _StaticShellChip(text: item)],
+    );
+  }
+}
+
+class _StaticShellList extends StatelessWidget {
+  const _StaticShellList({required this.items});
+
+  final List<String> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (var index = 0; index < items.length; index++) ...[
+          _StaticShellLine(text: items[index]),
+          if (index != items.length - 1) const SizedBox(height: 6),
+        ],
+      ],
+    );
+  }
+}
+
+class _StaticVerdictBody extends StatelessWidget {
+  const _StaticVerdictBody();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _StaticShellLine(text: AppText.cmdIa1VerdictPassWithGuards),
+        SizedBox(height: 6),
+        _StaticShellLine(text: AppText.cmdScopeStaticShellOnly),
+        SizedBox(height: 6),
+        _StaticShellLine(text: AppText.cmdNextGateSourcePatchVerification),
+        SizedBox(height: 6),
+        _StaticShellLine(text: AppText.markerNoLiveAgentExecution),
+      ],
+    );
+  }
+}
+
+class _StaticShellChip extends StatelessWidget {
+  const _StaticShellChip({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+      decoration: BoxDecoration(
+        color: RynPalette.deepNavy.withValues(alpha: 0.70),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 10.5,
+          fontWeight: FontWeight.w900,
+        ),
+      ),
+    );
+  }
+}
+
+class _StaticShellLine extends StatelessWidget {
+  const _StaticShellLine({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 5,
+          height: 5,
+          margin: const EdgeInsets.only(top: 6, right: 7),
+          decoration: const BoxDecoration(
+            color: RynPalette.gold,
+            shape: BoxShape.circle,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              color: Color(0xFFD9E0EE),
+              fontSize: 11.5,
+              fontWeight: FontWeight.w800,
+              height: 1.18,
+            ),
+          ),
         ),
       ],
     );
@@ -593,66 +895,84 @@ class _CompactCommandObject extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: const [
-        _CentralCommandOrb(compact: true),
-        SizedBox(height: 18),
-        Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 10,
-          runSpacing: 10,
-          children: [
-            _OrbitNode(
-              icon: Icons.support_agent_rounded,
-              title: AppText.personaHermesName,
-              caption: AppText.personaHermesRole,
-              status: '준비 중',
-              small: true,
-            ),
-            _OrbitNode(
-              icon: Icons.code_rounded,
-              title: AppText.agentCodex,
-              caption: '구현 보조',
-              status: '승인 후',
-              small: true,
-            ),
-            _OrbitNode(
-              icon: Icons.groups_rounded,
-              title: AppText.agentCouncil,
-              caption: '검토 준비',
-              status: 'placeholder',
-              small: true,
-            ),
-            _OrbitNode(
-              icon: Icons.diamond_rounded,
-              title: AppText.recordObsidian,
-              caption: '기록 연결',
-              status: '정적',
-              small: true,
-            ),
-            _OrbitNode(
-              icon: Icons.verified_user_rounded,
-              title: AppText.approvalGate,
-              caption: '승인 흐름',
-              status: '대기',
-              small: true,
-            ),
-          ],
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final ultraCompact = constraints.maxWidth < 360;
+        final orbSize = ultraCompact ? 204.0 : 230.0;
+        final nodeWidth = ultraCompact ? 126.0 : 138.0;
+        final nodeGap = ultraCompact ? 8.0 : 10.0;
+
+        return SingleChildScrollView(
+          physics: const NeverScrollableScrollPhysics(),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _CentralCommandOrb(compact: true, compactSize: orbSize),
+              SizedBox(height: ultraCompact ? 14 : 18),
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: nodeGap,
+                runSpacing: nodeGap,
+                children: [
+                  _OrbitNode(
+                    icon: Icons.support_agent_rounded,
+                    title: AppText.personaHermesName,
+                    caption: AppText.personaHermesRole,
+                    status: '준비 중',
+                    small: true,
+                    width: nodeWidth,
+                  ),
+                  _OrbitNode(
+                    icon: Icons.code_rounded,
+                    title: AppText.agentCodex,
+                    caption: '구현 보조',
+                    status: '승인 후',
+                    small: true,
+                    width: nodeWidth,
+                  ),
+                  _OrbitNode(
+                    icon: Icons.groups_rounded,
+                    title: AppText.agentCouncil,
+                    caption: '검토 준비',
+                    status: 'placeholder',
+                    small: true,
+                    width: nodeWidth,
+                  ),
+                  _OrbitNode(
+                    icon: Icons.diamond_rounded,
+                    title: AppText.recordObsidian,
+                    caption: '기록 연결',
+                    status: '정적',
+                    small: true,
+                    width: nodeWidth,
+                  ),
+                  _OrbitNode(
+                    icon: Icons.verified_user_rounded,
+                    title: AppText.approvalGate,
+                    caption: '승인 흐름',
+                    status: '대기',
+                    small: true,
+                    width: nodeWidth,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
 
 class _CentralCommandOrb extends StatelessWidget {
-  const _CentralCommandOrb({this.compact = false});
+  const _CentralCommandOrb({this.compact = false, this.compactSize});
 
   final bool compact;
+  final double? compactSize;
 
   @override
   Widget build(BuildContext context) {
-    final size = compact ? 230.0 : 290.0;
+    final size = compact ? compactSize ?? 230.0 : 290.0;
     return SizedBox(
       width: size,
       height: size,
@@ -696,43 +1016,50 @@ class _CentralCommandOrb extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Text(
-                  AppText.cmdAiCommandCenter,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 27,
-                    fontWeight: FontWeight.w900,
-                    height: 1.08,
-                    letterSpacing: -0.5,
-                  ),
+            padding: EdgeInsets.symmetric(horizontal: compact ? 20 : 28),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: SizedBox(
+                width: size * 0.68,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      AppText.cmdAiCommandCenter,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: compact ? 22 : 27,
+                        fontWeight: FontWeight.w900,
+                        height: 1.08,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    SizedBox(height: compact ? 8 : 12),
+                    const Text(
+                      '현재 핵심 명령',
+                      style: TextStyle(
+                        color: RynPalette.gold,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    SizedBox(height: compact ? 4 : 6),
+                    Text(
+                      'AI 전략 보고서 작성',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: const Color(0xFFEDE7D9),
+                        fontSize: compact ? 14 : 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    SizedBox(height: compact ? 10 : 16),
+                    const _CommandCta(),
+                  ],
                 ),
-                SizedBox(height: 12),
-                Text(
-                  '현재 핵심 명령',
-                  style: TextStyle(
-                    color: RynPalette.gold,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                SizedBox(height: 6),
-                Text(
-                  'AI 전략 보고서 작성',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xFFEDE7D9),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                SizedBox(height: 16),
-                _CommandCta(),
-              ],
+              ),
             ),
           ),
         ],
@@ -816,6 +1143,7 @@ class _OrbitNode extends StatelessWidget {
     required this.caption,
     required this.status,
     this.small = false,
+    this.width,
   });
 
   final IconData icon;
@@ -823,11 +1151,12 @@ class _OrbitNode extends StatelessWidget {
   final String caption;
   final String status;
   final bool small;
+  final double? width;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: small ? 138 : 158,
+      width: width ?? (small ? 138 : 158),
       padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
         color: RynPalette.deepNavy.withValues(alpha: 0.82),
@@ -896,12 +1225,20 @@ class _CommandStatusStrip extends StatelessWidget {
     const primaryItems = [
       ('현재 상태', AppText.cmdStatusStaticMvpMode, Icons.radar_rounded),
       ('다음 행동', AppText.cmdNextActionSpecAlignedPatch, Icons.next_plan_rounded),
-      ('승인 / 위험', AppText.cmdApprovalRiskBoundedSource, Icons.verified_user_rounded),
+      (
+        '승인 / 위험',
+        AppText.cmdApprovalRiskBoundedSource,
+        Icons.verified_user_rounded,
+      ),
     ];
     const secondaryItems = [
       ('기록 연결', 'Obsidian 보고 중심', Icons.menu_book_rounded),
       ('경계 신호', AppText.markerStaticNoAutomationSummary, Icons.shield_rounded),
-      ('외부 연동', AppText.markerNoExternalSending, Icons.near_me_disabled_rounded),
+      (
+        '외부 연동',
+        AppText.markerNoExternalSending,
+        Icons.near_me_disabled_rounded,
+      ),
     ];
 
     return Container(
@@ -921,7 +1258,11 @@ class _CommandStatusStrip extends StatelessWidget {
             children: [
               Row(
                 children: const [
-                  Icon(Icons.space_dashboard_rounded, size: 14, color: RynPalette.gold),
+                  Icon(
+                    Icons.space_dashboard_rounded,
+                    size: 14,
+                    color: RynPalette.gold,
+                  ),
                   SizedBox(width: 7),
                   Expanded(
                     child: Text(
@@ -943,21 +1284,30 @@ class _CommandStatusStrip extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    for (var index = 0; index < primaryItems.length; index++) ...[
+                    for (
+                      var index = 0;
+                      index < primaryItems.length;
+                      index++
+                    ) ...[
                       _DarkDecisionTile(
                         label: primaryItems[index].$1,
                         value: primaryItems[index].$2,
                         icon: primaryItems[index].$3,
                         dense: true,
                       ),
-                      if (index != primaryItems.length - 1) const SizedBox(height: 8),
+                      if (index != primaryItems.length - 1)
+                        const SizedBox(height: 8),
                     ],
                   ],
                 )
               else
                 Row(
                   children: [
-                    for (var index = 0; index < primaryItems.length; index++) ...[
+                    for (
+                      var index = 0;
+                      index < primaryItems.length;
+                      index++
+                    ) ...[
                       Expanded(
                         child: _DarkDecisionTile(
                           label: primaryItems[index].$1,
@@ -966,7 +1316,8 @@ class _CommandStatusStrip extends StatelessWidget {
                           dense: true,
                         ),
                       ),
-                      if (index != primaryItems.length - 1) const SizedBox(width: 8),
+                      if (index != primaryItems.length - 1)
+                        const SizedBox(width: 8),
                     ],
                   ],
                 ),
@@ -975,14 +1326,19 @@ class _CommandStatusStrip extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    for (var index = 0; index < secondaryItems.length; index++) ...[
+                    for (
+                      var index = 0;
+                      index < secondaryItems.length;
+                      index++
+                    ) ...[
                       _DarkStatusTile(
                         label: secondaryItems[index].$1,
                         value: secondaryItems[index].$2,
                         icon: secondaryItems[index].$3,
                         fullWidth: true,
                       ),
-                      if (index != secondaryItems.length - 1) const SizedBox(height: 8),
+                      if (index != secondaryItems.length - 1)
+                        const SizedBox(height: 8),
                     ],
                   ],
                 )
@@ -992,7 +1348,11 @@ class _CommandStatusStrip extends StatelessWidget {
                   runSpacing: 8,
                   children: [
                     for (final item in secondaryItems)
-                      _DarkStatusTile(label: item.$1, value: item.$2, icon: item.$3),
+                      _DarkStatusTile(
+                        label: item.$1,
+                        value: item.$2,
+                        icon: item.$3,
+                      ),
                   ],
                 ),
             ],
@@ -1351,69 +1711,245 @@ class _KanbanOrchestraLaneState extends State<_KanbanOrchestraLane> {
               ? constraints.maxWidth
               : RynMetrics.maxWidth;
           final stackedGroups = availableWidth < 1320;
-          final columnWidth = ((availableWidth - 12) / 2).clamp(280.0, 520.0);
+          final safeInset = availableWidth < 480
+              ? 120.0
+              : availableWidth < 640
+              ? 96.0
+              : availableWidth < 960
+              ? 72.0
+              : availableWidth < 1320
+              ? 36.0
+              : 0.0;
+          final rawLaneWidth = math.max(0.0, availableWidth - safeInset);
+          final laneWidth = availableWidth < 480
+              ? rawLaneWidth.clamp(220.0, availableWidth).toDouble()
+              : rawLaneWidth;
+          final columnWidth = ((laneWidth - 12) / 2).clamp(280.0, 520.0);
+
+          Widget boundedLane(Widget child) {
+            return Align(
+              alignment: Alignment.centerLeft,
+              child: SizedBox(width: laneWidth, child: child),
+            );
+          }
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const _SectionHeader(
-                title: AppText.kanbanTitleOrchestra,
-                caption: AppText.kanbanCaptionStaticOperationsLane,
+              boundedLane(
+                const _SectionHeader(
+                  title: AppText.kanbanTitleOrchestra,
+                  caption: AppText.kanbanCaptionStaticOperationsLane,
+                ),
               ),
               const SizedBox(height: 12),
-              ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: availableWidth),
-                child: const _KanbanStaticMarkerStrip(),
-              ),
+              boundedLane(const _KanbanStaticMarkerStrip()),
               const SizedBox(height: 14),
-              ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: availableWidth),
-                child: _KanbanDetailPreview(task: selectedTask),
-              ),
+              boundedLane(const _KanbanOperationSnapshot()),
               const SizedBox(height: 14),
-              if (stackedGroups)
+              boundedLane(_KanbanDetailPreview(task: selectedTask)),
+              const SizedBox(height: 14),
+              boundedLane(
+                stackedGroups
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          for (final column in columns) ...[
+                            _KanbanColumn(
+                              title: column,
+                              tasks: tasks
+                                  .where((task) => task.state == column)
+                                  .toList(),
+                              width: laneWidth,
+                              compactCards: true,
+                              selectedTaskTitle: selectedTaskTitle,
+                              onTaskSelected: (task) => setState(() {
+                                selectedTaskTitle = task.title;
+                              }),
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        ],
+                      )
+                    : Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          for (final column in columns)
+                            _KanbanColumn(
+                              title: column,
+                              tasks: tasks
+                                  .where((task) => task.state == column)
+                                  .toList(),
+                              width: columnWidth,
+                              selectedTaskTitle: selectedTaskTitle,
+                              onTaskSelected: (task) => setState(() {
+                                selectedTaskTitle = task.title;
+                              }),
+                            ),
+                        ],
+                      ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _KanbanOperationSnapshot extends StatelessWidget {
+  const _KanbanOperationSnapshot();
+
+  @override
+  Widget build(BuildContext context) {
+    const items = [
+      (
+        Icons.fact_check_rounded,
+        AppText.kanbanSnapshotBaseline,
+        AppText.kanbanSnapshotBaselineValue,
+      ),
+      (
+        Icons.view_kanban_rounded,
+        AppText.kanbanSnapshotNextSlice,
+        AppText.kanbanSnapshotNextSliceValue,
+      ),
+      (
+        Icons.shield_rounded,
+        AppText.kanbanSnapshotBoundary,
+        AppText.kanbanSnapshotBoundaryValue,
+      ),
+    ];
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: RynPalette.navy,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: RynPalette.navyLine),
+        boxShadow: const [
+          BoxShadow(
+            color: RynPalette.darkShadow,
+            blurRadius: 18,
+            offset: Offset(0, 10),
+          ),
+        ],
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final stackItems = constraints.maxWidth < 980;
+          final cards = [
+            for (final item in items)
+              _KanbanSnapshotTile(
+                icon: item.$1,
+                label: item.$2,
+                value: item.$3,
+              ),
+          ];
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.radar_rounded, size: 15, color: RynPalette.gold),
+                  SizedBox(width: 7),
+                  Expanded(
+                    child: Text(
+                      AppText.kanbanSnapshotTitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Color(0xFFEDE7D9),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              if (stackItems)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    for (final column in columns) ...[
-                      _KanbanColumn(
-                        title: column,
-                        tasks: tasks
-                            .where((task) => task.state == column)
-                            .toList(),
-                        width: double.infinity,
-                        compactCards: true,
-                        selectedTaskTitle: selectedTaskTitle,
-                        onTaskSelected: (task) => setState(() {
-                          selectedTaskTitle = task.title;
-                        }),
-                      ),
-                      const SizedBox(height: 10),
+                    for (var index = 0; index < cards.length; index++) ...[
+                      cards[index],
+                      if (index != cards.length - 1) const SizedBox(height: 8),
                     ],
                   ],
                 )
               else
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
+                Row(
                   children: [
-                    for (final column in columns)
-                      _KanbanColumn(
-                        title: column,
-                        tasks: tasks
-                            .where((task) => task.state == column)
-                            .toList(),
-                        width: columnWidth,
-                        selectedTaskTitle: selectedTaskTitle,
-                        onTaskSelected: (task) => setState(() {
-                          selectedTaskTitle = task.title;
-                        }),
-                      ),
+                    for (var index = 0; index < cards.length; index++) ...[
+                      Expanded(child: cards[index]),
+                      if (index != cards.length - 1) const SizedBox(width: 8),
+                    ],
                   ],
                 ),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _KanbanSnapshotTile extends StatelessWidget {
+  const _KanbanSnapshotTile({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: RynPalette.gold.withValues(alpha: 0.24)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 17, color: RynPalette.gold),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Color(0xFFAEB8CA),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  value,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w900,
+                    height: 1.15,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1607,13 +2143,13 @@ class _KanbanDetailPreview extends StatelessWidget {
                   const SizedBox(height: 10),
                   LayoutBuilder(
                     builder: (context, constraints) {
-                      final compact = constraints.maxWidth < 980;
-                      final fieldWidth = compact
+                      final detailWidth = constraints.maxWidth.isFinite
                           ? constraints.maxWidth
-                          : ((constraints.maxWidth - 12) / 2).clamp(
-                              220.0,
-                              360.0,
-                            );
+                          : RynMetrics.maxWidth;
+                      final singleColumnFields = detailWidth < 1520;
+                      final fieldWidth = singleColumnFields
+                          ? detailWidth
+                          : ((detailWidth - 12) / 2).clamp(220.0, 360.0);
                       final fields = [
                         _KanbanDetailField(
                           width: fieldWidth,
@@ -1629,6 +2165,16 @@ class _KanbanDetailPreview extends StatelessWidget {
                           width: fieldWidth,
                           label: AppText.kanbanDetailAgentRole,
                           value: selected.owner,
+                        ),
+                        _KanbanDetailField(
+                          width: fieldWidth,
+                          label: AppText.kanbanDetailRecordStatus,
+                          value: selected.record,
+                        ),
+                        _KanbanDetailField(
+                          width: fieldWidth,
+                          label: AppText.kanbanDetailBoundarySignal,
+                          value: selected.boundary,
                         ),
                       ];
 
@@ -1926,7 +2472,7 @@ class _KanbanTaskCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   task.title,
-                  maxLines: 2,
+                  maxLines: compact ? 3 : 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     color: RynPalette.ink,
@@ -1939,22 +2485,27 @@ class _KanbanTaskCard extends StatelessWidget {
                 _KanbanMetaLine(
                   label: AppText.kanbanCardOwner,
                   value: task.owner,
+                  compact: compact,
                 ),
                 _KanbanMetaLine(
                   label: AppText.kanbanCardNext,
                   value: task.nextAction,
+                  compact: compact,
                 ),
                 _KanbanMetaLine(
                   label: AppText.kanbanCardApproval,
                   value: task.approval,
+                  compact: compact,
                 ),
                 _KanbanMetaLine(
                   label: AppText.kanbanCardRecord,
                   value: task.record,
+                  compact: compact,
                 ),
                 _KanbanMetaLine(
                   label: AppText.kanbanCardBoundary,
                   value: task.boundary,
+                  compact: compact,
                 ),
               ],
             ),
@@ -2034,10 +2585,15 @@ class _KanbanMetaPill extends StatelessWidget {
 }
 
 class _KanbanMetaLine extends StatelessWidget {
-  const _KanbanMetaLine({required this.label, required this.value});
+  const _KanbanMetaLine({
+    required this.label,
+    required this.value,
+    this.compact = false,
+  });
 
   final String label;
   final String value;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -2047,7 +2603,7 @@ class _KanbanMetaLine extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 58,
+            width: compact ? 54 : 58,
             child: Text(
               label,
               style: const TextStyle(
@@ -2060,7 +2616,7 @@ class _KanbanMetaLine extends StatelessWidget {
           Expanded(
             child: Text(
               value,
-              maxLines: 2,
+              maxLines: compact ? 3 : 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: RynPalette.muted,
@@ -2140,56 +2696,66 @@ class _BrandBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            gradient: const LinearGradient(
-              colors: [RynPalette.navy, RynPalette.graphite],
-            ),
-          ),
-          child: const Icon(
-            Icons.auto_awesome_rounded,
-            color: RynPalette.gold,
-            size: 22,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Flexible(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                AppText.productName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: RynPalette.ink,
-                  fontWeight: FontWeight.w900,
-                  fontSize: 16,
-                  letterSpacing: -0.2,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final ultraCompact = compact && constraints.maxWidth < 260;
+        final iconSize = ultraCompact ? 36.0 : 40.0;
+        final gap = ultraCompact ? 8.0 : 10.0;
+        final titleSize = ultraCompact ? 14.0 : 16.0;
+
+        return Row(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Container(
+              width: iconSize,
+              height: iconSize,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(ultraCompact ? 13 : 15),
+                gradient: const LinearGradient(
+                  colors: [RynPalette.navy, RynPalette.graphite],
                 ),
               ),
-              if (!compact)
-                const Text(
-                  'AI-native · Local-first · Calm · Premium',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: RynPalette.warmMuted,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
+              child: Icon(
+                Icons.auto_awesome_rounded,
+                color: RynPalette.gold,
+                size: ultraCompact ? 20 : 22,
+              ),
+            ),
+            SizedBox(width: gap),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    AppText.productName,
+                    maxLines: ultraCompact ? 2 : 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: RynPalette.ink,
+                      fontWeight: FontWeight.w900,
+                      fontSize: titleSize,
+                      height: 1.05,
+                      letterSpacing: -0.2,
+                    ),
                   ),
-                ),
-            ],
-          ),
-        ),
-      ],
+                  if (!compact)
+                    const Text(
+                      'AI-native · Local-first · Calm · Premium',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: RynPalette.warmMuted,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -2978,7 +3544,9 @@ class _MarkerPill extends StatelessWidget {
             ? constraints.maxWidth
             : 320.0;
         final compact = finiteWidth < 980;
-        final maxChipWidth = compact ? finiteWidth : math.min(finiteWidth, 320.0);
+        final maxChipWidth = compact
+            ? finiteWidth
+            : math.min(finiteWidth, 320.0);
         return ConstrainedBox(
           constraints: BoxConstraints(maxWidth: maxChipWidth),
           child: Container(
