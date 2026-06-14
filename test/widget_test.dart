@@ -49,6 +49,9 @@ void main() {
     expect(find.text('1순위 · Next Permit Queue'), findsOneWidget);
     expect(find.text('7-Profile Council Growth Plan'), findsOneWidget);
     expect(find.text('DB Schema Blueprint · 문서 전용'), findsOneWidget);
+    expect(find.text('Council Growth Plan 문서'), findsOneWidget);
+    expect(find.text('RYN-CORE-COUNCIL-GROWTH-PLAN1'), findsAtLeastNWidgets(1));
+    expect(find.text('Obsidian AI Command Center 기록'), findsOneWidget);
     expect(find.text('IA1: PASS WITH GUARDS'), findsAtLeastNWidgets(1));
     expect(find.text('Council Sessions'), findsOneWidget);
     expect(find.text('Obsidian Links'), findsOneWidget);

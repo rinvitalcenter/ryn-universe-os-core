@@ -35,6 +35,9 @@ abstract final class AppText {
   static const cmdNextPermitPrimary = '1순위 · Next Permit Queue';
   static const cmdNextPermitCouncilGrowth = '7-Profile Council Growth Plan';
   static const cmdNextPermitDbBlueprint = 'DB Schema Blueprint · 문서 전용';
+  static const cmdCouncilGrowthPlanDoc = 'Council Growth Plan 문서';
+  static const cmdCouncilGrowthPlanDocId = 'RYN-CORE-COUNCIL-GROWTH-PLAN1';
+  static const cmdCouncilGrowthPlanVault = 'Obsidian AI Command Center 기록';
   static const cmdDbClosedNoWrite = 'DB CLOSED / NO WRITE';
   static const cmdSchemaHold = 'Schema HOLD';
   static const cmdGitPushHold = 'Git PUSH HOLD';

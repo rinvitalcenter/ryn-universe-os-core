@@ -586,6 +586,14 @@ class _NextPermitQueue extends StatelessWidget {
               AppText.cmdNextPermitDbBlueprint,
             ],
           ),
+          SizedBox(height: 10),
+          _StaticShellWrap(
+            items: [
+              AppText.cmdCouncilGrowthPlanDoc,
+              AppText.cmdCouncilGrowthPlanDocId,
+              AppText.cmdCouncilGrowthPlanVault,
+            ],
+          ),
         ],
       ),
     );
