@@ -38,6 +38,9 @@ abstract final class AppText {
   static const cmdCouncilGrowthPlanDoc = 'Council Growth Plan 문서';
   static const cmdCouncilGrowthPlanDocId = 'RYN-CORE-COUNCIL-GROWTH-PLAN1';
   static const cmdCouncilGrowthPlanVault = 'Obsidian AI Command Center 기록';
+  static const cmdDbBlueprintDoc = 'DB Blueprint 문서';
+  static const cmdDbBlueprintDocId = 'RYN-CORE-DB-SCHEMA-BLUEPRINT-DOC1';
+  static const cmdDbBlueprintHold = 'DB 구현 HOLD';
   static const cmdDbClosedNoWrite = 'DB CLOSED / NO WRITE';
   static const cmdSchemaHold = 'Schema HOLD';
   static const cmdGitPushHold = 'Git PUSH HOLD';
