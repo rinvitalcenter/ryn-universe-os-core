@@ -47,9 +47,13 @@ abstract final class AppText {
   static const cmdExternalAutomationHold = '외부 자동화 HOLD';
   static const cmdDailyHomeTitle = '린님 Daily Home';
   static const cmdDailyHomeToday = 'Today';
+  static const cmdDailyHomeTodayBody = 'Ryn OS Core 홈 화면을 더 편하게 정리';
   static const cmdDailyHomeApproval = 'Pending approval';
+  static const cmdDailyHomeApprovalBody = '지금은 승인할 위험 작업이 없어요';
   static const cmdDailyHomeRecent = 'Recent result';
+  static const cmdDailyHomeRecentBody = '사용자 화면을 먼저 보이게 정리';
   static const cmdDailyHomeContinueCta = 'Continue';
+  static const cmdDailyHomeContinueBody = '다음 작업을 한 카드에서 이어가기';
   static const cmdDailyHomeContinue = '오늘 이어갈 일';
   static const cmdDailyHomeApprovalOnly = '승인 필요한 일만 보기';
   static const cmdChiefGovernanceDeck = 'Chief / Governance Deck';

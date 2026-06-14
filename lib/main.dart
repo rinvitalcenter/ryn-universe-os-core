@@ -383,8 +383,6 @@ class _TopSystemBar extends StatelessWidget {
                 if (!tight) const SizedBox(width: 16),
                 if (!tight) const Expanded(child: _CommandSearchPlaceholder()),
                 if (!tight) const SizedBox(width: 12),
-                const _StaticMarkers(),
-                const SizedBox(width: 10),
                 const _OwnerChip(),
               ];
               if (tight) {
@@ -408,11 +406,18 @@ class _TopSystemBar extends StatelessWidget {
                     SizedBox(height: veryTight ? 8 : 10),
                     const _CommandSearchPlaceholder(),
                     SizedBox(height: veryTight ? 8 : 10),
-                    const _StaticMarkers(),
+                    const _DailyHomeSurface(),
                   ],
                 );
               }
-              return Row(children: content);
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(children: content),
+                  const SizedBox(height: 12),
+                  const _DailyHomeSurface(),
+                ],
+              );
             },
           ),
         );
@@ -495,8 +500,6 @@ class _CommandSurface extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _DailyHomeSurface(),
-          SizedBox(height: compact ? 10 : 12),
           const _CommandSurfaceHeader(),
           SizedBox(height: compact ? 12 : 16),
           const _CommandCenterStaticShell(),
@@ -539,7 +542,7 @@ class _DailyHomeSurface extends StatelessWidget {
             icon: Icons.home_work_rounded,
             title: AppText.cmdDailyHomeTitle,
             caption: '첫 화면은 오늘 할 일, 승인, 최근 결과, 이어가기만 보여줍니다.',
-            onDark: true,
+            onDark: false,
           ),
           SizedBox(height: 12),
           Wrap(
@@ -549,22 +552,22 @@ class _DailyHomeSurface extends StatelessWidget {
               _DailyHomeTile(
                 icon: Icons.today_rounded,
                 title: AppText.cmdDailyHomeToday,
-                body: 'Daily Home 단순화 이어서 진행',
+                body: AppText.cmdDailyHomeTodayBody,
               ),
               _DailyHomeTile(
                 icon: Icons.verified_user_rounded,
                 title: AppText.cmdDailyHomeApproval,
-                body: '위험 작업 없음 · 승인 대기 없음',
+                body: AppText.cmdDailyHomeApprovalBody,
               ),
               _DailyHomeTile(
                 icon: Icons.done_all_rounded,
                 title: AppText.cmdDailyHomeRecent,
-                body: '사용자 화면과 관리 화면 1차 분리',
+                body: AppText.cmdDailyHomeRecentBody,
               ),
               _DailyHomeTile(
                 icon: Icons.play_arrow_rounded,
                 title: AppText.cmdDailyHomeContinueCta,
-                body: 'Daily Home을 실제 거실 화면으로 정리',
+                body: AppText.cmdDailyHomeContinueBody,
               ),
             ],
           ),
@@ -649,6 +652,8 @@ class _ChiefGovernanceDeck extends StatelessWidget {
         ),
         SizedBox(height: 10),
         _CommandStatusStrip(),
+        SizedBox(height: 10),
+        _StaticMarkers(),
         SizedBox(height: 10),
         _ConstructionStageBanner(),
         SizedBox(height: 10),

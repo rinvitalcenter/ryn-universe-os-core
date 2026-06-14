@@ -44,9 +44,13 @@ void main() {
     expect(find.text('Gateway OFF'), findsAtLeastNWidgets(1));
     expect(find.text('린님 Daily Home'), findsOneWidget);
     expect(find.text('Today'), findsOneWidget);
+    expect(find.text('Ryn OS Core 홈 화면을 더 편하게 정리'), findsOneWidget);
     expect(find.text('Pending approval'), findsOneWidget);
+    expect(find.text('지금은 승인할 위험 작업이 없어요'), findsOneWidget);
     expect(find.text('Recent result'), findsOneWidget);
+    expect(find.text('사용자 화면을 먼저 보이게 정리'), findsOneWidget);
     expect(find.text('Continue'), findsOneWidget);
+    expect(find.text('다음 작업을 한 카드에서 이어가기'), findsOneWidget);
     expect(find.text('Chief / Governance Deck'), findsOneWidget);
     expect(find.text('Construction Stage Map'), findsOneWidget);
     expect(find.text('공사 장부: GitHub 보관'), findsOneWidget);
