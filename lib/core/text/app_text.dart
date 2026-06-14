@@ -46,6 +46,10 @@ abstract final class AppText {
       'RYN-CORE-EXTERNAL-AUTOMATION-POLICY1';
   static const cmdExternalAutomationHold = '외부 자동화 HOLD';
   static const cmdDailyHomeTitle = '린님 Daily Home';
+  static const cmdDailyHomeToday = 'Today';
+  static const cmdDailyHomeApproval = 'Pending approval';
+  static const cmdDailyHomeRecent = 'Recent result';
+  static const cmdDailyHomeContinueCta = 'Continue';
   static const cmdDailyHomeContinue = '오늘 이어갈 일';
   static const cmdDailyHomeApprovalOnly = '승인 필요한 일만 보기';
   static const cmdChiefGovernanceDeck = 'Chief / Governance Deck';

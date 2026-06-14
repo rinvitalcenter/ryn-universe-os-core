@@ -495,8 +495,6 @@ class _CommandSurface extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const _CommandStatusStrip(),
-          SizedBox(height: compact ? 10 : 12),
           const _DailyHomeSurface(),
           SizedBox(height: compact ? 10 : 12),
           const _CommandSurfaceHeader(),
@@ -528,7 +526,7 @@ class _DailyHomeSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFFF8E8B0).withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(22),
@@ -540,18 +538,96 @@ class _DailyHomeSurface extends StatelessWidget {
           _MiniHeading(
             icon: Icons.home_work_rounded,
             title: AppText.cmdDailyHomeTitle,
-            caption: '실제 사용 화면은 오늘 이어갈 일과 승인만 먼저 보여줍니다.',
+            caption: '첫 화면은 오늘 할 일, 승인, 최근 결과, 이어가기만 보여줍니다.',
             onDark: true,
           ),
-          SizedBox(height: 10),
-          _StaticShellWrap(
-            items: [
-              AppText.cmdDailyHomeContinue,
-              AppText.cmdDailyHomeApprovalOnly,
-              '최근 결과는 한 줄 요약',
+          SizedBox(height: 12),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              _DailyHomeTile(
+                icon: Icons.today_rounded,
+                title: AppText.cmdDailyHomeToday,
+                body: 'Daily Home 단순화 이어서 진행',
+              ),
+              _DailyHomeTile(
+                icon: Icons.verified_user_rounded,
+                title: AppText.cmdDailyHomeApproval,
+                body: '위험 작업 없음 · 승인 대기 없음',
+              ),
+              _DailyHomeTile(
+                icon: Icons.done_all_rounded,
+                title: AppText.cmdDailyHomeRecent,
+                body: '사용자 화면과 관리 화면 1차 분리',
+              ),
+              _DailyHomeTile(
+                icon: Icons.play_arrow_rounded,
+                title: AppText.cmdDailyHomeContinueCta,
+                body: 'Daily Home을 실제 거실 화면으로 정리',
+              ),
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _DailyHomeTile extends StatelessWidget {
+  const _DailyHomeTile({
+    required this.icon,
+    required this.title,
+    required this.body,
+  });
+
+  final IconData icon;
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 320,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: RynPalette.deepNavy.withValues(alpha: 0.58),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: RynPalette.gold, size: 22),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Color(0xFFF9E7B7),
+                      fontWeight: FontWeight.w900,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    body,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.74),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12.5,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -571,6 +647,8 @@ class _ChiefGovernanceDeck extends StatelessWidget {
           caption: '문서 ID, HOLD, 공사 표지판은 린님 Daily Home 아래의 관리/감리 영역에 둡니다.',
           onDark: true,
         ),
+        SizedBox(height: 10),
+        _CommandStatusStrip(),
         SizedBox(height: 10),
         _ConstructionStageBanner(),
         SizedBox(height: 10),

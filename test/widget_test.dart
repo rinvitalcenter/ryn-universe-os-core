@@ -43,8 +43,10 @@ void main() {
     expect(find.text('DB CLOSED / NO WRITE'), findsAtLeastNWidgets(1));
     expect(find.text('Gateway OFF'), findsAtLeastNWidgets(1));
     expect(find.text('린님 Daily Home'), findsOneWidget);
-    expect(find.text('오늘 이어갈 일'), findsOneWidget);
-    expect(find.text('승인 필요한 일만 보기'), findsOneWidget);
+    expect(find.text('Today'), findsOneWidget);
+    expect(find.text('Pending approval'), findsOneWidget);
+    expect(find.text('Recent result'), findsOneWidget);
+    expect(find.text('Continue'), findsOneWidget);
     expect(find.text('Chief / Governance Deck'), findsOneWidget);
     expect(find.text('Construction Stage Map'), findsOneWidget);
     expect(find.text('공사 장부: GitHub 보관'), findsOneWidget);
