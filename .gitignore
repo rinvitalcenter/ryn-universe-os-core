@@ -97,6 +97,9 @@ credentials/
 *.crt
 *.cer
 
+# Ryn OS Core local Hermes QA evidence and agent scratch work
+.hermes/
+
 # Obsidian machine-local state
 .obsidian/workspace*.json
 .obsidian/cache/
