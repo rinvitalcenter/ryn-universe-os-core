@@ -31,6 +31,10 @@ abstract final class AppText {
   static const cmdConstructionLedgerFiled = '공사 장부: GitHub 보관';
   static const cmdConstructionNextPermit = '다음 허가: Command Center UI 공사';
   static const cmdConstructionFenceInstalled = '.hermes 안전 펜스 설치';
+  static const cmdNextPermitQueue = 'Next Permit Queue';
+  static const cmdNextPermitPrimary = '1순위 · Next Permit Queue';
+  static const cmdNextPermitCouncilGrowth = '7-Profile Council Growth Plan';
+  static const cmdNextPermitDbBlueprint = 'DB Schema Blueprint · 문서 전용';
   static const cmdDbClosedNoWrite = 'DB CLOSED / NO WRITE';
   static const cmdSchemaHold = 'Schema HOLD';
   static const cmdGitPushHold = 'Git PUSH HOLD';

@@ -499,6 +499,8 @@ class _CommandSurface extends StatelessWidget {
           SizedBox(height: compact ? 10 : 12),
           const _ConstructionStageBanner(),
           SizedBox(height: compact ? 10 : 12),
+          const _NextPermitQueue(),
+          SizedBox(height: compact ? 10 : 12),
           const _CommandSurfaceHeader(),
           SizedBox(height: compact ? 12 : 16),
           const _CommandCenterStaticShell(),
@@ -547,6 +549,41 @@ class _ConstructionStageBanner extends StatelessWidget {
               AppText.cmdConstructionLedgerFiled,
               AppText.cmdConstructionFenceInstalled,
               AppText.cmdConstructionNextPermit,
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NextPermitQueue extends StatelessWidget {
+  const _NextPermitQueue();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF111A2B).withValues(alpha: 0.78),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          _MiniHeading(
+            icon: Icons.next_plan_rounded,
+            title: AppText.cmdNextPermitQueue,
+            caption: '승인 대기 공사 구역을 정적으로 보여주는 대기열입니다.',
+            onDark: true,
+          ),
+          SizedBox(height: 10),
+          _StaticShellWrap(
+            items: [
+              AppText.cmdNextPermitPrimary,
+              AppText.cmdNextPermitCouncilGrowth,
+              AppText.cmdNextPermitDbBlueprint,
             ],
           ),
         ],

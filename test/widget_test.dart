@@ -45,6 +45,10 @@ void main() {
     expect(find.text('Construction Stage Map'), findsOneWidget);
     expect(find.text('공사 장부: GitHub 보관'), findsOneWidget);
     expect(find.text('다음 허가: Command Center UI 공사'), findsOneWidget);
+    expect(find.text('Next Permit Queue'), findsOneWidget);
+    expect(find.text('1순위 · Next Permit Queue'), findsOneWidget);
+    expect(find.text('7-Profile Council Growth Plan'), findsOneWidget);
+    expect(find.text('DB Schema Blueprint · 문서 전용'), findsOneWidget);
     expect(find.text('IA1: PASS WITH GUARDS'), findsAtLeastNWidgets(1));
     expect(find.text('Council Sessions'), findsOneWidget);
     expect(find.text('Obsidian Links'), findsOneWidget);
