@@ -497,9 +497,7 @@ class _CommandSurface extends StatelessWidget {
         children: [
           const _CommandStatusStrip(),
           SizedBox(height: compact ? 10 : 12),
-          const _ConstructionStageBanner(),
-          SizedBox(height: compact ? 10 : 12),
-          const _NextPermitQueue(),
+          const _DailyHomeSurface(),
           SizedBox(height: compact ? 10 : 12),
           const _CommandSurfaceHeader(),
           SizedBox(height: compact ? 12 : 16),
@@ -516,8 +514,68 @@ class _CommandSurface extends StatelessWidget {
               },
             ),
           ),
+          SizedBox(height: compact ? 12 : 16),
+          const _ChiefGovernanceDeck(),
         ],
       ),
+    );
+  }
+}
+
+class _DailyHomeSurface extends StatelessWidget {
+  const _DailyHomeSurface();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8E8B0).withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: RynPalette.gold.withValues(alpha: 0.32)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          _MiniHeading(
+            icon: Icons.home_work_rounded,
+            title: AppText.cmdDailyHomeTitle,
+            caption: '실제 사용 화면은 오늘 이어갈 일과 승인만 먼저 보여줍니다.',
+            onDark: true,
+          ),
+          SizedBox(height: 10),
+          _StaticShellWrap(
+            items: [
+              AppText.cmdDailyHomeContinue,
+              AppText.cmdDailyHomeApprovalOnly,
+              '최근 결과는 한 줄 요약',
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ChiefGovernanceDeck extends StatelessWidget {
+  const _ChiefGovernanceDeck();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: const [
+        _MiniHeading(
+          icon: Icons.admin_panel_settings_rounded,
+          title: AppText.cmdChiefGovernanceDeck,
+          caption: '문서 ID, HOLD, 공사 표지판은 린님 Daily Home 아래의 관리/감리 영역에 둡니다.',
+          onDark: true,
+        ),
+        SizedBox(height: 10),
+        _ConstructionStageBanner(),
+        SizedBox(height: 10),
+        _NextPermitQueue(),
+      ],
     );
   }
 }
