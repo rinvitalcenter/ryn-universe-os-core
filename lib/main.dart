@@ -107,7 +107,7 @@ class StaticKanbanTask {
   final String boundary;
 }
 
-class CoreOsShell extends StatelessWidget {
+class CoreOsShell extends StatefulWidget {
   const CoreOsShell({super.key});
 
   static const navigationItems = [
@@ -170,6 +170,19 @@ class CoreOsShell extends StatelessWidget {
   ];
 
   @override
+  State<CoreOsShell> createState() => _CoreOsShellState();
+}
+
+class _CoreOsShellState extends State<CoreOsShell> {
+  String _selectedNav = AppText.navHome;
+
+  void _selectNav(String label) {
+    setState(() {
+      _selectedNav = label;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -179,14 +192,26 @@ class CoreOsShell extends StatelessWidget {
             return Container(
               color: RynPalette.ivoryCanvas,
               child: useRail
-                  ? const Row(
+                  ? Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _NavigationRailPanel(),
-                        Expanded(child: _ScrollableShellCanvas()),
+                        _NavigationRailPanel(
+                          selectedLabel: _selectedNav,
+                          onSelected: _selectNav,
+                        ),
+                        Expanded(
+                          child: _ScrollableShellCanvas(
+                            selectedLabel: _selectedNav,
+                            onNavSelected: _selectNav,
+                          ),
+                        ),
                       ],
                     )
-                  : const _ScrollableShellCanvas(showCompactNav: true),
+                  : _ScrollableShellCanvas(
+                      showCompactNav: true,
+                      selectedLabel: _selectedNav,
+                      onNavSelected: _selectNav,
+                    ),
             );
           },
         ),
@@ -196,9 +221,15 @@ class CoreOsShell extends StatelessWidget {
 }
 
 class _ScrollableShellCanvas extends StatelessWidget {
-  const _ScrollableShellCanvas({this.showCompactNav = false});
+  const _ScrollableShellCanvas({
+    this.showCompactNav = false,
+    required this.selectedLabel,
+    required this.onNavSelected,
+  });
 
   final bool showCompactNav;
+  final String selectedLabel;
+  final ValueChanged<String> onNavSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -240,23 +271,10 @@ class _ScrollableShellCanvas extends StatelessWidget {
                   : Alignment.center,
               child: SizedBox(
                 width: contentWidth,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (showCompactNav) ...[
-                      const _CompactNavigationPanel(),
-                      const SizedBox(height: 12),
-                    ],
-                    const _TopSystemBar(),
-                    const SizedBox(height: 16),
-                    const _CommandHome(),
-                    const SizedBox(height: 16),
-                    const _KanbanOrchestraLane(),
-                    const SizedBox(height: 16),
-                    const _ModuleAccessStrip(),
-                    const SizedBox(height: 14),
-                    const _PrincipleFooter(),
-                  ],
+                child: _ShellPageContent(
+                  showCompactNav: showCompactNav,
+                  selectedLabel: selectedLabel,
+                  onNavSelected: onNavSelected,
                 ),
               ),
             ),
@@ -267,8 +285,65 @@ class _ScrollableShellCanvas extends StatelessWidget {
   }
 }
 
+class _ShellPageContent extends StatelessWidget {
+  const _ShellPageContent({
+    required this.showCompactNav,
+    required this.selectedLabel,
+    required this.onNavSelected,
+  });
+
+  final bool showCompactNav;
+  final String selectedLabel;
+  final ValueChanged<String> onNavSelected;
+
+  bool get _isHome => selectedLabel == AppText.navHome;
+
+  @override
+  Widget build(BuildContext context) {
+    final body = _isHome
+        ? const <Widget>[
+            _TopSystemBar(showDailyHome: true),
+            SizedBox(height: 16),
+            _ModuleAccessStrip(),
+            SizedBox(height: 14),
+            _PrincipleFooter(),
+          ]
+        : const <Widget>[
+            _TopSystemBar(showDailyHome: false),
+            SizedBox(height: 16),
+            _CommandHome(),
+            SizedBox(height: 16),
+            _KanbanOrchestraLane(),
+            SizedBox(height: 16),
+            _ModuleAccessStrip(),
+            SizedBox(height: 14),
+            _PrincipleFooter(),
+          ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (showCompactNav) ...[
+          _CompactNavigationPanel(
+            selectedLabel: selectedLabel,
+            onSelected: onNavSelected,
+          ),
+          const SizedBox(height: 12),
+        ],
+        ...body,
+      ],
+    );
+  }
+}
+
 class _NavigationRailPanel extends StatelessWidget {
-  const _NavigationRailPanel();
+  const _NavigationRailPanel({
+    required this.selectedLabel,
+    required this.onSelected,
+  });
+
+  final String selectedLabel;
+  final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -298,7 +373,11 @@ class _NavigationRailPanel extends StatelessWidget {
               padding: EdgeInsets.zero,
               children: [
                 for (final item in CoreOsShell.navigationItems)
-                  _NavPill(item: item, active: item.label == '홈'),
+                  _NavPill(
+                    item: item,
+                    active: item.label == selectedLabel,
+                    onTap: () => onSelected(item.label),
+                  ),
               ],
             ),
           ),
@@ -313,7 +392,13 @@ class _NavigationRailPanel extends StatelessWidget {
 }
 
 class _CompactNavigationPanel extends StatelessWidget {
-  const _CompactNavigationPanel();
+  const _CompactNavigationPanel({
+    required this.selectedLabel,
+    required this.onSelected,
+  });
+
+  final String selectedLabel;
+  final ValueChanged<String> onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -323,7 +408,11 @@ class _CompactNavigationPanel extends StatelessWidget {
         runSpacing: 8,
         children: [
           for (final item in items)
-            _CompactNavChip(item: item, active: item.label == '홈'),
+            _CompactNavChip(
+              item: item,
+              active: item.label == selectedLabel,
+              onTap: () => onSelected(item.label),
+            ),
         ],
       );
     }
@@ -363,7 +452,9 @@ class _CompactNavigationPanel extends StatelessWidget {
 }
 
 class _TopSystemBar extends StatelessWidget {
-  const _TopSystemBar();
+  const _TopSystemBar({this.showDailyHome = true});
+
+  final bool showDailyHome;
 
   @override
   Widget build(BuildContext context) {
@@ -405,8 +496,10 @@ class _TopSystemBar extends StatelessWidget {
                       ),
                     SizedBox(height: veryTight ? 8 : 10),
                     const _CommandSearchPlaceholder(),
-                    SizedBox(height: veryTight ? 8 : 10),
-                    const _DailyHomeSurface(),
+                    if (showDailyHome) ...[
+                      SizedBox(height: veryTight ? 8 : 10),
+                      const _DailyHomeSurface(),
+                    ],
                   ],
                 );
               }
@@ -414,8 +507,10 @@ class _TopSystemBar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Row(children: content),
-                  const SizedBox(height: 12),
-                  const _DailyHomeSurface(),
+                  if (showDailyHome) ...[
+                    const SizedBox(height: 12),
+                    const _DailyHomeSurface(),
+                  ],
                 ],
               );
             },
@@ -3293,78 +3388,96 @@ class _OwnerChip extends StatelessWidget {
 }
 
 class _NavPill extends StatelessWidget {
-  const _NavPill({required this.item, required this.active});
+  const _NavPill({
+    required this.item,
+    required this.active,
+    required this.onTap,
+  });
   final NavItem item;
   final bool active;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
-      decoration: BoxDecoration(
-        color: active ? RynPalette.navy : Colors.transparent,
-        borderRadius: BorderRadius.circular(17),
-        border: Border.all(
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(17),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
+        decoration: BoxDecoration(
           color: active ? RynPalette.navy : Colors.transparent,
+          borderRadius: BorderRadius.circular(17),
+          border: Border.all(
+            color: active ? RynPalette.navy : Colors.transparent,
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            item.icon,
-            size: 18,
-            color: active ? RynPalette.gold : RynPalette.muted,
-          ),
-          const SizedBox(width: 9),
-          Text(
-            item.label,
-            style: TextStyle(
-              color: active ? Colors.white : RynPalette.ink,
-              fontWeight: FontWeight.w900,
-              fontSize: 13,
+        child: Row(
+          children: [
+            Icon(
+              item.icon,
+              size: 18,
+              color: active ? RynPalette.gold : RynPalette.muted,
             ),
-          ),
-        ],
+            const SizedBox(width: 9),
+            Text(
+              item.label,
+              style: TextStyle(
+                color: active ? Colors.white : RynPalette.ink,
+                fontWeight: FontWeight.w900,
+                fontSize: 13,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _CompactNavChip extends StatelessWidget {
-  const _CompactNavChip({required this.item, required this.active});
+  const _CompactNavChip({
+    required this.item,
+    required this.active,
+    required this.onTap,
+  });
   final NavItem item;
   final bool active;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(
-        color: active ? RynPalette.navy : RynPalette.ivorySoft,
-        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
-        border: Border.all(
-          color: active ? RynPalette.navy : RynPalette.ivoryLine,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: active ? RynPalette.navy : RynPalette.ivorySoft,
+          borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+          border: Border.all(
+            color: active ? RynPalette.navy : RynPalette.ivoryLine,
+          ),
         ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            item.icon,
-            size: 16,
-            color: active ? RynPalette.gold : RynPalette.muted,
-          ),
-          const SizedBox(width: 6),
-          Text(
-            item.label,
-            style: TextStyle(
-              color: active ? Colors.white : RynPalette.ink,
-              fontWeight: FontWeight.w900,
-              fontSize: 12,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              item.icon,
+              size: 16,
+              color: active ? RynPalette.gold : RynPalette.muted,
             ),
-          ),
-        ],
+            const SizedBox(width: 6),
+            Text(
+              item.label,
+              style: TextStyle(
+                color: active ? Colors.white : RynPalette.ink,
+                fontWeight: FontWeight.w900,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

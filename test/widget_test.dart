@@ -19,6 +19,14 @@ void main() {
     expect(find.text('기록'), findsAtLeastNWidgets(1));
     expect(find.text('산출'), findsAtLeastNWidgets(1));
     expect(find.text('설정'), findsAtLeastNWidgets(1));
+    expect(find.text('린님 Daily Home'), findsOneWidget);
+    expect(find.text('Command Hub'), findsOneWidget);
+    expect(find.text('Today'), findsOneWidget);
+    expect(find.text('이어가기 준비됨'), findsOneWidget);
+    expect(find.text('Chief / Governance Deck'), findsNothing);
+
+    await tester.tap(find.text('명령'));
+    await tester.pumpAndSettle();
 
     expect(find.text('AI Command Center'), findsAtLeastNWidgets(1));
     expect(find.text('Home / Command Hub'), findsOneWidget);
@@ -42,25 +50,6 @@ void main() {
     expect(find.text('Safety Status Strip'), findsOneWidget);
     expect(find.text('DB CLOSED / NO WRITE'), findsAtLeastNWidgets(1));
     expect(find.text('Gateway OFF'), findsAtLeastNWidgets(1));
-    expect(find.text('린님 Daily Home'), findsOneWidget);
-    expect(find.text('Today'), findsOneWidget);
-    expect(find.text('Ryn OS Core 홈 화면을 더 편하게 정리'), findsOneWidget);
-    expect(find.text('Pending approval'), findsOneWidget);
-    expect(find.text('지금은 승인할 위험 작업이 없어요'), findsOneWidget);
-    expect(find.text('Recent result'), findsOneWidget);
-    expect(find.text('사용자 화면을 먼저 보이게 정리'), findsOneWidget);
-    expect(find.text('Continue'), findsOneWidget);
-    expect(find.text('다음 작업 확인 준비 중'), findsOneWidget);
-    expect(find.text('이어가기 준비됨'), findsOneWidget);
-    expect(find.text('Command Hub'), findsOneWidget);
-    expect(find.text('이어서 할 작업을 고르는 곳'), findsOneWidget);
-    expect(find.text('Continue work'), findsOneWidget);
-    expect(find.text('다음 작업을 고르는 자리'), findsOneWidget);
-    expect(find.text('Approval check'), findsOneWidget);
-    expect(find.text('위험 작업은 승인 후 진행'), findsOneWidget);
-    expect(find.text('Recent output'), findsOneWidget);
-    expect(find.text('최근 결과를 짧게 확인'), findsOneWidget);
-    expect(find.text('정적 카드 shell'), findsNWidgets(3));
     expect(find.text('Chief / Governance Deck'), findsOneWidget);
     expect(find.text('Construction Stage Map'), findsOneWidget);
     expect(find.text('공사 장부: GitHub 보관'), findsOneWidget);
@@ -118,6 +107,29 @@ void main() {
     expect(find.text('자동화'), findsAtLeastNWidgets(1));
   });
 
+  testWidgets('separates 린님 Home from Dev/Governance surface', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('린님 Daily Home'), findsOneWidget);
+    expect(find.text('Command Hub'), findsOneWidget);
+    expect(find.text('Today'), findsOneWidget);
+    expect(find.text('이어가기 준비됨'), findsOneWidget);
+    expect(find.text('Chief / Governance Deck'), findsNothing);
+    expect(find.text('Safety Status Strip'), findsNothing);
+    expect(find.text('DB CLOSED / NO WRITE'), findsNothing);
+    expect(find.text('Mission Control Decision Surface'), findsNothing);
+
+    await tester.tap(find.text('명령'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('AI Command Center'), findsAtLeastNWidgets(1));
+    expect(find.text('Chief / Governance Deck'), findsOneWidget);
+    expect(find.text('Safety Status Strip'), findsOneWidget);
+  });
+
   testWidgets('renders compact 364px client layout without overflow', (
     WidgetTester tester,
   ) async {
@@ -129,6 +141,8 @@ void main() {
     });
 
     await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('명령'));
     await tester.pumpAndSettle();
 
     expect(find.text(AppText.cmdAiCommandCenter), findsAtLeastNWidgets(1));
@@ -154,6 +168,8 @@ void main() {
     });
 
     await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('명령'));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Governance / Record / Boundary'));
     await tester.pumpAndSettle();
@@ -189,6 +205,9 @@ void main() {
     });
 
     await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('명령'));
+    await tester.pumpAndSettle();
 
     await tester.ensureVisible(find.text(AppText.kanbanTitleOrchestra));
     await tester.pumpAndSettle();
