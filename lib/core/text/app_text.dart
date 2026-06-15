@@ -62,7 +62,10 @@ abstract final class AppText {
   static const cmdCommandHubContinue = 'Continue work';
   static const cmdCommandHubApproval = 'Approval check';
   static const cmdCommandHubRecent = 'Recent output';
-  static const cmdCommandHubStaticPreview = '정적 작업 카드 미리보기';
+  static const cmdCommandHubContinueBody = '다음 작업을 고르는 자리';
+  static const cmdCommandHubApprovalBody = '위험 작업은 승인 후 진행';
+  static const cmdCommandHubRecentBody = '최근 결과를 짧게 확인';
+  static const cmdCommandHubStaticPreview = '정적 카드 shell';
   static const cmdChiefGovernanceDeck = 'Chief / Governance Deck';
   static const cmdDbClosedNoWrite = 'DB CLOSED / NO WRITE';
   static const cmdSchemaHold = 'Schema HOLD';

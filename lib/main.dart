@@ -545,13 +545,117 @@ class _CommandHubScopeSurface extends StatelessWidget {
             onDark: false,
           ),
           SizedBox(height: 10),
-          _StaticShellWrap(
-            items: [
-              AppText.cmdCommandHubContinue,
-              AppText.cmdCommandHubApproval,
-              AppText.cmdCommandHubRecent,
-              AppText.cmdCommandHubStaticPreview,
+          _CommandHubCardRow(),
+        ],
+      ),
+    );
+  }
+}
+
+class _CommandHubCardRow extends StatelessWidget {
+  const _CommandHubCardRow();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: [
+        _CommandHubCardShell(
+          icon: Icons.play_circle_outline_rounded,
+          title: AppText.cmdCommandHubContinue,
+          body: AppText.cmdCommandHubContinueBody,
+        ),
+        _CommandHubCardShell(
+          icon: Icons.verified_user_outlined,
+          title: AppText.cmdCommandHubApproval,
+          body: AppText.cmdCommandHubApprovalBody,
+        ),
+        _CommandHubCardShell(
+          icon: Icons.summarize_outlined,
+          title: AppText.cmdCommandHubRecent,
+          body: AppText.cmdCommandHubRecentBody,
+        ),
+      ],
+    );
+  }
+}
+
+class _CommandHubCardShell extends StatelessWidget {
+  const _CommandHubCardShell({
+    required this.icon,
+    required this.title,
+    required this.body,
+  });
+
+  final IconData icon;
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 200,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.60),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: RynPalette.gold.withValues(alpha: 0.24)),
+        boxShadow: [
+          BoxShadow(
+            color: RynPalette.navy.withValues(alpha: 0.06),
+            blurRadius: 14,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 18, color: RynPalette.gold),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: RynPalette.ink,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 13,
+                  ),
+                ),
+              ),
             ],
+          ),
+          const SizedBox(height: 7),
+          Text(
+            body,
+            style: TextStyle(
+              color: RynPalette.muted.withValues(alpha: 0.86),
+              fontWeight: FontWeight.w800,
+              fontSize: 12,
+              height: 1.25,
+            ),
+          ),
+          const SizedBox(height: 9),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: RynPalette.deepNavy.withValues(alpha: 0.07),
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(
+                color: RynPalette.deepNavy.withValues(alpha: 0.10),
+              ),
+            ),
+            child: const Text(
+              AppText.cmdCommandHubStaticPreview,
+              style: TextStyle(
+                color: RynPalette.muted,
+                fontSize: 10.5,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
           ),
         ],
       ),
