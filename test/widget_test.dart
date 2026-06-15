@@ -52,6 +52,12 @@ void main() {
     expect(find.text('Continue'), findsOneWidget);
     expect(find.text('다음 작업 확인 준비 중'), findsOneWidget);
     expect(find.text('이어가기 준비됨'), findsOneWidget);
+    expect(find.text('Command Hub'), findsOneWidget);
+    expect(find.text('이어서 할 작업을 고르는 곳'), findsOneWidget);
+    expect(find.text('Continue work'), findsOneWidget);
+    expect(find.text('Approval check'), findsOneWidget);
+    expect(find.text('Recent output'), findsOneWidget);
+    expect(find.text('정적 작업 카드 미리보기'), findsOneWidget);
     expect(find.text('Chief / Governance Deck'), findsOneWidget);
     expect(find.text('Construction Stage Map'), findsOneWidget);
     expect(find.text('공사 장부: GitHub 보관'), findsOneWidget);

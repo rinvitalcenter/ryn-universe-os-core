@@ -57,6 +57,12 @@ abstract final class AppText {
   static const cmdDailyHomeContinueAction = '이어가기 준비됨';
   static const cmdDailyHomeContinue = '오늘 이어갈 일';
   static const cmdDailyHomeApprovalOnly = '승인 필요한 일만 보기';
+  static const cmdCommandHubTitle = 'Command Hub';
+  static const cmdCommandHubCaption = '이어서 할 작업을 고르는 곳';
+  static const cmdCommandHubContinue = 'Continue work';
+  static const cmdCommandHubApproval = 'Approval check';
+  static const cmdCommandHubRecent = 'Recent output';
+  static const cmdCommandHubStaticPreview = '정적 작업 카드 미리보기';
   static const cmdChiefGovernanceDeck = 'Chief / Governance Deck';
   static const cmdDbClosedNoWrite = 'DB CLOSED / NO WRITE';
   static const cmdSchemaHold = 'Schema HOLD';

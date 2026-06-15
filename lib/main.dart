@@ -523,6 +523,42 @@ class _CommandSurface extends StatelessWidget {
   }
 }
 
+class _CommandHubScopeSurface extends StatelessWidget {
+  const _CommandHubScopeSurface();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: RynPalette.deepNavy.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: RynPalette.gold.withValues(alpha: 0.22)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          _MiniHeading(
+            icon: Icons.dashboard_customize_rounded,
+            title: AppText.cmdCommandHubTitle,
+            caption: AppText.cmdCommandHubCaption,
+            onDark: false,
+          ),
+          SizedBox(height: 10),
+          _StaticShellWrap(
+            items: [
+              AppText.cmdCommandHubContinue,
+              AppText.cmdCommandHubApproval,
+              AppText.cmdCommandHubRecent,
+              AppText.cmdCommandHubStaticPreview,
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _DailyHomeSurface extends StatelessWidget {
   const _DailyHomeSurface();
 
@@ -544,6 +580,8 @@ class _DailyHomeSurface extends StatelessWidget {
             caption: '첫 화면은 오늘 할 일, 승인, 최근 결과, 이어가기만 보여줍니다.',
             onDark: false,
           ),
+          SizedBox(height: 10),
+          _CommandHubScopeSurface(),
           SizedBox(height: 12),
           Wrap(
             spacing: 10,
