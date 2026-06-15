@@ -568,6 +568,7 @@ class _DailyHomeSurface extends StatelessWidget {
                 icon: Icons.play_arrow_rounded,
                 title: AppText.cmdDailyHomeContinueCta,
                 body: AppText.cmdDailyHomeContinueBody,
+                actionLabel: AppText.cmdDailyHomeContinueAction,
               ),
             ],
           ),
@@ -582,11 +583,13 @@ class _DailyHomeTile extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.body,
+    this.actionLabel,
   });
 
   final IconData icon;
   final String title;
   final String body;
+  final String? actionLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -608,13 +611,43 @@ class _DailyHomeTile extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Color(0xFFF9E7B7),
-                      fontWeight: FontWeight.w900,
-                      fontSize: 14,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          title,
+                          style: const TextStyle(
+                            color: Color(0xFFF9E7B7),
+                            fontWeight: FontWeight.w900,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      if (actionLabel != null) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: RynPalette.gold.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(999),
+                            border: Border.all(
+                              color: RynPalette.gold.withValues(alpha: 0.42),
+                            ),
+                          ),
+                          child: Text(
+                            actionLabel!,
+                            style: const TextStyle(
+                              color: Color(0xFFF9E7B7),
+                              fontWeight: FontWeight.w900,
+                              fontSize: 10.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: 5),
                   Text(

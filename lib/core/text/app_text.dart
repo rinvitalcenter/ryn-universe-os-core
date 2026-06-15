@@ -53,7 +53,8 @@ abstract final class AppText {
   static const cmdDailyHomeRecent = 'Recent result';
   static const cmdDailyHomeRecentBody = '사용자 화면을 먼저 보이게 정리';
   static const cmdDailyHomeContinueCta = 'Continue';
-  static const cmdDailyHomeContinueBody = '다음 작업을 한 카드에서 이어가기';
+  static const cmdDailyHomeContinueBody = '다음 작업 확인 준비 중';
+  static const cmdDailyHomeContinueAction = '이어가기 준비됨';
   static const cmdDailyHomeContinue = '오늘 이어갈 일';
   static const cmdDailyHomeApprovalOnly = '승인 필요한 일만 보기';
   static const cmdChiefGovernanceDeck = 'Chief / Governance Deck';

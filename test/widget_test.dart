@@ -50,7 +50,8 @@ void main() {
     expect(find.text('Recent result'), findsOneWidget);
     expect(find.text('사용자 화면을 먼저 보이게 정리'), findsOneWidget);
     expect(find.text('Continue'), findsOneWidget);
-    expect(find.text('다음 작업을 한 카드에서 이어가기'), findsOneWidget);
+    expect(find.text('다음 작업 확인 준비 중'), findsOneWidget);
+    expect(find.text('이어가기 준비됨'), findsOneWidget);
     expect(find.text('Chief / Governance Deck'), findsOneWidget);
     expect(find.text('Construction Stage Map'), findsOneWidget);
     expect(find.text('공사 장부: GitHub 보관'), findsOneWidget);
