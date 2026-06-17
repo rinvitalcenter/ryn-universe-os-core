@@ -19,10 +19,21 @@ void main() {
     expect(find.text('기록'), findsAtLeastNWidgets(1));
     expect(find.text('산출'), findsAtLeastNWidgets(1));
     expect(find.text('설정'), findsAtLeastNWidgets(1));
-    expect(find.text('린님 Daily Home'), findsOneWidget);
-    expect(find.text('Command Hub'), findsOneWidget);
-    expect(find.text('Today'), findsOneWidget);
-    expect(find.text('이어가기 준비됨'), findsOneWidget);
+    expect(find.text(AppText.premiumHomeTitle), findsOneWidget);
+    expect(find.text(AppText.missionCommandTitle), findsOneWidget);
+    expect(find.text(AppText.missionCommandSearch), findsOneWidget);
+    expect(find.text('AI Command Center'), findsAtLeastNWidgets(1));
+    expect(find.text(AppText.missionCommandOverview), findsOneWidget);
+    expect(find.text(AppText.missionCommandSelectedMission), findsOneWidget);
+    expect(find.text(AppText.missionCommandSelectedTitle), findsOneWidget);
+    expect(find.text(AppText.missionCommandProgress), findsOneWidget);
+    expect(find.text(AppText.missionCommandStaticNote), findsOneWidget);
+    expect(find.text('AI 모델 운영'), findsAtLeastNWidgets(1));
+    expect(find.text('Command Hub'), findsNothing);
+    expect(find.text('Today'), findsNothing);
+    expect(find.text('작업 시작'), findsNothing);
+    expect(find.text('실행하기'), findsNothing);
+    expect(find.text('승인하기'), findsNothing);
     expect(find.text('Chief / Governance Deck'), findsNothing);
 
     await tester.tap(find.text('명령'));
@@ -113,10 +124,21 @@ void main() {
     await tester.pumpWidget(const RynUniverseApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('린님 Daily Home'), findsOneWidget);
-    expect(find.text('Command Hub'), findsOneWidget);
-    expect(find.text('Today'), findsOneWidget);
-    expect(find.text('이어가기 준비됨'), findsOneWidget);
+    expect(find.text(AppText.premiumHomeTitle), findsOneWidget);
+    expect(find.text(AppText.missionCommandTitle), findsOneWidget);
+    expect(find.text(AppText.missionCommandSearch), findsOneWidget);
+    expect(find.text('AI Command Center'), findsAtLeastNWidgets(1));
+    expect(find.text(AppText.missionCommandOverview), findsOneWidget);
+    expect(find.text(AppText.missionCommandSelectedMission), findsOneWidget);
+    expect(find.text(AppText.missionCommandSelectedTitle), findsOneWidget);
+    expect(find.text(AppText.missionCommandProgress), findsOneWidget);
+    expect(find.text(AppText.missionCommandStaticNote), findsOneWidget);
+    expect(find.text('AI 모델 운영'), findsAtLeastNWidgets(1));
+    expect(find.text('Command Hub'), findsNothing);
+    expect(find.text('Today'), findsNothing);
+    expect(find.text('작업 시작'), findsNothing);
+    expect(find.text('실행하기'), findsNothing);
+    expect(find.text('승인하기'), findsNothing);
     expect(find.text('Chief / Governance Deck'), findsNothing);
     expect(find.text('Safety Status Strip'), findsNothing);
     expect(find.text('DB CLOSED / NO WRITE'), findsNothing);
@@ -157,42 +179,34 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('keeps desktop capture content inside 1280 capture area', (
-    WidgetTester tester,
-  ) async {
-    tester.view.physicalSize = const Size(1500, 900);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(() {
-      tester.view.resetPhysicalSize();
-      tester.view.resetDevicePixelRatio();
-    });
+  testWidgets(
+    'expands Home canvas on large desktop instead of 1280-style cap',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(2400, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
 
-    await tester.pumpWidget(const RynUniverseApp());
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('명령'));
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('Governance / Record / Boundary'));
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(const RynUniverseApp());
+      await tester.pumpAndSettle();
 
-    final commandSurfaceRect = tester.getRect(
-      find
-          .byWidgetPredicate(
-            (widget) => widget.runtimeType.toString() == '_CommandSurface',
-          )
-          .first,
-    );
-    final governanceSurfaceRect = tester.getRect(
-      find
-          .byWidgetPredicate(
-            (widget) => widget.runtimeType.toString() == '_GovernanceSurface',
-          )
-          .first,
-    );
+      final premiumCommandRect = tester.getRect(
+        find
+            .byWidgetPredicate(
+              (widget) =>
+                  widget.runtimeType.toString() == '_PremiumHomeCommandCenter',
+            )
+            .first,
+      );
 
-    expect(commandSurfaceRect.right, lessThanOrEqualTo(1280));
-    expect(governanceSurfaceRect.right, lessThanOrEqualTo(1280));
-    expect(tester.takeException(), isNull);
-  });
+      expect(premiumCommandRect.width, greaterThan(1120));
+      expect(premiumCommandRect.right, lessThanOrEqualTo(2400));
+      expect(find.text('AI Command Center'), findsAtLeastNWidgets(1));
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('selects a static Kanban card and shows inspection-only detail', (
     WidgetTester tester,

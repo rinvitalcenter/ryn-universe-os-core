@@ -57,7 +57,7 @@ class RynPalette {
 class RynMetrics {
   const RynMetrics._();
 
-  static const maxWidth = 1120.0;
+  static const maxWidth = 3200.0;
   static const radiusShell = 32.0;
   static const radiusCard = 24.0;
   static const radiusSoft = 18.0;
@@ -188,7 +188,7 @@ class _CoreOsShellState extends State<CoreOsShell> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final useRail = constraints.maxWidth >= 2200;
+            final useRail = constraints.maxWidth >= 1600;
             return Container(
               color: RynPalette.ivoryCanvas,
               child: useRail
@@ -242,21 +242,17 @@ class _ScrollableShellCanvas extends StatelessWidget {
             : width < 720
             ? 12.0
             : 20.0;
-        // Windows runtime screenshots at 390px still lose practical edge room
-        // to the native frame/capture boundary. Keep the ultra-compact shell
-        // intentionally narrower than the reported Flutter max width so the
-        // premium command surface stays fully inside the visible client area.
+        // Keep only the ultra-compact diagnostic guard narrow. Desktop is
+        // Windows-first and should expand like a real OS workspace instead of
+        // preserving the older screenshot/mobile-style 900~1120px cap.
         final railMode = !showCompactNav;
-        final railCaptureGuard = railMode && width < 1400;
-        final desktopCaptureGuard =
-            showCompactNav && width >= 1200 && width < 2200;
         final maxContentWidth = ultraCompact
             ? 260.0
-            : desktopCaptureGuard
+            : railMode
+            ? (width < 2200 ? 1180.0 : RynMetrics.maxWidth)
+            : width < 1200
             ? 900.0
-            : railCaptureGuard
-            ? 1060.0
-            : RynMetrics.maxWidth;
+            : 1240.0;
         final runtimeEdgeReserve = ultraCompact ? 64.0 : 0.0;
         final contentWidth = math.max(
           0.0,
@@ -266,9 +262,7 @@ class _ScrollableShellCanvas extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.fromLTRB(padding, 16, padding, 28),
             child: Align(
-              alignment: railMode || desktopCaptureGuard
-                  ? Alignment.centerLeft
-                  : Alignment.center,
+              alignment: railMode ? Alignment.centerLeft : Alignment.center,
               child: SizedBox(
                 width: contentWidth,
                 child: _ShellPageContent(
@@ -302,9 +296,9 @@ class _ShellPageContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final body = _isHome
         ? const <Widget>[
-            _TopSystemBar(showDailyHome: true),
-            SizedBox(height: 16),
-            _ModuleAccessStrip(),
+            _TopSystemBar(showDailyHome: false, compactHome: true),
+            SizedBox(height: 10),
+            _PremiumHomeShell(),
             SizedBox(height: 14),
             _PrincipleFooter(),
           ]
@@ -404,8 +398,8 @@ class _CompactNavigationPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget navWrap(Iterable<NavItem> items) {
       return Wrap(
-        spacing: 7,
-        runSpacing: 8,
+        spacing: 6,
+        runSpacing: 6,
         children: [
           for (final item in items)
             _CompactNavChip(
@@ -424,25 +418,16 @@ class _CompactNavigationPanel extends StatelessWidget {
         final secondLine = CoreOsShell.navigationItems.skip(4);
 
         return _LightCard(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (twoLine) ...[
                 navWrap(firstLine),
-                const SizedBox(height: 8),
+                const SizedBox(height: 6),
                 navWrap(secondLine),
               ] else
                 navWrap(CoreOsShell.navigationItems),
-              const SizedBox(height: 8),
-              const Text(
-                '모든 OS 메뉴는 위 칩에서 접근합니다.',
-                style: TextStyle(
-                  color: RynPalette.muted,
-                  fontSize: 10.5,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
             ],
           ),
         );
@@ -452,9 +437,10 @@ class _CompactNavigationPanel extends StatelessWidget {
 }
 
 class _TopSystemBar extends StatelessWidget {
-  const _TopSystemBar({this.showDailyHome = true});
+  const _TopSystemBar({this.showDailyHome = true, this.compactHome = false});
 
   final bool showDailyHome;
+  final bool compactHome;
 
   @override
   Widget build(BuildContext context) {
@@ -462,7 +448,9 @@ class _TopSystemBar extends StatelessWidget {
       builder: (context, outerConstraints) {
         final ultraCompact = outerConstraints.maxWidth < 360;
         return _LightCard(
-          padding: ultraCompact
+          padding: compactHome
+              ? const EdgeInsets.fromLTRB(12, 8, 12, 8)
+              : ultraCompact
               ? const EdgeInsets.fromLTRB(12, 12, 12, 12)
               : const EdgeInsets.fromLTRB(16, 14, 16, 14),
           child: LayoutBuilder(
@@ -470,10 +458,18 @@ class _TopSystemBar extends StatelessWidget {
               final tight = constraints.maxWidth < 1240;
               final veryTight = constraints.maxWidth < 360;
               final content = [
-                const _BrandBlock(),
-                if (!tight) const SizedBox(width: 16),
-                if (!tight) const Expanded(child: _CommandSearchPlaceholder()),
-                if (!tight) const SizedBox(width: 12),
+                SizedBox(
+                  width: compactHome ? 240 : 300,
+                  child: compactHome
+                      ? const _BrandBlock(compact: true)
+                      : const _BrandBlock(),
+                ),
+                if (!tight) SizedBox(width: compactHome ? 12 : 16),
+                if (!tight)
+                  Expanded(
+                    child: _CommandSearchPlaceholder(compact: compactHome),
+                  ),
+                if (!tight) SizedBox(width: compactHome ? 10 : 12),
                 const _OwnerChip(),
               ];
               if (tight) {
@@ -494,8 +490,8 @@ class _TopSystemBar extends StatelessWidget {
                           _OwnerChip(),
                         ],
                       ),
-                    SizedBox(height: veryTight ? 8 : 10),
-                    const _CommandSearchPlaceholder(),
+                    SizedBox(height: compactHome ? 6 : (veryTight ? 8 : 10)),
+                    _CommandSearchPlaceholder(compact: compactHome),
                     if (showDailyHome) ...[
                       SizedBox(height: veryTight ? 8 : 10),
                       const _DailyHomeSurface(),
@@ -753,6 +749,711 @@ class _CommandHubCardShell extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _PremiumHomeShell extends StatelessWidget {
+  const _PremiumHomeShell();
+
+  @override
+  Widget build(BuildContext context) {
+    return _LightCard(
+      padding: const EdgeInsets.all(12),
+      child: const _PremiumHomeCommandCenter(),
+    );
+  }
+}
+
+class _PremiumHomeCommandCenter extends StatelessWidget {
+  const _PremiumHomeCommandCenter();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 760;
+        final medium = constraints.maxWidth < 1240;
+        final orbit = _MissionOrbitMap(compact: compact);
+        return Container(
+          padding: EdgeInsets.fromLTRB(
+            compact ? 14 : 18,
+            compact ? 14 : 16,
+            compact ? 14 : 18,
+            compact ? 14 : 16,
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(32),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Color(0xFF070D1B),
+                RynPalette.deepNavy,
+                Color(0xFF182238),
+              ],
+            ),
+            border: Border.all(color: RynPalette.gold.withValues(alpha: 0.36)),
+            boxShadow: [
+              BoxShadow(
+                color: RynPalette.navy.withValues(alpha: 0.28),
+                blurRadius: 34,
+                offset: const Offset(0, 22),
+              ),
+              BoxShadow(
+                color: RynPalette.gold.withValues(alpha: 0.08),
+                blurRadius: 42,
+                offset: const Offset(0, -10),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const _MissionCommandHeader(),
+              SizedBox(height: compact ? 14 : 16),
+              if (compact)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    orbit,
+                    const SizedBox(height: 12),
+                    const _MissionOverviewPanel(),
+                    const SizedBox(height: 12),
+                    const _MissionFocusPanel(),
+                  ],
+                )
+              else if (medium)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const _MissionFocusPanel(),
+                    const SizedBox(height: 12),
+                    const _MissionOverviewPanel(),
+                    const SizedBox(height: 14),
+                    orbit,
+                  ],
+                )
+              else
+                SizedBox(
+                  height: 410,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(
+                        width: 172,
+                        child: _MissionOverviewPanel(),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(child: orbit),
+                      const SizedBox(width: 16),
+                      const SizedBox(width: 272, child: _MissionFocusPanel()),
+                    ],
+                  ),
+                ),
+              const SizedBox(height: 12),
+              const _InlineMissionLanePreview(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _MissionCommandHeader extends StatelessWidget {
+  const _MissionCommandHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final tight = constraints.maxWidth < 760;
+        final title = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const _DarkPill(
+              icon: Icons.radar_rounded,
+              text: AppText.premiumHomeTitle,
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              AppText.missionCommandTitle,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 25,
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.8,
+              ),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              AppText.premiumHomeCaption,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.68),
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                height: 1.25,
+              ),
+            ),
+          ],
+        );
+        final search = const _MissionSearchPill();
+        final actions = const Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            _ReadinessChip(text: AppText.missionCommandGovernanceButton),
+            _ReadinessChip(text: AppText.missionCommandExecuteReady),
+          ],
+        );
+        if (tight) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              title,
+              const SizedBox(height: 10),
+              search,
+              const SizedBox(height: 10),
+              actions,
+            ],
+          );
+        }
+        return Row(
+          children: [
+            SizedBox(width: 220, child: title),
+            const SizedBox(width: 16),
+            Expanded(child: search),
+            const SizedBox(width: 12),
+            actions,
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _MissionSearchPill extends StatelessWidget {
+  const _MissionSearchPill();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 42,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+      ),
+      child: Row(
+        children: [
+          Text(
+            AppText.missionCommandSearch,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.62),
+              fontSize: 12.5,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const Spacer(),
+          Icon(
+            Icons.search_rounded,
+            color: Colors.white.withValues(alpha: 0.62),
+            size: 18,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MissionOverviewPanel extends StatelessWidget {
+  const _MissionOverviewPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    const stats = [
+      (AppText.missionCommandActive, '28', RynTokens.coreCyan),
+      (AppText.missionCommandWaiting, '14', Color(0xFF94A3B8)),
+      (AppText.missionCommandDone, '127', RynPalette.gold),
+      (AppText.missionCommandReliability, '96.4%', Colors.white),
+    ];
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            AppText.missionCommandOverview,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 12),
+          for (final stat in stats) ...[
+            _MissionStatLine(label: stat.$1, value: stat.$2, color: stat.$3),
+            const SizedBox(height: 10),
+          ],
+          const SizedBox(height: 2),
+          Text(
+            AppText.missionCommandLoad,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.58),
+              fontSize: 10.5,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: const LinearProgressIndicator(
+              value: 0.42,
+              minHeight: 5,
+              color: RynTokens.coreCyan,
+              backgroundColor: Color(0x2238BDF8),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            '-3.2%',
+            style: TextStyle(
+              color: Color(0xFF5EEAD4),
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MissionStatLine extends StatelessWidget {
+  const _MissionStatLine({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  final String label;
+  final String value;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.58),
+            fontSize: 10.5,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          value,
+          style: TextStyle(
+            color: color,
+            fontSize: 20,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.4,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MissionOrbitMap extends StatelessWidget {
+  const _MissionOrbitMap({required this.compact});
+
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final height = compact ? 300.0 : 410.0;
+    final nodes = [
+      (
+        Alignment.topCenter,
+        Icons.smart_toy_rounded,
+        'AI 모델 운영',
+        RynTokens.coreViolet,
+      ),
+      (
+        Alignment.centerRight,
+        Icons.menu_book_rounded,
+        '지식 관리',
+        RynTokens.coreBlue,
+      ),
+      (
+        Alignment.bottomRight,
+        Icons.inventory_2_rounded,
+        '인프라 운영',
+        RynTokens.coreCyan,
+      ),
+      (
+        Alignment.bottomLeft,
+        Icons.shield_rounded,
+        '보안 & 컴플라이언스',
+        RynTokens.coreViolet,
+      ),
+      (
+        Alignment.centerLeft,
+        Icons.storage_rounded,
+        '데이터 파이프라인',
+        RynTokens.coreCyan,
+      ),
+    ];
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(26),
+        gradient: RadialGradient(
+          center: Alignment.center,
+          radius: 0.86,
+          colors: [
+            RynTokens.coreBlue.withValues(alpha: 0.22),
+            Colors.white.withValues(alpha: 0.035),
+            Colors.transparent,
+          ],
+        ),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+      ),
+      child: Stack(
+        children: [
+          Positioned.fill(child: CustomPaint(painter: _MissionOrbitPainter())),
+          Align(
+            alignment: Alignment.center,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _CentralCommandOrb(
+                  compact: true,
+                  compactSize: compact ? 152 : 190,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  AppText.cmdAiCommandCenter,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          for (final node in nodes)
+            Align(
+              alignment: node.$1,
+              child: Padding(
+                padding: EdgeInsets.all(compact ? 18 : 26),
+                child: _MissionDomainNode(
+                  icon: node.$2,
+                  label: node.$3,
+                  color: node.$4,
+                  compact: compact,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MissionDomainNode extends StatelessWidget {
+  const _MissionDomainNode({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.compact,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color color;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 8 : 10,
+        vertical: compact ? 6 : 8,
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xFF081426).withValues(alpha: 0.86),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: color.withValues(alpha: 0.6)),
+        boxShadow: [
+          BoxShadow(color: color.withValues(alpha: 0.18), blurRadius: 18),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: compact ? 14 : 16),
+          if (!compact) ...[
+            const SizedBox(width: 7),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _MissionOrbitPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final orbitPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1
+      ..color = RynPalette.gold.withValues(alpha: 0.24);
+    final linePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.8
+      ..color = RynPalette.gold.withValues(alpha: 0.18);
+    for (final scale in [0.34, 0.52, 0.70, 0.86]) {
+      canvas.drawOval(
+        Rect.fromCenter(
+          center: center,
+          width: size.width * scale,
+          height: size.height * scale * 0.58,
+        ),
+        orbitPaint,
+      );
+    }
+    canvas.drawLine(
+      Offset(center.dx, 34),
+      Offset(center.dx, size.height - 34),
+      linePaint,
+    );
+    canvas.drawLine(
+      Offset(42, center.dy),
+      Offset(size.width - 42, center.dy),
+      linePaint,
+    );
+    canvas.drawLine(
+      Offset(78, 62),
+      Offset(size.width - 78, size.height - 62),
+      linePaint,
+    );
+    canvas.drawLine(
+      Offset(size.width - 78, 62),
+      Offset(78, size.height - 62),
+      linePaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _MissionFocusPanel extends StatelessWidget {
+  const _MissionFocusPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Expanded(
+                child: Text(
+                  AppText.missionCommandSelectedMission,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.close_rounded,
+                color: Colors.white.withValues(alpha: 0.42),
+                size: 16,
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            AppText.missionCommandMissionId,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.62),
+              fontSize: 11,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 6),
+          const Text(
+            AppText.missionCommandSelectedTitle,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 17,
+              fontWeight: FontWeight.w900,
+              height: 1.18,
+            ),
+          ),
+          const SizedBox(height: 8),
+          const _StaticShellChip(text: AppText.missionCommandSelectedTag),
+          const SizedBox(height: 14),
+          Text(
+            AppText.premiumHomeCommandBody,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.68),
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              height: 1.32,
+            ),
+          ),
+          const SizedBox(height: 14),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: const LinearProgressIndicator(
+              value: 0.5,
+              minHeight: 6,
+              color: RynTokens.coreBlue,
+              backgroundColor: Color(0x223B82F6),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            AppText.missionCommandProgress,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 11,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 12),
+          const _ReadinessChip(text: AppText.missionCommandNextStep),
+          const SizedBox(height: 8),
+          Text(
+            AppText.missionCommandStaticNote,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.46),
+              fontSize: 10.5,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InlineMissionLanePreview extends StatelessWidget {
+  const _InlineMissionLanePreview();
+
+  @override
+  Widget build(BuildContext context) {
+    const lanes = [
+      ('대기', '14', Color(0xFFCBD5E1)),
+      ('진행', '8', RynTokens.coreBlue),
+      ('검토', '5', RynPalette.gold),
+      ('완료', '127', Color(0xFF86EFAC)),
+    ];
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final lane in lanes)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.07),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: lane.$3.withValues(alpha: 0.34)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 6,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: lane.$3,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  lane.$1,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  lane.$2,
+                  style: TextStyle(
+                    color: lane.$3,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _ReadinessChip extends StatelessWidget {
+  const _ReadinessChip({required this.text});
+  final String text;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+      decoration: BoxDecoration(
+        color: RynPalette.gold.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        border: Border.all(color: RynPalette.gold.withValues(alpha: 0.44)),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Color(0xFFF9E7B7),
+          fontSize: 10.5,
+          fontWeight: FontWeight.w900,
+        ),
       ),
     );
   }
@@ -2759,7 +3460,7 @@ class _KanbanSignalPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
       decoration: BoxDecoration(
         color: RynPalette.goldSoft,
         borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
@@ -3270,29 +3971,38 @@ class _BrandBlock extends StatelessWidget {
 }
 
 class _CommandSearchPlaceholder extends StatelessWidget {
-  const _CommandSearchPlaceholder();
+  const _CommandSearchPlaceholder({this.compact = false});
+
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: const BoxConstraints(minHeight: 42),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      constraints: BoxConstraints(minHeight: compact ? 34 : 42),
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 12 : 14,
+        vertical: compact ? 7 : 10,
+      ),
       decoration: BoxDecoration(
         color: RynPalette.ivorySoft,
         borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
         border: Border.all(color: RynPalette.ivoryLine),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Icon(Icons.search_rounded, size: 18, color: RynPalette.muted),
-          SizedBox(width: 8),
+          Icon(
+            Icons.search_rounded,
+            size: compact ? 16 : 18,
+            color: RynPalette.muted,
+          ),
+          const SizedBox(width: 8),
           Expanded(
             child: Text(
               '검색 / 명령 / 흐름 / 기록...',
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: RynPalette.muted,
-                fontSize: 13,
+                fontSize: compact ? 12 : 13,
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -3464,7 +4174,7 @@ class _CompactNavChip extends StatelessWidget {
           children: [
             Icon(
               item.icon,
-              size: 16,
+              size: 14,
               color: active ? RynPalette.gold : RynPalette.muted,
             ),
             const SizedBox(width: 6),
@@ -3473,7 +4183,7 @@ class _CompactNavChip extends StatelessWidget {
               style: TextStyle(
                 color: active ? Colors.white : RynPalette.ink,
                 fontWeight: FontWeight.w900,
-                fontSize: 12,
+                fontSize: 11,
               ),
             ),
           ],
