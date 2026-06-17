@@ -64,6 +64,29 @@ class RynMetrics {
   static const radiusPill = 999.0;
 }
 
+class RynFonts {
+  const RynFonts._();
+
+  // Local preview only: these are system-installed family references on
+  // 린님's PC. No Apple font files are copied into the repo or bundled.
+  static const display = 'SF Pro Display';
+  static const text = 'SF Pro Text';
+  static const rounded = 'SF Pro Rounded';
+  static const displayFallback = <String>[
+    'SF Pro',
+    'Segoe UI Variable Display',
+    'Segoe UI Variable',
+    'Segoe UI',
+  ];
+  static const textFallback = <String>[
+    'SF Pro',
+    'Segoe UI Variable Text',
+    'Segoe UI Variable',
+    'Segoe UI',
+    'Malgun Gothic',
+  ];
+}
+
 class NavItem {
   const NavItem(this.label, this.icon);
   final String label;
@@ -244,10 +267,15 @@ class _ScrollableShellCanvas extends StatelessWidget {
             : 20.0;
         // Keep only the ultra-compact diagnostic guard narrow. Desktop is
         // Windows-first and should expand like a real OS workspace instead of
-        // preserving the older screenshot/mobile-style 900~1120px cap.
+        // preserving the older screenshot/mobile-style 900~1120px cap. The
+        // 린님-facing Home still gets a small right-edge reserve so screenshots
+        // show the full command-center shell instead of cropping the edge.
         final railMode = !showCompactNav;
+        final homeMode = selectedLabel == AppText.navHome;
         final maxContentWidth = ultraCompact
             ? 260.0
+            : railMode && homeMode
+            ? 640.0
             : railMode
             ? (width < 2200 ? 1180.0 : RynMetrics.maxWidth)
             : width < 1200
@@ -808,53 +836,59 @@ class _PremiumHomeCommandCenter extends StatelessWidget {
               ),
             ],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const _MissionCommandHeader(),
-              SizedBox(height: compact ? 14 : 16),
-              if (compact)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    orbit,
-                    const SizedBox(height: 12),
-                    const _MissionOverviewPanel(),
-                    const SizedBox(height: 12),
-                    const _MissionFocusPanel(),
-                  ],
-                )
-              else if (medium)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const _MissionFocusPanel(),
-                    const SizedBox(height: 12),
-                    const _MissionOverviewPanel(),
-                    const SizedBox(height: 14),
-                    orbit,
-                  ],
-                )
-              else
-                SizedBox(
-                  height: 410,
-                  child: Row(
+          child: DefaultTextStyle.merge(
+            style: const TextStyle(
+              fontFamily: RynFonts.text,
+              fontFamilyFallback: RynFonts.textFallback,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const _MissionCommandHeader(),
+                SizedBox(height: compact ? 14 : 16),
+                if (compact)
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const SizedBox(
-                        width: 172,
-                        child: _MissionOverviewPanel(),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(child: orbit),
-                      const SizedBox(width: 16),
-                      const SizedBox(width: 272, child: _MissionFocusPanel()),
+                      orbit,
+                      const SizedBox(height: 12),
+                      const _MissionOverviewPanel(),
+                      const SizedBox(height: 12),
+                      const _MissionFocusPanel(),
                     ],
+                  )
+                else if (medium)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const _MissionFocusPanel(),
+                      const SizedBox(height: 12),
+                      const _MissionOverviewPanel(),
+                      const SizedBox(height: 14),
+                      orbit,
+                    ],
+                  )
+                else
+                  SizedBox(
+                    height: 410,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(width: 360, child: _MissionFocusPanel()),
+                        const SizedBox(width: 16),
+                        Expanded(child: orbit),
+                        const SizedBox(width: 16),
+                        const SizedBox(
+                          width: 190,
+                          child: _MissionOverviewPanel(),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              const SizedBox(height: 12),
-              const _InlineMissionLanePreview(),
-            ],
+                const SizedBox(height: 12),
+                const _InlineMissionLanePreview(),
+              ],
+            ),
           ),
         );
       },
@@ -869,7 +903,7 @@ class _MissionCommandHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final tight = constraints.maxWidth < 760;
+        final tight = constraints.maxWidth < 1100;
         final title = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
@@ -882,6 +916,8 @@ class _MissionCommandHeader extends StatelessWidget {
             const Text(
               AppText.missionCommandTitle,
               style: TextStyle(
+                fontFamily: RynFonts.display,
+                fontFamilyFallback: RynFonts.displayFallback,
                 color: Colors.white,
                 fontSize: 25,
                 fontWeight: FontWeight.w900,
@@ -952,15 +988,19 @@ class _MissionSearchPill extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Text(
-            AppText.missionCommandSearch,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.62),
-              fontSize: 12.5,
-              fontWeight: FontWeight.w800,
+          Expanded(
+            child: Text(
+              AppText.missionCommandSearch,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.62),
+                fontSize: 12.5,
+                fontWeight: FontWeight.w800,
+              ),
             ),
           ),
-          const Spacer(),
+          const SizedBox(width: 8),
           Icon(
             Icons.search_rounded,
             color: Colors.white.withValues(alpha: 0.62),
@@ -1280,93 +1320,126 @@ class _MissionFocusPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: 0.15),
+            RynTokens.coreBlue.withValues(alpha: 0.12),
+            Colors.white.withValues(alpha: 0.055),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+        boxShadow: [
+          BoxShadow(
+            color: RynTokens.coreBlue.withValues(alpha: 0.16),
+            blurRadius: 32,
+            offset: const Offset(0, 18),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const Expanded(
-                child: Text(
-                  AppText.missionCommandSelectedMission,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-              Icon(
-                Icons.close_rounded,
-                color: Colors.white.withValues(alpha: 0.42),
-                size: 16,
-              ),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: const [
+              _StaticShellChip(text: AppText.missionCommandSelectedMission),
+              _StaticShellChip(text: AppText.missionCommandSelectedTag),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 18),
           Text(
             AppText.missionCommandMissionId,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.62),
+              color: Colors.white.withValues(alpha: 0.58),
               fontSize: 11,
               fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            AppText.missionCommandSelectedTitle,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 17,
-              fontWeight: FontWeight.w900,
-              height: 1.18,
+              letterSpacing: 0.2,
             ),
           ),
           const SizedBox(height: 8),
-          const _StaticShellChip(text: AppText.missionCommandSelectedTag),
-          const SizedBox(height: 14),
+          const Text(
+            AppText.missionCommandSelectedTitle,
+            style: TextStyle(
+              fontFamily: RynFonts.display,
+              fontFamilyFallback: RynFonts.displayFallback,
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.w900,
+              height: 1.08,
+              letterSpacing: -0.9,
+            ),
+          ),
+          const SizedBox(height: 12),
           Text(
             AppText.premiumHomeCommandBody,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.68),
-              fontSize: 12,
+              color: Colors.white.withValues(alpha: 0.72),
+              fontSize: 13,
               fontWeight: FontWeight.w700,
-              height: 1.32,
+              height: 1.38,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 18),
           ClipRRect(
             borderRadius: BorderRadius.circular(999),
             child: const LinearProgressIndicator(
               value: 0.5,
-              minHeight: 6,
+              minHeight: 7,
               color: RynTokens.coreBlue,
               backgroundColor: Color(0x223B82F6),
             ),
           ),
-          const SizedBox(height: 8),
-          const Text(
-            AppText.missionCommandProgress,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 11,
-              fontWeight: FontWeight.w900,
-            ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 10,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              const Text(
+                AppText.missionCommandProgress,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              Text(
+                AppText.missionCommandStaticNote,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.50),
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          const _ReadinessChip(text: AppText.missionCommandNextStep),
-          const SizedBox(height: 8),
-          Text(
-            AppText.missionCommandStaticNote,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.46),
-              fontSize: 10.5,
-              fontWeight: FontWeight.w800,
+          const SizedBox(height: 14),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: RynPalette.gold.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: RynPalette.gold.withValues(alpha: 0.38),
+              ),
+            ),
+            child: const Text(
+              AppText.missionCommandNextStep,
+              style: TextStyle(
+                fontFamily: RynFonts.rounded,
+                fontFamilyFallback: RynFonts.textFallback,
+                color: Color(0xFFF9E7B7),
+                fontSize: 12,
+                fontWeight: FontWeight.w900,
+                height: 1.2,
+              ),
             ),
           ),
         ],

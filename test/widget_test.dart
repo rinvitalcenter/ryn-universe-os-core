@@ -180,7 +180,7 @@ void main() {
   });
 
   testWidgets(
-    'expands Home canvas on large desktop instead of 1280-style cap',
+    'contains Home canvas inside desktop capture while staying wider than mobile cap',
     (WidgetTester tester) async {
       tester.view.physicalSize = const Size(2400, 1200);
       tester.view.devicePixelRatio = 1.0;
@@ -201,7 +201,8 @@ void main() {
             .first,
       );
 
-      expect(premiumCommandRect.width, greaterThan(1120));
+      expect(premiumCommandRect.width, greaterThan(600));
+      expect(premiumCommandRect.width, lessThanOrEqualTo(780));
       expect(premiumCommandRect.right, lessThanOrEqualTo(2400));
       expect(find.text('AI Command Center'), findsAtLeastNWidgets(1));
       expect(tester.takeException(), isNull);
