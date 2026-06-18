@@ -5,6 +5,7 @@
 abstract final class AppText {
   // Navigation
   static const navHome = '홈';
+  static const navStudy = '스터디';
   static const navCommand = '명령';
   static const navControl = '관제';
   static const navFlow = '흐름';
@@ -127,6 +128,34 @@ abstract final class AppText {
   static const recordObsidian = 'Obsidian';
   static const approvalGate = 'Approval Gate';
   static const boundarySignal = 'Boundary Signal';
+
+  // Ryn Study OS 2.0 shell
+  static const studyOsTitle = 'Ryn Study OS 2.0';
+  static const studyOsCaption = '스터디 운영을 준비하고 기록하는 첫 실사용 모듈';
+  static const studyOsStaticShellMarker = '정적 화면 shell';
+  static const studyOsNoRuntimeDb = 'DB 연결 없음';
+  static const studyOsNoCrud = '저장/수정 없음';
+  static const studyScreenHome = '스터디 홈';
+  static const studyScreenSessions = '스터디';
+  static const studyScreenSessionDetail = '세션 상세';
+  static const studyScreenMembers = '회원';
+  static const studyScreenAttendance = '출석';
+  static const studyScreenMaterials = '자료';
+  static const studyScreenJournal = '기록';
+  static const studyScreenReports = '리포트';
+  static const studyScreenSettings = '설정';
+  static const studyHomeHelper = '오늘 준비할 스터디 흐름을 한곳에서 확인합니다.';
+  static const studySessionsHelper = '계획된 세션과 진행 상태를 확인하는 자리입니다.';
+  static const studySessionDetailHelper = '세션 목적, 준비 항목, 연결 자료를 보여주는 화면입니다.';
+  static const studyMembersHelper = '스터디 참여자 목록과 기본 상태를 확인합니다.';
+  static const studyAttendanceHelper = '세션 전 출석 준비와 당일 확인 흐름을 정리합니다.';
+  static const studyMaterialsHelper = '스터디 자료 링크와 참고 항목을 모아 둡니다.';
+  static const studyJournalHelper = '세션 후 관찰, 메모, 다음 조치를 짧게 남기는 공간입니다.';
+  static const studyReportsHelper = '세션 요약과 후속 보고 초안을 확인합니다.';
+  static const studyLocalSafetyHelper = '로컬 우선 원칙과 데이터 안전 경계를 확인합니다.';
+  static const studyPrimaryActionPlan = '세션 준비';
+  static const studyPrimaryActionReview = '흐름 확인';
+  static const studyEmptyState = '아직 실제 데이터는 연결하지 않았습니다.';
 
   // Static / honesty markers
   static const markerStaticPreview = '정적 미리보기';

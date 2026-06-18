@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'core/theme/ryn_tokens.dart';
 import 'core/text/app_text.dart';
+import 'features/study_os/study_os_shell.dart';
 
 void main() {
   runApp(const RynUniverseApp());
@@ -135,6 +136,7 @@ class CoreOsShell extends StatefulWidget {
 
   static const navigationItems = [
     NavItem(AppText.navHome, Icons.home_rounded),
+    NavItem(AppText.navStudy, Icons.school_rounded),
     NavItem(AppText.navCommand, Icons.auto_awesome_rounded),
     NavItem(AppText.navControl, Icons.hub_rounded),
     NavItem(AppText.navFlow, Icons.account_tree_rounded),
@@ -319,6 +321,7 @@ class _ShellPageContent extends StatelessWidget {
   final ValueChanged<String> onNavSelected;
 
   bool get _isHome => selectedLabel == AppText.navHome;
+  bool get _isStudy => selectedLabel == AppText.navStudy;
 
   @override
   Widget build(BuildContext context) {
@@ -327,6 +330,14 @@ class _ShellPageContent extends StatelessWidget {
             _TopSystemBar(showDailyHome: false, compactHome: true),
             SizedBox(height: 10),
             _PremiumHomeShell(),
+            SizedBox(height: 14),
+            _PrincipleFooter(),
+          ]
+        : _isStudy
+        ? const <Widget>[
+            _TopSystemBar(showDailyHome: false),
+            SizedBox(height: 16),
+            StudyOsShell(),
             SizedBox(height: 14),
             _PrincipleFooter(),
           ]

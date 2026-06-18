@@ -209,6 +209,51 @@ void main() {
     },
   );
 
+  testWidgets('renders Study OS 2.0 shell without runtime persistence', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(AppText.navStudy));
+    await tester.pumpAndSettle();
+
+    expect(find.text(AppText.studyOsTitle), findsOneWidget);
+    expect(
+      find.text(AppText.studyOsStaticShellMarker),
+      findsAtLeastNWidgets(1),
+    );
+    expect(find.text(AppText.studyOsNoRuntimeDb), findsAtLeastNWidgets(1));
+    expect(find.text(AppText.studyOsNoCrud), findsAtLeastNWidgets(1));
+
+    const screenLabels = <String>[
+      AppText.studyScreenHome,
+      AppText.studyScreenSessions,
+      AppText.studyScreenSessionDetail,
+      AppText.studyScreenMembers,
+      AppText.studyScreenAttendance,
+      AppText.studyScreenMaterials,
+      AppText.studyScreenJournal,
+      AppText.studyScreenReports,
+      AppText.studyScreenSettings,
+    ];
+
+    for (final label in screenLabels) {
+      expect(find.text(label), findsAtLeastNWidgets(1));
+    }
+
+    await tester.tap(find.text(AppText.studyScreenAttendance).first);
+    await tester.pumpAndSettle();
+    expect(find.text(AppText.studyAttendanceHelper), findsOneWidget);
+
+    await tester.ensureVisible(find.text(AppText.studyScreenSettings).last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(AppText.studyScreenSettings).last);
+    await tester.pumpAndSettle();
+    expect(find.text(AppText.studyLocalSafetyHelper), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('selects a static Kanban card and shows inspection-only detail', (
     WidgetTester tester,
   ) async {
