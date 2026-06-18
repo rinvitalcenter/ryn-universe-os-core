@@ -219,6 +219,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text(AppText.studyOsTitle), findsOneWidget);
+    expect(find.text(AppText.studyOsKicker), findsOneWidget);
+    expect(find.text(AppText.studyOverviewTitle), findsOneWidget);
+    expect(find.text(AppText.studyScreenMapTitle), findsOneWidget);
+    expect(find.text(AppText.studyReadinessTitle), findsOneWidget);
     expect(
       find.text(AppText.studyOsStaticShellMarker),
       findsAtLeastNWidgets(1),
@@ -242,6 +246,8 @@ void main() {
       expect(find.text(label), findsAtLeastNWidgets(1));
     }
 
+    await tester.ensureVisible(find.text(AppText.studyScreenAttendance).first);
+    await tester.pumpAndSettle();
     await tester.tap(find.text(AppText.studyScreenAttendance).first);
     await tester.pumpAndSettle();
     expect(find.text(AppText.studyAttendanceHelper), findsOneWidget);
@@ -250,7 +256,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text(AppText.studyScreenSettings).last);
     await tester.pumpAndSettle();
-    expect(find.text(AppText.studyLocalSafetyHelper), findsOneWidget);
+    expect(find.text(AppText.studyLocalSafetyHelper), findsAtLeastNWidgets(1));
     expect(tester.takeException(), isNull);
   });
 

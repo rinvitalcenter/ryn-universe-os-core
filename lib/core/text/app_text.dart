@@ -131,7 +131,8 @@ abstract final class AppText {
 
   // Ryn Study OS 2.0 shell
   static const studyOsTitle = 'Ryn Study OS 2.0';
-  static const studyOsCaption = '스터디 운영을 준비하고 기록하는 첫 실사용 모듈';
+  static const studyOsCaption = '스터디 준비, 진행, 기록을 조용히 정리하는 첫 실사용 모듈';
+  static const studyOsKicker = 'Minimum Viable Core · Study Module';
   static const studyOsStaticShellMarker = '정적 화면 shell';
   static const studyOsNoRuntimeDb = 'DB 연결 없음';
   static const studyOsNoCrud = '저장/수정 없음';
@@ -144,18 +145,27 @@ abstract final class AppText {
   static const studyScreenJournal = '기록';
   static const studyScreenReports = '리포트';
   static const studyScreenSettings = '설정';
-  static const studyHomeHelper = '오늘 준비할 스터디 흐름을 한곳에서 확인합니다.';
-  static const studySessionsHelper = '계획된 세션과 진행 상태를 확인하는 자리입니다.';
-  static const studySessionDetailHelper = '세션 목적, 준비 항목, 연결 자료를 보여주는 화면입니다.';
-  static const studyMembersHelper = '스터디 참여자 목록과 기본 상태를 확인합니다.';
+  static const studyHomeHelper = '오늘 준비할 흐름을 한 화면에서 확인합니다.';
+  static const studySessionsHelper = '계획된 세션과 진행 상태를 정리합니다.';
+  static const studySessionDetailHelper = '목적, 준비 항목, 연결 자료를 확인합니다.';
+  static const studyMembersHelper = '참여자와 기본 상태를 확인합니다.';
   static const studyAttendanceHelper = '세션 전 출석 준비와 당일 확인 흐름을 정리합니다.';
-  static const studyMaterialsHelper = '스터디 자료 링크와 참고 항목을 모아 둡니다.';
-  static const studyJournalHelper = '세션 후 관찰, 메모, 다음 조치를 짧게 남기는 공간입니다.';
-  static const studyReportsHelper = '세션 요약과 후속 보고 초안을 확인합니다.';
+  static const studyMaterialsHelper = '자료 링크와 참고 항목을 모아 둡니다.';
+  static const studyJournalHelper = '세션 후 메모와 다음 조치를 남깁니다.';
+  static const studyReportsHelper = '요약과 후속 보고 초안을 확인합니다.';
   static const studyLocalSafetyHelper = '로컬 우선 원칙과 데이터 안전 경계를 확인합니다.';
   static const studyPrimaryActionPlan = '세션 준비';
   static const studyPrimaryActionReview = '흐름 확인';
   static const studyEmptyState = '아직 실제 데이터는 연결하지 않았습니다.';
+  static const studyOverviewTitle = '오늘의 스터디 운영';
+  static const studyOverviewBody = '세션 준비부터 기록까지, 필요한 화면만 차분히 배치합니다.';
+  static const studyScreenMapTitle = '화면 구성';
+  static const studyScreenMapBody = '9개 화면은 정적 shell이며 이후 데이터 연결을 기다립니다.';
+  static const studySelectedScreenLabel = '선택한 화면';
+  static const studyReadinessTitle = '준비 상태';
+  static const studyReadinessLocalOnly = '로컬 우선';
+  static const studyReadinessStatic = '정적 표시';
+  static const studyReadinessNoSave = '저장 없음';
 
   // Static / honesty markers
   static const markerStaticPreview = '정적 미리보기';
