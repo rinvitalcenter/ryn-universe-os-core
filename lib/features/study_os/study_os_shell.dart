@@ -48,72 +48,38 @@ class _StudyOsHero extends StatelessWidget {
 
     return _StudyOsSurface(
       padding: const EdgeInsets.all(28),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final wide = constraints.maxWidth >= 820;
-          final titleBlock = Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                AppText.studyOsKicker,
-                style: textTheme.labelMedium?.copyWith(
-                  color: colorScheme.primary,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.4,
-                ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppText.studyOsKicker,
+            style: textTheme.labelMedium?.copyWith(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.4,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            AppText.studyOsTitle,
+            style: textTheme.headlineMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.8,
+              height: 1.05,
+            ),
+          ),
+          const SizedBox(height: 10),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 560),
+            child: Text(
+              AppText.studyOsCaption,
+              style: textTheme.bodyLarge?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                height: 1.45,
               ),
-              const SizedBox(height: 10),
-              Text(
-                AppText.studyOsTitle,
-                style: textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: -0.8,
-                  height: 1.05,
-                ),
-              ),
-              const SizedBox(height: 10),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 560),
-                child: Text(
-                  AppText.studyOsCaption,
-                  style: textTheme.bodyLarge?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                    height: 1.45,
-                  ),
-                ),
-              ),
-            ],
-          );
-
-          final statusBlock = Column(
-            crossAxisAlignment: wide
-                ? CrossAxisAlignment.end
-                : CrossAxisAlignment.start,
-            children: const [
-              _StudyOsPill(AppText.studyOsStaticShellMarker),
-              SizedBox(height: 8),
-              _StudyOsPill(AppText.studyOsNoRuntimeDb),
-              SizedBox(height: 8),
-              _StudyOsPill(AppText.studyOsNoCrud),
-            ],
-          );
-
-          if (!wide) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [titleBlock, const SizedBox(height: 18), statusBlock],
-            );
-          }
-
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(child: titleBlock),
-              const SizedBox(width: 24),
-              statusBlock,
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -902,38 +868,6 @@ class _StudyOsIconBadge extends StatelessWidget {
         icon,
         size: large ? 24 : 19,
         color: selected ? colorScheme.primary : colorScheme.onSurfaceVariant,
-      ),
-    );
-  }
-}
-
-class _StudyOsPill extends StatelessWidget {
-  const _StudyOsPill(this.label);
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colorScheme.secondaryContainer.withValues(alpha: 0.70),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: colorScheme.outlineVariant.withValues(alpha: 0.35),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: colorScheme.onSecondaryContainer,
-            fontWeight: FontWeight.w800,
-            fontSize: 12,
-          ),
-        ),
       ),
     );
   }

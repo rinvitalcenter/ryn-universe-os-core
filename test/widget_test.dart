@@ -230,12 +230,12 @@ void main() {
     expect(find.text(AppText.studyCueAttendance), findsAtLeastNWidgets(1));
     expect(find.text(AppText.studyCueMaterials), findsAtLeastNWidgets(1));
     expect(find.text(AppText.studyCueNotesReport), findsAtLeastNWidgets(1));
-    expect(
-      find.text(AppText.studyOsStaticShellMarker),
-      findsAtLeastNWidgets(1),
-    );
-    expect(find.text(AppText.studyOsNoRuntimeDb), findsAtLeastNWidgets(1));
-    expect(find.text(AppText.studyOsNoCrud), findsAtLeastNWidgets(1));
+    expect(find.text(AppText.studyCueLocalSafe), findsAtLeastNWidgets(1));
+    expect(find.text('정적 화면 shell'), findsNothing);
+    expect(find.text('DB 연결 없음'), findsNothing);
+    expect(find.text('저장/수정 없음'), findsNothing);
+    expect(find.textContaining('runtime', findRichText: true), findsNothing);
+    expect(find.textContaining('CRUD', findRichText: true), findsNothing);
 
     const screenLabels = <String>[
       AppText.studyScreenHome,
