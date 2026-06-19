@@ -1,0 +1,156 @@
+/// User-facing text for normal Ryn Universe OS screens.
+///
+/// Keep this file free of developer, governance, debug, and storage wording.
+abstract final class UserText {
+  // Navigation
+  static const navHome = '홈';
+  static const navOperating = '운영';
+  static const navStudy = '스터디';
+  static const navReading = '리딩';
+  static const navPractice = '수련';
+  static const navContent = '콘텐츠';
+  static const navRecord = '기록';
+  static const navOutput = '산출';
+  static const navAi = 'AI';
+  static const navSettings = '설정';
+
+  // Product
+  static const productName = 'Ryn Universe OS Core';
+
+  // Home operating dashboard
+  static const homeToday = '오늘';
+  static const homeThisWeek = '이번 주';
+  static const homeContinue = '이어가기';
+  static const homeTodo = '오늘 할 일';
+  static const homeTodoEmpty = '아직 등록된 일이 없습니다';
+  static const homeTodayEmpty = '아직 등록된 일정이 없습니다';
+  static const homeTodaySchedule = '오늘 일정';
+  static const homeWeekSchedule = '이번 주 일정';
+  static const homeQuickMemo = '빠른 메모';
+  static const homeQuickMemoBody = '생각을 짧게 남겨보세요';
+  static const homeContinueRecords = '최근 기록';
+  static const homeContinueRecordsEmpty = '아직 이어쓸 기록이 없습니다';
+  static const homeMaterialsReady = '준비할 자료';
+  static const homeMaterialsReadyBody = '필요한 항목을 선택하세요';
+  static const homeOutputsReview = '검토할 산출';
+  static const homeOutputsReviewBody = '아직 항목이 없습니다';
+  static const homeAiAssist = 'AI 보조';
+  static const homeAiAssistBody = '요청할 작업이나 검토할 결과를 확인하세요';
+  static const homeQuickLinks = '바로가기';
+  static const homeStudyOps = '스터디 운영';
+  static const homeReadingPractice = '리딩 실습';
+
+  // Theme
+  static const themeSettingTitle = '화면 모드';
+  static const themeLight = 'Light';
+  static const themeDark = 'Dark';
+  static const themeSystem = 'System';
+
+  // Area pages
+  static const readingWorkspaceTitle = '리딩';
+  static const readingToolTarot = '타로';
+  static const readingToolSaju = '사주';
+  static const readingToolAstrology = '점성학';
+  static const readingToolHumanDesign = '휴먼디자인';
+  static const readingToolPalmistry = '손금';
+  static const readingToolPhysiognomy = '관상';
+  static const backToWorkspace = '뒤로';
+  static const emptyItems = '아직 항목이 없습니다';
+  static const readingAreaTitle = '리딩';
+  static const readingAreaBody = '타로 · 사주 · 점성학 · 휴먼디자인 · 손금 · 관상';
+  static const operatingAreaTitle = '운영';
+  static const operatingAreaBody = '할 일 · 일정 · 메모 · 준비 업무';
+  static const operatingTodo = '오늘 할 일';
+  static const operatingSchedule = '일정';
+  static const operatingQuickMemo = '빠른 메모';
+  static const operatingPrepWork = '준비 업무';
+  static const practiceAreaTitle = '수련';
+  static const practiceAreaBody = '기공 · 요가 · 명상 · 몸과 호흡 기록';
+  static const practiceQigong = '기공';
+  static const practiceYoga = '요가';
+  static const practiceMeditation = '명상';
+  static const practiceJournal = '기공 수련기';
+  static const practiceBodyBreath = '몸/호흡 기록';
+  static const contentAreaTitle = '콘텐츠';
+  static const contentAreaBody = '교안 · 전자책 · 강의안 · SNS 초안';
+  static const contentLessonPlan = '교안';
+  static const contentEbook = '전자책';
+  static const contentLectureDraft = '강의안';
+  static const contentSnsDraft = 'SNS 초안';
+  static const recordsAreaTitle = '기록';
+  static const recordsAreaBody = '수업 노트 · 상담 메모';
+  static const outputsAreaTitle = '산출';
+  static const outputsAreaBody = '리포트 · 요약 · 공지';
+  static const settingsAreaTitle = '설정';
+  static const settingsAreaBody = '화면 모드와 기본 사용 환경';
+  static const aiWorkbenchTitle = 'AI';
+  static const aiWorkbenchCue = '요청 · 검토 · 승인';
+  static const aiWorkbenchRequest = '요청';
+  static const aiWorkbenchReview = '검토';
+  static const aiWorkbenchApproved = '승인 후 사용';
+
+  // Study OS
+  static const studyWorkspaceTitle = '스터디';
+  static const studyOsTitle = 'Ryn Study OS 2.0';
+  static const studyUserSubtitle = '수업 준비와 기록을 정리합니다.';
+  static const studyActionToday = '오늘의 스터디';
+  static const studyActionAttendance = '출석 확인';
+  static const studyActionMaterials = '자료 준비';
+  static const studyActionJournal = '기록 쓰기';
+  static const studyActionReports = '리포트 정리';
+  static const studyActionMembers = '회원 보기';
+  static const studyActionSessions = '세션 보기';
+  static const studyActionSettings = '설정';
+  static const studyEmptyRegistered = '아직 등록된 스터디가 없습니다.';
+  static const studyOsCaption = '스터디 준비, 진행, 기록을 조용히 정리하는 첫 실사용 모듈';
+  static const studyOsKicker = '스터디 운영';
+  static const studyPickNeededItem = '필요한 항목을 선택하세요';
+  static const studyAddPreparation = '준비할 내용을 추가해 보세요';
+  static const studyScreenHome = '스터디 홈';
+  static const studyScreenSessions = '스터디';
+  static const studyScreenSessionDetail = '세션 상세';
+  static const studyScreenMembers = '회원';
+  static const studyScreenAttendance = '출석';
+  static const studyScreenMaterials = '자료';
+  static const studyScreenJournal = '기록';
+  static const studyScreenReports = '리포트';
+  static const studyScreenSettings = '설정';
+  static const studyHomeHelper = '오늘 준비할 흐름을 한 화면에서 확인합니다.';
+  static const studySessionsHelper = '계획된 세션과 진행 상태를 정리합니다.';
+  static const studySessionDetailHelper = '목적, 준비 항목, 연결 자료를 확인합니다.';
+  static const studyMembersHelper = '참여자와 기본 상태를 확인합니다.';
+  static const studyAttendanceHelper = '세션 전 출석 준비와 당일 확인 흐름을 정리합니다.';
+  static const studyMaterialsHelper = '자료 링크와 참고 항목을 모아 둡니다.';
+  static const studyJournalHelper = '세션 후 메모와 다음 조치를 남깁니다.';
+  static const studyReportsHelper = '요약과 후속 보고 초안을 확인합니다.';
+  static const studyLocalSafetyHelper = '화면 모드와 기본 사용 환경을 확인합니다.';
+  static const studyPrimaryActionPlan = '세션 준비';
+  static const studyPrimaryActionReview = '흐름 확인';
+  static const studyEmptyState = '아직 기록이 없습니다.';
+  static const studyOverviewTitle = '오늘의 스터디 운영';
+  static const studyOverviewBody = '세션 준비부터 기록까지, 필요한 화면만 차분히 배치합니다.';
+  static const studyScreenMapTitle = '스터디 메뉴';
+  static const studyScreenMapBody = '스터디 준비와 기록을 확인합니다.';
+  static const studySelectedScreenLabel = '현재 항목';
+  static const studyReadinessTitle = '준비 상태';
+  static const studyReadinessLocalOnly = '오늘';
+  static const studyReadinessStatic = '자료';
+  static const studyReadinessNoSave = '기록';
+  static const studyNextPrepTitle = '다음 스터디 준비';
+  static const studyNextPrepBody = '오늘은 세션 목적, 출석 준비, 자료 연결, 기록 흐름을 먼저 확인합니다.';
+  static const studyFlowBefore = '세션 전';
+  static const studyFlowBeforeBody = '목표 확인 · 출석 준비 · 자료 점검';
+  static const studyFlowSessionDay = '세션 당일';
+  static const studyFlowSessionDayBody = '진행 흐름 · 출석 확인 · 참고 자료';
+  static const studyFlowAfter = '세션 후';
+  static const studyFlowAfterBody = '메모 정리 · 요약 준비 · 다음 조치';
+  static const studyCueAttendance = '출석 준비';
+  static const studyCueMaterials = '자료 준비';
+  static const studyCueSessionLink = '세션-자료 연결';
+  static const studyCueNotesReport = '기록 → 리포트';
+  static const studyCueLocalSafe = '로컬 안전';
+  static const studyActionOpenSessions = '스터디 화면에서 세션 흐름 확인';
+  static const studyActionOpenAttendance = '출석 화면에서 준비 상태 확인';
+  static const studyActionOpenMaterials = '자료 화면에서 연결 개념 확인';
+  static const studyActionOpenJournal = '기록과 리포트 흐름 확인';
+}

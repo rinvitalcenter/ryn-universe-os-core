@@ -1,155 +1,156 @@
+import 'dart:io';
 import 'dart:ui' show Size;
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:ryn_universe_os_core/core/text/app_text.dart';
+import 'package:ryn_universe_os_core/core/text/user_text.dart';
 import 'package:ryn_universe_os_core/main.dart';
 
 void main() {
-  testWidgets('renders REDESIGN4 Premium Core OS shell markers', (
-    WidgetTester tester,
-  ) async {
-    await tester.pumpWidget(const RynUniverseApp());
+  test('text registries keep user copy separated from developer copy', () {
+    final userTextFile = File('lib/core/text/user_text.dart');
+    final devTextFile = File('lib/core/text/dev_text.dart');
+    final internalTextFile = File('lib/core/text/internal_text.dart');
+    expect(userTextFile.existsSync(), isTrue);
+    expect(devTextFile.existsSync(), isTrue);
+    expect(internalTextFile.existsSync(), isTrue);
 
-    expect(find.text('Ryn Universe OS Core'), findsAtLeastNWidgets(1));
-    expect(find.text('홈'), findsAtLeastNWidgets(1));
-    expect(find.text('명령'), findsAtLeastNWidgets(1));
-    expect(find.text('관제'), findsAtLeastNWidgets(1));
-    expect(find.text('흐름'), findsAtLeastNWidgets(1));
-    expect(find.text('기록'), findsAtLeastNWidgets(1));
-    expect(find.text('산출'), findsAtLeastNWidgets(1));
-    expect(find.text('설정'), findsAtLeastNWidgets(1));
-    expect(find.text(AppText.premiumHomeTitle), findsOneWidget);
-    expect(find.text(AppText.missionCommandTitle), findsOneWidget);
-    expect(find.text(AppText.missionCommandSearch), findsOneWidget);
-    expect(find.text('AI Command Center'), findsAtLeastNWidgets(1));
-    expect(find.text(AppText.missionCommandOverview), findsOneWidget);
-    expect(find.text(AppText.missionCommandSelectedMission), findsOneWidget);
-    expect(find.text(AppText.missionCommandSelectedTitle), findsOneWidget);
-    expect(find.text(AppText.missionCommandProgress), findsOneWidget);
-    expect(find.text(AppText.missionCommandStaticNote), findsOneWidget);
-    expect(find.text('AI 모델 운영'), findsAtLeastNWidgets(1));
-    expect(find.text('Command Hub'), findsNothing);
-    expect(find.text('Today'), findsNothing);
-    expect(find.text('작업 시작'), findsNothing);
-    expect(find.text('실행하기'), findsNothing);
-    expect(find.text('승인하기'), findsNothing);
-    expect(find.text('Chief / Governance Deck'), findsNothing);
+    final userText = userTextFile.readAsStringSync();
+    final userVisibleStrings = RegExp(
+      "'([^']*)'",
+    ).allMatches(userText).map((match) => match.group(1) ?? '').join('\n');
+    const rawDeveloperTerms = <String>[
+      'DB',
+      'schema',
+      'migration',
+      'runtime',
+      'AppData',
+      'Drift',
+      'CRUD',
+      'HOLD',
+      'guard',
+      'Git',
+      'Codex',
+      'Hermes',
+      'token',
+      'QA',
+      'shell',
+      'static',
+      'implementation',
+      'persistence',
+      'Minimum Viable Core',
+      '화면 구성',
+      '선택한 화면',
+      '9개 화면',
+      '보관 전',
+    ];
+    for (final term in rawDeveloperTerms) {
+      expect(
+        userVisibleStrings.contains(term),
+        isFalse,
+        reason: 'UserText visible string contains $term',
+      );
+    }
 
-    await tester.tap(find.text('명령'));
-    await tester.pumpAndSettle();
+    expect(UserText.navHome, '홈');
+    expect(UserText.navReading, '리딩');
+    expect(UserText.studyOsTitle, 'Ryn Study OS 2.0');
 
-    expect(find.text('AI Command Center'), findsAtLeastNWidgets(1));
-    expect(find.text('Home / Command Hub'), findsOneWidget);
-    expect(find.text('AI 전략 보고서 작성'), findsAtLeastNWidgets(1));
-    expect(find.text('Mission Control Decision Surface'), findsOneWidget);
-    expect(find.text(AppText.cmdStatusStaticMvpMode), findsAtLeastNWidgets(1));
-    expect(
-      find.text(AppText.cmdNextActionSpecAlignedPatch),
-      findsAtLeastNWidgets(1),
-    );
-    expect(
-      find.text(AppText.cmdApprovalRiskBoundedSource),
-      findsAtLeastNWidgets(1),
-    );
-    expect(find.text('Obsidian 보고 중심'), findsAtLeastNWidgets(1));
-    expect(find.text(AppText.markerSpecMvpBaseline), findsAtLeastNWidgets(1));
-    expect(
-      find.text(AppText.markerApprovalPacketOnly),
-      findsAtLeastNWidgets(1),
-    );
-    expect(find.text('Safety Status Strip'), findsOneWidget);
-    expect(find.text('DB CLOSED / NO WRITE'), findsAtLeastNWidgets(1));
-    expect(find.text('Gateway OFF'), findsAtLeastNWidgets(1));
-    expect(find.text('Chief / Governance Deck'), findsOneWidget);
-    expect(find.text('Construction Stage Map'), findsOneWidget);
-    expect(find.text('공사 장부: GitHub 보관'), findsOneWidget);
-    expect(find.text('다음 허가: Command Center UI 공사'), findsOneWidget);
-    expect(find.text('Next Permit Queue'), findsOneWidget);
-    expect(find.text('1순위 · Next Permit Queue'), findsOneWidget);
-    expect(find.text('7-Profile Council Growth Plan'), findsOneWidget);
-    expect(find.text('DB Schema Blueprint · 문서 전용'), findsOneWidget);
-    expect(find.text('Council Growth Plan 문서'), findsOneWidget);
-    expect(find.text('RYN-CORE-COUNCIL-GROWTH-PLAN1'), findsAtLeastNWidgets(1));
-    expect(find.text('Obsidian AI Command Center 기록'), findsOneWidget);
-    expect(find.text('DB Blueprint 문서'), findsOneWidget);
-    expect(
-      find.text('RYN-CORE-DB-SCHEMA-BLUEPRINT-DOC1'),
-      findsAtLeastNWidgets(1),
-    );
-    expect(find.text('DB 구현 HOLD'), findsOneWidget);
-    expect(find.text('External Automation Policy 문서'), findsOneWidget);
-    expect(
-      find.text('RYN-CORE-EXTERNAL-AUTOMATION-POLICY1'),
-      findsAtLeastNWidgets(1),
-    );
-    expect(find.text('외부 자동화 HOLD'), findsOneWidget);
-    expect(find.text('IA1: PASS WITH GUARDS'), findsAtLeastNWidgets(1));
-    expect(find.text('Council Sessions'), findsOneWidget);
-    expect(find.text('Obsidian Links'), findsOneWidget);
-    expect(
-      find.text('RYN-CORE-COMMAND-CENTER-IA1-spec'),
-      findsAtLeastNWidgets(1),
-    );
-
-    expect(find.text('Hermes'), findsAtLeastNWidgets(1));
-    expect(find.text('AI 운영 비서'), findsAtLeastNWidgets(1));
-    expect(find.text('Codex'), findsAtLeastNWidgets(1));
-    expect(find.text('7-Agent Council'), findsAtLeastNWidgets(1));
-    expect(find.text('Obsidian'), findsAtLeastNWidgets(1));
-    expect(find.text('Approval Gate'), findsAtLeastNWidgets(1));
-
-    expect(find.text('정적 미리보기'), findsAtLeastNWidgets(1));
-    expect(find.text('실제 Telegram 연동 없음'), findsAtLeastNWidgets(1));
-    expect(find.text('실제 자동화 없음'), findsAtLeastNWidgets(1));
-
-    expect(find.text('한서윤'), findsAtLeastNWidgets(1));
-    expect(find.text('강도현'), findsAtLeastNWidgets(1));
-    expect(find.text('윤지안'), findsAtLeastNWidgets(1));
-    expect(find.text('서하린'), findsAtLeastNWidgets(1));
-    expect(find.text('이유진'), findsAtLeastNWidgets(1));
-    expect(find.text('차민준'), findsAtLeastNWidgets(1));
-    expect(find.text('문서아'), findsAtLeastNWidgets(1));
-
-    expect(find.text('프로젝트'), findsAtLeastNWidgets(1));
-    expect(find.text('문서'), findsAtLeastNWidgets(1));
-    expect(find.text('AI 모델'), findsAtLeastNWidgets(1));
-    expect(find.text('데이터'), findsAtLeastNWidgets(1));
-    expect(find.text('자동화'), findsAtLeastNWidgets(1));
+    final studyShell = File(
+      'lib/features/study_os/study_os_shell.dart',
+    ).readAsStringSync();
+    expect(studyShell.contains('dev_text.dart'), isFalse);
   });
 
-  testWidgets('separates 린님 Home from Dev/Governance surface', (
+  testWidgets('renders clean action Home, practical menu, and theme control', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1000, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+
+    const menuLabels = <String>[
+      UserText.navHome,
+      UserText.navOperating,
+      UserText.navStudy,
+      UserText.navReading,
+      UserText.navPractice,
+      UserText.navContent,
+      UserText.navRecord,
+      UserText.navOutput,
+      UserText.navAi,
+      UserText.navSettings,
+    ];
+
+    for (final label in menuLabels) {
+      expect(find.text(label), findsAtLeastNWidgets(1));
+    }
+
+    expect(find.text(UserText.homeToday), findsOneWidget);
+    expect(find.text(UserText.homeThisWeek), findsOneWidget);
+    expect(find.text(UserText.homeContinue), findsOneWidget);
+    expect(find.text(UserText.homeTodayEmpty), findsAtLeastNWidgets(1));
+    expect(find.text(UserText.homeTodo), findsOneWidget);
+    expect(find.text(UserText.homeTodaySchedule), findsOneWidget);
+    expect(find.text(UserText.homeWeekSchedule), findsOneWidget);
+    expect(find.text(UserText.homeQuickMemo), findsOneWidget);
+    expect(find.text(UserText.homeContinueRecords), findsOneWidget);
+    expect(find.text(UserText.homeMaterialsReady), findsOneWidget);
+    expect(find.text(UserText.homeOutputsReview), findsOneWidget);
+    expect(find.text(UserText.homeAiAssist), findsOneWidget);
+    expect(find.text(UserText.homeQuickLinks), findsOneWidget);
+    expect(find.text(UserText.homeStudyOps), findsNothing);
+    expect(find.text(UserText.homeReadingPractice), findsNothing);
+    expect(find.text('Ryn Business OS'), findsNothing);
+    expect(
+      find.text('수업, 상담, 자료, 기록, 산출물을 한 화면에서 준비하는 개인 운영 허브'),
+      findsNothing,
+    );
+    expect(find.text('운영 모듈'), findsNothing);
+    expect(find.text('Calm'), findsNothing);
+    expect(find.text('Control'), findsNothing);
+    expect(find.text('Continuity'), findsNothing);
+    expect(find.text('Local-First'), findsNothing);
+    expect(find.text('AI-Native'), findsNothing);
+    expect(find.text('AI Command Center'), findsNothing);
+
+    await tester.tap(find.text(UserText.navSettings).first);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('검색 / 자료 / 기록 / 일정'), findsOneWidget);
+    expect(find.text(UserText.themeSettingTitle), findsOneWidget);
+    expect(find.text(UserText.themeLight), findsAtLeastNWidgets(1));
+    expect(find.text(UserText.themeDark), findsAtLeastNWidgets(1));
+    expect(find.text(UserText.themeSystem), findsAtLeastNWidgets(1));
+  });
+
+  testWidgets('keeps normal user surfaces free of developer wording', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const RynUniverseApp());
     await tester.pumpAndSettle();
 
-    expect(find.text(AppText.premiumHomeTitle), findsOneWidget);
-    expect(find.text(AppText.missionCommandTitle), findsOneWidget);
-    expect(find.text(AppText.missionCommandSearch), findsOneWidget);
-    expect(find.text('AI Command Center'), findsAtLeastNWidgets(1));
-    expect(find.text(AppText.missionCommandOverview), findsOneWidget);
-    expect(find.text(AppText.missionCommandSelectedMission), findsOneWidget);
-    expect(find.text(AppText.missionCommandSelectedTitle), findsOneWidget);
-    expect(find.text(AppText.missionCommandProgress), findsOneWidget);
-    expect(find.text(AppText.missionCommandStaticNote), findsOneWidget);
-    expect(find.text('AI 모델 운영'), findsAtLeastNWidgets(1));
-    expect(find.text('Command Hub'), findsNothing);
-    expect(find.text('Today'), findsNothing);
-    expect(find.text('작업 시작'), findsNothing);
-    expect(find.text('실행하기'), findsNothing);
-    expect(find.text('승인하기'), findsNothing);
+    expect(find.text(UserText.homeToday), findsAtLeastNWidgets(1));
+    expect(find.text('AI Command Center'), findsNothing);
     expect(find.text('Chief / Governance Deck'), findsNothing);
     expect(find.text('Safety Status Strip'), findsNothing);
     expect(find.text('DB CLOSED / NO WRITE'), findsNothing);
-    expect(find.text('Mission Control Decision Surface'), findsNothing);
+    expect(find.textContaining('HOLD', findRichText: true), findsNothing);
+    expect(find.textContaining('runtime', findRichText: true), findsNothing);
+    expect(find.textContaining('CRUD', findRichText: true), findsNothing);
 
-    await tester.tap(find.text('명령'));
+    await tester.tap(find.text(UserText.navOperating).first);
     await tester.pumpAndSettle();
 
-    expect(find.text('AI Command Center'), findsAtLeastNWidgets(1));
-    expect(find.text('Chief / Governance Deck'), findsOneWidget);
-    expect(find.text('Safety Status Strip'), findsOneWidget);
+    expect(find.text(UserText.operatingAreaTitle), findsAtLeastNWidgets(1));
+    expect(find.text('AI Command Center'), findsNothing);
+    expect(find.textContaining('DB', findRichText: true), findsNothing);
   });
 
   testWidgets('renders compact 364px client layout without overflow', (
@@ -164,18 +165,18 @@ void main() {
 
     await tester.pumpWidget(const RynUniverseApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.text('명령'));
+    await tester.tap(find.text(UserText.navAi).first);
     await tester.pumpAndSettle();
 
-    expect(find.text(AppText.cmdAiCommandCenter), findsAtLeastNWidgets(1));
-    expect(find.text(AppText.markerNoTelegram), findsAtLeastNWidgets(1));
+    expect(find.text(UserText.aiWorkbenchTitle), findsAtLeastNWidgets(1));
+    expect(find.text(UserText.aiWorkbenchCue), findsOneWidget);
     expect(tester.takeException(), isNull);
 
-    await tester.ensureVisible(find.text(AppText.kanbanTitleOrchestra));
+    await tester.ensureVisible(find.text(UserText.aiWorkbenchReview));
     await tester.pumpAndSettle();
 
-    expect(find.text(AppText.kanbanTitleOrchestra), findsOneWidget);
-    expect(find.text(AppText.kanbanSnapshotTitle), findsOneWidget);
+    expect(find.text(UserText.aiWorkbenchReview), findsAtLeastNWidgets(1));
+    expect(find.text(UserText.aiWorkbenchApproved), findsAtLeastNWidgets(1));
     expect(tester.takeException(), isNull);
   });
 
@@ -192,20 +193,97 @@ void main() {
       await tester.pumpWidget(const RynUniverseApp());
       await tester.pumpAndSettle();
 
-      final premiumCommandRect = tester.getRect(
+      final businessHomeRect = tester.getRect(
         find
             .byWidgetPredicate(
               (widget) =>
-                  widget.runtimeType.toString() == '_PremiumHomeCommandCenter',
+                  widget.runtimeType.toString() == '_BusinessHomeDashboard',
             )
             .first,
       );
 
-      expect(premiumCommandRect.width, greaterThan(600));
-      expect(premiumCommandRect.width, lessThanOrEqualTo(780));
-      expect(premiumCommandRect.right, lessThanOrEqualTo(2400));
-      expect(find.text('AI Command Center'), findsAtLeastNWidgets(1));
+      expect(businessHomeRect.width, greaterThan(1100));
+      expect(businessHomeRect.width, lessThanOrEqualTo(1700));
+      expect(businessHomeRect.right, lessThanOrEqualTo(2400));
+      expect(find.text(UserText.homeToday), findsAtLeastNWidgets(1));
+
+      final homeGroups = find.byWidgetPredicate(
+        (widget) => widget.runtimeType.toString() == '_HomeDashboardGroup',
+      );
+      expect(homeGroups, findsNWidgets(3));
+      final firstHomeGroup = tester.getRect(homeGroups.at(0));
+      final secondHomeGroup = tester.getRect(homeGroups.at(1));
+      expect(
+        (firstHomeGroup.width - secondHomeGroup.width).abs(),
+        lessThan(0.1),
+      );
+      expect(firstHomeGroup.height, greaterThan(180));
+
+      await tester.tap(find.text(UserText.navOperating).first);
+      await tester.pumpAndSettle();
+      final workspaceRect = tester.getRect(
+        find
+            .byWidgetPredicate(
+              (widget) => widget.runtimeType.toString() == '_BusinessAreaPage',
+            )
+            .first,
+      );
+      expect((businessHomeRect.width - workspaceRect.width).abs(), lessThan(1));
       expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('Home secondary quick links navigate to workspace homes', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text(UserText.navStudy).last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(UserText.navStudy).last);
+    await tester.pumpAndSettle();
+    expect(find.text(UserText.studyWorkspaceTitle), findsAtLeastNWidgets(1));
+    expect(find.text(UserText.studyActionAttendance), findsOneWidget);
+
+    await tester.ensureVisible(find.text(UserText.navHome).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(UserText.navHome).first);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text(UserText.navReading).last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(UserText.navReading).last);
+    await tester.pumpAndSettle();
+    expect(find.text(UserText.readingWorkspaceTitle), findsAtLeastNWidgets(1));
+    expect(find.text(UserText.readingToolTarot), findsOneWidget);
+    expect(find.text(UserText.readingToolSaju), findsOneWidget);
+  });
+
+  testWidgets(
+    'final IA workspaces expose operating, practice, and content tools',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(const RynUniverseApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text(UserText.navOperating).first);
+      await tester.pumpAndSettle();
+      expect(find.text(UserText.operatingTodo), findsOneWidget);
+      expect(find.text(UserText.operatingSchedule), findsOneWidget);
+      expect(find.text(UserText.operatingQuickMemo), findsOneWidget);
+
+      await tester.tap(find.text(UserText.navPractice).first);
+      await tester.pumpAndSettle();
+      expect(find.text(UserText.practiceQigong), findsOneWidget);
+      expect(find.text(UserText.practiceYoga), findsOneWidget);
+      expect(find.text(UserText.practiceMeditation), findsOneWidget);
+      expect(find.text(UserText.practiceJournal), findsOneWidget);
+
+      await tester.tap(find.text(UserText.navContent).first);
+      await tester.pumpAndSettle();
+      expect(find.text(UserText.contentLessonPlan), findsOneWidget);
+      expect(find.text(UserText.contentEbook), findsOneWidget);
+      expect(find.text(UserText.contentLectureDraft), findsOneWidget);
+      expect(find.text(UserText.contentSnsDraft), findsOneWidget);
     },
   );
 
@@ -215,59 +293,74 @@ void main() {
     await tester.pumpWidget(const RynUniverseApp());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text(AppText.navStudy));
+    await tester.tap(find.text(UserText.navStudy).first);
     await tester.pumpAndSettle();
 
-    expect(find.text(AppText.studyOsTitle), findsOneWidget);
-    expect(find.text(AppText.studyOsKicker), findsOneWidget);
-    expect(find.text(AppText.studyOverviewTitle), findsOneWidget);
-    expect(find.text(AppText.studyScreenMapTitle), findsOneWidget);
-    expect(find.text(AppText.studyReadinessTitle), findsOneWidget);
-    expect(find.text(AppText.studyNextPrepTitle), findsOneWidget);
-    expect(find.text(AppText.studyFlowBefore), findsOneWidget);
-    expect(find.text(AppText.studyFlowSessionDay), findsOneWidget);
-    expect(find.text(AppText.studyFlowAfter), findsOneWidget);
-    expect(find.text(AppText.studyCueAttendance), findsAtLeastNWidgets(1));
-    expect(find.text(AppText.studyCueMaterials), findsAtLeastNWidgets(1));
-    expect(find.text(AppText.studyCueNotesReport), findsAtLeastNWidgets(1));
-    expect(find.text(AppText.studyCueLocalSafe), findsAtLeastNWidgets(1));
-    expect(find.text('정적 화면 shell'), findsNothing);
-    expect(find.text('DB 연결 없음'), findsNothing);
-    expect(find.text('저장/수정 없음'), findsNothing);
+    expect(find.text(UserText.studyOsTitle), findsOneWidget);
+    expect(find.text(UserText.studyUserSubtitle), findsOneWidget);
+    expect(find.text(UserText.studyActionToday), findsOneWidget);
+    expect(find.text(UserText.studyActionAttendance), findsOneWidget);
+    expect(find.text(UserText.studyActionMaterials), findsOneWidget);
+    expect(find.text(UserText.studyActionJournal), findsOneWidget);
+    expect(find.text(UserText.studyActionReports), findsOneWidget);
+    expect(find.text(UserText.studyActionMembers), findsOneWidget);
+    expect(find.text(UserText.studyActionSessions), findsOneWidget);
+    expect(find.textContaining(UserText.studyEmptyRegistered), findsOneWidget);
+    expect(
+      find.textContaining(UserText.studyPickNeededItem),
+      findsAtLeastNWidgets(1),
+    );
+
+    final studyCards = find.byWidgetPredicate(
+      (widget) => widget.runtimeType.toString() == '_StudyUserActionCard',
+    );
+    expect(studyCards, findsWidgets);
+    final firstStudyCard = tester.getRect(studyCards.at(0));
+    final secondStudyCard = tester.getRect(studyCards.at(1));
+    expect((firstStudyCard.width - secondStudyCard.width).abs(), lessThan(0.1));
+    expect(firstStudyCard.height, lessThanOrEqualTo(150));
+
+    await tester.tap(find.text(UserText.studyActionAttendance).first);
+    await tester.pumpAndSettle();
+    expect(
+      find.text('${UserText.navStudy} > ${UserText.studyActionAttendance}'),
+      findsOneWidget,
+    );
+    expect(find.text(UserText.backToWorkspace), findsOneWidget);
+    expect(find.text(UserText.emptyItems), findsOneWidget);
+    await tester.tap(find.text(UserText.backToWorkspace));
+    await tester.pumpAndSettle();
+    expect(find.text(UserText.studyWorkspaceTitle), findsOneWidget);
+
+    const forbiddenStudyLabels = <String>[
+      '화면 구성',
+      '선택한 화면',
+      '보관 전',
+      '화면 흐름 확인 단계',
+      '아직 입력한 내용은 보관되지 않습니다.',
+      '정적 화면 shell',
+      'DB 연결 없음',
+      '저장/수정 없음',
+    ];
+    for (final label in forbiddenStudyLabels) {
+      expect(find.text(label), findsNothing);
+    }
     expect(find.textContaining('runtime', findRichText: true), findsNothing);
     expect(find.textContaining('CRUD', findRichText: true), findsNothing);
-
-    const screenLabels = <String>[
-      AppText.studyScreenHome,
-      AppText.studyScreenSessions,
-      AppText.studyScreenSessionDetail,
-      AppText.studyScreenMembers,
-      AppText.studyScreenAttendance,
-      AppText.studyScreenMaterials,
-      AppText.studyScreenJournal,
-      AppText.studyScreenReports,
-      AppText.studyScreenSettings,
-    ];
-
-    for (final label in screenLabels) {
-      expect(find.text(label), findsAtLeastNWidgets(1));
-    }
-
-    await tester.ensureVisible(find.text(AppText.studyScreenAttendance).first);
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(AppText.studyScreenAttendance).first);
-    await tester.pumpAndSettle();
-    expect(find.text(AppText.studyAttendanceHelper), findsOneWidget);
-
-    await tester.ensureVisible(find.text(AppText.studyScreenSettings).last);
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(AppText.studyScreenSettings).last);
-    await tester.pumpAndSettle();
-    expect(find.text(AppText.studyLocalSafetyHelper), findsAtLeastNWidgets(1));
+    expect(find.textContaining('shell', findRichText: true), findsNothing);
+    expect(find.textContaining('static', findRichText: true), findsNothing);
+    expect(
+      find.textContaining('implementation', findRichText: true),
+      findsNothing,
+    );
+    expect(
+      find.textContaining('persistence', findRichText: true),
+      findsNothing,
+    );
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('selects a static Kanban card and shows inspection-only detail', (
+  testWidgets('AI Workbench stays lightweight and user-facing', (
     WidgetTester tester,
   ) async {
     tester.view.physicalSize = const Size(1440, 1100);
@@ -279,37 +372,17 @@ void main() {
 
     await tester.pumpWidget(const RynUniverseApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.text('명령'));
+    await tester.tap(find.text(UserText.navAi).first);
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(find.text(AppText.kanbanTitleOrchestra));
-    await tester.pumpAndSettle();
-
-    expect(find.text(AppText.kanbanSnapshotTitle), findsOneWidget);
-    expect(find.text(AppText.kanbanSnapshotBaselineValue), findsOneWidget);
-    expect(find.text(AppText.kanbanSnapshotNextSliceValue), findsOneWidget);
-    expect(find.text(AppText.kanbanSnapshotBoundaryValue), findsOneWidget);
-
-    expect(find.text(AppText.kanbanSelectionNoneSelected), findsOneWidget);
-    expect(find.text(AppText.kanbanMsgSelectCardToPreview), findsOneWidget);
-
-    await tester.ensureVisible(find.text('KANBAN-ORCH3'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('KANBAN-ORCH3'));
-    await tester.pumpAndSettle();
-
-    expect(
-      find.text(AppText.kanbanSelectionCardSelected),
-      findsAtLeastNWidgets(1),
-    );
-    expect(find.text(AppText.kanbanDetailTaskSummary), findsOneWidget);
-    expect(find.text(AppText.kanbanDetailRecordStatus), findsOneWidget);
-    expect(
-      find.text(AppText.kanbanDetailBoundarySignal),
-      findsAtLeastNWidgets(1),
-    );
-    expect(find.text(AppText.kanbanDetailInspectionOnlyNote), findsOneWidget);
-    expect(find.text(AppText.markerNoLaneMovement), findsAtLeastNWidgets(1));
-    expect(find.text(AppText.markerNoDragDrop), findsAtLeastNWidgets(1));
+    expect(find.text(UserText.aiWorkbenchTitle), findsAtLeastNWidgets(1));
+    expect(find.text(UserText.aiWorkbenchCue), findsOneWidget);
+    expect(find.text(UserText.aiWorkbenchRequest), findsOneWidget);
+    expect(find.text(UserText.aiWorkbenchReview), findsOneWidget);
+    expect(find.text(UserText.aiWorkbenchApproved), findsOneWidget);
+    expect(find.text('AI Command Center'), findsNothing);
+    expect(find.text('Kanban Orchestra'), findsNothing);
+    expect(find.textContaining('DB', findRichText: true), findsNothing);
+    expect(find.textContaining('HOLD', findRichText: true), findsNothing);
   });
 }

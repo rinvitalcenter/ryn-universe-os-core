@@ -1,6 +1,8 @@
+// ignore_for_file: unused_element
+
 import 'package:flutter/material.dart';
 
-import '../../core/text/app_text.dart';
+import '../../core/text/user_text.dart';
 
 class StudyOsShell extends StatefulWidget {
   const StudyOsShell({super.key});
@@ -10,30 +12,343 @@ class StudyOsShell extends StatefulWidget {
 }
 
 class _StudyOsShellState extends State<StudyOsShell> {
-  String _selectedScreen = AppText.studyScreenHome;
-
-  void _selectScreen(String label) {
-    setState(() {
-      _selectedScreen = label;
-    });
-  }
+  String? _detail;
 
   @override
   Widget build(BuildContext context) {
-    final selected = _StudyOsScreenSpec.byLabel(_selectedScreen);
+    final studyTheme = ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: const Color(0xFF2F6FED),
+        brightness: Brightness.light,
+        surface: Colors.white,
+      ),
+      scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+      useMaterial3: true,
+    );
+    return Theme(
+      data: studyTheme,
+      child: _detail == null
+          ? _StudyUserReadySurface(
+              onOpenDetail: (label) => setState(() => _detail = label),
+            )
+          : _StudyDetailSurface(
+              title: _detail!,
+              onBack: () => setState(() => _detail = null),
+            ),
+    );
+  }
+}
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const _StudyOsHero(),
-        const SizedBox(height: 18),
-        _StudyOsScreenMap(
-          selectedLabel: selected.label,
-          onSelected: _selectScreen,
+class _StudyUserReadySurface extends StatelessWidget {
+  const _StudyUserReadySurface({required this.onOpenDetail});
+
+  final ValueChanged<String> onOpenDetail;
+
+  static const _actions = <_StudyActionCardSpec>[
+    _StudyActionCardSpec(
+      UserText.studyActionToday,
+      UserText.studyPickNeededItem,
+      Icons.today_rounded,
+    ),
+    _StudyActionCardSpec(
+      UserText.studyActionAttendance,
+      '출석 상태를 확인합니다.',
+      Icons.fact_check_rounded,
+    ),
+    _StudyActionCardSpec(
+      UserText.studyActionMaterials,
+      '수업 자료를 준비합니다.',
+      Icons.menu_book_rounded,
+    ),
+    _StudyActionCardSpec(
+      UserText.studyActionJournal,
+      '수업 메모를 이어갑니다.',
+      Icons.edit_note_rounded,
+    ),
+    _StudyActionCardSpec(
+      UserText.studyActionReports,
+      '정리할 산출물을 확인합니다.',
+      Icons.summarize_rounded,
+    ),
+    _StudyActionCardSpec(
+      UserText.studyActionMembers,
+      '회원 화면으로 이동합니다.',
+      Icons.group_rounded,
+    ),
+    _StudyActionCardSpec(
+      UserText.studyActionSessions,
+      '세션 목록을 확인합니다.',
+      Icons.calendar_month_rounded,
+    ),
+    _StudyActionCardSpec(
+      UserText.studyActionSettings,
+      '화면 모드를 확인합니다.',
+      Icons.tune_rounded,
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return _StudyOsSurface(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: colorScheme.primary.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Icon(
+                  Icons.school_rounded,
+                  color: colorScheme.primary,
+                  size: 28,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      UserText.studyOsTitle,
+                      style: textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.7,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      UserText.studyUserSubtitle,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 22),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final columns = constraints.maxWidth >= 1500
+                  ? 5
+                  : constraints.maxWidth >= 1120
+                  ? 4
+                  : constraints.maxWidth >= 760
+                  ? 3
+                  : constraints.maxWidth >= 520
+                  ? 2
+                  : 1;
+              final spacing = 12.0;
+              final cardWidth =
+                  (constraints.maxWidth - spacing * (columns - 1)) / columns;
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: [
+                  for (final action in _actions)
+                    SizedBox(
+                      width: cardWidth,
+                      child: _StudyUserActionCard(
+                        spec: action,
+                        onTap: () => onOpenDetail(action.title),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          const _StudyUserEmptyState(),
+        ],
+      ),
+    );
+  }
+}
+
+class _StudyActionCardSpec {
+  const _StudyActionCardSpec(this.title, this.body, this.icon);
+
+  final String title;
+  final String body;
+  final IconData icon;
+}
+
+class _StudyUserActionCard extends StatelessWidget {
+  const _StudyUserActionCard({required this.spec, this.onTap});
+
+  final _StudyActionCardSpec spec;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final card = Container(
+      constraints: const BoxConstraints(minHeight: 120),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.60),
         ),
-        const SizedBox(height: 18),
-        _StudyOsScreenDetail(spec: selected),
-      ],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.035),
+            blurRadius: 18,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: colorScheme.primary.withValues(alpha: 0.09),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(spec.icon, color: colorScheme.primary, size: 21),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            spec.title,
+            style: textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.2,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            spec.body,
+            style: textTheme.bodySmall?.copyWith(
+              color: colorScheme.onSurfaceVariant,
+              height: 1.35,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (onTap == null) {
+      return card;
+    }
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onTap,
+        child: card,
+      ),
+    );
+  }
+}
+
+class _StudyDetailSurface extends StatelessWidget {
+  const _StudyDetailSurface({required this.title, required this.onBack});
+
+  final String title;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return _StudyOsSurface(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextButton.icon(
+            onPressed: onBack,
+            icon: const Icon(Icons.arrow_back_rounded, size: 18),
+            label: const Text(UserText.backToWorkspace),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            '${UserText.navStudy} > $title',
+            style: textTheme.labelLarge?.copyWith(
+              color: colorScheme.primary,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            title,
+            style: textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.6,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(
+                color: colorScheme.outlineVariant.withValues(alpha: 0.60),
+              ),
+            ),
+            child: const Text(UserText.emptyItems),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StudyUserEmptyState extends StatelessWidget {
+  const _StudyUserEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.55),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.info_outline_rounded,
+            color: colorScheme.primary,
+            size: 20,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              '${UserText.studyEmptyRegistered} ${UserText.studyPickNeededItem}',
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onSurfaceVariant,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -52,7 +367,7 @@ class _StudyOsHero extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            AppText.studyOsKicker,
+            UserText.studyOsKicker,
             style: textTheme.labelMedium?.copyWith(
               color: colorScheme.primary,
               fontWeight: FontWeight.w800,
@@ -61,7 +376,7 @@ class _StudyOsHero extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            AppText.studyOsTitle,
+            UserText.studyOsTitle,
             style: textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w800,
               letterSpacing: -0.8,
@@ -72,7 +387,7 @@ class _StudyOsHero extends StatelessWidget {
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 560),
             child: Text(
-              AppText.studyOsCaption,
+              UserText.studyOsCaption,
               style: textTheme.bodyLarge?.copyWith(
                 color: colorScheme.onSurfaceVariant,
                 height: 1.45,
@@ -102,8 +417,8 @@ class _StudyOsScreenMap extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const _StudyOsSectionHeader(
-            title: AppText.studyScreenMapTitle,
-            body: AppText.studyScreenMapBody,
+            title: UserText.studyScreenMapTitle,
+            body: UserText.studyScreenMapBody,
           ),
           const SizedBox(height: 16),
           LayoutBuilder(
@@ -287,7 +602,7 @@ class _StudyOsSelectedScreen extends StatelessWidget {
         const _StudyOsUsableDashboard(),
         const SizedBox(height: 20),
         Text(
-          AppText.studySelectedScreenLabel,
+          UserText.studySelectedScreenLabel,
           style: textTheme.labelMedium?.copyWith(
             color: colorScheme.primary,
             fontWeight: FontWeight.w800,
@@ -344,8 +659,8 @@ class _StudyOsOverview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const _StudyOsSectionHeader(
-      title: AppText.studyOverviewTitle,
-      body: AppText.studyOverviewBody,
+      title: UserText.studyOverviewTitle,
+      body: UserText.studyOverviewBody,
     );
   }
 }
@@ -375,11 +690,11 @@ class _StudyOsPreparationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return const _StudyOsInsetCard(
       icon: Icons.event_available_rounded,
-      title: AppText.studyNextPrepTitle,
-      body: AppText.studyNextPrepBody,
+      title: UserText.studyNextPrepTitle,
+      body: UserText.studyNextPrepBody,
       chips: [
-        AppText.studyActionOpenSessions,
-        AppText.studyActionOpenAttendance,
+        UserText.studyActionOpenSessions,
+        UserText.studyActionOpenAttendance,
       ],
     );
   }
@@ -396,18 +711,18 @@ class _StudyOsOperationFlow extends StatelessWidget {
         const steps = [
           _StudyOsFlowStep(
             icon: Icons.flag_rounded,
-            title: AppText.studyFlowBefore,
-            body: AppText.studyFlowBeforeBody,
+            title: UserText.studyFlowBefore,
+            body: UserText.studyFlowBeforeBody,
           ),
           _StudyOsFlowStep(
             icon: Icons.play_circle_rounded,
-            title: AppText.studyFlowSessionDay,
-            body: AppText.studyFlowSessionDayBody,
+            title: UserText.studyFlowSessionDay,
+            body: UserText.studyFlowSessionDayBody,
           ),
           _StudyOsFlowStep(
             icon: Icons.check_circle_rounded,
-            title: AppText.studyFlowAfter,
-            body: AppText.studyFlowAfterBody,
+            title: UserText.studyFlowAfter,
+            body: UserText.studyFlowAfterBody,
           ),
         ];
 
@@ -417,20 +732,20 @@ class _StudyOsOperationFlow extends StatelessWidget {
             children: [
               _StudyOsFlowStep(
                 icon: Icons.flag_rounded,
-                title: AppText.studyFlowBefore,
-                body: AppText.studyFlowBeforeBody,
+                title: UserText.studyFlowBefore,
+                body: UserText.studyFlowBeforeBody,
               ),
               SizedBox(height: 10),
               _StudyOsFlowStep(
                 icon: Icons.play_circle_rounded,
-                title: AppText.studyFlowSessionDay,
-                body: AppText.studyFlowSessionDayBody,
+                title: UserText.studyFlowSessionDay,
+                body: UserText.studyFlowSessionDayBody,
               ),
               SizedBox(height: 10),
               _StudyOsFlowStep(
                 icon: Icons.check_circle_rounded,
-                title: AppText.studyFlowAfter,
-                body: AppText.studyFlowAfterBody,
+                title: UserText.studyFlowAfter,
+                body: UserText.studyFlowAfterBody,
               ),
             ],
           );
@@ -463,11 +778,11 @@ class _StudyOsCueGrid extends StatelessWidget {
       spacing: 8,
       runSpacing: 8,
       children: [
-        _StudyOsCueChip(Icons.fact_check_rounded, AppText.studyCueAttendance),
-        _StudyOsCueChip(Icons.menu_book_rounded, AppText.studyCueMaterials),
-        _StudyOsCueChip(Icons.link_rounded, AppText.studyCueSessionLink),
-        _StudyOsCueChip(Icons.edit_note_rounded, AppText.studyCueNotesReport),
-        _StudyOsCueChip(Icons.shield_rounded, AppText.studyCueLocalSafe),
+        _StudyOsCueChip(Icons.fact_check_rounded, UserText.studyCueAttendance),
+        _StudyOsCueChip(Icons.menu_book_rounded, UserText.studyCueMaterials),
+        _StudyOsCueChip(Icons.link_rounded, UserText.studyCueSessionLink),
+        _StudyOsCueChip(Icons.edit_note_rounded, UserText.studyCueNotesReport),
+        _StudyOsCueChip(Icons.shield_rounded, UserText.studyCueLocalSafe),
       ],
     );
   }
@@ -676,26 +991,26 @@ class _StudyOsReadinessPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _StudyOsSectionHeader(
-          title: AppText.studyReadinessTitle,
-          body: AppText.studyEmptyState,
+          title: UserText.studyReadinessTitle,
+          body: UserText.studyPickNeededItem,
         ),
         SizedBox(height: 14),
         _StudyOsStatusTile(
-          icon: Icons.laptop_windows_rounded,
-          title: AppText.studyReadinessLocalOnly,
-          body: AppText.studyLocalSafetyHelper,
+          icon: Icons.today_rounded,
+          title: UserText.studyReadinessLocalOnly,
+          body: UserText.studyAddPreparation,
         ),
         SizedBox(height: 10),
         _StudyOsStatusTile(
-          icon: Icons.layers_rounded,
-          title: AppText.studyReadinessStatic,
-          body: AppText.studyOsStaticShellMarker,
+          icon: Icons.menu_book_rounded,
+          title: UserText.studyReadinessStatic,
+          body: UserText.studyActionOpenMaterials,
         ),
         SizedBox(height: 10),
         _StudyOsStatusTile(
-          icon: Icons.lock_outline_rounded,
-          title: AppText.studyReadinessNoSave,
-          body: AppText.studyOsNoCrud,
+          icon: Icons.edit_note_rounded,
+          title: UserText.studyReadinessNoSave,
+          body: UserText.studyActionOpenJournal,
         ),
       ],
     );
@@ -753,7 +1068,7 @@ class _StudyOsEmptyState extends StatelessWidget {
           color: colorScheme.outlineVariant.withValues(alpha: 0.6),
         ),
       ),
-      child: const Text(AppText.studyEmptyState),
+      child: const Text(UserText.studyEmptyState),
     );
   }
 }
@@ -888,58 +1203,58 @@ class _StudyOsScreenSpec {
 
   static const screens = <_StudyOsScreenSpec>[
     _StudyOsScreenSpec(
-      label: AppText.studyScreenHome,
-      helper: AppText.studyHomeHelper,
+      label: UserText.studyScreenHome,
+      helper: UserText.studyHomeHelper,
       icon: Icons.home_rounded,
-      cues: [AppText.studyCueAttendance, AppText.studyCueMaterials],
+      cues: [UserText.studyCueAttendance, UserText.studyCueMaterials],
     ),
     _StudyOsScreenSpec(
-      label: AppText.studyScreenSessions,
-      helper: AppText.studySessionsHelper,
+      label: UserText.studyScreenSessions,
+      helper: UserText.studySessionsHelper,
       icon: Icons.calendar_month_rounded,
-      cues: [AppText.studyActionOpenSessions, AppText.studyFlowBefore],
+      cues: [UserText.studyActionOpenSessions, UserText.studyFlowBefore],
     ),
     _StudyOsScreenSpec(
-      label: AppText.studyScreenSessionDetail,
-      helper: AppText.studySessionDetailHelper,
+      label: UserText.studyScreenSessionDetail,
+      helper: UserText.studySessionDetailHelper,
       icon: Icons.view_agenda_rounded,
-      cues: [AppText.studyCueSessionLink, AppText.studyFlowSessionDay],
+      cues: [UserText.studyCueSessionLink, UserText.studyFlowSessionDay],
     ),
     _StudyOsScreenSpec(
-      label: AppText.studyScreenMembers,
-      helper: AppText.studyMembersHelper,
+      label: UserText.studyScreenMembers,
+      helper: UserText.studyMembersHelper,
       icon: Icons.group_rounded,
-      cues: [AppText.studyCueAttendance, AppText.studyOsNoCrud],
+      cues: [UserText.studyCueAttendance, UserText.studyPickNeededItem],
     ),
     _StudyOsScreenSpec(
-      label: AppText.studyScreenAttendance,
-      helper: AppText.studyAttendanceHelper,
+      label: UserText.studyScreenAttendance,
+      helper: UserText.studyAttendanceHelper,
       icon: Icons.fact_check_rounded,
-      cues: [AppText.studyCueAttendance, AppText.studyActionOpenAttendance],
+      cues: [UserText.studyCueAttendance, UserText.studyActionOpenAttendance],
     ),
     _StudyOsScreenSpec(
-      label: AppText.studyScreenMaterials,
-      helper: AppText.studyMaterialsHelper,
+      label: UserText.studyScreenMaterials,
+      helper: UserText.studyMaterialsHelper,
       icon: Icons.menu_book_rounded,
-      cues: [AppText.studyCueMaterials, AppText.studyCueSessionLink],
+      cues: [UserText.studyCueMaterials, UserText.studyCueSessionLink],
     ),
     _StudyOsScreenSpec(
-      label: AppText.studyScreenJournal,
-      helper: AppText.studyJournalHelper,
+      label: UserText.studyScreenJournal,
+      helper: UserText.studyJournalHelper,
       icon: Icons.edit_note_rounded,
-      cues: [AppText.studyFlowAfter, AppText.studyCueNotesReport],
+      cues: [UserText.studyFlowAfter, UserText.studyCueNotesReport],
     ),
     _StudyOsScreenSpec(
-      label: AppText.studyScreenReports,
-      helper: AppText.studyReportsHelper,
+      label: UserText.studyScreenReports,
+      helper: UserText.studyReportsHelper,
       icon: Icons.summarize_rounded,
-      cues: [AppText.studyCueNotesReport, AppText.studyActionOpenJournal],
+      cues: [UserText.studyCueNotesReport, UserText.studyActionOpenJournal],
     ),
     _StudyOsScreenSpec(
-      label: AppText.studyScreenSettings,
-      helper: AppText.studyLocalSafetyHelper,
-      icon: Icons.shield_rounded,
-      cues: [AppText.studyCueLocalSafe, AppText.studyOsNoRuntimeDb],
+      label: UserText.studyScreenSettings,
+      helper: UserText.studyLocalSafetyHelper,
+      icon: Icons.tune_rounded,
+      cues: [UserText.themeSettingTitle, UserText.studyPickNeededItem],
     ),
   ];
 

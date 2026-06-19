@@ -1,43 +1,88 @@
+// ignore_for_file: unused_element
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
 import 'core/theme/ryn_tokens.dart';
-import 'core/text/app_text.dart';
+import 'core/text/app_text.dart' hide UserText;
+import 'core/text/user_text.dart';
 import 'features/study_os/study_os_shell.dart';
 
 void main() {
   runApp(const RynUniverseApp());
 }
 
-class RynUniverseApp extends StatelessWidget {
+class RynUniverseApp extends StatefulWidget {
   const RynUniverseApp({super.key});
 
   @override
+  State<RynUniverseApp> createState() => _RynUniverseAppState();
+}
+
+class _RynUniverseAppState extends State<RynUniverseApp> {
+  ThemeMode _themeMode = ThemeMode.system;
+
+  void _setThemeMode(ThemeMode mode) {
+    setState(() => _themeMode = mode);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: AppText.productName,
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: RynPalette.navy,
-          brightness: Brightness.light,
+    return _ThemeModeScope(
+      mode: _themeMode,
+      onChanged: _setThemeMode,
+      child: MaterialApp(
+        title: UserText.productName,
+        debugShowCheckedModeBanner: false,
+        themeMode: _themeMode,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: RynPalette.navy,
+            brightness: Brightness.light,
+          ),
+          scaffoldBackgroundColor: RynPalette.ivoryCanvas,
+          useMaterial3: true,
         ),
-        scaffoldBackgroundColor: RynPalette.ivoryCanvas,
-        useMaterial3: true,
+        darkTheme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: RynPalette.gold,
+            brightness: Brightness.dark,
+          ),
+          scaffoldBackgroundColor: RynPalette.navy,
+          useMaterial3: true,
+        ),
+        home: const CoreOsShell(),
       ),
-      home: const CoreOsShell(),
     );
   }
+}
+
+class _ThemeModeScope extends InheritedWidget {
+  const _ThemeModeScope({
+    required this.mode,
+    required this.onChanged,
+    required super.child,
+  });
+
+  final ThemeMode mode;
+  final ValueChanged<ThemeMode> onChanged;
+
+  static _ThemeModeScope of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<_ThemeModeScope>()!;
+  }
+
+  @override
+  bool updateShouldNotify(_ThemeModeScope oldWidget) => mode != oldWidget.mode;
 }
 
 class RynPalette {
   const RynPalette._();
 
-  static const ivoryCanvas = Color(0xFFF7F1E8);
-  static const ivory = Color(0xFFFFFCF7);
-  static const ivorySoft = Color(0xFFFBF4EA);
-  static const ivoryLine = Color(0xFFE7D9CA);
+  static const ivoryCanvas = Color(0xFFF8FAFC);
+  static const ivory = Color(0xFFFFFFFF);
+  static const ivorySoft = Color(0xFFF9FAFB);
+  static const ivoryLine = Color(0xFFE5E7EB);
   static const ink = Color(0xFF111827);
   static const muted = Color(0xFF647082);
   static const warmMuted = Color(0xFF8A735A);
@@ -135,23 +180,39 @@ class CoreOsShell extends StatefulWidget {
   const CoreOsShell({super.key});
 
   static const navigationItems = [
-    NavItem(AppText.navHome, Icons.home_rounded),
-    NavItem(AppText.navStudy, Icons.school_rounded),
-    NavItem(AppText.navCommand, Icons.auto_awesome_rounded),
-    NavItem(AppText.navControl, Icons.hub_rounded),
-    NavItem(AppText.navFlow, Icons.account_tree_rounded),
-    NavItem(AppText.navRecord, Icons.menu_book_rounded),
-    NavItem(AppText.navOutput, Icons.outbox_rounded),
-    NavItem(AppText.navSettings, Icons.tune_rounded),
+    NavItem(UserText.navHome, Icons.home_rounded),
+    NavItem(UserText.navOperating, Icons.dashboard_customize_rounded),
+    NavItem(UserText.navStudy, Icons.school_rounded),
+    NavItem(UserText.navReading, Icons.auto_stories_rounded),
+    NavItem(UserText.navPractice, Icons.self_improvement_rounded),
+    NavItem(UserText.navContent, Icons.draw_rounded),
+    NavItem(UserText.navRecord, Icons.edit_note_rounded),
+    NavItem(UserText.navOutput, Icons.outbox_rounded),
+    NavItem(UserText.navAi, Icons.auto_awesome_rounded),
+    NavItem(UserText.navSettings, Icons.tune_rounded),
   ];
 
   static const moduleItems = [
-    ModuleItem('프로젝트', '진행 맥락', Icons.folder_special_rounded),
-    ModuleItem('문서', '기록 검토', Icons.description_rounded),
-    ModuleItem('AI 모델', '보조 두뇌', Icons.psychology_rounded),
-    ModuleItem('데이터', '로컬 기준', Icons.storage_rounded),
-    ModuleItem('자동화', '승인 후 실행', Icons.bolt_rounded),
-    ModuleItem('설정', '운영 기준', Icons.settings_rounded),
+    ModuleItem(
+      UserText.navOperating,
+      '할 일 · 일정 · 메모',
+      Icons.dashboard_customize_rounded,
+    ),
+    ModuleItem(UserText.navStudy, '세션 · 회원 · 출석', Icons.school_rounded),
+    ModuleItem(
+      UserText.navReading,
+      '타로 · 사주 · 점성학',
+      Icons.auto_stories_rounded,
+    ),
+    ModuleItem(
+      UserText.navPractice,
+      '기공 · 요가 · 명상',
+      Icons.self_improvement_rounded,
+    ),
+    ModuleItem(UserText.navContent, '교안 · 전자책 · 초안', Icons.draw_rounded),
+    ModuleItem(UserText.navRecord, '수업 · 리딩 · 메모', Icons.edit_note_rounded),
+    ModuleItem(UserText.navOutput, '리포트 · 이미지 · PDF', Icons.outbox_rounded),
+    ModuleItem(UserText.navAi, '요청 · 검토', Icons.auto_awesome_rounded),
   ];
 
   static const agents = [
@@ -199,7 +260,7 @@ class CoreOsShell extends StatefulWidget {
 }
 
 class _CoreOsShellState extends State<CoreOsShell> {
-  String _selectedNav = AppText.navHome;
+  String _selectedNav = UserText.navHome;
 
   void _selectNav(String label) {
     setState(() {
@@ -273,13 +334,10 @@ class _ScrollableShellCanvas extends StatelessWidget {
         // 린님-facing Home still gets a small right-edge reserve so screenshots
         // show the full command-center shell instead of cropping the edge.
         final railMode = !showCompactNav;
-        final homeMode = selectedLabel == AppText.navHome;
         final maxContentWidth = ultraCompact
             ? 260.0
-            : railMode && homeMode
-            ? 640.0
             : railMode
-            ? (width < 2200 ? 1180.0 : RynMetrics.maxWidth)
+            ? (width < 2200 ? 1480.0 : 1680.0)
             : width < 1200
             ? 900.0
             : 1240.0;
@@ -320,37 +378,27 @@ class _ShellPageContent extends StatelessWidget {
   final String selectedLabel;
   final ValueChanged<String> onNavSelected;
 
-  bool get _isHome => selectedLabel == AppText.navHome;
-  bool get _isStudy => selectedLabel == AppText.navStudy;
+  bool get _isHome => selectedLabel == UserText.navHome;
+  bool get _isStudy => selectedLabel == UserText.navStudy;
 
   @override
   Widget build(BuildContext context) {
     final body = _isHome
-        ? const <Widget>[
-            _TopSystemBar(showDailyHome: false, compactHome: true),
-            SizedBox(height: 10),
-            _PremiumHomeShell(),
-            SizedBox(height: 14),
-            _PrincipleFooter(),
+        ? <Widget>[
+            const _TopSystemBar(showDailyHome: false, compactHome: true),
+            const SizedBox(height: 14),
+            _BusinessHomeDashboard(onOpenWorkspace: onNavSelected),
           ]
         : _isStudy
         ? const <Widget>[
             _TopSystemBar(showDailyHome: false),
             SizedBox(height: 16),
             StudyOsShell(),
-            SizedBox(height: 14),
-            _PrincipleFooter(),
           ]
-        : const <Widget>[
-            _TopSystemBar(showDailyHome: false),
-            SizedBox(height: 16),
-            _CommandHome(),
-            SizedBox(height: 16),
-            _KanbanOrchestraLane(),
-            SizedBox(height: 16),
-            _ModuleAccessStrip(),
-            SizedBox(height: 14),
-            _PrincipleFooter(),
+        : <Widget>[
+            const _TopSystemBar(showDailyHome: false),
+            const SizedBox(height: 16),
+            _BusinessAreaPage(label: selectedLabel),
           ];
 
     return Column(
@@ -415,9 +463,7 @@ class _NavigationRailPanel extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          const _BoundaryMini(text: AppText.markerStaticPreview),
-          const SizedBox(height: 8),
-          const _BoundaryMini(text: AppText.markerNoAutomation),
+          const _SidebarHint(),
         ],
       ),
     );
@@ -475,6 +521,554 @@ class _CompactNavigationPanel extends StatelessWidget {
   }
 }
 
+class _SidebarHint extends StatelessWidget {
+  const _SidebarHint();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: RynPalette.ivorySoft,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: RynPalette.ivoryLine),
+      ),
+      child: const Text(
+        '개인 운영 허브',
+        style: TextStyle(
+          color: RynPalette.warmMuted,
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+}
+
+class _BusinessHomeDashboard extends StatelessWidget {
+  const _BusinessHomeDashboard({required this.onOpenWorkspace});
+
+  final ValueChanged<String> onOpenWorkspace;
+
+  static const _groups = [
+    _HomeDashboardGroupSpec(UserText.homeToday, [
+      _HomeDashboardItemSpec(
+        UserText.homeTodo,
+        UserText.homeTodoEmpty,
+        Icons.task_alt_rounded,
+      ),
+      _HomeDashboardItemSpec(
+        UserText.homeTodaySchedule,
+        UserText.homeTodayEmpty,
+        Icons.today_rounded,
+      ),
+      _HomeDashboardItemSpec(
+        UserText.homeQuickMemo,
+        UserText.homeQuickMemoBody,
+        Icons.sticky_note_2_rounded,
+      ),
+    ]),
+    _HomeDashboardGroupSpec(UserText.homeThisWeek, [
+      _HomeDashboardItemSpec(
+        UserText.homeWeekSchedule,
+        UserText.homeTodayEmpty,
+        Icons.calendar_month_rounded,
+      ),
+      _HomeDashboardItemSpec(
+        UserText.homeMaterialsReady,
+        UserText.homeMaterialsReadyBody,
+        Icons.menu_book_rounded,
+      ),
+    ]),
+    _HomeDashboardGroupSpec(UserText.homeContinue, [
+      _HomeDashboardItemSpec(
+        UserText.homeContinueRecords,
+        UserText.homeContinueRecordsEmpty,
+        Icons.history_edu_rounded,
+      ),
+      _HomeDashboardItemSpec(
+        UserText.homeOutputsReview,
+        UserText.homeOutputsReviewBody,
+        Icons.outbox_rounded,
+      ),
+      _HomeDashboardItemSpec(
+        UserText.homeAiAssist,
+        UserText.homeAiAssistBody,
+        Icons.auto_awesome_rounded,
+      ),
+    ]),
+  ];
+
+  static const _quickLinks = [
+    _HomeQuickLinkSpec(
+      UserText.navOperating,
+      Icons.dashboard_customize_rounded,
+    ),
+    _HomeQuickLinkSpec(UserText.navStudy, Icons.school_rounded),
+    _HomeQuickLinkSpec(UserText.navReading, Icons.auto_stories_rounded),
+    _HomeQuickLinkSpec(UserText.navPractice, Icons.self_improvement_rounded),
+    _HomeQuickLinkSpec(UserText.navContent, Icons.draw_rounded),
+    _HomeQuickLinkSpec(UserText.navRecord, Icons.edit_note_rounded),
+    _HomeQuickLinkSpec(UserText.navAi, Icons.auto_awesome_rounded),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return _LightCard(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final columns = constraints.maxWidth >= 1500
+                  ? 3
+                  : constraints.maxWidth >= 980
+                  ? 2
+                  : 1;
+              final spacing = 12.0;
+              final groupWidth =
+                  (constraints.maxWidth - spacing * (columns - 1)) / columns;
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: [
+                  for (final group in _groups)
+                    SizedBox(
+                      width: groupWidth,
+                      child: _HomeDashboardGroup(spec: group),
+                    ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            UserText.homeQuickLinks,
+            style: TextStyle(
+              color: RynPalette.ink,
+              fontSize: 14,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.1,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final link in _quickLinks)
+                _HomeQuickLinkChip(
+                  spec: link,
+                  onTap: () => onOpenWorkspace(link.label),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HomeDashboardGroupSpec {
+  const _HomeDashboardGroupSpec(this.title, this.items);
+
+  final String title;
+  final List<_HomeDashboardItemSpec> items;
+}
+
+class _HomeDashboardItemSpec {
+  const _HomeDashboardItemSpec(this.title, this.body, this.icon);
+
+  final String title;
+  final String body;
+  final IconData icon;
+}
+
+class _HomeQuickLinkSpec {
+  const _HomeQuickLinkSpec(this.label, this.icon);
+
+  final String label;
+  final IconData icon;
+}
+
+class _HomeDashboardGroup extends StatelessWidget {
+  const _HomeDashboardGroup({required this.spec});
+
+  final _HomeDashboardGroupSpec spec;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 246),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: RynPalette.ivorySoft,
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
+        border: Border.all(color: RynPalette.ivoryLine),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            spec.title,
+            style: const TextStyle(
+              color: RynPalette.ink,
+              fontWeight: FontWeight.w900,
+              fontSize: 17,
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(height: 10),
+          for (final item in spec.items) ...[
+            _HomeDashboardItemCard(spec: item),
+            if (item != spec.items.last) const SizedBox(height: 8),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _HomeDashboardItemCard extends StatelessWidget {
+  const _HomeDashboardItemCard({required this.spec});
+
+  final _HomeDashboardItemSpec spec;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+        border: Border.all(color: RynPalette.ivoryLine),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _BusinessIconBadge(icon: spec.icon),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  spec.title,
+                  style: const TextStyle(
+                    color: RynPalette.ink,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 15,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  spec.body,
+                  style: const TextStyle(
+                    color: RynPalette.muted,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12.5,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HomeQuickLinkChip extends StatelessWidget {
+  const _HomeQuickLinkChip({required this.spec, required this.onTap});
+
+  final _HomeQuickLinkSpec spec;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+            border: Border.all(color: RynPalette.ivoryLine),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(spec.icon, size: 16, color: RynPalette.deepNavy),
+              const SizedBox(width: 6),
+              Text(
+                spec.label,
+                style: const TextStyle(
+                  color: RynPalette.ink,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _BusinessAreaPage extends StatelessWidget {
+  const _BusinessAreaPage({required this.label});
+
+  final String label;
+
+  _BusinessActionSpec get _spec {
+    return switch (label) {
+      UserText.navOperating => const _BusinessActionSpec(
+        UserText.operatingAreaTitle,
+        UserText.operatingAreaBody,
+        Icons.dashboard_customize_rounded,
+      ),
+      UserText.navReading => const _BusinessActionSpec(
+        UserText.readingAreaTitle,
+        UserText.readingAreaBody,
+        Icons.auto_stories_rounded,
+      ),
+      UserText.navPractice => const _BusinessActionSpec(
+        UserText.practiceAreaTitle,
+        UserText.practiceAreaBody,
+        Icons.self_improvement_rounded,
+      ),
+      UserText.navContent => const _BusinessActionSpec(
+        UserText.contentAreaTitle,
+        UserText.contentAreaBody,
+        Icons.draw_rounded,
+      ),
+      UserText.navRecord => const _BusinessActionSpec(
+        UserText.recordsAreaTitle,
+        UserText.recordsAreaBody,
+        Icons.edit_note_rounded,
+      ),
+      UserText.navOutput => const _BusinessActionSpec(
+        UserText.outputsAreaTitle,
+        UserText.outputsAreaBody,
+        Icons.outbox_rounded,
+      ),
+      UserText.navAi => const _BusinessActionSpec(
+        UserText.aiWorkbenchTitle,
+        UserText.aiWorkbenchCue,
+        Icons.auto_awesome_rounded,
+      ),
+      _ => const _BusinessActionSpec(
+        UserText.settingsAreaTitle,
+        UserText.settingsAreaBody,
+        Icons.tune_rounded,
+      ),
+    };
+  }
+
+  List<Widget> get _workspaceChips {
+    return switch (label) {
+      UserText.navOperating => const [
+        _BusinessChip(UserText.operatingTodo),
+        _BusinessChip(UserText.operatingSchedule),
+        _BusinessChip(UserText.operatingQuickMemo),
+        _BusinessChip(UserText.operatingPrepWork),
+      ],
+      UserText.navReading => const [
+        _BusinessChip(UserText.readingToolTarot),
+        _BusinessChip(UserText.readingToolSaju),
+        _BusinessChip(UserText.readingToolAstrology),
+        _BusinessChip(UserText.readingToolHumanDesign),
+        _BusinessChip(UserText.readingToolPalmistry),
+        _BusinessChip(UserText.readingToolPhysiognomy),
+      ],
+      UserText.navPractice => const [
+        _BusinessChip(UserText.practiceQigong),
+        _BusinessChip(UserText.practiceYoga),
+        _BusinessChip(UserText.practiceMeditation),
+        _BusinessChip(UserText.practiceJournal),
+        _BusinessChip(UserText.practiceBodyBreath),
+      ],
+      UserText.navContent => const [
+        _BusinessChip(UserText.contentLessonPlan),
+        _BusinessChip(UserText.contentEbook),
+        _BusinessChip(UserText.contentLectureDraft),
+        _BusinessChip(UserText.contentSnsDraft),
+      ],
+      UserText.navAi => const [
+        _BusinessChip(UserText.aiWorkbenchRequest),
+        _BusinessChip(UserText.aiWorkbenchReview),
+        _BusinessChip(UserText.aiWorkbenchApproved),
+      ],
+      _ => const [
+        _BusinessChip(UserText.emptyItems),
+        _BusinessChip(UserText.studyPickNeededItem),
+      ],
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final spec = _spec;
+    final settingsMode = label == UserText.navSettings;
+    return _LightCard(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _BusinessIconBadge(icon: spec.icon),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      spec.title,
+                      style: const TextStyle(
+                        color: RynPalette.ink,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.7,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      spec.body,
+                      style: const TextStyle(
+                        color: RynPalette.muted,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        height: 1.45,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          if (settingsMode) ...[
+            const Text(
+              UserText.themeSettingTitle,
+              style: TextStyle(
+                color: RynPalette.ink,
+                fontSize: 16,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: settingsMode
+                ? const [_HeaderThemeToggle()]
+                : _workspaceChips,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BusinessModuleSummary extends StatelessWidget {
+  const _BusinessModuleSummary();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: RynPalette.ivorySoft,
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
+        border: Border.all(color: RynPalette.ivoryLine),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _SectionHeader(
+            title: AppText.moduleModelTitle,
+            caption: AppText.moduleModelBody,
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final item in CoreOsShell.moduleItems)
+                _BusinessChip('${item.label} · ${item.caption}'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BusinessIconBadge extends StatelessWidget {
+  const _BusinessIconBadge({required this.icon});
+
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        color: RynPalette.goldSoft,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Icon(icon, size: 22, color: RynPalette.deepNavy),
+    );
+  }
+}
+
+class _BusinessChip extends StatelessWidget {
+  const _BusinessChip(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
+      decoration: BoxDecoration(
+        color: RynPalette.ivory,
+        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        border: Border.all(color: RynPalette.ivoryLine),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          color: RynPalette.graphite,
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+}
+
+class _BusinessActionSpec {
+  const _BusinessActionSpec(this.title, this.body, this.icon);
+
+  final String title;
+  final String body;
+  final IconData icon;
+}
+
 class _TopSystemBar extends StatelessWidget {
   const _TopSystemBar({this.showDailyHome = true, this.compactHome = false});
 
@@ -497,17 +1091,11 @@ class _TopSystemBar extends StatelessWidget {
               final tight = constraints.maxWidth < 1240;
               final veryTight = constraints.maxWidth < 360;
               final content = [
-                SizedBox(
-                  width: compactHome ? 240 : 300,
-                  child: compactHome
-                      ? const _BrandBlock(compact: true)
-                      : const _BrandBlock(),
+                Expanded(
+                  child: _CommandSearchPlaceholder(compact: compactHome),
                 ),
-                if (!tight) SizedBox(width: compactHome ? 12 : 16),
-                if (!tight)
-                  Expanded(
-                    child: _CommandSearchPlaceholder(compact: compactHome),
-                  ),
+                if (!tight) SizedBox(width: compactHome ? 10 : 12),
+                const _HeaderThemeToggle(),
                 if (!tight) SizedBox(width: compactHome ? 10 : 12),
                 const _OwnerChip(),
               ];
@@ -516,21 +1104,17 @@ class _TopSystemBar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     if (veryTight) ...[
-                      const _BrandBlock(compact: true),
-                      const SizedBox(height: 8),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: const _OwnerChip(),
-                      ),
+                      const _OwnerChip(),
                     ] else
                       Row(
                         children: const [
-                          Expanded(child: _BrandBlock()),
+                          Expanded(child: _CommandSearchPlaceholder()),
+                          SizedBox(width: 10),
+                          _HeaderThemeToggle(),
+                          SizedBox(width: 10),
                           _OwnerChip(),
                         ],
                       ),
-                    SizedBox(height: compactHome ? 6 : (veryTight ? 8 : 10)),
-                    _CommandSearchPlaceholder(compact: compactHome),
                     if (showDailyHome) ...[
                       SizedBox(height: veryTight ? 8 : 10),
                       const _DailyHomeSurface(),
@@ -552,6 +1136,34 @@ class _TopSystemBar extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _HeaderThemeToggle extends StatelessWidget {
+  const _HeaderThemeToggle();
+
+  @override
+  Widget build(BuildContext context) {
+    final scope = _ThemeModeScope.of(context);
+    return SegmentedButton<ThemeMode>(
+      showSelectedIcon: false,
+      style: ButtonStyle(
+        visualDensity: VisualDensity.compact,
+        textStyle: WidgetStateProperty.all(
+          const TextStyle(fontSize: 11, fontWeight: FontWeight.w800),
+        ),
+      ),
+      segments: const [
+        ButtonSegment(value: ThemeMode.light, label: Text(UserText.themeLight)),
+        ButtonSegment(value: ThemeMode.dark, label: Text(UserText.themeDark)),
+        ButtonSegment(
+          value: ThemeMode.system,
+          label: Text(UserText.themeSystem),
+        ),
+      ],
+      selected: {scope.mode},
+      onSelectionChanged: (selection) => scope.onChanged(selection.first),
     );
   }
 }
@@ -4022,7 +4634,7 @@ class _BrandBlock extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    AppText.productName,
+                    UserText.productName,
                     maxLines: ultraCompact ? 2 : 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -4082,7 +4694,7 @@ class _CommandSearchPlaceholder extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              '검색 / 명령 / 흐름 / 기록...',
+              '검색 / 자료 / 기록 / 일정...',
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 color: RynPalette.muted,
