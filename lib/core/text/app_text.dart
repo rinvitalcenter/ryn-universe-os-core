@@ -166,6 +166,23 @@ abstract final class AppText {
   static const studyReadinessLocalOnly = '로컬 우선';
   static const studyReadinessStatic = '정적 표시';
   static const studyReadinessNoSave = '저장 없음';
+  static const studyNextPrepTitle = '다음 스터디 준비';
+  static const studyNextPrepBody = '오늘은 세션 목적, 출석 준비, 자료 연결, 기록 흐름을 먼저 확인합니다.';
+  static const studyFlowBefore = '세션 전';
+  static const studyFlowBeforeBody = '목표 확인 · 출석 준비 · 자료 점검';
+  static const studyFlowSessionDay = '세션 당일';
+  static const studyFlowSessionDayBody = '진행 흐름 · 출석 확인 · 참고 자료';
+  static const studyFlowAfter = '세션 후';
+  static const studyFlowAfterBody = '메모 정리 · 요약 준비 · 다음 조치';
+  static const studyCueAttendance = '출석 준비';
+  static const studyCueMaterials = '자료 준비';
+  static const studyCueSessionLink = '세션-자료 연결';
+  static const studyCueNotesReport = '기록 → 리포트';
+  static const studyCueLocalSafe = '로컬 안전';
+  static const studyActionOpenSessions = '스터디 화면에서 세션 흐름 확인';
+  static const studyActionOpenAttendance = '출석 화면에서 준비 상태 확인';
+  static const studyActionOpenMaterials = '자료 화면에서 연결 개념 확인';
+  static const studyActionOpenJournal = '기록과 리포트 흐름 확인';
 
   // Static / honesty markers
   static const markerStaticPreview = '정적 미리보기';

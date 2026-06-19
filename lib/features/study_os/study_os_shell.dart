@@ -317,6 +317,8 @@ class _StudyOsSelectedScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const _StudyOsOverview(),
+        const SizedBox(height: 18),
+        const _StudyOsUsableDashboard(),
         const SizedBox(height: 20),
         Text(
           AppText.studySelectedScreenLabel,
@@ -350,6 +352,14 @@ class _StudyOsSelectedScreen extends StatelessWidget {
                       height: 1.45,
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: spec.cues
+                        .map((cue) => _StudyOsMiniChip(cue))
+                        .toList(),
+                  ),
                 ],
               ),
             ),
@@ -370,6 +380,323 @@ class _StudyOsOverview extends StatelessWidget {
     return const _StudyOsSectionHeader(
       title: AppText.studyOverviewTitle,
       body: AppText.studyOverviewBody,
+    );
+  }
+}
+
+class _StudyOsUsableDashboard extends StatelessWidget {
+  const _StudyOsUsableDashboard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: const [
+        _StudyOsPreparationCard(),
+        SizedBox(height: 14),
+        _StudyOsOperationFlow(),
+        SizedBox(height: 14),
+        _StudyOsCueGrid(),
+      ],
+    );
+  }
+}
+
+class _StudyOsPreparationCard extends StatelessWidget {
+  const _StudyOsPreparationCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return const _StudyOsInsetCard(
+      icon: Icons.event_available_rounded,
+      title: AppText.studyNextPrepTitle,
+      body: AppText.studyNextPrepBody,
+      chips: [
+        AppText.studyActionOpenSessions,
+        AppText.studyActionOpenAttendance,
+      ],
+    );
+  }
+}
+
+class _StudyOsOperationFlow extends StatelessWidget {
+  const _StudyOsOperationFlow();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final compact = constraints.maxWidth < 680;
+        const steps = [
+          _StudyOsFlowStep(
+            icon: Icons.flag_rounded,
+            title: AppText.studyFlowBefore,
+            body: AppText.studyFlowBeforeBody,
+          ),
+          _StudyOsFlowStep(
+            icon: Icons.play_circle_rounded,
+            title: AppText.studyFlowSessionDay,
+            body: AppText.studyFlowSessionDayBody,
+          ),
+          _StudyOsFlowStep(
+            icon: Icons.check_circle_rounded,
+            title: AppText.studyFlowAfter,
+            body: AppText.studyFlowAfterBody,
+          ),
+        ];
+
+        if (compact) {
+          return const Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _StudyOsFlowStep(
+                icon: Icons.flag_rounded,
+                title: AppText.studyFlowBefore,
+                body: AppText.studyFlowBeforeBody,
+              ),
+              SizedBox(height: 10),
+              _StudyOsFlowStep(
+                icon: Icons.play_circle_rounded,
+                title: AppText.studyFlowSessionDay,
+                body: AppText.studyFlowSessionDayBody,
+              ),
+              SizedBox(height: 10),
+              _StudyOsFlowStep(
+                icon: Icons.check_circle_rounded,
+                title: AppText.studyFlowAfter,
+                body: AppText.studyFlowAfterBody,
+              ),
+            ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: steps
+              .map(
+                (step) => Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 10),
+                    child: step,
+                  ),
+                ),
+              )
+              .toList(),
+        );
+      },
+    );
+  }
+}
+
+class _StudyOsCueGrid extends StatelessWidget {
+  const _StudyOsCueGrid();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        _StudyOsCueChip(Icons.fact_check_rounded, AppText.studyCueAttendance),
+        _StudyOsCueChip(Icons.menu_book_rounded, AppText.studyCueMaterials),
+        _StudyOsCueChip(Icons.link_rounded, AppText.studyCueSessionLink),
+        _StudyOsCueChip(Icons.edit_note_rounded, AppText.studyCueNotesReport),
+        _StudyOsCueChip(Icons.shield_rounded, AppText.studyCueLocalSafe),
+      ],
+    );
+  }
+}
+
+class _StudyOsInsetCard extends StatelessWidget {
+  const _StudyOsInsetCard({
+    required this.icon,
+    required this.title,
+    required this.body,
+    required this.chips,
+  });
+
+  final IconData icon;
+  final String title;
+  final String body;
+  final List<String> chips;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colorScheme.primaryContainer.withValues(alpha: 0.32),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: colorScheme.primary.withValues(alpha: 0.14)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _StudyOsIconBadge(icon: icon, selected: true, large: true),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  body,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: chips
+                      .map((chip) => _StudyOsMiniChip(chip))
+                      .toList(),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StudyOsFlowStep extends StatelessWidget {
+  const _StudyOsFlowStep({
+    required this.icon,
+    required this.title,
+    required this.body,
+  });
+
+  final IconData icon;
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return _StudyOsInsetTile(icon: icon, title: title, body: body);
+  }
+}
+
+class _StudyOsCueChip extends StatelessWidget {
+  const _StudyOsCueChip(this.icon, this.label);
+
+  final IconData icon;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow.withValues(alpha: 0.78),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.65),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: colorScheme.primary),
+          const SizedBox(width: 7),
+          Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
+        ],
+      ),
+    );
+  }
+}
+
+class _StudyOsMiniChip extends StatelessWidget {
+  const _StudyOsMiniChip(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colorScheme.surface.withValues(alpha: 0.78),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+        child: Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
+      ),
+    );
+  }
+}
+
+class _StudyOsInsetTile extends StatelessWidget {
+  const _StudyOsInsetTile({
+    required this.icon,
+    required this.title,
+    required this.body,
+  });
+
+  final IconData icon;
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerLow.withValues(alpha: 0.70),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.46),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: colorScheme.primary),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: textTheme.labelLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  body,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -617,57 +944,68 @@ class _StudyOsScreenSpec {
     required this.label,
     required this.helper,
     required this.icon,
+    required this.cues,
   });
 
   final String label;
   final String helper;
   final IconData icon;
+  final List<String> cues;
 
   static const screens = <_StudyOsScreenSpec>[
     _StudyOsScreenSpec(
       label: AppText.studyScreenHome,
       helper: AppText.studyHomeHelper,
       icon: Icons.home_rounded,
+      cues: [AppText.studyCueAttendance, AppText.studyCueMaterials],
     ),
     _StudyOsScreenSpec(
       label: AppText.studyScreenSessions,
       helper: AppText.studySessionsHelper,
       icon: Icons.calendar_month_rounded,
+      cues: [AppText.studyActionOpenSessions, AppText.studyFlowBefore],
     ),
     _StudyOsScreenSpec(
       label: AppText.studyScreenSessionDetail,
       helper: AppText.studySessionDetailHelper,
       icon: Icons.view_agenda_rounded,
+      cues: [AppText.studyCueSessionLink, AppText.studyFlowSessionDay],
     ),
     _StudyOsScreenSpec(
       label: AppText.studyScreenMembers,
       helper: AppText.studyMembersHelper,
       icon: Icons.group_rounded,
+      cues: [AppText.studyCueAttendance, AppText.studyOsNoCrud],
     ),
     _StudyOsScreenSpec(
       label: AppText.studyScreenAttendance,
       helper: AppText.studyAttendanceHelper,
       icon: Icons.fact_check_rounded,
+      cues: [AppText.studyCueAttendance, AppText.studyActionOpenAttendance],
     ),
     _StudyOsScreenSpec(
       label: AppText.studyScreenMaterials,
       helper: AppText.studyMaterialsHelper,
       icon: Icons.menu_book_rounded,
+      cues: [AppText.studyCueMaterials, AppText.studyCueSessionLink],
     ),
     _StudyOsScreenSpec(
       label: AppText.studyScreenJournal,
       helper: AppText.studyJournalHelper,
       icon: Icons.edit_note_rounded,
+      cues: [AppText.studyFlowAfter, AppText.studyCueNotesReport],
     ),
     _StudyOsScreenSpec(
       label: AppText.studyScreenReports,
       helper: AppText.studyReportsHelper,
       icon: Icons.summarize_rounded,
+      cues: [AppText.studyCueNotesReport, AppText.studyActionOpenJournal],
     ),
     _StudyOsScreenSpec(
       label: AppText.studyScreenSettings,
       helper: AppText.studyLocalSafetyHelper,
       icon: Icons.shield_rounded,
+      cues: [AppText.studyCueLocalSafe, AppText.studyOsNoRuntimeDb],
     ),
   ];
 

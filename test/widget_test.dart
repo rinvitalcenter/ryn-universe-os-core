@@ -223,6 +223,13 @@ void main() {
     expect(find.text(AppText.studyOverviewTitle), findsOneWidget);
     expect(find.text(AppText.studyScreenMapTitle), findsOneWidget);
     expect(find.text(AppText.studyReadinessTitle), findsOneWidget);
+    expect(find.text(AppText.studyNextPrepTitle), findsOneWidget);
+    expect(find.text(AppText.studyFlowBefore), findsOneWidget);
+    expect(find.text(AppText.studyFlowSessionDay), findsOneWidget);
+    expect(find.text(AppText.studyFlowAfter), findsOneWidget);
+    expect(find.text(AppText.studyCueAttendance), findsAtLeastNWidgets(1));
+    expect(find.text(AppText.studyCueMaterials), findsAtLeastNWidgets(1));
+    expect(find.text(AppText.studyCueNotesReport), findsAtLeastNWidgets(1));
     expect(
       find.text(AppText.studyOsStaticShellMarker),
       findsAtLeastNWidgets(1),
