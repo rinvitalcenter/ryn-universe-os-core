@@ -1048,36 +1048,35 @@ class _TarotFullDeckBoard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('tarot-full-deck-stage'),
-      height: 500,
+      height: 620,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: RynPalette.surfaceSoft(context),
-        borderRadius: BorderRadius.circular(32),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            RynPalette.surfaceSoft(context),
+            RynPalette.surfaceElevated(context),
+            RynPalette.accentSoft(context).withValues(alpha: 0.55),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(34),
         border: Border.all(color: RynPalette.line(context)),
         boxShadow: [
+          ...RynPalette.panelShadow(context),
           BoxShadow(
-            color: RynPalette.accent(context).withValues(alpha: 0.08),
-            blurRadius: 42,
-            spreadRadius: 3,
+            color: RynPalette.accent(context).withValues(alpha: 0.12),
+            blurRadius: 52,
+            spreadRadius: 4,
           ),
         ],
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          const rowCount = 3;
-          final cardWidth = constraints.maxWidth >= 1220 ? 54.0 : 48.0;
+          final cardWidth = constraints.maxWidth >= 1500 ? 64.0 : 58.0;
           final cardHeight = cardWidth * 1.5;
-          final gap = constraints.maxWidth >= 1220 ? 10.0 : 8.0;
-          final rowGap = constraints.maxWidth >= 1220 ? 104.0 : 94.0;
-          final rowLength = (cards.length / rowCount).ceil();
-          final tableWidth = math.max(
-            constraints.maxWidth,
-            rowLength * (cardWidth + gap) + 84,
-          );
-          final tableHeight = math.max(
-            constraints.maxHeight,
-            (rowCount - 1) * rowGap + cardHeight + 74,
-          );
+          final tableWidth = math.max(constraints.maxWidth, cardWidth * 24.5);
+          final tableHeight = math.max(constraints.maxHeight, 560.0);
           return SingleChildScrollView(
             key: const Key('tarot-full-deck-grid'),
             scrollDirection: Axis.horizontal,
@@ -1087,15 +1086,30 @@ class _TarotFullDeckBoard extends StatelessWidget {
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(28),
+                          gradient: RadialGradient(
+                            center: const Alignment(0, -0.15),
+                            radius: 0.9,
+                            colors: [
+                              Colors.white.withValues(alpha: 0.18),
+                              Colors.transparent,
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                   for (var index = 0; index < cards.length; index++)
-                    _PositionedTableCard(
+                    _PositionedFanCard(
                       index: index,
-                      rowLength: rowLength,
                       cardWidth: cardWidth,
                       cardHeight: cardHeight,
-                      gap: gap,
-                      rowGap: rowGap,
                       tableWidth: tableWidth,
+                      tableHeight: tableHeight,
                       selected: selectedIndexes.contains(index),
                       disabled:
                           targetReached && !selectedIndexes.contains(index),
@@ -1111,52 +1125,59 @@ class _TarotFullDeckBoard extends StatelessWidget {
   }
 }
 
-class _PositionedTableCard extends StatelessWidget {
-  const _PositionedTableCard({
+class _PositionedFanCard extends StatelessWidget {
+  const _PositionedFanCard({
     required this.index,
-    required this.rowLength,
     required this.cardWidth,
     required this.cardHeight,
-    required this.gap,
-    required this.rowGap,
     required this.tableWidth,
+    required this.tableHeight,
     required this.selected,
     required this.disabled,
     required this.onTap,
   });
 
   final int index;
-  final int rowLength;
   final double cardWidth;
   final double cardHeight;
-  final double gap;
-  final double rowGap;
   final double tableWidth;
+  final double tableHeight;
   final bool selected;
   final bool disabled;
   final VoidCallback onTap;
 
+  static const _tierStarts = [0, 28, 56, 78];
+
   @override
   Widget build(BuildContext context) {
-    final row = index ~/ rowLength;
-    final column = index % rowLength;
-    final rowCards = math.min(rowLength, 78 - row * rowLength);
-    final rowWidth = rowCards * (cardWidth + gap) - gap;
-    final rowStart =
-        (tableWidth - rowWidth) / 2 + (row.isOdd ? cardWidth * 0.44 : 0);
-    final normalized = rowCards <= 1 ? 0.0 : (column / (rowCards - 1)) * 2 - 1;
-    final arc = math.pow(normalized, 2).toDouble() * 22;
-    final y = 34 + row * rowGap + arc + (row == 1 ? 18 : 0);
-    final angle = normalized * (row == 1 ? 0.09 : 0.14) + (row - 1) * 0.035;
+    final tier = index < _tierStarts[1]
+        ? 0
+        : index < _tierStarts[2]
+        ? 1
+        : 2;
+    final tierStart = _tierStarts[tier];
+    final tierEnd = _tierStarts[tier + 1];
+    final localIndex = index - tierStart;
+    final tierCount = tierEnd - tierStart;
+    final t = tierCount <= 1 ? 0.5 : localIndex / (tierCount - 1);
+    final angle = -1.18 + (2.36 * t);
+    final radiusX = tableWidth * (0.38 + tier * 0.035);
+    final radiusY = 155.0 + tier * 22.0;
+    final centerX = tableWidth / 2;
+    final centerY = -44.0 + tier * 128.0;
+    final stagger = tier.isOdd ? cardWidth * 0.28 : 0.0;
+    final x = centerX + radiusX * math.sin(angle) - cardWidth / 2 + stagger;
+    final y = centerY + radiusY * math.cos(angle) + tier * 54;
+    final rotation = angle * 0.34;
     return Positioned(
-      left: rowStart + column * (cardWidth + gap),
-      top: y,
+      left: x.clamp(0.0, tableWidth - cardWidth),
+      top: y.clamp(16.0, tableHeight - cardHeight - 18),
       width: cardWidth,
       height: cardHeight,
       child: _TarotFullDeckCard(
         key: Key('tarot-full-deck-card-$index'),
         index: index,
-        angle: angle,
+        angle: rotation,
         selected: selected,
         disabled: disabled,
         onTap: onTap,
@@ -1191,19 +1212,25 @@ class _TarotFullDeckCardState extends State<_TarotFullDeckCard> {
   @override
   Widget build(BuildContext context) {
     final lifted = _hovered && !widget.disabled;
+    final liftAngle = widget.angle - math.pi / 2;
+    final liftOffset = Offset(
+      math.cos(liftAngle) * (lifted ? 10 : 0),
+      math.sin(liftAngle) * (lifted ? 10 : 0),
+    );
     return MouseRegion(
+      cursor: widget.disabled ? MouseCursor.defer : SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedScale(
-        scale: lifted ? 1.2 : 1.0,
+        scale: lifted ? 1.28 : 1.0,
         duration: const Duration(milliseconds: 140),
         curve: Curves.easeOutCubic,
         child: Transform.translate(
-          offset: Offset(0, lifted ? -12 : 0),
+          offset: liftOffset,
           child: Transform.rotate(
             angle: widget.angle,
             child: Opacity(
-              opacity: widget.disabled ? 0.38 : 1,
+              opacity: widget.disabled ? 0.42 : 1,
               child: _TarotCardBackChoice(
                 onTap: widget.disabled || widget.selected
                     ? () {}
@@ -1506,8 +1533,8 @@ class _TarotCardBack extends StatelessWidget {
     return AnimatedContainer(
       key: const Key('tarot-card-back'),
       duration: const Duration(milliseconds: 220),
-      width: compact ? 48 : 86,
-      height: compact ? 72 : 132,
+      width: compact ? 58 : 86,
+      height: compact ? 87 : 132,
       decoration: BoxDecoration(
         color: RynPalette.accentSoft(context),
         borderRadius: BorderRadius.circular(16),
@@ -1984,57 +2011,57 @@ class _TarotSlotSpec {
 const _tarotSpreadOneSlots = [_TarotSlotSpec('중심', 0.5, 0.5)];
 
 const _tarotSpreadThreeSlots = [
-  _TarotSlotSpec('과거', 0.08, 0.5),
+  _TarotSlotSpec('과거', 0.2, 0.5),
   _TarotSlotSpec('현재', 0.5, 0.5),
-  _TarotSlotSpec('미래', 0.92, 0.5),
+  _TarotSlotSpec('미래', 0.8, 0.5),
 ];
 
 const _tarotSpreadFourSlots = [
-  _TarotSlotSpec('상단', 0.5, 0.0),
-  _TarotSlotSpec('좌측', 0.08, 0.5),
-  _TarotSlotSpec('우측', 0.92, 0.5),
-  _TarotSlotSpec('하단', 0.5, 1.0),
+  _TarotSlotSpec('상단', 0.5, 0.08),
+  _TarotSlotSpec('좌측', 0.25, 0.5),
+  _TarotSlotSpec('우측', 0.75, 0.5),
+  _TarotSlotSpec('하단', 0.5, 0.92),
 ];
 
 const _tarotSpreadFiveSlots = [
   _TarotSlotSpec('중심', 0.5, 0.5),
-  _TarotSlotSpec('위', 0.5, 0.0),
-  _TarotSlotSpec('아래', 0.5, 1.0),
-  _TarotSlotSpec('좌', 0.04, 0.5),
-  _TarotSlotSpec('우', 0.96, 0.5),
+  _TarotSlotSpec('위', 0.5, 0.08),
+  _TarotSlotSpec('아래', 0.5, 0.92),
+  _TarotSlotSpec('좌', 0.22, 0.5),
+  _TarotSlotSpec('우', 0.78, 0.5),
 ];
 
 const _tarotSpreadCelticSlots = [
-  _TarotSlotSpec('현재', 0.28, 0.5),
-  _TarotSlotSpec('교차', 0.43, 0.5),
-  _TarotSlotSpec('위', 0.36, 0.0),
-  _TarotSlotSpec('아래', 0.36, 1.0),
-  _TarotSlotSpec('과거', 0.04, 0.5),
+  _TarotSlotSpec('현재', 0.34, 0.5),
+  _TarotSlotSpec('교차', 0.47, 0.5),
+  _TarotSlotSpec('위', 0.4, 0.08),
+  _TarotSlotSpec('아래', 0.4, 0.92),
+  _TarotSlotSpec('과거', 0.14, 0.5),
   _TarotSlotSpec('미래', 0.62, 0.5),
-  _TarotSlotSpec('조언', 0.96, 1.0),
-  _TarotSlotSpec('환경', 0.96, 0.66),
-  _TarotSlotSpec('희망', 0.96, 0.33),
-  _TarotSlotSpec('결과', 0.96, 0.0),
+  _TarotSlotSpec('조언', 0.84, 0.92),
+  _TarotSlotSpec('환경', 0.84, 0.64),
+  _TarotSlotSpec('희망', 0.84, 0.36),
+  _TarotSlotSpec('결과', 0.84, 0.08),
 ];
 
 const _tarotSpreadBinarySlots = [
-  _TarotSlotSpec('A 시작', 0.18, 0.0),
-  _TarotSlotSpec('A 흐름', 0.18, 0.5),
-  _TarotSlotSpec('A 결과', 0.18, 1.0),
-  _TarotSlotSpec('B 시작', 0.82, 0.0),
-  _TarotSlotSpec('B 흐름', 0.82, 0.5),
-  _TarotSlotSpec('B 결과', 0.82, 1.0),
+  _TarotSlotSpec('A 시작', 0.28, 0.08),
+  _TarotSlotSpec('A 흐름', 0.28, 0.5),
+  _TarotSlotSpec('A 결과', 0.28, 0.92),
+  _TarotSlotSpec('B 시작', 0.72, 0.08),
+  _TarotSlotSpec('B 흐름', 0.72, 0.5),
+  _TarotSlotSpec('B 결과', 0.72, 0.92),
 ];
 
 const _tarotSpreadRelationSlots = [
-  _TarotSlotSpec('나', 0.08, 0.5),
-  _TarotSlotSpec('상대', 0.92, 0.5),
-  _TarotSlotSpec('연결', 0.5, 0.0),
-  _TarotSlotSpec('흐름', 0.5, 1.0),
+  _TarotSlotSpec('나', 0.24, 0.5),
+  _TarotSlotSpec('상대', 0.76, 0.5),
+  _TarotSlotSpec('연결', 0.5, 0.12),
+  _TarotSlotSpec('흐름', 0.5, 0.88),
 ];
 
 const _tarotSpreadIssueSlots = [
-  _TarotSlotSpec('문제', 0.08, 0.5),
+  _TarotSlotSpec('문제', 0.2, 0.5),
   _TarotSlotSpec('원인', 0.5, 0.5),
-  _TarotSlotSpec('해결', 0.92, 0.5),
+  _TarotSlotSpec('해결', 0.8, 0.5),
 ];
