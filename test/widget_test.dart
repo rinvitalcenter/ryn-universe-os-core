@@ -336,6 +336,7 @@ void main() {
       find.byKey(const Key('tarot-rws-card-image')).first,
     );
     expect(firstImage.image, isA<AssetImage>());
+    expect(firstImage.fit, BoxFit.contain);
     expect(
       (firstImage.image as AssetImage).assetName,
       startsWith('assets/tarot/decks/rws_public_domain/'),
@@ -347,6 +348,11 @@ void main() {
     expect(find.byKey(const Key('tarot-drawn-card')), findsNWidgets(3));
     expect(find.byKey(const Key('tarot-empty-slot')), findsNothing);
     expect(find.text(UserText.tarotReversed), findsAtLeastNWidgets(1));
+    final drawnAssetNames = tester
+        .widgetList<Image>(find.byKey(const Key('tarot-rws-card-image')))
+        .map((image) => (image.image as AssetImage).assetName)
+        .toSet();
+    expect(drawnAssetNames, hasLength(3));
 
     await tester.tap(find.text(UserText.tarotResetDraw));
     await tester.pumpAndSettle();

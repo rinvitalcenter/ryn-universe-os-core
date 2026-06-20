@@ -573,7 +573,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
 
   void _resetDeck() {
     _remainingDeck = List<_TarotCardDefinition>.of(_rwsCards)
-      ..shuffle(math.Random(42));
+      ..shuffle(math.Random());
     _drawnCards.clear();
   }
 
@@ -1104,9 +1104,9 @@ class _TarotSpreadCanvas extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cardSize = _cardSizeForSlots(slots.length);
+    final canvasHeight = _canvasHeightForSlots(slots.length);
     return Container(
-      height: 620,
+      height: canvasHeight,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: RynPalette.surfaceSoft(context),
@@ -1147,7 +1147,12 @@ class _TarotSpreadCanvas extends StatelessWidget {
               ),
               child: LayoutBuilder(
                 builder: (context, constraints) {
+                  final cardSize = _cardSizeForLayout(
+                    slots.length,
+                    constraints,
+                  );
                   return Stack(
+                    alignment: Alignment.center,
                     children: [
                       for (var index = 0; index < slots.length; index++)
                         Positioned(
@@ -1180,12 +1185,45 @@ class _TarotSpreadCanvas extends StatelessWidget {
   }
 }
 
-Size _cardSizeForSlots(int count) {
-  if (count == 1) return const Size(142, 224);
-  if (count <= 3) return const Size(124, 198);
-  if (count <= 5) return const Size(110, 176);
-  if (count <= 6) return const Size(100, 158);
-  return const Size(88, 140);
+double _canvasHeightForSlots(int count) {
+  if (count == 1) return 680;
+  if (count <= 3) return 660;
+  if (count <= 5) return 720;
+  if (count <= 6) return 740;
+  return 780;
+}
+
+Size _cardSizeForLayout(int count, BoxConstraints constraints) {
+  final maxWidth = constraints.maxWidth;
+  final maxHeight = constraints.maxHeight;
+  final preferredWidth = switch (count) {
+    1 => 210.0,
+    <= 3 => 160.0,
+    <= 5 => 132.0,
+    <= 6 => 124.0,
+    _ => 96.0,
+  };
+  final horizontalSlots = switch (count) {
+    1 => 1.8,
+    <= 3 => 4.0,
+    <= 5 => 5.0,
+    <= 6 => 4.2,
+    _ => 5.8,
+  };
+  final verticalSlots = switch (count) {
+    1 => 1.2,
+    <= 3 => 1.7,
+    <= 5 => 3.2,
+    <= 6 => 3.4,
+    _ => 4.25,
+  };
+  final widthLimit = maxWidth / horizontalSlots;
+  final heightLimit = ((maxHeight / verticalSlots) - 50) / 1.62;
+  final width = math.max(
+    62.0,
+    math.min(preferredWidth, math.min(widthLimit, heightLimit)),
+  );
+  return Size(width, (width * 1.62) + 50);
 }
 
 class _TarotEmptySlot extends StatelessWidget {
@@ -1270,29 +1308,41 @@ class _TarotDrawnCardView extends StatelessWidget {
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(11),
-              child: Image.asset(
-                drawnCard.card.imagePath,
-                key: const Key('tarot-rws-card-image'),
-                fit: BoxFit.cover,
-                width: double.infinity,
-                alignment: Alignment.topCenter,
+              child: ColoredBox(
+                color: RynPalette.surface(context),
+                child: Image.asset(
+                  drawnCard.card.imagePath,
+                  key: const Key('tarot-rws-card-image'),
+                  fit: BoxFit.contain,
+                  width: double.infinity,
+                  height: double.infinity,
+                  alignment: Alignment.center,
+                ),
               ),
             ),
           ),
-          const SizedBox(height: 5),
-          Text(
-            drawnCard.card.label,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: RynPalette.text(context),
-              fontSize: 11,
-              fontWeight: FontWeight.w900,
+          const SizedBox(height: 6),
+          SizedBox(
+            height: 44,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  drawnCard.card.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: RynPalette.text(context),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                _TarotSmallBadge(orientation, compact: true),
+              ],
             ),
           ),
-          const SizedBox(height: 4),
-          _TarotSmallBadge(orientation, compact: true),
         ],
       ),
     );
@@ -1462,60 +1512,60 @@ class _TarotSlotSpec {
   final double yRatio;
 }
 
-const _tarotSpreadOneSlots = [_TarotSlotSpec('중심', 0.5, 0.38)];
+const _tarotSpreadOneSlots = [_TarotSlotSpec('중심', 0.5, 0.5)];
 
 const _tarotSpreadThreeSlots = [
-  _TarotSlotSpec('과거', 0.16, 0.42),
-  _TarotSlotSpec('현재', 0.5, 0.32),
-  _TarotSlotSpec('미래', 0.84, 0.42),
+  _TarotSlotSpec('과거', 0.08, 0.5),
+  _TarotSlotSpec('현재', 0.5, 0.5),
+  _TarotSlotSpec('미래', 0.92, 0.5),
 ];
 
 const _tarotSpreadFourSlots = [
-  _TarotSlotSpec('상단', 0.5, 0.08),
-  _TarotSlotSpec('좌측', 0.2, 0.42),
-  _TarotSlotSpec('우측', 0.8, 0.42),
-  _TarotSlotSpec('하단', 0.5, 0.76),
+  _TarotSlotSpec('상단', 0.5, 0.0),
+  _TarotSlotSpec('좌측', 0.08, 0.5),
+  _TarotSlotSpec('우측', 0.92, 0.5),
+  _TarotSlotSpec('하단', 0.5, 1.0),
 ];
 
 const _tarotSpreadFiveSlots = [
-  _TarotSlotSpec('중심', 0.5, 0.42),
-  _TarotSlotSpec('위', 0.5, 0.12),
-  _TarotSlotSpec('아래', 0.5, 0.74),
-  _TarotSlotSpec('좌', 0.22, 0.42),
-  _TarotSlotSpec('우', 0.78, 0.42),
+  _TarotSlotSpec('중심', 0.5, 0.5),
+  _TarotSlotSpec('위', 0.5, 0.0),
+  _TarotSlotSpec('아래', 0.5, 1.0),
+  _TarotSlotSpec('좌', 0.04, 0.5),
+  _TarotSlotSpec('우', 0.96, 0.5),
 ];
 
 const _tarotSpreadCelticSlots = [
-  _TarotSlotSpec('현재', 0.34, 0.4),
-  _TarotSlotSpec('교차', 0.47, 0.4),
-  _TarotSlotSpec('위', 0.4, 0.08),
-  _TarotSlotSpec('아래', 0.4, 0.72),
-  _TarotSlotSpec('과거', 0.15, 0.4),
-  _TarotSlotSpec('미래', 0.64, 0.4),
-  _TarotSlotSpec('조언', 0.86, 0.76),
-  _TarotSlotSpec('환경', 0.86, 0.53),
-  _TarotSlotSpec('희망', 0.86, 0.3),
-  _TarotSlotSpec('결과', 0.86, 0.07),
+  _TarotSlotSpec('현재', 0.28, 0.5),
+  _TarotSlotSpec('교차', 0.43, 0.5),
+  _TarotSlotSpec('위', 0.36, 0.0),
+  _TarotSlotSpec('아래', 0.36, 1.0),
+  _TarotSlotSpec('과거', 0.04, 0.5),
+  _TarotSlotSpec('미래', 0.62, 0.5),
+  _TarotSlotSpec('조언', 0.96, 1.0),
+  _TarotSlotSpec('환경', 0.96, 0.66),
+  _TarotSlotSpec('희망', 0.96, 0.33),
+  _TarotSlotSpec('결과', 0.96, 0.0),
 ];
 
 const _tarotSpreadBinarySlots = [
-  _TarotSlotSpec('A 시작', 0.22, 0.16),
-  _TarotSlotSpec('A 흐름', 0.22, 0.45),
-  _TarotSlotSpec('A 결과', 0.22, 0.74),
-  _TarotSlotSpec('B 시작', 0.78, 0.16),
-  _TarotSlotSpec('B 흐름', 0.78, 0.45),
-  _TarotSlotSpec('B 결과', 0.78, 0.74),
+  _TarotSlotSpec('A 시작', 0.18, 0.0),
+  _TarotSlotSpec('A 흐름', 0.18, 0.5),
+  _TarotSlotSpec('A 결과', 0.18, 1.0),
+  _TarotSlotSpec('B 시작', 0.82, 0.0),
+  _TarotSlotSpec('B 흐름', 0.82, 0.5),
+  _TarotSlotSpec('B 결과', 0.82, 1.0),
 ];
 
 const _tarotSpreadRelationSlots = [
-  _TarotSlotSpec('나', 0.22, 0.45),
-  _TarotSlotSpec('상대', 0.78, 0.45),
-  _TarotSlotSpec('연결', 0.5, 0.22),
-  _TarotSlotSpec('흐름', 0.5, 0.68),
+  _TarotSlotSpec('나', 0.08, 0.5),
+  _TarotSlotSpec('상대', 0.92, 0.5),
+  _TarotSlotSpec('연결', 0.5, 0.0),
+  _TarotSlotSpec('흐름', 0.5, 1.0),
 ];
 
 const _tarotSpreadIssueSlots = [
-  _TarotSlotSpec('문제', 0.2, 0.45),
-  _TarotSlotSpec('원인', 0.5, 0.28),
-  _TarotSlotSpec('해결', 0.8, 0.45),
+  _TarotSlotSpec('문제', 0.08, 0.5),
+  _TarotSlotSpec('원인', 0.5, 0.5),
+  _TarotSlotSpec('해결', 0.92, 0.5),
 ];
