@@ -1094,75 +1094,82 @@ class _ReadingWorkspacePageState extends State<_ReadingWorkspacePage> {
     if (_tarotOpen) {
       return TarotSpreadShell(onBack: () => setState(() => _tarotOpen = false));
     }
-    return _LightCard(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const _TopSystemBar(showDailyHome: false),
+        const SizedBox(height: 16),
+        _LightCard(
+          padding: const EdgeInsets.all(24),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const _BusinessIconBadge(icon: Icons.auto_stories_rounded),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      UserText.readingWorkspaceTitle,
-                      style: TextStyle(
-                        color: RynPalette.text(context),
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.7,
-                      ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _BusinessIconBadge(icon: Icons.auto_stories_rounded),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          UserText.readingWorkspaceTitle,
+                          style: TextStyle(
+                            color: RynPalette.text(context),
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.7,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          UserText.readingAreaBody,
+                          style: TextStyle(
+                            color: RynPalette.subtext(context),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            height: 1.45,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      UserText.readingAreaBody,
-                      style: TextStyle(
-                        color: RynPalette.subtext(context),
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        height: 1.45,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  _ReadingToolCard(
+                    label: UserText.readingToolTarot,
+                    caption: UserText.tarotSubtitle,
+                    icon: Icons.style_rounded,
+                    prominent: true,
+                    onTap: () => setState(() => _tarotOpen = true),
+                  ),
+                  const _ReadingToolCard(
+                    label: UserText.readingToolSaju,
+                    caption: '사주와 명리 흐름은 타로 이후에 준비합니다.',
+                    icon: Icons.grid_view_rounded,
+                  ),
+                  const _ReadingToolCard(
+                    label: UserText.readingToolAstrology,
+                    caption: '별자리와 차트 읽기를 위한 자리입니다.',
+                    icon: Icons.public_rounded,
+                  ),
+                  const _ReadingToolCard(
+                    label: UserText.readingToolHumanDesign,
+                    caption: '휴먼디자인 노트를 위한 자리입니다.',
+                    icon: Icons.hub_rounded,
+                  ),
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              _ReadingToolCard(
-                label: UserText.readingToolTarot,
-                caption: UserText.tarotSubtitle,
-                icon: Icons.style_rounded,
-                prominent: true,
-                onTap: () => setState(() => _tarotOpen = true),
-              ),
-              const _ReadingToolCard(
-                label: UserText.readingToolSaju,
-                caption: '사주와 명리 흐름은 타로 이후에 준비합니다.',
-                icon: Icons.grid_view_rounded,
-              ),
-              const _ReadingToolCard(
-                label: UserText.readingToolAstrology,
-                caption: '별자리와 차트 읽기를 위한 자리입니다.',
-                icon: Icons.public_rounded,
-              ),
-              const _ReadingToolCard(
-                label: UserText.readingToolHumanDesign,
-                caption: '휴먼디자인 노트를 위한 자리입니다.',
-                icon: Icons.hub_rounded,
-              ),
-            ],
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
