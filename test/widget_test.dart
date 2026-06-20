@@ -297,13 +297,12 @@ void main() {
 
     expect(find.text(UserText.tarotDeckSelect), findsOneWidget);
     expect(find.text(UserText.tarotSpreadSelect), findsOneWidget);
-    expect(find.text(UserText.tarotManualDraw), findsOneWidget);
-    expect(find.text(UserText.tarotAutoDraw), findsOneWidget);
-    expect(find.text(UserText.tarotDeckPile), findsOneWidget);
+    expect(find.text('준비하기'), findsOneWidget);
     expect(find.text('셔플하기'), findsAtLeastNWidgets(1));
-    expect(find.text(UserText.tarotResultTable), findsOneWidget);
     expect(find.text(UserText.tarotQuestion), findsOneWidget);
     expect(find.text(UserText.tarotMemo), findsOneWidget);
+    expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
+    expect(find.byKey(const Key('tarot-empty-slot')), findsNothing);
 
     for (final spread in [
       UserText.tarotSpreadOne,
@@ -323,21 +322,34 @@ void main() {
       expect(find.text(deck), findsAtLeastNWidgets(1));
     }
 
-    expect(find.byKey(const Key('tarot-empty-slot')), findsNWidgets(3));
-    expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
-    expect(find.byKey(const Key('tarot-card-back')), findsWidgets);
     expect(find.byKey(const Key('tarot-shuffle-button')), findsOneWidget);
-
     await tester.tap(find.byKey(const Key('tarot-shuffle-button')));
     await tester.pumpAndSettle();
-    expect(find.text(UserText.tarotDrawPreparation), findsOneWidget);
-    expect(find.byKey(const Key('tarot-fan-selection')), findsOneWidget);
-    expect(find.byKey(const Key('tarot-card-back-choice')), findsWidgets);
 
-    await tester.tap(find.byKey(const Key('tarot-fan-card-3')));
+    expect(find.text(UserText.tarotDrawPreparation), findsOneWidget);
+    expect(find.byKey(const Key('tarot-full-deck-stage')), findsOneWidget);
+    expect(find.byKey(const Key('tarot-full-deck-card-0')), findsOneWidget);
+    expect(find.byKey(const Key('tarot-full-deck-card-77')), findsOneWidget);
+    expect(find.byKey(const Key('tarot-card-back-image')), findsNWidgets(78));
+    expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
+    expect(find.byKey(const Key('tarot-show-result-button')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('tarot-full-deck-card-3')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('tarot-drawn-card')), findsOneWidget);
-    expect(find.byKey(const Key('tarot-empty-slot')), findsNWidgets(2));
+    expect(find.text('1 / 3 선택'), findsOneWidget);
+    expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
+
+    await tester.tap(find.byKey(const Key('tarot-full-deck-card-7')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('tarot-full-deck-card-12')));
+    await tester.pumpAndSettle();
+    expect(find.text('3 / 3 선택'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('tarot-show-result-button')));
+    await tester.pumpAndSettle();
+    expect(find.text(UserText.tarotResultTable), findsOneWidget);
+    expect(find.byKey(const Key('tarot-drawn-card')), findsNWidgets(3));
+    expect(find.byKey(const Key('tarot-empty-slot')), findsNothing);
     final firstImage = tester.widget<Image>(
       find.byKey(const Key('tarot-rws-card-image')).first,
     );
@@ -348,11 +360,6 @@ void main() {
       startsWith('assets/tarot/decks/rws_public_domain/'),
     );
     expect(find.text(UserText.tarotUpright), findsAtLeastNWidgets(1));
-
-    await tester.tap(find.text(UserText.tarotAutoDraw));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('tarot-drawn-card')), findsNWidgets(3));
-    expect(find.byKey(const Key('tarot-empty-slot')), findsNothing);
     expect(find.text(UserText.tarotReversed), findsAtLeastNWidgets(1));
     final drawnAssetNames = tester
         .widgetList<Image>(find.byKey(const Key('tarot-rws-card-image')))
@@ -362,12 +369,11 @@ void main() {
 
     await tester.tap(find.text(UserText.tarotResetDraw));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('tarot-empty-slot')), findsNWidgets(3));
+    expect(find.text('준비하기'), findsOneWidget);
     expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
 
     await tester.tap(find.text(UserText.tarotSpreadOne));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('tarot-empty-slot')), findsOneWidget);
     await tester.tap(find.text(UserText.tarotAutoDraw));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('tarot-drawn-card')), findsOneWidget);
