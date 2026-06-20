@@ -259,6 +259,117 @@ void main() {
     expect(find.text(UserText.readingToolSaju), findsOneWidget);
   });
 
+  testWidgets('Reading workspace opens RWS Tarot draw flow without storage', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 1100);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+
+    const menuLabels = <String>[
+      UserText.navHome,
+      UserText.navOperating,
+      UserText.navStudy,
+      UserText.navReading,
+      UserText.navPractice,
+      UserText.navContent,
+      UserText.navRecord,
+      UserText.navOutput,
+      UserText.navAi,
+      UserText.navSettings,
+    ];
+    for (final label in menuLabels) {
+      expect(find.text(label), findsAtLeastNWidgets(1));
+    }
+
+    await tester.tap(find.text(UserText.navReading).first);
+    await tester.pumpAndSettle();
+    expect(find.text(UserText.readingToolTarot), findsAtLeastNWidgets(1));
+
+    await tester.tap(find.text(UserText.readingToolTarot).last);
+    await tester.pumpAndSettle();
+
+    expect(find.text(UserText.tarotDeckSelect), findsOneWidget);
+    expect(find.text(UserText.tarotSpreadSelect), findsOneWidget);
+    expect(find.text(UserText.tarotManualDraw), findsOneWidget);
+    expect(find.text(UserText.tarotAutoDraw), findsOneWidget);
+    expect(find.text(UserText.tarotDeckPile), findsOneWidget);
+    expect(find.text(UserText.tarotDrawPreparation), findsOneWidget);
+    expect(find.text(UserText.tarotResultTable), findsOneWidget);
+    expect(find.text(UserText.tarotQuestion), findsOneWidget);
+    expect(find.text(UserText.tarotMemo), findsOneWidget);
+
+    for (final spread in [
+      UserText.tarotSpreadOne,
+      UserText.tarotSpreadThree,
+      UserText.tarotSpreadFour,
+      UserText.tarotSpreadFive,
+      UserText.tarotSpreadCeltic,
+      UserText.tarotSpreadBinary,
+    ]) {
+      expect(find.text(spread), findsAtLeastNWidgets(1));
+    }
+    for (final deck in [
+      UserText.tarotDeckUniversalWaite,
+      UserText.tarotDeckOracle,
+      UserText.tarotDeckPersonalScan,
+    ]) {
+      expect(find.text(deck), findsAtLeastNWidgets(1));
+    }
+
+    expect(find.byKey(const Key('tarot-empty-slot')), findsNWidgets(3));
+    expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
+    expect(find.byKey(const Key('tarot-card-back')), findsWidgets);
+    expect(find.byKey(const Key('tarot-card-back-choice')), findsWidgets);
+
+    await tester.tap(find.byKey(const Key('tarot-card-back-choice')).first);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tarot-drawn-card')), findsOneWidget);
+    expect(find.byKey(const Key('tarot-empty-slot')), findsNWidgets(2));
+    final firstImage = tester.widget<Image>(
+      find.byKey(const Key('tarot-rws-card-image')).first,
+    );
+    expect(firstImage.image, isA<AssetImage>());
+    expect(
+      (firstImage.image as AssetImage).assetName,
+      startsWith('assets/tarot/decks/rws_public_domain/'),
+    );
+    expect(find.text(UserText.tarotUpright), findsAtLeastNWidgets(1));
+
+    await tester.tap(find.text(UserText.tarotAutoDraw));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tarot-drawn-card')), findsNWidgets(3));
+    expect(find.byKey(const Key('tarot-empty-slot')), findsNothing);
+    expect(find.text(UserText.tarotReversed), findsAtLeastNWidgets(1));
+
+    await tester.tap(find.text(UserText.tarotResetDraw));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tarot-empty-slot')), findsNWidgets(3));
+    expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
+
+    await tester.tap(find.text(UserText.tarotSpreadOne));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tarot-empty-slot')), findsOneWidget);
+    await tester.tap(find.text(UserText.tarotAutoDraw));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tarot-drawn-card')), findsOneWidget);
+    expect(find.byKey(const Key('tarot-empty-slot')), findsNothing);
+
+    expect(find.textContaining('DB', findRichText: true), findsNothing);
+    expect(find.textContaining('runtime', findRichText: true), findsNothing);
+    expect(
+      find.textContaining('persistence', findRichText: true),
+      findsNothing,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'final IA workspaces expose operating, practice, and content tools',
     (WidgetTester tester) async {

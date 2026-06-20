@@ -153,4 +153,44 @@ abstract final class UserText {
   static const studyActionOpenAttendance = '출석 화면에서 준비 상태 확인';
   static const studyActionOpenMaterials = '자료 화면에서 연결 개념 확인';
   static const studyActionOpenJournal = '기록과 리포트 흐름 확인';
+
+  // Tarot OS
+  static const tarotTitle = '타로';
+  static const tarotSubtitle = '덱과 스프레드를 고르고 카드를 펼쳐봅니다.';
+  static const tarotDeckSelect = '덱 선택';
+  static const tarotSpreadSelect = '스프레드 선택';
+  static const tarotManualDraw = '수동 뽑기';
+  static const tarotAutoDraw = '자동 뽑기';
+  static const tarotUpright = '정방향';
+  static const tarotReversed = '역방향';
+  static const tarotQuestion = '질문';
+  static const tarotKeywords = '핵심 키워드';
+  static const tarotMemo = '해석 메모';
+  static const tarotQuestionHint = '오늘 묻고 싶은 주제를 적어보세요';
+  static const tarotKeywordsHint = '떠오르는 단어를 짧게 모아둡니다';
+  static const tarotMemoHint = '카드를 보며 해석 흐름을 정리합니다';
+  static const tarotDeckPile = '덱 더미';
+  static const tarotDrawPreparation = '카드를 선택하세요';
+  static const tarotResultTable = '결과 스프레드';
+  static const tarotCurrentSelection = '현재 선택';
+  static const tarotRemainingCards = '남은 카드';
+  static const tarotResetDraw = '다시 뽑기';
+  static const tarotEmptySlot = '빈 자리';
+  static const tarotDrawnCard = '뽑은 카드';
+  static const tarotDeckUniversalWaite = '유니버셜 웨이트';
+  static const tarotDeckThoth = '토트 타로';
+  static const tarotDeckMarseille = '마르세유 타로';
+  static const tarotDeckManshin1 = '만신타로 1';
+  static const tarotDeckManshin2 = '만신타로 2';
+  static const tarotDeckOracle = '오라클 카드';
+  static const tarotDeckLenormand = '레노먼드 카드';
+  static const tarotDeckPersonalScan = '개인 스캔 덱';
+  static const tarotSpreadOne = '1카드';
+  static const tarotSpreadThree = '3카드';
+  static const tarotSpreadFour = '4카드';
+  static const tarotSpreadFive = '5카드';
+  static const tarotSpreadCeltic = '켈틱 크로스';
+  static const tarotSpreadBinary = '양자택일';
+  static const tarotSpreadRelation = '관계 리딩';
+  static const tarotSpreadIssue = '문제-원인-해결';
 }
