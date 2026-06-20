@@ -300,7 +300,7 @@ void main() {
     expect(find.text(UserText.tarotManualDraw), findsOneWidget);
     expect(find.text(UserText.tarotAutoDraw), findsOneWidget);
     expect(find.text(UserText.tarotDeckPile), findsOneWidget);
-    expect(find.text(UserText.tarotDrawPreparation), findsOneWidget);
+    expect(find.text('셔플하기'), findsAtLeastNWidgets(1));
     expect(find.text(UserText.tarotResultTable), findsOneWidget);
     expect(find.text(UserText.tarotQuestion), findsOneWidget);
     expect(find.text(UserText.tarotMemo), findsOneWidget);
@@ -326,9 +326,15 @@ void main() {
     expect(find.byKey(const Key('tarot-empty-slot')), findsNWidgets(3));
     expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
     expect(find.byKey(const Key('tarot-card-back')), findsWidgets);
+    expect(find.byKey(const Key('tarot-shuffle-button')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('tarot-shuffle-button')));
+    await tester.pumpAndSettle();
+    expect(find.text(UserText.tarotDrawPreparation), findsOneWidget);
+    expect(find.byKey(const Key('tarot-fan-selection')), findsOneWidget);
     expect(find.byKey(const Key('tarot-card-back-choice')), findsWidgets);
 
-    await tester.tap(find.byKey(const Key('tarot-card-back-choice')).first);
+    await tester.tap(find.byKey(const Key('tarot-fan-card-3')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('tarot-drawn-card')), findsOneWidget);
     expect(find.byKey(const Key('tarot-empty-slot')), findsNWidgets(2));
