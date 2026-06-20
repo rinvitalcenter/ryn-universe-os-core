@@ -393,7 +393,10 @@ class _ScrollableShellCanvas extends StatelessWidget {
         // 린님-facing Home still gets a small right-edge reserve so screenshots
         // show the full command-center shell instead of cropping the edge.
         final railMode = !showCompactNav;
-        final maxContentWidth = ultraCompact
+        final readingFocus = selectedLabel == UserText.navReading;
+        final maxContentWidth = readingFocus
+            ? math.max(900.0, width - (padding * 2))
+            : ultraCompact
             ? 260.0
             : railMode
             ? (width < 2200 ? 1480.0 : 1680.0)
@@ -454,6 +457,8 @@ class _ShellPageContent extends StatelessWidget {
             SizedBox(height: 16),
             StudyOsShell(),
           ]
+        : selectedLabel == UserText.navReading
+        ? <Widget>[_BusinessAreaPage(label: selectedLabel)]
         : <Widget>[
             const _TopSystemBar(showDailyHome: false),
             const SizedBox(height: 16),

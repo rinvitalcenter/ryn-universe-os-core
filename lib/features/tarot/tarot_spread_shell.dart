@@ -1048,34 +1048,118 @@ class _TarotFullDeckBoard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('tarot-full-deck-stage'),
-      height: 560,
-      padding: const EdgeInsets.all(16),
+      height: 500,
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: RynPalette.surfaceSoft(context),
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(32),
         border: Border.all(color: RynPalette.line(context)),
+        boxShadow: [
+          BoxShadow(
+            color: RynPalette.accent(context).withValues(alpha: 0.08),
+            blurRadius: 42,
+            spreadRadius: 3,
+          ),
+        ],
       ),
-      child: SingleChildScrollView(
-        key: const Key('tarot-full-deck-grid'),
-        child: Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 8,
-          runSpacing: 10,
-          children: [
-            for (var index = 0; index < cards.length; index++)
-              SizedBox(
-                key: Key('tarot-full-deck-card-$index'),
-                width: 48,
-                height: 72,
-                child: _TarotFullDeckCard(
-                  index: index,
-                  selected: selectedIndexes.contains(index),
-                  disabled: targetReached && !selectedIndexes.contains(index),
-                  onTap: () => onSelected(index),
-                ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          const rowCount = 3;
+          final cardWidth = constraints.maxWidth >= 1220 ? 54.0 : 48.0;
+          final cardHeight = cardWidth * 1.5;
+          final gap = constraints.maxWidth >= 1220 ? 10.0 : 8.0;
+          final rowGap = constraints.maxWidth >= 1220 ? 104.0 : 94.0;
+          final rowLength = (cards.length / rowCount).ceil();
+          final tableWidth = math.max(
+            constraints.maxWidth,
+            rowLength * (cardWidth + gap) + 84,
+          );
+          final tableHeight = math.max(
+            constraints.maxHeight,
+            (rowCount - 1) * rowGap + cardHeight + 74,
+          );
+          return SingleChildScrollView(
+            key: const Key('tarot-full-deck-grid'),
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: tableWidth,
+              height: tableHeight,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  for (var index = 0; index < cards.length; index++)
+                    _PositionedTableCard(
+                      index: index,
+                      rowLength: rowLength,
+                      cardWidth: cardWidth,
+                      cardHeight: cardHeight,
+                      gap: gap,
+                      rowGap: rowGap,
+                      tableWidth: tableWidth,
+                      selected: selectedIndexes.contains(index),
+                      disabled:
+                          targetReached && !selectedIndexes.contains(index),
+                      onTap: () => onSelected(index),
+                    ),
+                ],
               ),
-          ],
-        ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _PositionedTableCard extends StatelessWidget {
+  const _PositionedTableCard({
+    required this.index,
+    required this.rowLength,
+    required this.cardWidth,
+    required this.cardHeight,
+    required this.gap,
+    required this.rowGap,
+    required this.tableWidth,
+    required this.selected,
+    required this.disabled,
+    required this.onTap,
+  });
+
+  final int index;
+  final int rowLength;
+  final double cardWidth;
+  final double cardHeight;
+  final double gap;
+  final double rowGap;
+  final double tableWidth;
+  final bool selected;
+  final bool disabled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final row = index ~/ rowLength;
+    final column = index % rowLength;
+    final rowCards = math.min(rowLength, 78 - row * rowLength);
+    final rowWidth = rowCards * (cardWidth + gap) - gap;
+    final rowStart =
+        (tableWidth - rowWidth) / 2 + (row.isOdd ? cardWidth * 0.44 : 0);
+    final normalized = rowCards <= 1 ? 0.0 : (column / (rowCards - 1)) * 2 - 1;
+    final arc = math.pow(normalized, 2).toDouble() * 22;
+    final y = 34 + row * rowGap + arc + (row == 1 ? 18 : 0);
+    final angle = normalized * (row == 1 ? 0.09 : 0.14) + (row - 1) * 0.035;
+    return Positioned(
+      left: rowStart + column * (cardWidth + gap),
+      top: y,
+      width: cardWidth,
+      height: cardHeight,
+      child: _TarotFullDeckCard(
+        key: Key('tarot-full-deck-card-$index'),
+        index: index,
+        angle: angle,
+        selected: selected,
+        disabled: disabled,
+        onTap: onTap,
       ),
     );
   }
@@ -1083,13 +1167,16 @@ class _TarotFullDeckBoard extends StatelessWidget {
 
 class _TarotFullDeckCard extends StatefulWidget {
   const _TarotFullDeckCard({
+    super.key,
     required this.index,
+    required this.angle,
     required this.selected,
     required this.disabled,
     required this.onTap,
   });
 
   final int index;
+  final double angle;
   final bool selected;
   final bool disabled;
   final VoidCallback onTap;
@@ -1108,15 +1195,23 @@ class _TarotFullDeckCardState extends State<_TarotFullDeckCard> {
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedScale(
-        scale: lifted ? 1.18 : 1.0,
+        scale: lifted ? 1.2 : 1.0,
         duration: const Duration(milliseconds: 140),
         curve: Curves.easeOutCubic,
-        child: Opacity(
-          opacity: widget.disabled ? 0.45 : 1,
-          child: _TarotCardBackChoice(
-            onTap: widget.disabled || widget.selected ? () {} : widget.onTap,
-            compact: true,
-            glowing: widget.selected || lifted,
+        child: Transform.translate(
+          offset: Offset(0, lifted ? -12 : 0),
+          child: Transform.rotate(
+            angle: widget.angle,
+            child: Opacity(
+              opacity: widget.disabled ? 0.38 : 1,
+              child: _TarotCardBackChoice(
+                onTap: widget.disabled || widget.selected
+                    ? () {}
+                    : widget.onTap,
+                compact: true,
+                glowing: widget.selected || lifted,
+              ),
+            ),
           ),
         ),
       ),
@@ -1154,12 +1249,14 @@ class _TarotResultStage extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
-        _TarotSpreadCanvas(
-          spreadLabel: spreadLabel,
-          slots: slots,
-          drawnCards: drawnCards,
-          showEmptySlots: false,
-          onEmptySlotTap: () {},
+        SingleChildScrollView(
+          child: _TarotSpreadCanvas(
+            spreadLabel: spreadLabel,
+            slots: slots,
+            drawnCards: drawnCards,
+            showEmptySlots: false,
+            onEmptySlotTap: () {},
+          ),
         ),
         const SizedBox(height: 16),
         const _TarotMemoPanel(),
@@ -1558,36 +1655,36 @@ class _TarotSpreadCanvas extends StatelessWidget {
 }
 
 double _canvasHeightForSlots(int count) {
-  if (count == 1) return 680;
-  if (count <= 3) return 660;
-  if (count <= 5) return 720;
-  if (count <= 6) return 740;
-  return 780;
+  if (count == 1) return 700;
+  if (count <= 3) return 650;
+  if (count <= 5) return 760;
+  if (count <= 6) return 780;
+  return 920;
 }
 
 Size _cardSizeForLayout(int count, BoxConstraints constraints) {
   final maxWidth = constraints.maxWidth;
   final maxHeight = constraints.maxHeight;
   final preferredWidth = switch (count) {
-    1 => 210.0,
-    <= 3 => 160.0,
-    <= 5 => 132.0,
-    <= 6 => 124.0,
-    _ => 96.0,
+    1 => 260.0,
+    <= 3 => 190.0,
+    <= 5 => 158.0,
+    <= 6 => 150.0,
+    _ => 124.0,
   };
   final horizontalSlots = switch (count) {
-    1 => 1.8,
-    <= 3 => 4.0,
-    <= 5 => 5.0,
-    <= 6 => 4.2,
-    _ => 5.8,
+    1 => 1.55,
+    <= 3 => 3.35,
+    <= 5 => 4.35,
+    <= 6 => 3.8,
+    _ => 5.15,
   };
   final verticalSlots = switch (count) {
-    1 => 1.2,
-    <= 3 => 1.7,
-    <= 5 => 3.2,
-    <= 6 => 3.4,
-    _ => 4.25,
+    1 => 1.08,
+    <= 3 => 1.55,
+    <= 5 => 2.95,
+    <= 6 => 3.15,
+    _ => 4.05,
   };
   final widthLimit = maxWidth / horizontalSlots;
   final heightLimit = ((maxHeight / verticalSlots) - 50) / 1.62;
@@ -1706,8 +1803,8 @@ class _TarotDrawnCardView extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: RynPalette.text(context),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w900,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(height: 4),
