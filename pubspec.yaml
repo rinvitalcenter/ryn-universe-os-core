@@ -39,6 +39,9 @@ dependencies:
   sqlite3: ^3.3.2
   path: ^1.9.1
   path_provider: ^2.1.5
+  flutter_animate: ^4.5.2
+  newton_particles: ^0.3.0
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:

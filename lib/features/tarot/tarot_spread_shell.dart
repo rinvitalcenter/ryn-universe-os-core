@@ -1,6 +1,9 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:newton_particles/newton_particles.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:ryn_universe_os_core/core/text/user_text.dart';
 import 'package:ryn_universe_os_core/core/theme/ryn_tokens.dart';
 
@@ -129,6 +132,11 @@ class _TarotUiText {
   static const autoDirection = '정/역방향';
   static const changeDirection = '방향 바꾸기';
 }
+
+// Future TAROT-SPREAD-LAYOUT2: revisit 5-card overlap/spacing after the FX
+// foundation stabilizes; this task intentionally avoids layout micro-polish.
+// Future TAROT-SPREAD-LAYOUT2: revisit Celtic Cross overlap/spacing after the
+// FX foundation stabilizes; this task intentionally avoids layout micro-polish.
 
 class TarotSpreadShell extends StatefulWidget {
   const TarotSpreadShell({super.key, required this.onBack});
@@ -1318,10 +1326,25 @@ class _TarotFullDeckCardState extends State<_TarotFullDeckCard> {
                 clipBehavior: Clip.none,
                 children: [
                   _TarotCardBackChoice(
-                    onTap: widget.disabled || selected ? () {} : widget.onTap,
-                    compact: true,
-                    glowing: selected || lifted,
-                  ),
+                        onTap: widget.disabled || selected
+                            ? () {}
+                            : widget.onTap,
+                        compact: true,
+                        glowing: selected || lifted,
+                      )
+                      .animate(target: selected ? 1 : 0)
+                      .scale(
+                        begin: const Offset(1, 1),
+                        end: const Offset(1.04, 1.04),
+                        duration: 220.ms,
+                        curve: Curves.easeOutCubic,
+                      )
+                      .shimmer(
+                        duration: 520.ms,
+                        color: RynPalette.accent(
+                          context,
+                        ).withValues(alpha: 0.22),
+                      ),
                   if (selected && widget.selectedOrder != null)
                     Positioned(
                       right: -5,
@@ -1642,23 +1665,38 @@ class _ShuffleDeckStack extends StatelessWidget {
           key: const Key('tarot-shuffle-stack'),
           width: 116,
           height: 156,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              for (var index = 3; index >= 0; index--)
-                Positioned(
-                  left: 14 + index * 3,
-                  top: 10 + index * 3,
-                  child: Opacity(
-                    opacity: 0.62 + index * 0.09,
-                    child: _TarotCardBack(
-                      compact: false,
-                      glowing: isShuffling || index == 0,
-                    ),
+          child:
+              Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      for (var index = 3; index >= 0; index--)
+                        Positioned(
+                          left: 14 + index * 3,
+                          top: 10 + index * 3,
+                          child: Opacity(
+                            opacity: 0.62 + index * 0.09,
+                            child: _TarotCardBack(
+                              compact: false,
+                              glowing: isShuffling || index == 0,
+                            ),
+                          ),
+                        ),
+                      if (isShuffling)
+                        const Positioned.fill(
+                          child: _TarotFxBurst(
+                            particleCount: 10,
+                            origin: Offset(0.5, 0.48),
+                          ),
+                        ),
+                    ],
+                  )
+                  .animate(target: isShuffling ? 1 : 0)
+                  .scale(
+                    begin: const Offset(1, 1),
+                    end: const Offset(1.05, 1.05),
+                    duration: 360.ms,
+                    curve: Curves.easeOutCubic,
                   ),
-                ),
-            ],
-          ),
         ),
       ),
     );
@@ -1725,31 +1763,89 @@ class _TarotCardBack extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.asset(
-              defaultAssetPath,
-              key: const Key('tarot-card-back-image'),
-              fit: BoxFit.cover,
-            ),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white.withValues(alpha: glowing ? 0.16 : 0.04),
-                    Colors.transparent,
-                    accent.withValues(alpha: glowing ? 0.18 : 0.06),
-                  ],
+        child: Shimmer.fromColors(
+          enabled: compact || glowing,
+          loop: 1,
+          period: const Duration(milliseconds: 1800),
+          baseColor: Colors.white.withValues(alpha: 0.06),
+          highlightColor: Colors.white.withValues(alpha: glowing ? 0.42 : 0.22),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset(
+                defaultAssetPath,
+                key: const Key('tarot-card-back-image'),
+                fit: BoxFit.cover,
+              ),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white.withValues(alpha: glowing ? 0.16 : 0.04),
+                      Colors.transparent,
+                      accent.withValues(alpha: glowing ? 0.18 : 0.06),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+}
+
+class _TarotFxBurst extends StatelessWidget {
+  const _TarotFxBurst({
+    this.particleCount = 8,
+    this.origin = const Offset(0.5, 0.5),
+  });
+
+  final int particleCount;
+  final Offset origin;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = RynPalette.accent(context);
+    return IgnorePointer(
+      child: Newton(
+        effectConfigurations: [
+          ExplosionPreset(
+            colors: [
+              accent.withValues(alpha: 0.62),
+              RynPalette.lavenderStrong.withValues(alpha: 0.52),
+              Colors.white.withValues(alpha: 0.5),
+            ],
+            particleCount: particleCount,
+            particlesPerEmit: particleCount,
+            origin: origin,
+            gravity: Gravity.zero,
+          ).toConfiguration(),
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotRevealReadyFrame extends StatelessWidget {
+  const _TarotRevealReadyFrame({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return child
+        .animate()
+        .fadeIn(duration: 180.ms, curve: Curves.easeOutCubic)
+        .scale(
+          begin: const Offset(0.985, 0.985),
+          end: const Offset(1, 1),
+          duration: 220.ms,
+          curve: Curves.easeOutCubic,
+        );
   }
 }
 
@@ -1988,17 +2084,19 @@ class _TarotDrawnCardView extends StatelessWidget {
               borderRadius: BorderRadius.circular(11),
               child: ColoredBox(
                 color: RynPalette.surface(context),
-                child: AnimatedRotation(
-                  turns: drawnCard.reversed ? 0.5 : 0,
-                  duration: const Duration(milliseconds: 180),
-                  curve: Curves.easeOutCubic,
-                  child: Image.asset(
-                    drawnCard.card.imagePath,
-                    key: const Key('tarot-rws-card-image'),
-                    fit: BoxFit.contain,
-                    width: double.infinity,
-                    height: double.infinity,
-                    alignment: Alignment.center,
+                child: _TarotRevealReadyFrame(
+                  child: AnimatedRotation(
+                    turns: drawnCard.reversed ? 0.5 : 0,
+                    duration: const Duration(milliseconds: 180),
+                    curve: Curves.easeOutCubic,
+                    child: Image.asset(
+                      drawnCard.card.imagePath,
+                      key: const Key('tarot-rws-card-image'),
+                      fit: BoxFit.contain,
+                      width: double.infinity,
+                      height: double.infinity,
+                      alignment: Alignment.center,
+                    ),
                   ),
                 ),
               ),
