@@ -131,6 +131,8 @@ class _TarotUiText {
   static const uprightOnly = '정방향만';
   static const autoDirection = '정/역방향';
   static const changeDirection = '방향 바꾸기';
+  static const revealPrompt = '카드를 펼쳐보세요';
+  static const revealAll = '모두 펼치기';
 }
 
 // Future TAROT-SPREAD-LAYOUT2: revisit 5-card overlap/spacing after the FX
@@ -580,6 +582,8 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   late List<_TarotCardDefinition> _remainingDeck;
   final List<_DrawnTarotCard> _drawnCards = [];
   final Set<int> _selectedDeckIndexes = {};
+  final Set<int> _revealedResultIndexes = {};
+  final Set<int> _revealFxIndexes = {};
   _TarotDrawPhase _phase = _TarotDrawPhase.beforeShuffle;
   _TarotFlowStage _stage = _TarotFlowStage.setup;
 
@@ -630,6 +634,8 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     if (clearDrawn) {
       _drawnCards.clear();
       _selectedDeckIndexes.clear();
+      _revealedResultIndexes.clear();
+      _revealFxIndexes.clear();
     }
   }
 
@@ -698,13 +704,46 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         );
       }
       _phase = _isComplete ? _TarotDrawPhase.complete : _TarotDrawPhase.ready;
-      if (_isComplete) _stage = _TarotFlowStage.result;
+      if (_isComplete) _enterResultStage();
     });
+  }
+
+  void _startRevealFx(int index) {
+    _revealFxIndexes.add(index);
+    Future<void>.delayed(const Duration(milliseconds: 620), () {
+      if (!mounted) return;
+      setState(() => _revealFxIndexes.remove(index));
+    });
+  }
+
+  void _revealResultCard(int index) {
+    if (index < 0 || index >= _drawnCards.length) return;
+    if (_revealedResultIndexes.contains(index)) return;
+    setState(() {
+      _revealedResultIndexes.add(index);
+      _startRevealFx(index);
+    });
+  }
+
+  Future<void> _revealAllResultCards() async {
+    for (var index = 0; index < _drawnCards.length; index++) {
+      if (!_revealedResultIndexes.contains(index)) {
+        _revealResultCard(index);
+        await Future<void>.delayed(const Duration(milliseconds: 90));
+        if (!mounted) return;
+      }
+    }
+  }
+
+  void _enterResultStage() {
+    _revealedResultIndexes.clear();
+    _revealFxIndexes.clear();
+    _stage = _TarotFlowStage.result;
   }
 
   void _showResult() {
     if (!_isComplete) return;
-    setState(() => _stage = _TarotFlowStage.result);
+    setState(_enterResultStage);
   }
 
   void _selectSpread(String spread) {
@@ -820,6 +859,10 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
               spreadLabel: _selectedSpread,
               slots: _slots,
               drawnCards: _drawnCards,
+              revealedIndexes: _revealedResultIndexes,
+              revealFxIndexes: _revealFxIndexes,
+              onRevealCard: _revealResultCard,
+              onRevealAll: _revealAllResultCards,
               onReset: _resetDraw,
               onDirectionToggle: _toggleDrawnDirection,
             ),
@@ -1398,6 +1441,10 @@ class _TarotResultStage extends StatelessWidget {
     required this.spreadLabel,
     required this.slots,
     required this.drawnCards,
+    required this.revealedIndexes,
+    required this.revealFxIndexes,
+    required this.onRevealCard,
+    required this.onRevealAll,
     required this.onReset,
     required this.onDirectionToggle,
   });
@@ -1405,18 +1452,30 @@ class _TarotResultStage extends StatelessWidget {
   final String spreadLabel;
   final List<_TarotSlotSpec> slots;
   final List<_DrawnTarotCard> drawnCards;
+  final Set<int> revealedIndexes;
+  final Set<int> revealFxIndexes;
+  final ValueChanged<int> onRevealCard;
+  final VoidCallback onRevealAll;
   final VoidCallback onReset;
   final ValueChanged<int> onDirectionToggle;
 
   @override
   Widget build(BuildContext context) {
+    final allRevealed = revealedIndexes.length >= drawnCards.length;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
           children: [
-            const _TarotSmallStageLabel(label: _TarotUiText.showResult),
+            const _TarotSmallStageLabel(label: _TarotUiText.revealPrompt),
             const Spacer(),
+            OutlinedButton.icon(
+              key: const Key('tarot-reveal-all-button'),
+              onPressed: allRevealed ? null : onRevealAll,
+              icon: const Icon(Icons.auto_awesome_rounded, size: 18),
+              label: const Text(_TarotUiText.revealAll),
+            ),
+            const SizedBox(width: 8),
             TextButton.icon(
               onPressed: onReset,
               icon: const Icon(Icons.refresh_rounded, size: 18),
@@ -1430,6 +1489,9 @@ class _TarotResultStage extends StatelessWidget {
             spreadLabel: spreadLabel,
             slots: slots,
             drawnCards: drawnCards,
+            revealedIndexes: revealedIndexes,
+            revealFxIndexes: revealFxIndexes,
+            onRevealCard: onRevealCard,
             onDirectionToggle: onDirectionToggle,
             showEmptySlots: false,
             onEmptySlotTap: () {},
@@ -1854,6 +1916,9 @@ class _TarotSpreadCanvas extends StatelessWidget {
     required this.spreadLabel,
     required this.slots,
     required this.drawnCards,
+    required this.revealedIndexes,
+    required this.revealFxIndexes,
+    required this.onRevealCard,
     required this.onDirectionToggle,
     required this.onEmptySlotTap,
     this.showEmptySlots = true,
@@ -1862,6 +1927,9 @@ class _TarotSpreadCanvas extends StatelessWidget {
   final String spreadLabel;
   final List<_TarotSlotSpec> slots;
   final List<_DrawnTarotCard> drawnCards;
+  final Set<int> revealedIndexes;
+  final Set<int> revealFxIndexes;
+  final ValueChanged<int> onRevealCard;
   final ValueChanged<int> onDirectionToggle;
   final VoidCallback onEmptySlotTap;
   final bool showEmptySlots;
@@ -1932,6 +2000,9 @@ class _TarotSpreadCanvas extends StatelessWidget {
                               ? _TarotDrawnCardView(
                                   drawnCard: drawnCards[index],
                                   index: index,
+                                  revealed: revealedIndexes.contains(index),
+                                  showRevealFx: revealFxIndexes.contains(index),
+                                  onReveal: () => onRevealCard(index),
                                   onDirectionToggle: onDirectionToggle,
                                 )
                               : showEmptySlots
@@ -2054,6 +2125,198 @@ class _TarotDrawnCardView extends StatelessWidget {
   const _TarotDrawnCardView({
     required this.drawnCard,
     required this.index,
+    required this.revealed,
+    required this.showRevealFx,
+    required this.onReveal,
+    required this.onDirectionToggle,
+  });
+
+  final _DrawnTarotCard drawnCard;
+  final int index;
+  final bool revealed;
+  final bool showRevealFx;
+  final VoidCallback onReveal;
+  final ValueChanged<int> onDirectionToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('tarot-drawn-card'),
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        color: RynPalette.surfaceElevated(context),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: RynPalette.accent(
+            context,
+          ).withValues(alpha: revealed ? 0.48 : 0.3),
+        ),
+        boxShadow: [
+          ...RynPalette.panelShadow(context),
+          if (revealed || showRevealFx)
+            BoxShadow(
+              color: RynPalette.accent(context).withValues(alpha: 0.18),
+              blurRadius: 22,
+              spreadRadius: 1,
+            ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(11),
+              child: ColoredBox(
+                color: RynPalette.surface(context),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    _TarotFlipRevealFrame(
+                      revealed: revealed,
+                      back: _TarotUnrevealedResultCard(onReveal: onReveal),
+                      front: _TarotRevealedCardFace(drawnCard: drawnCard),
+                    ),
+                    if (showRevealFx)
+                      const Positioned.fill(
+                        child: _TarotFxBurst(particleCount: 8),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
+          SizedBox(
+            height: 46,
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 160),
+              child: revealed
+                  ? _TarotRevealedCaption(
+                      key: ValueKey('caption-$index-revealed'),
+                      drawnCard: drawnCard,
+                      index: index,
+                      onDirectionToggle: onDirectionToggle,
+                    )
+                  : Center(
+                      key: ValueKey('caption-$index-hidden'),
+                      child: Text(
+                        _TarotUiText.revealPrompt,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: RynPalette.subtext(context),
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotUnrevealedResultCard extends StatelessWidget {
+  const _TarotUnrevealedResultCard({required this.onReveal});
+
+  final VoidCallback onReveal;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: _TarotCardBackChoice(
+          onTap: onReveal,
+          compact: false,
+          glowing: true,
+        ),
+      ),
+    ).animate().shimmer(
+      duration: 1600.ms,
+      color: Colors.white.withValues(alpha: 0.16),
+    );
+  }
+}
+
+class _TarotRevealedCardFace extends StatelessWidget {
+  const _TarotRevealedCardFace({required this.drawnCard});
+
+  final _DrawnTarotCard drawnCard;
+
+  @override
+  Widget build(BuildContext context) {
+    return _TarotRevealReadyFrame(
+      child: AnimatedRotation(
+        turns: drawnCard.reversed ? 0.5 : 0,
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        child: Image.asset(
+          drawnCard.card.imagePath,
+          key: const Key('tarot-rws-card-image'),
+          fit: BoxFit.contain,
+          width: double.infinity,
+          height: double.infinity,
+          alignment: Alignment.center,
+        ),
+      ),
+    );
+  }
+}
+
+class _TarotFlipRevealFrame extends StatelessWidget {
+  const _TarotFlipRevealFrame({
+    required this.revealed,
+    required this.back,
+    required this.front,
+  });
+
+  final bool revealed;
+  final Widget back;
+  final Widget front;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 320),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) {
+        return AnimatedBuilder(
+          animation: animation,
+          child: child,
+          builder: (context, child) {
+            final value = animation.value;
+            final angle = (1 - value) * math.pi / 2;
+            return Opacity(
+              opacity: value.clamp(0.0, 1.0),
+              child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.identity()
+                  ..setEntry(3, 2, 0.001)
+                  ..rotateY(angle),
+                child: child,
+              ),
+            );
+          },
+        );
+      },
+      child: KeyedSubtree(
+        key: ValueKey(revealed ? 'front' : 'back'),
+        child: revealed ? front : back,
+      ),
+    );
+  }
+}
+
+class _TarotRevealedCaption extends StatelessWidget {
+  const _TarotRevealedCaption({
+    super.key,
+    required this.drawnCard,
+    required this.index,
     required this.onDirectionToggle,
   });
 
@@ -2066,98 +2329,53 @@ class _TarotDrawnCardView extends StatelessWidget {
     final orientation = drawnCard.reversed
         ? UserText.tarotReversed
         : UserText.tarotUpright;
-    return Container(
-      key: const Key('tarot-drawn-card'),
-      padding: const EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: RynPalette.surfaceElevated(context),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: RynPalette.accent(context).withValues(alpha: 0.38),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          drawnCard.card.label,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: RynPalette.text(context),
+            fontSize: 9.5,
+            fontWeight: FontWeight.w800,
+          ),
         ),
-        boxShadow: RynPalette.panelShadow(context),
-      ),
-      child: Column(
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(11),
-              child: ColoredBox(
-                color: RynPalette.surface(context),
-                child: _TarotRevealReadyFrame(
-                  child: AnimatedRotation(
-                    turns: drawnCard.reversed ? 0.5 : 0,
-                    duration: const Duration(milliseconds: 180),
-                    curve: Curves.easeOutCubic,
-                    child: Image.asset(
-                      drawnCard.card.imagePath,
-                      key: const Key('tarot-rws-card-image'),
-                      fit: BoxFit.contain,
-                      width: double.infinity,
-                      height: double.infinity,
-                      alignment: Alignment.center,
+        const SizedBox(height: 3),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _TarotSmallBadge(orientation, compact: true),
+              const SizedBox(width: 4),
+              Tooltip(
+                message: _TarotUiText.changeDirection,
+                child: InkWell(
+                  key: Key('tarot-direction-toggle-$index'),
+                  borderRadius: BorderRadius.circular(999),
+                  onTap: () => onDirectionToggle(index),
+                  child: Container(
+                    padding: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: RynPalette.surfaceSoft(context),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: RynPalette.line(context)),
+                    ),
+                    child: Icon(
+                      Icons.screen_rotation_alt_rounded,
+                      size: 12,
+                      color: RynPalette.accent(context),
                     ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
-          const SizedBox(height: 4),
-          SizedBox(
-            height: 46,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  drawnCard.card.label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: RynPalette.text(context),
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _TarotSmallBadge(orientation, compact: true),
-                      const SizedBox(width: 4),
-                      Tooltip(
-                        message: _TarotUiText.changeDirection,
-                        child: InkWell(
-                          key: Key('tarot-direction-toggle-$index'),
-                          borderRadius: BorderRadius.circular(999),
-                          onTap: () => onDirectionToggle(index),
-                          child: Container(
-                            padding: const EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              color: RynPalette.surfaceSoft(context),
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: RynPalette.line(context),
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.screen_rotation_alt_rounded,
-                              size: 12,
-                              color: RynPalette.accent(context),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

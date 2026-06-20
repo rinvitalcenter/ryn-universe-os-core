@@ -348,8 +348,16 @@ void main() {
     await tester.tap(find.byKey(const Key('tarot-show-result-button')));
     await tester.pumpAndSettle();
     expect(find.text(UserText.tarotResultTable), findsOneWidget);
+    expect(find.text('카드를 펼쳐보세요'), findsAtLeastNWidgets(1));
     expect(find.byKey(const Key('tarot-drawn-card')), findsNWidgets(3));
     expect(find.byKey(const Key('tarot-empty-slot')), findsNothing);
+    expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
+    expect(find.byKey(const Key('tarot-card-back-image')), findsNWidgets(3));
+    expect(find.byKey(const Key('tarot-reveal-all-button')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('tarot-reveal-all-button')));
+    await tester.pump(const Duration(milliseconds: 1200));
+    await tester.pumpAndSettle();
     final firstImage = tester.widget<Image>(
       find.byKey(const Key('tarot-rws-card-image')).first,
     );
