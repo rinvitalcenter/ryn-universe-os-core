@@ -16,13 +16,28 @@ class _StudyOsShellState extends State<StudyOsShell> {
 
   @override
   Widget build(BuildContext context) {
+    final parentBrightness = Theme.of(context).brightness;
+    final dark = parentBrightness == Brightness.dark;
     final studyTheme = ThemeData(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF2F6FED),
-        brightness: Brightness.light,
-        surface: Colors.white,
-      ),
-      scaffoldBackgroundColor: const Color(0xFFF8FAFC),
+      colorScheme: dark
+          ? const ColorScheme.dark(
+              primary: Color(0xFF64A8FF),
+              secondary: Color(0xFF8B7CF6),
+              surface: Color(0xFF07090D),
+              surfaceContainerLow: Color(0xFF10141C),
+              surfaceContainerHighest: Color(0xFF171C26),
+              onSurface: Color(0xFFF6F7FB),
+              onSurfaceVariant: Color(0xFFA3AAB7),
+              outlineVariant: Color(0xFF252B36),
+            )
+          : ColorScheme.fromSeed(
+              seedColor: const Color(0xFF2F6FED),
+              brightness: Brightness.light,
+              surface: Colors.white,
+            ),
+      scaffoldBackgroundColor: dark
+          ? const Color(0xFF000000)
+          : const Color(0xFFF6F7FA),
       useMaterial3: true,
     );
     return Theme(
@@ -194,11 +209,13 @@ class _StudyUserActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final dark = Theme.of(context).brightness == Brightness.dark;
     final card = Container(
+      key: const Key('study-user-action-card'),
       constraints: const BoxConstraints(minHeight: 120),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: dark ? colorScheme.surfaceContainerHighest : colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: colorScheme.outlineVariant.withValues(alpha: 0.60),

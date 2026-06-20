@@ -38,18 +38,27 @@ class _RynUniverseAppState extends State<RynUniverseApp> {
         themeMode: _themeMode,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-            seedColor: RynPalette.navy,
+            seedColor: RynPalette.accentBlue,
             brightness: Brightness.light,
+            surface: RynPalette.ivory,
           ),
           scaffoldBackgroundColor: RynPalette.ivoryCanvas,
+          fontFamily: RynFonts.text,
+          fontFamilyFallback: RynFonts.textFallback,
           useMaterial3: true,
         ),
         darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: RynPalette.gold,
-            brightness: Brightness.dark,
+          colorScheme: const ColorScheme.dark(
+            primary: RynPalette.accentBlueDark,
+            secondary: RynPalette.lavenderStrong,
+            surface: RynPalette.oledSurface,
+            onSurface: RynPalette.oledInk,
+            onSurfaceVariant: RynPalette.oledMuted,
+            outlineVariant: RynPalette.oledLine,
           ),
-          scaffoldBackgroundColor: RynPalette.navy,
+          scaffoldBackgroundColor: RynPalette.oledCanvas,
+          fontFamily: RynFonts.text,
+          fontFamilyFallback: RynFonts.textFallback,
           useMaterial3: true,
         ),
         home: const CoreOsShell(),
@@ -79,25 +88,74 @@ class _ThemeModeScope extends InheritedWidget {
 class RynPalette {
   const RynPalette._();
 
-  static const ivoryCanvas = Color(0xFFF8FAFC);
-  static const ivory = Color(0xFFFFFFFF);
-  static const ivorySoft = Color(0xFFF9FAFB);
-  static const ivoryLine = Color(0xFFE5E7EB);
-  static const ink = Color(0xFF111827);
-  static const muted = Color(0xFF647082);
-  static const warmMuted = Color(0xFF8A735A);
+  // Light surfaces: clean near-white, low tint, thin borders.
+  static const ivoryCanvas = RynTokens.lightCanvas;
+  static const ivory = RynTokens.lightSurface;
+  static const ivorySoft = RynTokens.lightSurfaceSoft;
+  static const ivoryLine = RynTokens.lightBorder;
+  static const ink = RynTokens.lightTextPrimary;
+  static const muted = RynTokens.lightTextSecondary;
+  static const warmMuted = RynTokens.lightTextSecondary;
+
+  // OLED dark surfaces: near-black base, neutral panels, blue/violet accents.
+  static const oledCanvas = RynTokens.oledCanvas;
+  static const oledSurface = RynTokens.oledSurface;
+  static const oledSurfaceSoft = RynTokens.oledSurfaceSoft;
+  static const oledCard = RynTokens.oledCard;
+  static const oledLine = RynTokens.oledBorder;
+  static const oledInk = RynTokens.oledTextPrimary;
+  static const oledMuted = RynTokens.oledTextSecondary;
+
   static const navy = Color(0xFF07101F);
   static const deepNavy = Color(0xFF101A2F);
   static const graphite = Color(0xFF1B2638);
   static const navyLine = Color(0xFF2D3B55);
   static const gold = Color(0xFFD4AF5F);
-  static const goldSoft = Color(0xFFF1DFB5);
+  static const goldSoft = RynTokens.lightAccentSoft;
   static const lavender = Color(0xFFE9E5FF);
   static const lavenderStrong = Color(0xFF8B7CF6);
+  static const accentBlue = RynTokens.lightAccent;
+  static const accentBlueDark = RynTokens.oledAccent;
+  static const accentSoftDark = RynTokens.oledAccentSoft;
   static const success = Color(0xFF4F8A6B);
   static const warning = Color(0xFFC08337);
-  static const shadow = Color(0x20513A20);
-  static const darkShadow = Color(0x55000000);
+  static const shadow = Color(0x1A0F172A);
+  static const darkShadow = Color(0xA6000000);
+
+  static bool isDark(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark;
+  static Color canvas(BuildContext context) =>
+      isDark(context) ? oledCanvas : ivoryCanvas;
+  static Color surface(BuildContext context) =>
+      isDark(context) ? oledSurface : ivory;
+  static Color surfaceSoft(BuildContext context) =>
+      isDark(context) ? oledSurfaceSoft : ivorySoft;
+  static Color surfaceElevated(BuildContext context) =>
+      isDark(context) ? oledCard : ivory;
+  static Color line(BuildContext context) =>
+      isDark(context) ? oledLine : ivoryLine;
+  static Color text(BuildContext context) => isDark(context) ? oledInk : ink;
+  static Color subtext(BuildContext context) =>
+      isDark(context) ? oledMuted : muted;
+  static Color accent(BuildContext context) =>
+      isDark(context) ? accentBlueDark : accentBlue;
+  static Color accentSoft(BuildContext context) =>
+      isDark(context) ? accentSoftDark : goldSoft;
+  static Color navSelected(BuildContext context) =>
+      isDark(context) ? const Color(0xFF18243A) : navy;
+  static Color iconOnAccent(BuildContext context) =>
+      isDark(context) ? accentBlueDark : deepNavy;
+  static List<BoxShadow> panelShadow(BuildContext context) => isDark(context)
+      ? const <BoxShadow>[
+          BoxShadow(
+            color: Color(0xB0000000),
+            blurRadius: 28,
+            offset: Offset(0, 18),
+          ),
+        ]
+      : const <BoxShadow>[
+          BoxShadow(color: shadow, blurRadius: 24, offset: Offset(0, 14)),
+        ];
 }
 
 class RynMetrics {
@@ -276,7 +334,7 @@ class _CoreOsShellState extends State<CoreOsShell> {
           builder: (context, constraints) {
             final useRail = constraints.maxWidth >= 1600;
             return Container(
-              color: RynPalette.ivoryCanvas,
+              color: RynPalette.canvas(context),
               child: useRail
                   ? Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -433,16 +491,10 @@ class _NavigationRailPanel extends StatelessWidget {
       margin: const EdgeInsets.all(12),
       padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
       decoration: BoxDecoration(
-        color: RynPalette.ivory,
+        color: RynPalette.surface(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusShell),
-        border: Border.all(color: RynPalette.ivoryLine),
-        boxShadow: const [
-          BoxShadow(
-            color: RynPalette.shadow,
-            blurRadius: 26,
-            offset: Offset(0, 16),
-          ),
-        ],
+        border: Border.all(color: RynPalette.line(context)),
+        boxShadow: RynPalette.panelShadow(context),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -530,14 +582,14 @@ class _SidebarHint extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: RynPalette.ivorySoft,
+        color: RynPalette.surfaceSoft(context),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: RynPalette.ivoryLine),
+        border: Border.all(color: RynPalette.line(context)),
       ),
-      child: const Text(
+      child: Text(
         '개인 운영 허브',
         style: TextStyle(
-          color: RynPalette.warmMuted,
+          color: RynPalette.subtext(context),
           fontSize: 12,
           fontWeight: FontWeight.w800,
         ),
@@ -644,10 +696,10 @@ class _BusinessHomeDashboard extends StatelessWidget {
             },
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             UserText.homeQuickLinks,
             style: TextStyle(
-              color: RynPalette.ink,
+              color: RynPalette.text(context),
               fontSize: 14,
               fontWeight: FontWeight.w900,
               letterSpacing: -0.1,
@@ -704,17 +756,17 @@ class _HomeDashboardGroup extends StatelessWidget {
       constraints: const BoxConstraints(minHeight: 246),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: RynPalette.ivorySoft,
+        color: RynPalette.surfaceSoft(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
-        border: Border.all(color: RynPalette.ivoryLine),
+        border: Border.all(color: RynPalette.line(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             spec.title,
-            style: const TextStyle(
-              color: RynPalette.ink,
+            style: TextStyle(
+              color: RynPalette.text(context),
               fontWeight: FontWeight.w900,
               fontSize: 17,
               letterSpacing: -0.3,
@@ -739,12 +791,13 @@ class _HomeDashboardItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      key: const Key('home-dashboard-item-card'),
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: RynPalette.surfaceElevated(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
-        border: Border.all(color: RynPalette.ivoryLine),
+        border: Border.all(color: RynPalette.line(context)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -757,8 +810,8 @@ class _HomeDashboardItemCard extends StatelessWidget {
               children: [
                 Text(
                   spec.title,
-                  style: const TextStyle(
-                    color: RynPalette.ink,
+                  style: TextStyle(
+                    color: RynPalette.text(context),
                     fontWeight: FontWeight.w900,
                     fontSize: 15,
                     letterSpacing: -0.2,
@@ -767,8 +820,8 @@ class _HomeDashboardItemCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   spec.body,
-                  style: const TextStyle(
-                    color: RynPalette.muted,
+                  style: TextStyle(
+                    color: RynPalette.subtext(context),
                     fontWeight: FontWeight.w600,
                     fontSize: 12.5,
                     height: 1.3,
@@ -797,21 +850,22 @@ class _HomeQuickLinkChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
         onTap: onTap,
         child: Container(
+          key: const Key('home-quick-link-chip'),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: RynPalette.surfaceElevated(context),
             borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
-            border: Border.all(color: RynPalette.ivoryLine),
+            border: Border.all(color: RynPalette.line(context)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(spec.icon, size: 16, color: RynPalette.deepNavy),
+              Icon(spec.icon, size: 16, color: RynPalette.accent(context)),
               const SizedBox(width: 6),
               Text(
                 spec.label,
-                style: const TextStyle(
-                  color: RynPalette.ink,
+                style: TextStyle(
+                  color: RynPalette.text(context),
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
                 ),
@@ -935,8 +989,8 @@ class _BusinessAreaPage extends StatelessWidget {
                   children: [
                     Text(
                       spec.title,
-                      style: const TextStyle(
-                        color: RynPalette.ink,
+                      style: TextStyle(
+                        color: RynPalette.text(context),
                         fontSize: 28,
                         fontWeight: FontWeight.w900,
                         letterSpacing: -0.7,
@@ -945,8 +999,8 @@ class _BusinessAreaPage extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       spec.body,
-                      style: const TextStyle(
-                        color: RynPalette.muted,
+                      style: TextStyle(
+                        color: RynPalette.subtext(context),
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         height: 1.45,
@@ -959,10 +1013,10 @@ class _BusinessAreaPage extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           if (settingsMode) ...[
-            const Text(
+            Text(
               UserText.themeSettingTitle,
               style: TextStyle(
-                color: RynPalette.ink,
+                color: RynPalette.text(context),
                 fontSize: 16,
                 fontWeight: FontWeight.w900,
               ),
@@ -990,9 +1044,9 @@ class _BusinessModuleSummary extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: RynPalette.ivorySoft,
+        color: RynPalette.surfaceSoft(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
-        border: Border.all(color: RynPalette.ivoryLine),
+        border: Border.all(color: RynPalette.line(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1027,10 +1081,10 @@ class _BusinessIconBadge extends StatelessWidget {
       width: 38,
       height: 38,
       decoration: BoxDecoration(
-        color: RynPalette.goldSoft,
-        borderRadius: BorderRadius.circular(16),
+        color: RynPalette.accentSoft(context),
+        borderRadius: BorderRadius.circular(14),
       ),
-      child: Icon(icon, size: 22, color: RynPalette.deepNavy),
+      child: Icon(icon, size: 21, color: RynPalette.iconOnAccent(context)),
     );
   }
 }
@@ -1045,14 +1099,14 @@ class _BusinessChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
       decoration: BoxDecoration(
-        color: RynPalette.ivory,
+        color: RynPalette.surface(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
-        border: Border.all(color: RynPalette.ivoryLine),
+        border: Border.all(color: RynPalette.line(context)),
       ),
       child: Text(
         label,
-        style: const TextStyle(
-          color: RynPalette.graphite,
+        style: TextStyle(
+          color: RynPalette.text(context),
           fontSize: 12,
           fontWeight: FontWeight.w800,
         ),
@@ -1151,7 +1205,7 @@ class _HeaderThemeToggle extends StatelessWidget {
       style: ButtonStyle(
         visualDensity: VisualDensity.compact,
         textStyle: WidgetStateProperty.all(
-          const TextStyle(fontSize: 11, fontWeight: FontWeight.w800),
+          TextStyle(fontSize: 11, fontWeight: FontWeight.w800),
         ),
       ),
       segments: const [
@@ -1279,7 +1333,7 @@ class _CommandHubScopeSurface extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           _MiniHeading(
             icon: Icons.dashboard_customize_rounded,
             title: AppText.cmdCommandHubTitle,
@@ -1361,8 +1415,8 @@ class _CommandHubCardShell extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    color: RynPalette.ink,
+                  style: TextStyle(
+                    color: RynPalette.text(context),
                     fontWeight: FontWeight.w900,
                     fontSize: 13,
                   ),
@@ -1390,10 +1444,10 @@ class _CommandHubCardShell extends StatelessWidget {
                 color: RynPalette.deepNavy.withValues(alpha: 0.10),
               ),
             ),
-            child: const Text(
+            child: Text(
               AppText.cmdCommandHubStaticPreview,
               style: TextStyle(
-                color: RynPalette.muted,
+                color: RynPalette.subtext(context),
                 fontSize: 10.5,
                 fontWeight: FontWeight.w900,
               ),
@@ -1460,7 +1514,7 @@ class _PremiumHomeCommandCenter extends StatelessWidget {
             ],
           ),
           child: DefaultTextStyle.merge(
-            style: const TextStyle(
+            style: TextStyle(
               fontFamily: RynFonts.text,
               fontFamilyFallback: RynFonts.textFallback,
             ),
@@ -1536,7 +1590,7 @@ class _MissionCommandHeader extends StatelessWidget {
               text: AppText.premiumHomeTitle,
             ),
             const SizedBox(height: 6),
-            const Text(
+            Text(
               AppText.missionCommandTitle,
               style: TextStyle(
                 fontFamily: RynFonts.display,
@@ -1656,7 +1710,7 @@ class _MissionOverviewPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             AppText.missionCommandOverview,
             style: TextStyle(
               color: Colors.white,
@@ -1689,7 +1743,7 @@ class _MissionOverviewPanel extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             '-3.2%',
             style: TextStyle(
               color: Color(0xFF5EEAD4),
@@ -1810,7 +1864,7 @@ class _MissionOrbitMap extends StatelessWidget {
                   compactSize: compact ? 152 : 190,
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   AppText.cmdAiCommandCenter,
                   style: TextStyle(
                     color: Colors.white,
@@ -1876,7 +1930,7 @@ class _MissionDomainNode extends StatelessWidget {
             const SizedBox(width: 7),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 11,
                 fontWeight: FontWeight.w900,
@@ -1986,7 +2040,7 @@ class _MissionFocusPanel extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             AppText.missionCommandSelectedTitle,
             style: TextStyle(
               fontFamily: RynFonts.display,
@@ -2024,7 +2078,7 @@ class _MissionFocusPanel extends StatelessWidget {
             runSpacing: 6,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const Text(
+              Text(
                 AppText.missionCommandProgress,
                 style: TextStyle(
                   color: Colors.white,
@@ -2053,7 +2107,7 @@ class _MissionFocusPanel extends StatelessWidget {
                 color: RynPalette.gold.withValues(alpha: 0.38),
               ),
             ),
-            child: const Text(
+            child: Text(
               AppText.missionCommandNextStep,
               style: TextStyle(
                 fontFamily: RynFonts.rounded,
@@ -2108,7 +2162,7 @@ class _InlineMissionLanePreview extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   lane.$1,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
@@ -2145,7 +2199,7 @@ class _ReadinessChip extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           color: Color(0xFFF9E7B7),
           fontSize: 10.5,
           fontWeight: FontWeight.w900,
@@ -2169,7 +2223,7 @@ class _DailyHomeSurface extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           _MiniHeading(
             icon: Icons.home_work_rounded,
             title: AppText.cmdDailyHomeTitle,
@@ -2250,7 +2304,7 @@ class _DailyHomeTile extends StatelessWidget {
                       Expanded(
                         child: Text(
                           title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Color(0xFFF9E7B7),
                             fontWeight: FontWeight.w900,
                             fontSize: 14,
@@ -2273,7 +2327,7 @@ class _DailyHomeTile extends StatelessWidget {
                           ),
                           child: Text(
                             actionLabel!,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Color(0xFFF9E7B7),
                               fontWeight: FontWeight.w900,
                               fontSize: 10.5,
@@ -2344,7 +2398,7 @@ class _ConstructionStageBanner extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           _MiniHeading(
             icon: Icons.apartment_rounded,
             title: AppText.cmdConstructionStageMap,
@@ -2379,7 +2433,7 @@ class _NextPermitQueue extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           _MiniHeading(
             icon: Icons.next_plan_rounded,
             title: AppText.cmdNextPermitQueue,
@@ -2600,7 +2654,7 @@ class _StaticShellPanel extends StatelessWidget {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Color(0xFFEDE7D9),
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
@@ -2687,7 +2741,7 @@ class _StaticShellChip extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.white,
           fontSize: 10.5,
           fontWeight: FontWeight.w900,
@@ -2719,7 +2773,7 @@ class _StaticShellLine extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
+            style: TextStyle(
               color: Color(0xFFD9E0EE),
               fontSize: 11.5,
               fontWeight: FontWeight.w800,
@@ -2943,10 +2997,10 @@ class _CentralCommandOrb extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: compact ? 8 : 12),
-                    const Text(
+                    Text(
                       '현재 핵심 명령',
                       style: TextStyle(
-                        color: RynPalette.gold,
+                        color: RynPalette.accent(context),
                         fontSize: 13,
                         fontWeight: FontWeight.w800,
                       ),
@@ -2986,7 +3040,7 @@ class _CommandCta extends StatelessWidget {
         borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
         border: Border.all(color: RynPalette.gold.withValues(alpha: 0.50)),
       ),
-      child: const Text(
+      child: Text(
         '명령 열기',
         style: TextStyle(
           color: Colors.white,
@@ -3088,7 +3142,7 @@ class _OrbitNode extends StatelessWidget {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w900,
                     fontSize: 13,
@@ -3102,7 +3156,7 @@ class _OrbitNode extends StatelessWidget {
             caption,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
+            style: TextStyle(
               color: Color(0xFFB9C2D5),
               fontSize: 11,
               fontWeight: FontWeight.w700,
@@ -3111,7 +3165,7 @@ class _OrbitNode extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             status,
-            style: const TextStyle(
+            style: TextStyle(
               color: RynPalette.gold,
               fontSize: 11,
               fontWeight: FontWeight.w900,
@@ -3163,11 +3217,11 @@ class _CommandStatusStrip extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
-                children: const [
+                children: [
                   Icon(
                     Icons.space_dashboard_rounded,
                     size: 14,
-                    color: RynPalette.gold,
+                    color: RynPalette.accent(context),
                   ),
                   SizedBox(width: 7),
                   Expanded(
@@ -3306,7 +3360,7 @@ class _DarkDecisionTile extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Color(0xFFAEB8CA),
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
@@ -3373,7 +3427,7 @@ class _ApprovalFlowCard extends StatelessWidget {
     return _InnerLightCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           _MiniHeading(
             icon: Icons.verified_user_rounded,
             title: '승인 흐름',
@@ -3385,7 +3439,7 @@ class _ApprovalFlowCard extends StatelessWidget {
           Text(
             '린님 최종 승인 전까지 실제 실행은 일어나지 않습니다.',
             style: TextStyle(
-              color: RynPalette.muted,
+              color: RynPalette.subtext(context),
               fontSize: 12,
               fontWeight: FontWeight.w700,
             ),
@@ -3404,7 +3458,7 @@ class _RecordStateCard extends StatelessWidget {
     return _InnerLightCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           _MiniHeading(
             icon: Icons.diamond_rounded,
             title: 'Obsidian 기록 상태',
@@ -3427,7 +3481,7 @@ class _HermesCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return _InnerLightCard(
       child: Row(
-        children: const [
+        children: [
           _InitialAvatar(initial: 'H', accent: RynPalette.navy),
           SizedBox(width: 12),
           Expanded(
@@ -3437,7 +3491,7 @@ class _HermesCard extends StatelessWidget {
                 Text(
                   AppText.personaHermesName,
                   style: TextStyle(
-                    color: RynPalette.ink,
+                    color: RynPalette.text(context),
                     fontSize: 15,
                     fontWeight: FontWeight.w900,
                   ),
@@ -3446,7 +3500,7 @@ class _HermesCard extends StatelessWidget {
                 Text(
                   'AI 운영 비서 · 미래 co-pilot 개념 · 준비 중',
                   style: TextStyle(
-                    color: RynPalette.muted,
+                    color: RynPalette.subtext(context),
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     height: 1.35,
@@ -3497,7 +3551,7 @@ class _BoundaryCard extends StatelessWidget {
     return _InnerLightCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           _MiniHeading(
             icon: Icons.shield_outlined,
             title: AppText.kanbanCardBoundary,
@@ -3834,7 +3888,7 @@ class _KanbanSnapshotTile extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Color(0xFFAEB8CA),
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
@@ -3845,7 +3899,7 @@ class _KanbanSnapshotTile extends StatelessWidget {
                   value,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 12.5,
                     fontWeight: FontWeight.w900,
@@ -4017,8 +4071,8 @@ class _KanbanDetailPreview extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     selected.title,
-                    style: const TextStyle(
-                      color: RynPalette.ink,
+                    style: TextStyle(
+                      color: RynPalette.text(context),
                       fontSize: 17,
                       fontWeight: FontWeight.w900,
                       height: 1.2,
@@ -4169,7 +4223,7 @@ class _KanbanSignalPill extends StatelessWidget {
           const SizedBox(width: 6),
           Text(
             '$label · $value',
-            style: const TextStyle(
+            style: TextStyle(
               color: RynPalette.warning,
               fontSize: 11,
               fontWeight: FontWeight.w900,
@@ -4201,14 +4255,14 @@ class _KanbanDetailField extends StatelessWidget {
         decoration: BoxDecoration(
           color: RynPalette.ivory,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: RynPalette.ivoryLine),
+          border: Border.all(color: RynPalette.line(context)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 color: RynPalette.warmMuted,
                 fontSize: 10,
                 fontWeight: FontWeight.w900,
@@ -4217,8 +4271,8 @@ class _KanbanDetailField extends StatelessWidget {
             const SizedBox(height: 3),
             Text(
               value,
-              style: const TextStyle(
-                color: RynPalette.ink,
+              style: TextStyle(
+                color: RynPalette.text(context),
                 fontSize: 12,
                 fontWeight: FontWeight.w900,
                 height: 1.25,
@@ -4257,7 +4311,7 @@ class _KanbanColumn extends StatelessWidget {
       decoration: BoxDecoration(
         color: RynPalette.ivorySoft,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: RynPalette.ivoryLine),
+        border: Border.all(color: RynPalette.line(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -4292,9 +4346,9 @@ class _KanbanEmptyState extends StatelessWidget {
       decoration: BoxDecoration(
         color: RynPalette.ivory,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: RynPalette.ivoryLine),
+        border: Border.all(color: RynPalette.line(context)),
       ),
-      child: const Text(
+      child: Text(
         AppText.kanbanEmptyStaticSample,
         style: TextStyle(
           color: RynPalette.muted,
@@ -4380,8 +4434,8 @@ class _KanbanTaskCard extends StatelessWidget {
                   task.title,
                   maxLines: compact ? 3 : 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: RynPalette.ink,
+                  style: TextStyle(
+                    color: RynPalette.text(context),
                     fontSize: 13,
                     fontWeight: FontWeight.w900,
                     height: 1.2,
@@ -4480,7 +4534,7 @@ class _KanbanMetaPill extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           color: RynPalette.warning,
           fontSize: 10,
           fontWeight: FontWeight.w900,
@@ -4512,7 +4566,7 @@ class _KanbanMetaLine extends StatelessWidget {
             width: compact ? 54 : 58,
             child: Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 color: RynPalette.warmMuted,
                 fontSize: 9.5,
                 fontWeight: FontWeight.w900,
@@ -4524,8 +4578,8 @@ class _KanbanMetaLine extends StatelessWidget {
               value,
               maxLines: compact ? 3 : 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: RynPalette.muted,
+              style: TextStyle(
+                color: RynPalette.subtext(context),
                 fontSize: 10.5,
                 fontWeight: FontWeight.w800,
                 height: 1.25,
@@ -4617,13 +4671,16 @@ class _BrandBlock extends StatelessWidget {
               height: iconSize,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(ultraCompact ? 13 : 15),
-                gradient: const LinearGradient(
-                  colors: [RynPalette.navy, RynPalette.graphite],
+                gradient: LinearGradient(
+                  colors: [
+                    RynPalette.navSelected(context),
+                    RynPalette.surfaceSoft(context),
+                  ],
                 ),
               ),
               child: Icon(
                 Icons.auto_awesome_rounded,
-                color: RynPalette.gold,
+                color: RynPalette.accent(context),
                 size: ultraCompact ? 20 : 22,
               ),
             ),
@@ -4638,7 +4695,7 @@ class _BrandBlock extends StatelessWidget {
                     maxLines: ultraCompact ? 2 : 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: RynPalette.ink,
+                      color: RynPalette.text(context),
                       fontWeight: FontWeight.w900,
                       fontSize: titleSize,
                       height: 1.05,
@@ -4646,12 +4703,12 @@ class _BrandBlock extends StatelessWidget {
                     ),
                   ),
                   if (!compact)
-                    const Text(
+                    Text(
                       'AI-native · Local-first · Calm · Premium',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: RynPalette.warmMuted,
+                        color: RynPalette.subtext(context),
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
                       ),
@@ -4680,16 +4737,16 @@ class _CommandSearchPlaceholder extends StatelessWidget {
         vertical: compact ? 7 : 10,
       ),
       decoration: BoxDecoration(
-        color: RynPalette.ivorySoft,
+        color: RynPalette.surfaceSoft(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
-        border: Border.all(color: RynPalette.ivoryLine),
+        border: Border.all(color: RynPalette.line(context)),
       ),
       child: Row(
         children: [
           Icon(
             Icons.search_rounded,
             size: compact ? 16 : 18,
-            color: RynPalette.muted,
+            color: RynPalette.subtext(context),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -4697,7 +4754,7 @@ class _CommandSearchPlaceholder extends StatelessWidget {
               '검색 / 자료 / 기록 / 일정...',
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: RynPalette.muted,
+                color: RynPalette.subtext(context),
                 fontSize: compact ? 12 : 13,
                 fontWeight: FontWeight.w700,
               ),
@@ -4772,9 +4829,9 @@ class _OwnerChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: RynPalette.ivorySoft,
         borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
-        border: Border.all(color: RynPalette.ivoryLine),
+        border: Border.all(color: RynPalette.line(context)),
       ),
-      child: const Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           _InitialAvatar(initial: '린', size: 28, accent: RynPalette.gold),
@@ -4782,7 +4839,7 @@ class _OwnerChip extends StatelessWidget {
           Text(
             '린님',
             style: TextStyle(
-              color: RynPalette.ink,
+              color: RynPalette.text(context),
               fontSize: 12,
               fontWeight: FontWeight.w900,
             ),
@@ -4812,10 +4869,12 @@ class _NavPill extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
         decoration: BoxDecoration(
-          color: active ? RynPalette.navy : Colors.transparent,
+          color: active ? RynPalette.navSelected(context) : Colors.transparent,
           borderRadius: BorderRadius.circular(17),
           border: Border.all(
-            color: active ? RynPalette.navy : Colors.transparent,
+            color: active
+                ? RynPalette.accent(context).withValues(alpha: 0.35)
+                : Colors.transparent,
           ),
         ),
         child: Row(
@@ -4823,13 +4882,15 @@ class _NavPill extends StatelessWidget {
             Icon(
               item.icon,
               size: 18,
-              color: active ? RynPalette.gold : RynPalette.muted,
+              color: active
+                  ? RynPalette.accent(context)
+                  : RynPalette.subtext(context),
             ),
             const SizedBox(width: 9),
             Text(
               item.label,
               style: TextStyle(
-                color: active ? Colors.white : RynPalette.ink,
+                color: active ? RynPalette.oledInk : RynPalette.text(context),
                 fontWeight: FontWeight.w900,
                 fontSize: 13,
               ),
@@ -4859,10 +4920,14 @@ class _CompactNavChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
-          color: active ? RynPalette.navy : RynPalette.ivorySoft,
+          color: active
+              ? RynPalette.navSelected(context)
+              : RynPalette.surfaceSoft(context),
           borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
           border: Border.all(
-            color: active ? RynPalette.navy : RynPalette.ivoryLine,
+            color: active
+                ? RynPalette.accent(context).withValues(alpha: 0.35)
+                : RynPalette.line(context),
           ),
         ),
         child: Row(
@@ -4871,13 +4936,15 @@ class _CompactNavChip extends StatelessWidget {
             Icon(
               item.icon,
               size: 14,
-              color: active ? RynPalette.gold : RynPalette.muted,
+              color: active
+                  ? RynPalette.accent(context)
+                  : RynPalette.subtext(context),
             ),
             const SizedBox(width: 6),
             Text(
               item.label,
               style: TextStyle(
-                color: active ? Colors.white : RynPalette.ink,
+                color: active ? RynPalette.oledInk : RynPalette.text(context),
                 fontWeight: FontWeight.w900,
                 fontSize: 11,
               ),
@@ -4902,16 +4969,10 @@ class _LightCard extends StatelessWidget {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: RynPalette.ivory,
+        color: RynPalette.surface(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusShell),
-        border: Border.all(color: RynPalette.ivoryLine),
-        boxShadow: const [
-          BoxShadow(
-            color: RynPalette.shadow,
-            blurRadius: 24,
-            offset: Offset(0, 14),
-          ),
-        ],
+        border: Border.all(color: RynPalette.line(context)),
+        boxShadow: RynPalette.panelShadow(context),
       ),
       child: child,
     );
@@ -4927,9 +4988,9 @@ class _InnerLightCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: RynPalette.ivorySoft,
+        color: RynPalette.surfaceSoft(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
-        border: Border.all(color: RynPalette.ivoryLine),
+        border: Border.all(color: RynPalette.line(context)),
       ),
       child: child,
     );
@@ -4948,8 +5009,8 @@ class _SectionHeader extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
-            color: RynPalette.ink,
+          style: TextStyle(
+            color: RynPalette.text(context),
             fontSize: 18,
             fontWeight: FontWeight.w900,
             letterSpacing: -0.2,
@@ -4958,8 +5019,8 @@ class _SectionHeader extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           caption,
-          style: const TextStyle(
-            color: RynPalette.muted,
+          style: TextStyle(
+            color: RynPalette.subtext(context),
             fontSize: 12,
             fontWeight: FontWeight.w700,
             height: 1.35,
@@ -5068,16 +5129,20 @@ class _TinyStep extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
       decoration: BoxDecoration(
-        color: active ? RynPalette.navy : RynPalette.ivory,
+        color: active
+            ? RynPalette.navSelected(context)
+            : RynPalette.surfaceElevated(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
         border: Border.all(
-          color: active ? RynPalette.navy : RynPalette.ivoryLine,
+          color: active
+              ? RynPalette.accent(context).withValues(alpha: 0.35)
+              : RynPalette.line(context),
         ),
       ),
       child: Text(
         label,
         style: TextStyle(
-          color: active ? Colors.white : RynPalette.muted,
+          color: active ? RynPalette.oledInk : RynPalette.subtext(context),
           fontSize: 11,
           fontWeight: FontWeight.w900,
         ),
@@ -5102,15 +5167,15 @@ class _MetricWrap extends StatelessWidget {
             decoration: BoxDecoration(
               color: RynPalette.ivory,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: RynPalette.ivoryLine),
+              border: Border.all(color: RynPalette.line(context)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   metric.$1,
-                  style: const TextStyle(
-                    color: RynPalette.muted,
+                  style: TextStyle(
+                    color: RynPalette.subtext(context),
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
                   ),
@@ -5118,8 +5183,8 @@ class _MetricWrap extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   metric.$2,
-                  style: const TextStyle(
-                    color: RynPalette.ink,
+                  style: TextStyle(
+                    color: RynPalette.text(context),
                     fontSize: 13,
                     fontWeight: FontWeight.w900,
                   ),
@@ -5160,8 +5225,8 @@ class _BoundaryList extends StatelessWidget {
                 Expanded(
                   child: Text(
                     item,
-                    style: const TextStyle(
-                      color: RynPalette.muted,
+                    style: TextStyle(
+                      color: RynPalette.subtext(context),
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
                     ),
@@ -5187,7 +5252,7 @@ class _AgentChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: RynPalette.ivory,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: RynPalette.ivoryLine),
+        border: Border.all(color: RynPalette.line(context)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -5206,8 +5271,8 @@ class _AgentChip extends StatelessWidget {
                   agent.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: RynPalette.ink,
+                  style: TextStyle(
+                    color: RynPalette.text(context),
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
                   ),
@@ -5216,8 +5281,8 @@ class _AgentChip extends StatelessWidget {
                   agent.role,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: RynPalette.muted,
+                  style: TextStyle(
+                    color: RynPalette.subtext(context),
                     fontSize: 9.5,
                     fontWeight: FontWeight.w700,
                   ),
@@ -5268,8 +5333,8 @@ class _ModuleChip extends StatelessWidget {
                   item.label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: RynPalette.ink,
+                  style: TextStyle(
+                    color: RynPalette.text(context),
                     fontWeight: FontWeight.w900,
                     fontSize: 13,
                   ),
@@ -5278,8 +5343,8 @@ class _ModuleChip extends StatelessWidget {
                   item.caption,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: RynPalette.muted,
+                  style: TextStyle(
+                    color: RynPalette.subtext(context),
                     fontWeight: FontWeight.w700,
                     fontSize: 10,
                   ),
@@ -5305,7 +5370,7 @@ class _PrincipleChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: RynPalette.ivorySoft,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: RynPalette.ivoryLine),
+        border: Border.all(color: RynPalette.line(context)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -5321,16 +5386,16 @@ class _PrincipleChip extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  color: RynPalette.ink,
+                style: TextStyle(
+                  color: RynPalette.text(context),
                   fontSize: 12,
                   fontWeight: FontWeight.w900,
                 ),
               ),
               Text(
                 caption,
-                style: const TextStyle(
-                  color: RynPalette.muted,
+                style: TextStyle(
+                  color: RynPalette.subtext(context),
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
                 ),
@@ -5401,7 +5466,7 @@ class _DarkStatusTile extends StatelessWidget {
                   label,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Color(0xFFAEB8CA),
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
@@ -5412,7 +5477,7 @@ class _DarkStatusTile extends StatelessWidget {
                   value,
                   maxLines: 2,
                   softWrap: true,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
@@ -5504,7 +5569,7 @@ class _MarkerPill extends StatelessWidget {
                   child: Text(
                     text,
                     softWrap: true,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: RynTokens.textStatic,
                       fontSize: 11,
                       fontWeight: FontWeight.w900,
@@ -5548,7 +5613,7 @@ class _DarkPill extends StatelessWidget {
                 text,
                 maxLines: 2,
                 softWrap: true,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Color(0xFFEDE7D9),
                   fontSize: 11,
                   fontWeight: FontWeight.w900,
@@ -5571,7 +5636,7 @@ class _BoundaryMini extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         color: RynPalette.muted,
         fontSize: 11,
         fontWeight: FontWeight.w800,

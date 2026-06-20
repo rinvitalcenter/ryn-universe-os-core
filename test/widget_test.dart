@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'dart:ui' show Size;
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ryn_universe_os_core/core/text/user_text.dart';
@@ -357,6 +357,60 @@ void main() {
       find.textContaining('persistence', findRichText: true),
       findsNothing,
     );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('dark mode keeps user navigation and Study surface readable', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(UserText.navSettings).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(UserText.themeDark).first);
+    await tester.pumpAndSettle();
+
+    expect(find.text(UserText.themeDark), findsAtLeastNWidgets(1));
+    await tester.tap(find.text(UserText.navHome).first);
+    await tester.pumpAndSettle();
+    expect(find.text(UserText.navHome), findsAtLeastNWidgets(1));
+
+    final homeItemColors = tester
+        .widgetList<Container>(
+          find.byKey(const Key('home-dashboard-item-card')),
+        )
+        .map((container) => container.decoration)
+        .whereType<BoxDecoration>()
+        .map((decoration) => decoration.color)
+        .whereType<Color>()
+        .toList();
+    expect(homeItemColors, isNotEmpty);
+    expect(homeItemColors.contains(Colors.white), isFalse);
+    final homeQuickLinkColors = tester
+        .widgetList<Container>(find.byKey(const Key('home-quick-link-chip')))
+        .map((container) => container.decoration)
+        .whereType<BoxDecoration>()
+        .map((decoration) => decoration.color)
+        .whereType<Color>()
+        .toList();
+    expect(homeQuickLinkColors, isNotEmpty);
+    expect(homeQuickLinkColors.contains(Colors.white), isFalse);
+
+    await tester.tap(find.text(UserText.navStudy).first);
+    await tester.pumpAndSettle();
+
+    expect(find.text(UserText.studyOsTitle), findsOneWidget);
+    expect(find.text(UserText.studyActionAttendance), findsOneWidget);
+    final studyCardColors = tester
+        .widgetList<Container>(find.byKey(const Key('study-user-action-card')))
+        .map((container) => container.decoration)
+        .whereType<BoxDecoration>()
+        .map((decoration) => decoration.color)
+        .whereType<Color>()
+        .toList();
+    expect(studyCardColors, isNotEmpty);
+    expect(studyCardColors.contains(Colors.white), isFalse);
     expect(tester.takeException(), isNull);
   });
 

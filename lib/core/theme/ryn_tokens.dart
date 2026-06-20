@@ -19,6 +19,26 @@ final class RynTokens {
   static const Color coreCyan = Color(0xFF5FE7F0);
   static const Color coreGold = Color(0xFFFFD27A);
 
+  // User OS visual baseline: clean light mode + OLED-first dark mode.
+  static const Color lightCanvas = Color(0xFFF6F7FA);
+  static const Color lightSurface = Color(0xFFFFFFFF);
+  static const Color lightSurfaceSoft = Color(0xFFF2F4F8);
+  static const Color lightBorder = Color(0xFFE2E6EE);
+  static const Color lightTextPrimary = Color(0xFF111827);
+  static const Color lightTextSecondary = Color(0xFF667085);
+  static const Color lightAccent = Color(0xFF2F6FED);
+  static const Color lightAccentSoft = Color(0xFFEAF2FF);
+
+  static const Color oledCanvas = Color(0xFF000000);
+  static const Color oledSurface = Color(0xFF07090D);
+  static const Color oledSurfaceSoft = Color(0xFF10141C);
+  static const Color oledCard = Color(0xFF171C26);
+  static const Color oledBorder = Color(0xFF2A3140);
+  static const Color oledTextPrimary = Color(0xFFF6F7FB);
+  static const Color oledTextSecondary = Color(0xFFA3AAB7);
+  static const Color oledAccent = Color(0xFF64A8FF);
+  static const Color oledAccentSoft = Color(0xFF102033);
+
   // Neutral scale: dark-mode first, light-mode ready.
   static const Color neutral0 = Color(0xFF03050A);
   static const Color neutral50 = Color(0xFF0B1020);
@@ -127,18 +147,10 @@ final class RynTokens {
 
   static const List<BoxShadow> shadowNone = <BoxShadow>[];
   static const List<BoxShadow> shadowCard = <BoxShadow>[
-    BoxShadow(
-      color: Color(0x33000000),
-      blurRadius: 18,
-      offset: Offset(0, 10),
-    ),
+    BoxShadow(color: Color(0x33000000), blurRadius: 18, offset: Offset(0, 10)),
   ];
   static const List<BoxShadow> shadowCommand = <BoxShadow>[
-    BoxShadow(
-      color: Color(0x59000000),
-      blurRadius: 32,
-      offset: Offset(0, 18),
-    ),
+    BoxShadow(color: Color(0x59000000), blurRadius: 32, offset: Offset(0, 18)),
   ];
 
   // ---------------------------------------------------------------------------
