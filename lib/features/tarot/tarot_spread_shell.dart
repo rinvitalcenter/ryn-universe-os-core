@@ -1061,75 +1061,105 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final canReveal = selectedCount >= targetCount;
     final remainingToSelect = math.max(0, targetCount - selectedCount);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _TarotSmallStageLabel(label: UserText.tarotDrawPreparation),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: RynPalette.surfaceElevated(context),
-            borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
-            border: Border.all(color: RynPalette.line(context)),
-            boxShadow: RynPalette.panelShadow(context),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+    final guideText = canReveal ? '카드가 모두 선택되었습니다' : '$targetCount장을 골라주세요';
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: RadialGradient(
+          center: const Alignment(0, -0.54),
+          radius: 1.12,
+          colors: [
+            RynPalette.accent(context).withValues(alpha: 0.14),
+            RynPalette.surfaceSoft(context),
+            RynPalette.surfaceElevated(context),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(34),
+        border: Border.all(color: RynPalette.line(context)),
+        boxShadow: RynPalette.panelShadow(context),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: _TarotSelectionSummary(deck: deck, spread: spread),
-                  ),
-                  const SizedBox(width: 12),
-                  _TarotSmallBadge('$selectedCount / $targetCount 선택'),
-                  const SizedBox(width: 8),
-                  _TarotSmallBadge('남은 선택 $remainingToSelect장'),
-                ],
+              _TarotSmallStageLabel(label: UserText.tarotDrawPreparation),
+              const SizedBox(width: 10),
+              TextButton.icon(
+                onPressed: onReset,
+                icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                label: const Text(_TarotUiText.prepare),
               ),
-              const SizedBox(height: 16),
-              _TarotFullDeckBoard(
-                cards: cards,
-                selectedIndexes: selectedIndexes,
-                selectedOrder: selectedOrder,
-                targetReached: selectedCount >= targetCount,
-                onSelected: onSelected,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  '${deck.label} · $spread',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: RynPalette.text(context),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.2,
+                  ),
+                ),
               ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: isShuffling ? null : onAutoDraw,
-                      icon: const Icon(Icons.auto_awesome_rounded, size: 18),
-                      label: const Text(UserText.tarotAutoDraw),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: FilledButton.icon(
-                      key: const Key('tarot-show-result-button'),
-                      onPressed: selectedCount >= targetCount
-                          ? onShowResult
-                          : null,
-                      icon: const Icon(Icons.table_chart_rounded, size: 18),
-                      label: const Text(_TarotUiText.showResult),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  TextButton.icon(
-                    onPressed: onReset,
-                    icon: const Icon(Icons.refresh_rounded, size: 18),
-                    label: const Text(UserText.tarotResetDraw),
-                  ),
-                ],
+              const SizedBox(width: 12),
+              _TarotSmallBadge('$selectedCount / $targetCount 선택'),
+              const SizedBox(width: 8),
+              _TarotSmallBadge('남은 선택 $remainingToSelect장'),
+              const SizedBox(width: 10),
+              OutlinedButton.icon(
+                onPressed: isShuffling ? null : onAutoDraw,
+                icon: const Icon(Icons.auto_awesome_rounded, size: 18),
+                label: const Text(UserText.tarotAutoDraw),
+              ),
+              const SizedBox(width: 8),
+              FilledButton.icon(
+                key: const Key('tarot-show-result-button'),
+                onPressed: canReveal ? onShowResult : null,
+                icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                label: const Text(_TarotUiText.showResult),
               ),
             ],
           ),
-        ),
-      ],
+          const SizedBox(height: 14),
+          Center(
+            child: Column(
+              children: [
+                Text(
+                  guideText,
+                  style: TextStyle(
+                    color: RynPalette.text(context),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '마음이 머무는 카드를 직관으로 선택하세요',
+                  style: TextStyle(
+                    color: RynPalette.subtext(context),
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          _TarotFullDeckBoard(
+            cards: cards,
+            selectedIndexes: selectedIndexes,
+            selectedOrder: selectedOrder,
+            targetReached: canReveal,
+            onSelected: onSelected,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1490,44 +1520,86 @@ class _TarotResultStage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final allRevealed = revealedIndexes.length >= drawnCards.length;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            const _TarotSmallStageLabel(label: _TarotUiText.revealPrompt),
-            const Spacer(),
-            OutlinedButton.icon(
-              key: const Key('tarot-reveal-all-button'),
-              onPressed: allRevealed ? null : onRevealAll,
-              icon: const Icon(Icons.auto_awesome_rounded, size: 18),
-              label: const Text(_TarotUiText.revealAll),
-            ),
-            const SizedBox(width: 8),
-            TextButton.icon(
-              onPressed: onReset,
-              icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text(UserText.tarotResetDraw),
-            ),
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: RadialGradient(
+          center: const Alignment(0, -0.62),
+          radius: 1.18,
+          colors: [
+            RynPalette.accent(context).withValues(alpha: 0.12),
+            RynPalette.surfaceSoft(context),
+            RynPalette.surfaceElevated(context),
           ],
         ),
-        const SizedBox(height: 12),
-        SingleChildScrollView(
-          child: _TarotSpreadCanvas(
-            spreadLabel: spreadLabel,
-            slots: slots,
-            drawnCards: drawnCards,
-            revealedIndexes: revealedIndexes,
-            revealFxIndexes: revealFxIndexes,
-            onRevealCard: onRevealCard,
-            onDirectionToggle: onDirectionToggle,
-            showEmptySlots: false,
-            onEmptySlotTap: () {},
+        borderRadius: BorderRadius.circular(34),
+        border: Border.all(color: RynPalette.line(context)),
+        boxShadow: RynPalette.panelShadow(context),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              TextButton.icon(
+                onPressed: onReset,
+                icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                label: const Text(UserText.tarotResetDraw),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '리딩 결과',
+                      style: TextStyle(
+                        color: RynPalette.text(context),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '$spreadLabel · 이미지를 먼저 보고 직관으로 읽어보세요',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: RynPalette.subtext(context),
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const _TarotSmallStageLabel(label: _TarotUiText.revealPrompt),
+              const SizedBox(width: 10),
+              OutlinedButton.icon(
+                key: const Key('tarot-reveal-all-button'),
+                onPressed: allRevealed ? null : onRevealAll,
+                icon: const Icon(Icons.auto_awesome_rounded, size: 18),
+                label: const Text(_TarotUiText.revealAll),
+              ),
+            ],
           ),
-        ),
-        const SizedBox(height: 16),
-        const _TarotMemoPanel(),
-      ],
+          const SizedBox(height: 14),
+          SingleChildScrollView(
+            child: _TarotSpreadCanvas(
+              spreadLabel: spreadLabel,
+              slots: slots,
+              drawnCards: drawnCards,
+              revealedIndexes: revealedIndexes,
+              revealFxIndexes: revealFxIndexes,
+              onRevealCard: onRevealCard,
+              onDirectionToggle: onDirectionToggle,
+              showEmptySlots: false,
+              onEmptySlotTap: () {},
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
