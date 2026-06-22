@@ -1357,10 +1357,14 @@ class _TarotFullDeckBoardState extends State<_TarotFullDeckBoard> {
         builder: (context, constraints) {
           final availableWidth = constraints.maxWidth;
           final availableHeight = constraints.maxHeight;
-          final desiredWidth = availableWidth >= 1500 ? 96.0 : 86.0;
+          final desiredWidth = availableWidth >= 1500 ? 76.0 : 64.0;
+          final widthForFullArc = (availableWidth * 0.94) / 18;
           final cardWidth = math.max(
-            72.0,
-            math.min(desiredWidth, availableHeight * 0.19),
+            42.0,
+            math.min(
+              desiredWidth,
+              math.min(widthForFullArc, availableHeight * 0.15),
+            ),
           );
           final cardHeight = cardWidth * 1.5;
           final tableWidth = availableWidth;
@@ -1468,9 +1472,9 @@ class _PositionedFanCard extends StatelessWidget {
         ? 0.0
         : (index - centerIndex) / centerIndex;
     final centerX = tableWidth / 2;
-    final fanWidth = (tableWidth * 0.94 - cardWidth) / 2;
-    final baseY = tableHeight * 0.28;
-    final curveDepth = tableHeight * 0.28;
+    final fanWidth = (tableWidth * 0.96 - cardWidth) / 2;
+    final baseY = tableHeight * 0.31;
+    final curveDepth = tableHeight * 0.25;
     final x = centerX + normalized * fanWidth - cardWidth / 2;
     final y = baseY + curveDepth * normalized * normalized;
     final rotation = normalized * (math.pi / 180) * 38;
@@ -1544,82 +1548,91 @@ class _TarotFullDeckCard extends StatelessWidget {
       cursor: disabled ? MouseCursor.defer : SystemMouseCursors.click,
       onEnter: (_) => onHoverChanged(true),
       onExit: (_) => onHoverChanged(false),
-      child: AnimatedScale(
-        scale: selected
-            ? 1.12
-            : lifted
-            ? 1.22
-            : 1.0,
-        duration: const Duration(milliseconds: 140),
-        curve: Curves.easeOutCubic,
-        child: Transform.translate(
-          offset: liftOffset,
-          child: Transform.rotate(
-            angle: angle,
-            child: Opacity(
-              opacity: opacity,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  IgnorePointer(
-                    ignoring: selected,
-                    child:
-                        _TarotCardBackChoice(
-                              onTap: disabled ? () {} : onTap,
-                              compact: true,
-                              glowing: selected || lifted,
-                            )
-                            .animate(target: selected ? 1 : 0)
-                            .scale(
-                              begin: const Offset(1, 1),
-                              end: const Offset(1.04, 1.04),
-                              duration: 220.ms,
-                              curve: Curves.easeOutCubic,
-                            )
-                            .shimmer(
-                              duration: 520.ms,
-                              color: RynPalette.accent(
-                                context,
-                              ).withValues(alpha: 0.22),
-                            ),
-                  ),
-                  if (selected && selectedOrder != null)
-                    Positioned(
-                      right: -5,
-                      top: -7,
-                      child: Container(
-                        key: Key('tarot-selected-order-$selectedOrder'),
-                        width: 26,
-                        height: 26,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: RynPalette.accent(context),
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: RynPalette.surface(context),
-                            width: 2,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: RynPalette.accent(
-                                context,
-                              ).withValues(alpha: 0.35),
-                              blurRadius: 16,
-                              spreadRadius: 1,
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          '$selectedOrder',
-                          style: TextStyle(
-                            color: RynPalette.iconOnAccent(context),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w900,
-                          ),
+      child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: disabled ? null : onTap,
+        child: AnimatedScale(
+          scale: selected
+              ? 1.12
+              : lifted
+              ? 1.22
+              : 1.0,
+          duration: const Duration(milliseconds: 140),
+          curve: Curves.easeOutCubic,
+          child: Transform.translate(
+            offset: liftOffset,
+            child: Transform.rotate(
+              angle: angle,
+              child: Opacity(
+                opacity: opacity,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    IgnorePointer(
+                      ignoring: selected,
+                      child: SizedBox.expand(
+                        child: FittedBox(
+                          fit: BoxFit.fill,
+                          child:
+                              _TarotCardBackChoice(
+                                    onTap: disabled ? () {} : onTap,
+                                    compact: true,
+                                    glowing: selected || lifted,
+                                  )
+                                  .animate(target: selected ? 1 : 0)
+                                  .scale(
+                                    begin: const Offset(1, 1),
+                                    end: const Offset(1.04, 1.04),
+                                    duration: 220.ms,
+                                    curve: Curves.easeOutCubic,
+                                  )
+                                  .shimmer(
+                                    duration: 520.ms,
+                                    color: RynPalette.accent(
+                                      context,
+                                    ).withValues(alpha: 0.22),
+                                  ),
                         ),
                       ),
                     ),
-                ],
+                    if (selected && selectedOrder != null)
+                      Positioned(
+                        right: -5,
+                        top: -7,
+                        child: Container(
+                          key: Key('tarot-selected-order-$selectedOrder'),
+                          width: 26,
+                          height: 26,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: RynPalette.accent(context),
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: RynPalette.surface(context),
+                              width: 2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: RynPalette.accent(
+                                  context,
+                                ).withValues(alpha: 0.35),
+                                blurRadius: 16,
+                                spreadRadius: 1,
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            '$selectedOrder',
+                            style: TextStyle(
+                              color: RynPalette.iconOnAccent(context),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -2030,7 +2043,7 @@ class _TarotCardBackChoice extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         key: const Key('tarot-card-back-choice'),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(4),
         onTap: onTap,
         child: _TarotCardBack(compact: compact, glowing: glowing),
       ),
@@ -2061,7 +2074,7 @@ class _TarotCardBack extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: [RynPalette.tarotViolet, RynPalette.tarotNavy],
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(4),
         border: Border.all(
           color: accent.withValues(alpha: glowing ? 0.92 : 0.58),
         ),
@@ -2080,7 +2093,7 @@ class _TarotCardBack extends StatelessWidget {
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(3),
         child: Shimmer.fromColors(
           enabled: compact || glowing,
           loop: 1,
@@ -2418,7 +2431,7 @@ class _TarotDrawnCardView extends StatelessWidget {
       padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
         color: RynPalette.surfaceElevated(context),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(4),
         border: Border.all(
           color: RynPalette.accent(
             context,
@@ -2438,7 +2451,7 @@ class _TarotDrawnCardView extends StatelessWidget {
         children: [
           Expanded(
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(11),
+              borderRadius: BorderRadius.circular(2),
               child: ColoredBox(
                 color: RynPalette.surface(context),
                 child: Stack(
