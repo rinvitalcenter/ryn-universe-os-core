@@ -36,6 +36,11 @@ class RynPalette {
   static const goldSoft = RynTokens.lightAccentSoft;
   static const lavender = Color(0xFFE9E5FF);
   static const lavenderStrong = Color(0xFF8B7CF6);
+  static const tarotMidnight = Color(0xFF060918);
+  static const tarotNavy = Color(0xFF0B1028);
+  static const tarotViolet = Color(0xFF211848);
+  static const tarotLavender = Color(0xFFB3A8F0);
+  static const tarotGold = Color(0xFFD9BC7A);
   static const accentBlue = RynTokens.lightAccent;
   static const accentBlueDark = RynTokens.oledAccent;
   static const accentSoftDark = RynTokens.oledAccentSoft;
@@ -973,6 +978,123 @@ class _TarotSmallStageLabel extends StatelessWidget {
   }
 }
 
+class _TarotStageProgress extends StatelessWidget {
+  const _TarotStageProgress({required this.activeIndex});
+
+  final int activeIndex;
+
+  @override
+  Widget build(BuildContext context) {
+    const labels = ['준비', '카드 드로우', '공개', '해석'];
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      children: [
+        for (var index = 0; index < labels.length; index++)
+          _TarotStageChip(label: labels[index], active: index == activeIndex),
+      ],
+    );
+  }
+}
+
+class _TarotStageChip extends StatelessWidget {
+  const _TarotStageChip({required this.label, required this.active});
+
+  final String label;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 7),
+      decoration: BoxDecoration(
+        gradient: active
+            ? const LinearGradient(
+                colors: [RynPalette.tarotViolet, RynPalette.lavenderStrong],
+              )
+            : null,
+        color: active ? null : Colors.white.withValues(alpha: 0.055),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        border: Border.all(
+          color: active
+              ? RynPalette.tarotGold.withValues(alpha: 0.58)
+              : Colors.white.withValues(alpha: 0.11),
+        ),
+        boxShadow: active
+            ? [
+                BoxShadow(
+                  color: RynPalette.lavenderStrong.withValues(alpha: 0.28),
+                  blurRadius: 18,
+                  spreadRadius: 1,
+                ),
+              ]
+            : null,
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: active ? Colors.white : RynPalette.tarotLavender,
+          fontSize: 11.5,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -0.1,
+        ),
+      ),
+    );
+  }
+}
+
+class _TarotCosmicParticles extends StatelessWidget {
+  const _TarotCosmicParticles();
+
+  static const _particles = <({double x, double y, double size, double alpha})>[
+    (x: 0.12, y: 0.22, size: 2.8, alpha: 0.42),
+    (x: 0.24, y: 0.76, size: 2.2, alpha: 0.28),
+    (x: 0.42, y: 0.18, size: 2.0, alpha: 0.34),
+    (x: 0.58, y: 0.68, size: 3.0, alpha: 0.24),
+    (x: 0.73, y: 0.28, size: 2.4, alpha: 0.38),
+    (x: 0.88, y: 0.62, size: 2.8, alpha: 0.30),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return Stack(
+            children: [
+              for (final particle in _particles)
+                Positioned(
+                  left: constraints.maxWidth * particle.x,
+                  top: constraints.maxHeight * particle.y,
+                  child: Container(
+                    width: particle.size,
+                    height: particle.size,
+                    decoration: BoxDecoration(
+                      color: RynPalette.tarotLavender.withValues(
+                        alpha: particle.alpha,
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: RynPalette.tarotLavender.withValues(
+                            alpha: particle.alpha,
+                          ),
+                          blurRadius: 10,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
 class _TarotPreparationPanel extends StatelessWidget {
   const _TarotPreparationPanel({
     required this.selectedDeck,
@@ -1063,100 +1185,113 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
   Widget build(BuildContext context) {
     final canReveal = selectedCount >= targetCount;
     final remainingToSelect = math.max(0, targetCount - selectedCount);
-    final guideText = canReveal ? '카드가 모두 선택되었습니다' : '$targetCount장을 골라주세요';
+    final guideText = canReveal ? '카드를 모두 선택했습니다' : '$targetCount장을 골라주세요';
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: RadialGradient(
-          center: const Alignment(0, -0.54),
-          radius: 1.12,
+        gradient: const RadialGradient(
+          center: Alignment(0, -0.58),
+          radius: 1.16,
           colors: [
-            RynPalette.accent(context).withValues(alpha: 0.14),
-            RynPalette.surfaceSoft(context),
-            RynPalette.surfaceElevated(context),
+            Color(0x552D2463),
+            RynPalette.tarotNavy,
+            RynPalette.tarotMidnight,
           ],
         ),
         borderRadius: BorderRadius.circular(34),
-        border: Border.all(color: RynPalette.line(context)),
-        boxShadow: RynPalette.panelShadow(context),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.095)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x99000000),
+            blurRadius: 38,
+            offset: Offset(0, 22),
+          ),
+        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Stack(
         children: [
-          Row(
+          const Positioned.fill(child: _TarotCosmicParticles()),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _TarotSmallStageLabel(label: UserText.tarotDrawPreparation),
-              const SizedBox(width: 10),
-              TextButton.icon(
-                onPressed: onReset,
-                icon: const Icon(Icons.arrow_back_rounded, size: 18),
-                label: const Text(_TarotUiText.prepare),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  '${deck.label} · $spread',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    color: RynPalette.text(context),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.2,
+              Row(
+                children: [
+                  _TarotSmallStageLabel(label: UserText.tarotDrawPreparation),
+                  const SizedBox(width: 10),
+                  const _TarotStageProgress(activeIndex: 1),
+                  const SizedBox(width: 10),
+                  TextButton.icon(
+                    onPressed: onReset,
+                    icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                    label: const Text(_TarotUiText.prepare),
                   ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      '${deck.label} · $spread',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  _TarotSmallBadge('$selectedCount / $targetCount 선택'),
+                  const SizedBox(width: 8),
+                  _TarotSmallBadge('남은 선택 $remainingToSelect장'),
+                  const SizedBox(width: 10),
+                  OutlinedButton.icon(
+                    onPressed: isShuffling ? null : onAutoDraw,
+                    icon: const Icon(Icons.auto_awesome_rounded, size: 18),
+                    label: const Text(UserText.tarotAutoDraw),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton.icon(
+                    key: const Key('tarot-show-result-button'),
+                    onPressed: canReveal ? onShowResult : null,
+                    icon: const Icon(Icons.arrow_forward_rounded, size: 18),
+                    label: const Text(_TarotUiText.showResult),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Center(
+                child: Column(
+                  children: [
+                    Text(
+                      guideText,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '마음이 머무는 카드를 직관으로 선택하세요',
+                      style: TextStyle(
+                        color: RynPalette.tarotLavender,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 12),
-              _TarotSmallBadge('$selectedCount / $targetCount 선택'),
-              const SizedBox(width: 8),
-              _TarotSmallBadge('남은 선택 $remainingToSelect장'),
-              const SizedBox(width: 10),
-              OutlinedButton.icon(
-                onPressed: isShuffling ? null : onAutoDraw,
-                icon: const Icon(Icons.auto_awesome_rounded, size: 18),
-                label: const Text(UserText.tarotAutoDraw),
-              ),
-              const SizedBox(width: 8),
-              FilledButton.icon(
-                key: const Key('tarot-show-result-button'),
-                onPressed: canReveal ? onShowResult : null,
-                icon: const Icon(Icons.arrow_forward_rounded, size: 18),
-                label: const Text(_TarotUiText.showResult),
+              const SizedBox(height: 12),
+              _TarotFullDeckBoard(
+                cards: cards,
+                selectedIndexes: selectedIndexes,
+                selectedOrder: selectedOrder,
+                targetReached: canReveal,
+                onSelected: onSelected,
               ),
             ],
-          ),
-          const SizedBox(height: 14),
-          Center(
-            child: Column(
-              children: [
-                Text(
-                  guideText,
-                  style: TextStyle(
-                    color: RynPalette.text(context),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.2,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '마음이 머무는 카드를 직관으로 선택하세요',
-                  style: TextStyle(
-                    color: RynPalette.subtext(context),
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          _TarotFullDeckBoard(
-            cards: cards,
-            selectedIndexes: selectedIndexes,
-            selectedOrder: selectedOrder,
-            targetReached: canReveal,
-            onSelected: onSelected,
           ),
         ],
       ),
@@ -1198,23 +1333,23 @@ class _TarotFullDeckBoardState extends State<_TarotFullDeckBoard> {
       height: 620,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            RynPalette.surfaceSoft(context),
-            RynPalette.surfaceElevated(context),
-            RynPalette.accentSoft(context).withValues(alpha: 0.55),
-          ],
+          colors: [Color(0xFF070A18), Color(0xFF111735), Color(0xFF201747)],
         ),
         borderRadius: BorderRadius.circular(34),
-        border: Border.all(color: RynPalette.line(context)),
+        border: Border.all(color: RynPalette.tarotGold.withValues(alpha: 0.16)),
         boxShadow: [
-          ...RynPalette.panelShadow(context),
+          const BoxShadow(
+            color: Color(0xAA000000),
+            blurRadius: 34,
+            offset: Offset(0, 18),
+          ),
           BoxShadow(
-            color: RynPalette.accent(context).withValues(alpha: 0.12),
-            blurRadius: 52,
-            spreadRadius: 4,
+            color: RynPalette.lavenderStrong.withValues(alpha: 0.18),
+            blurRadius: 58,
+            spreadRadius: 3,
           ),
         ],
       ),
@@ -1258,8 +1393,8 @@ class _TarotFullDeckBoardState extends State<_TarotFullDeckBoard> {
                           center: const Alignment(0, -0.1),
                           radius: 0.98,
                           colors: [
-                            Colors.white.withValues(alpha: 0.2),
-                            RynPalette.accent(context).withValues(alpha: 0.06),
+                            RynPalette.tarotLavender.withValues(alpha: 0.16),
+                            RynPalette.lavenderStrong.withValues(alpha: 0.075),
                             Colors.transparent,
                           ],
                         ),
@@ -1523,80 +1658,93 @@ class _TarotResultStage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: RadialGradient(
-          center: const Alignment(0, -0.62),
+        gradient: const RadialGradient(
+          center: Alignment(0, -0.62),
           radius: 1.18,
           colors: [
-            RynPalette.accent(context).withValues(alpha: 0.12),
-            RynPalette.surfaceSoft(context),
-            RynPalette.surfaceElevated(context),
+            Color(0x552D2463),
+            RynPalette.tarotNavy,
+            RynPalette.tarotMidnight,
           ],
         ),
         borderRadius: BorderRadius.circular(34),
-        border: Border.all(color: RynPalette.line(context)),
-        boxShadow: RynPalette.panelShadow(context),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.095)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x99000000),
+            blurRadius: 38,
+            offset: Offset(0, 22),
+          ),
+        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Stack(
         children: [
-          Row(
+          const Positioned.fill(child: _TarotCosmicParticles()),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextButton.icon(
-                onPressed: onReset,
-                icon: const Icon(Icons.arrow_back_rounded, size: 18),
-                label: const Text(UserText.tarotResetDraw),
+              Row(
+                children: [
+                  const _TarotStageProgress(activeIndex: 2),
+                  const SizedBox(width: 10),
+                  TextButton.icon(
+                    onPressed: onReset,
+                    icon: const Icon(Icons.arrow_back_rounded, size: 18),
+                    label: const Text(UserText.tarotResetDraw),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '리딩 결과',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '$spreadLabel · 이미지를 먼저 보고 직관으로 읽어보세요',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            color: RynPalette.tarotLavender,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const _TarotSmallStageLabel(label: _TarotUiText.revealPrompt),
+                  const SizedBox(width: 10),
+                  OutlinedButton.icon(
+                    key: const Key('tarot-reveal-all-button'),
+                    onPressed: allRevealed ? null : onRevealAll,
+                    icon: const Icon(Icons.auto_awesome_rounded, size: 18),
+                    label: const Text(_TarotUiText.revealAll),
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '리딩 결과',
-                      style: TextStyle(
-                        color: RynPalette.text(context),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      '$spreadLabel · 이미지를 먼저 보고 직관으로 읽어보세요',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: RynPalette.subtext(context),
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
+              const SizedBox(height: 14),
+              SingleChildScrollView(
+                child: _TarotSpreadCanvas(
+                  spreadLabel: spreadLabel,
+                  slots: slots,
+                  drawnCards: drawnCards,
+                  revealedIndexes: revealedIndexes,
+                  revealFxIndexes: revealFxIndexes,
+                  onRevealCard: onRevealCard,
+                  onDirectionToggle: onDirectionToggle,
+                  showEmptySlots: false,
+                  onEmptySlotTap: () {},
                 ),
               ),
-              const _TarotSmallStageLabel(label: _TarotUiText.revealPrompt),
-              const SizedBox(width: 10),
-              OutlinedButton.icon(
-                key: const Key('tarot-reveal-all-button'),
-                onPressed: allRevealed ? null : onRevealAll,
-                icon: const Icon(Icons.auto_awesome_rounded, size: 18),
-                label: const Text(_TarotUiText.revealAll),
-              ),
             ],
-          ),
-          const SizedBox(height: 14),
-          SingleChildScrollView(
-            child: _TarotSpreadCanvas(
-              spreadLabel: spreadLabel,
-              slots: slots,
-              drawnCards: drawnCards,
-              revealedIndexes: revealedIndexes,
-              revealFxIndexes: revealFxIndexes,
-              onRevealCard: onRevealCard,
-              onDirectionToggle: onDirectionToggle,
-              showEmptySlots: false,
-              onEmptySlotTap: () {},
-            ),
           ),
         ],
       ),
@@ -1901,24 +2049,32 @@ class _TarotCardBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accent = RynPalette.accent(context);
+    final accent = RynPalette.tarotGold;
     return AnimatedContainer(
       key: const Key('tarot-card-back'),
       duration: const Duration(milliseconds: 220),
       width: compact ? 58 : 86,
       height: compact ? 87 : 132,
       decoration: BoxDecoration(
-        color: RynPalette.accentSoft(context),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [RynPalette.tarotViolet, RynPalette.tarotNavy],
+        ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: accent.withValues(alpha: glowing ? 0.75 : 0.45),
+          color: accent.withValues(alpha: glowing ? 0.92 : 0.58),
         ),
         boxShadow: [
-          ...RynPalette.panelShadow(context),
+          const BoxShadow(
+            color: Color(0x99000000),
+            blurRadius: 14,
+            offset: Offset(0, 7),
+          ),
           if (glowing)
             BoxShadow(
-              color: accent.withValues(alpha: 0.36),
-              blurRadius: compact ? 18 : 28,
+              color: accent.withValues(alpha: 0.46),
+              blurRadius: compact ? 22 : 32,
               spreadRadius: 2,
             ),
         ],
@@ -1929,7 +2085,7 @@ class _TarotCardBack extends StatelessWidget {
           enabled: compact || glowing,
           loop: 1,
           period: const Duration(milliseconds: 1800),
-          baseColor: Colors.white.withValues(alpha: 0.06),
+          baseColor: RynPalette.tarotLavender.withValues(alpha: 0.08),
           highlightColor: Colors.white.withValues(alpha: glowing ? 0.42 : 0.22),
           child: Stack(
             fit: StackFit.expand,
@@ -2041,10 +2197,20 @@ class _TarotSpreadCanvas extends StatelessWidget {
       height: canvasHeight,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: RynPalette.surfaceSoft(context),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Color(0xFF090D1F), Color(0xFF151B3C), Color(0xFF211747)],
+        ),
         borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
-        border: Border.all(color: RynPalette.line(context)),
-        boxShadow: RynPalette.panelShadow(context),
+        border: Border.all(color: RynPalette.tarotGold.withValues(alpha: 0.13)),
+        boxShadow: [
+          BoxShadow(
+            color: RynPalette.lavenderStrong.withValues(alpha: 0.13),
+            blurRadius: 38,
+            spreadRadius: 1,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2053,14 +2219,14 @@ class _TarotSpreadCanvas extends StatelessWidget {
             children: [
               Icon(
                 Icons.auto_awesome_rounded,
-                color: RynPalette.accent(context),
+                color: RynPalette.tarotGold,
                 size: 18,
               ),
               const SizedBox(width: 8),
               Text(
                 UserText.tarotResultTable,
                 style: TextStyle(
-                  color: RynPalette.text(context),
+                  color: Colors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w900,
                 ),
@@ -2073,9 +2239,16 @@ class _TarotSpreadCanvas extends StatelessWidget {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: RynPalette.surface(context),
+                gradient: RadialGradient(
+                  center: const Alignment(0, -0.22),
+                  radius: 0.96,
+                  colors: [
+                    RynPalette.lavenderStrong.withValues(alpha: 0.12),
+                    const Color(0xFF070A18),
+                  ],
+                ),
                 borderRadius: BorderRadius.circular(28),
-                border: Border.all(color: RynPalette.line(context)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
               ),
               child: LayoutBuilder(
                 builder: (context, constraints) {
@@ -2492,7 +2665,7 @@ class _TarotSmallBadge extends StatelessWidget {
         vertical: compact ? 4 : 7,
       ),
       decoration: BoxDecoration(
-        color: RynPalette.accentSoft(context),
+        color: RynPalette.accentSoft(context).withValues(alpha: 0.78),
         borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
         border: Border.all(color: RynPalette.line(context)),
       ),
