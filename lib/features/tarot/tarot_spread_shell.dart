@@ -1190,15 +1190,16 @@ class _TarotFullDeckBoardState extends State<_TarotFullDeckBoard> {
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final cardWidth = constraints.maxWidth >= 1500 ? 86.0 : 78.0;
-          final cardHeight = cardWidth * 1.5;
-          final overlapStep = cardWidth * 0.34;
-          final fanWidth = overlapStep * (widget.cards.length - 1) / 2;
-          final tableWidth = math.max(
-            constraints.maxWidth,
-            (fanWidth * 2) + cardWidth + 160,
+          final availableWidth = constraints.maxWidth;
+          final availableHeight = constraints.maxHeight;
+          final desiredWidth = availableWidth >= 1500 ? 96.0 : 86.0;
+          final cardWidth = math.max(
+            72.0,
+            math.min(desiredWidth, availableHeight * 0.19),
           );
-          final tableHeight = math.max(constraints.maxHeight, 560.0);
+          final cardHeight = cardWidth * 1.5;
+          final tableWidth = availableWidth;
+          final tableHeight = math.max(availableHeight, 560.0);
           final orderedIndexes =
               List<int>.generate(widget.cards.length, (i) => i)..sort((a, b) {
                 int zRank(int index) {
@@ -1211,56 +1212,51 @@ class _TarotFullDeckBoardState extends State<_TarotFullDeckBoard> {
                 if (rankCompare != 0) return rankCompare;
                 return a.compareTo(b);
               });
-          return SingleChildScrollView(
+          return SizedBox(
             key: const Key('tarot-full-deck-grid'),
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              width: tableWidth,
-              height: tableHeight,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Positioned.fill(
-                    child: IgnorePointer(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(28),
-                          gradient: RadialGradient(
-                            center: const Alignment(0, -0.1),
-                            radius: 0.98,
-                            colors: [
-                              Colors.white.withValues(alpha: 0.2),
-                              RynPalette.accent(
-                                context,
-                              ).withValues(alpha: 0.06),
-                              Colors.transparent,
-                            ],
-                          ),
+            width: tableWidth,
+            height: tableHeight,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(28),
+                        gradient: RadialGradient(
+                          center: const Alignment(0, -0.1),
+                          radius: 0.98,
+                          colors: [
+                            Colors.white.withValues(alpha: 0.2),
+                            RynPalette.accent(context).withValues(alpha: 0.06),
+                            Colors.transparent,
+                          ],
                         ),
                       ),
                     ),
                   ),
-                  for (final index in orderedIndexes)
-                    _PositionedFanCard(
-                      index: index,
-                      count: widget.cards.length,
-                      cardWidth: cardWidth,
-                      cardHeight: cardHeight,
-                      tableWidth: tableWidth,
-                      tableHeight: tableHeight,
-                      selected: widget.selectedIndexes.contains(index),
-                      selectedOrder: widget.selectedOrder[index],
-                      hasSelection: widget.selectedIndexes.isNotEmpty,
-                      hovered: _hoveredIndex == index,
-                      disabled:
-                          widget.targetReached &&
-                          !widget.selectedIndexes.contains(index),
-                      onHoverChanged: (hovered) =>
-                          _setHoveredIndex(hovered ? index : null),
-                      onTap: () => widget.onSelected(index),
-                    ),
-                ],
-              ),
+                ),
+                for (final index in orderedIndexes)
+                  _PositionedFanCard(
+                    index: index,
+                    count: widget.cards.length,
+                    cardWidth: cardWidth,
+                    cardHeight: cardHeight,
+                    tableWidth: tableWidth,
+                    tableHeight: tableHeight,
+                    selected: widget.selectedIndexes.contains(index),
+                    selectedOrder: widget.selectedOrder[index],
+                    hasSelection: widget.selectedIndexes.isNotEmpty,
+                    hovered: _hoveredIndex == index,
+                    disabled:
+                        widget.targetReached &&
+                        !widget.selectedIndexes.contains(index),
+                    onHoverChanged: (hovered) =>
+                        _setHoveredIndex(hovered ? index : null),
+                    onTap: () => widget.onSelected(index),
+                  ),
+              ],
             ),
           );
         },
@@ -1307,15 +1303,15 @@ class _PositionedFanCard extends StatelessWidget {
         ? 0.0
         : (index - centerIndex) / centerIndex;
     final centerX = tableWidth / 2;
-    final fanWidth = (tableWidth - cardWidth - 160) / 2;
-    final baseY = tableHeight * 0.16;
-    final curveDepth = tableHeight * 0.46;
+    final fanWidth = (tableWidth * 0.94 - cardWidth) / 2;
+    final baseY = tableHeight * 0.28;
+    final curveDepth = tableHeight * 0.28;
     final x = centerX + normalized * fanWidth - cardWidth / 2;
     final y = baseY + curveDepth * normalized * normalized;
-    final rotation = normalized * (math.pi / 180) * 36;
+    final rotation = normalized * (math.pi / 180) * 38;
     return Positioned(
-      left: x.clamp(28.0, tableWidth - cardWidth - 28),
-      top: y.clamp(18.0, tableHeight - cardHeight - 28),
+      left: x.clamp(10.0, tableWidth - cardWidth - 10),
+      top: y.clamp(18.0, tableHeight - cardHeight - 18),
       width: cardWidth,
       height: cardHeight,
       child: _TarotFullDeckCard(
@@ -1385,9 +1381,9 @@ class _TarotFullDeckCard extends StatelessWidget {
       onExit: (_) => onHoverChanged(false),
       child: AnimatedScale(
         scale: selected
-            ? 1.18
+            ? 1.12
             : lifted
-            ? 1.34
+            ? 1.22
             : 1.0,
         duration: const Duration(milliseconds: 140),
         curve: Curves.easeOutCubic,
@@ -1400,24 +1396,28 @@ class _TarotFullDeckCard extends StatelessWidget {
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  _TarotCardBackChoice(
-                        onTap: disabled || selected ? () {} : onTap,
-                        compact: true,
-                        glowing: selected || lifted,
-                      )
-                      .animate(target: selected ? 1 : 0)
-                      .scale(
-                        begin: const Offset(1, 1),
-                        end: const Offset(1.04, 1.04),
-                        duration: 220.ms,
-                        curve: Curves.easeOutCubic,
-                      )
-                      .shimmer(
-                        duration: 520.ms,
-                        color: RynPalette.accent(
-                          context,
-                        ).withValues(alpha: 0.22),
-                      ),
+                  IgnorePointer(
+                    ignoring: selected,
+                    child:
+                        _TarotCardBackChoice(
+                              onTap: disabled ? () {} : onTap,
+                              compact: true,
+                              glowing: selected || lifted,
+                            )
+                            .animate(target: selected ? 1 : 0)
+                            .scale(
+                              begin: const Offset(1, 1),
+                              end: const Offset(1.04, 1.04),
+                              duration: 220.ms,
+                              curve: Curves.easeOutCubic,
+                            )
+                            .shimmer(
+                              duration: 520.ms,
+                              color: RynPalette.accent(
+                                context,
+                              ).withValues(alpha: 0.22),
+                            ),
+                  ),
                   if (selected && selectedOrder != null)
                     Positioned(
                       right: -5,
@@ -2064,33 +2064,33 @@ Size _cardSizeForLayout(int count, BoxConstraints constraints) {
   final maxWidth = constraints.maxWidth;
   final maxHeight = constraints.maxHeight;
   final preferredWidth = switch (count) {
-    1 => 270.0,
-    <= 3 => 198.0,
-    <= 5 => 172.0,
-    <= 6 => 160.0,
-    _ => 136.0,
+    1 => 315.0,
+    <= 3 => 225.0,
+    <= 5 => 150.0,
+    <= 6 => 148.0,
+    _ => 112.0,
   };
   final horizontalSlots = switch (count) {
-    1 => 1.45,
-    <= 3 => 3.18,
-    <= 5 => 3.55,
-    <= 6 => 3.25,
-    _ => 4.65,
+    1 => 1.35,
+    <= 3 => 3.05,
+    <= 5 => 4.35,
+    <= 6 => 3.65,
+    _ => 5.85,
   };
   final verticalSlots = switch (count) {
-    1 => 1.05,
-    <= 3 => 1.48,
-    <= 5 => 2.55,
-    <= 6 => 2.9,
-    _ => 4.05,
+    1 => 1.02,
+    <= 3 => 1.25,
+    <= 5 => 3.25,
+    <= 6 => 3.25,
+    _ => 4.85,
   };
   final widthLimit = maxWidth / horizontalSlots;
-  final heightLimit = ((maxHeight / verticalSlots) - 50) / 1.62;
+  final heightLimit = (maxHeight / verticalSlots) / 1.62;
   final width = math.max(
-    72.0,
+    66.0,
     math.min(preferredWidth, math.min(widthLimit, heightLimit)),
   );
-  return Size(width, (width * 1.62) + 50);
+  return Size(width, width * 1.62);
 }
 
 class _TarotEmptySlot extends StatelessWidget {
@@ -2213,34 +2213,6 @@ class _TarotDrawnCardView extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 4),
-          SizedBox(
-            height: 46,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 160),
-              child: revealed
-                  ? _TarotRevealedCaption(
-                      key: ValueKey('caption-$index-revealed'),
-                      drawnCard: drawnCard,
-                      index: index,
-                      onDirectionToggle: onDirectionToggle,
-                    )
-                  : Center(
-                      key: ValueKey('caption-$index-hidden'),
-                      child: Text(
-                        _TarotUiText.revealPrompt,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: RynPalette.subtext(context),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-            ),
-          ),
         ],
       ),
     );
@@ -2277,18 +2249,25 @@ class _TarotRevealedCardFace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _TarotRevealReadyFrame(
-      child: AnimatedRotation(
-        turns: drawnCard.reversed ? 0.5 : 0,
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeOutCubic,
-        child: Image.asset(
-          drawnCard.card.imagePath,
-          key: const Key('tarot-rws-card-image'),
-          fit: BoxFit.contain,
-          width: double.infinity,
-          height: double.infinity,
-          alignment: Alignment.center,
+    final orientation = drawnCard.reversed
+        ? UserText.tarotReversed
+        : UserText.tarotUpright;
+    return Tooltip(
+      message:
+          '${drawnCard.card.label} · $orientation · ${_TarotUiText.changeDirection}',
+      child: _TarotRevealReadyFrame(
+        child: AnimatedRotation(
+          turns: drawnCard.reversed ? 0.5 : 0,
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          child: Image.asset(
+            drawnCard.card.imagePath,
+            key: const Key('tarot-rws-card-image'),
+            fit: BoxFit.contain,
+            width: double.infinity,
+            height: double.infinity,
+            alignment: Alignment.center,
+          ),
         ),
       ),
     );
@@ -2336,74 +2315,6 @@ class _TarotFlipRevealFrame extends StatelessWidget {
         key: ValueKey(revealed ? 'front' : 'back'),
         child: revealed ? front : back,
       ),
-    );
-  }
-}
-
-class _TarotRevealedCaption extends StatelessWidget {
-  const _TarotRevealedCaption({
-    super.key,
-    required this.drawnCard,
-    required this.index,
-    required this.onDirectionToggle,
-  });
-
-  final _DrawnTarotCard drawnCard;
-  final int index;
-  final ValueChanged<int> onDirectionToggle;
-
-  @override
-  Widget build(BuildContext context) {
-    final orientation = drawnCard.reversed
-        ? UserText.tarotReversed
-        : UserText.tarotUpright;
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          drawnCard.card.label,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: RynPalette.text(context),
-            fontSize: 9.5,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        const SizedBox(height: 3),
-        FittedBox(
-          fit: BoxFit.scaleDown,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _TarotSmallBadge(orientation, compact: true),
-              const SizedBox(width: 4),
-              Tooltip(
-                message: _TarotUiText.changeDirection,
-                child: InkWell(
-                  key: Key('tarot-direction-toggle-$index'),
-                  borderRadius: BorderRadius.circular(999),
-                  onTap: () => onDirectionToggle(index),
-                  child: Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      color: RynPalette.surfaceSoft(context),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: RynPalette.line(context)),
-                    ),
-                    child: Icon(
-                      Icons.screen_rotation_alt_rounded,
-                      size: 12,
-                      color: RynPalette.accent(context),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
@@ -2588,23 +2499,23 @@ const _tarotSpreadFourSlots = [
 
 const _tarotSpreadFiveSlots = [
   _TarotSlotSpec('중심', 0.5, 0.5),
-  _TarotSlotSpec('위', 0.5, 0.18),
-  _TarotSlotSpec('아래', 0.5, 0.82),
-  _TarotSlotSpec('좌', 0.25, 0.5),
-  _TarotSlotSpec('우', 0.75, 0.5),
+  _TarotSlotSpec('위', 0.5, 0.08),
+  _TarotSlotSpec('아래', 0.5, 0.92),
+  _TarotSlotSpec('좌', 0.12, 0.5),
+  _TarotSlotSpec('우', 0.88, 0.5),
 ];
 
 const _tarotSpreadCelticSlots = [
-  _TarotSlotSpec('현재', 0.33, 0.5),
+  _TarotSlotSpec('현재', 0.30, 0.5),
   _TarotSlotSpec('교차', 0.45, 0.5),
-  _TarotSlotSpec('위', 0.39, 0.18),
-  _TarotSlotSpec('아래', 0.39, 0.82),
-  _TarotSlotSpec('과거', 0.14, 0.5),
-  _TarotSlotSpec('미래', 0.64, 0.5),
-  _TarotSlotSpec('조언', 0.84, 0.82),
-  _TarotSlotSpec('환경', 0.84, 0.61),
-  _TarotSlotSpec('희망', 0.84, 0.39),
-  _TarotSlotSpec('결과', 0.84, 0.18),
+  _TarotSlotSpec('위', 0.375, 0.08),
+  _TarotSlotSpec('아래', 0.375, 0.92),
+  _TarotSlotSpec('과거', 0.08, 0.5),
+  _TarotSlotSpec('미래', 0.67, 0.5),
+  _TarotSlotSpec('조언', 0.9, 0.92),
+  _TarotSlotSpec('환경', 0.9, 0.64),
+  _TarotSlotSpec('희망', 0.9, 0.36),
+  _TarotSlotSpec('결과', 0.9, 0.08),
 ];
 
 const _tarotSpreadBinarySlots = [

@@ -334,15 +334,25 @@ void main() {
     expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
     expect(find.byKey(const Key('tarot-show-result-button')), findsOneWidget);
 
-    await tester.tap(find.byKey(const Key('tarot-full-deck-card-3')));
-    await tester.pumpAndSettle();
+    final deckStageTopLeft = tester.getTopLeft(
+      find.byKey(const Key('tarot-full-deck-stage')),
+    );
+    final deckStageSize = tester.getSize(
+      find.byKey(const Key('tarot-full-deck-stage')),
+    );
+    Future<void> tapArcCard(double xRatio) async {
+      await tester.tapAt(
+        deckStageTopLeft + Offset(deckStageSize.width * xRatio, 250),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    await tapArcCard(0.5);
     expect(find.text('1 / 3 선택'), findsOneWidget);
     expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
 
-    await tester.tap(find.byKey(const Key('tarot-full-deck-card-7')));
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('tarot-full-deck-card-12')));
-    await tester.pumpAndSettle();
+    await tapArcCard(0.62);
+    await tapArcCard(0.38);
     expect(find.text('3 / 3 선택'), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('tarot-show-result-button')));
@@ -367,8 +377,8 @@ void main() {
       (firstImage.image as AssetImage).assetName,
       startsWith('assets/tarot/decks/rws_public_domain/'),
     );
-    expect(find.text(UserText.tarotUpright), findsAtLeastNWidgets(1));
-    expect(find.text(UserText.tarotReversed), findsAtLeastNWidgets(1));
+    expect(find.text(UserText.tarotUpright), findsNothing);
+    expect(find.text(UserText.tarotReversed), findsNothing);
     final drawnAssetNames = tester
         .widgetList<Image>(find.byKey(const Key('tarot-rws-card-image')))
         .map((image) => (image.image as AssetImage).assetName)
