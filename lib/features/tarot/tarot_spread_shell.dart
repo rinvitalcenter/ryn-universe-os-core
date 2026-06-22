@@ -1134,7 +1134,7 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
   }
 }
 
-class _TarotFullDeckBoard extends StatelessWidget {
+class _TarotFullDeckBoard extends StatefulWidget {
   const _TarotFullDeckBoard({
     required this.cards,
     required this.selectedIndexes,
@@ -1148,6 +1148,18 @@ class _TarotFullDeckBoard extends StatelessWidget {
   final Map<int, int> selectedOrder;
   final bool targetReached;
   final ValueChanged<int> onSelected;
+
+  @override
+  State<_TarotFullDeckBoard> createState() => _TarotFullDeckBoardState();
+}
+
+class _TarotFullDeckBoardState extends State<_TarotFullDeckBoard> {
+  int? _hoveredIndex;
+
+  void _setHoveredIndex(int? index) {
+    if (_hoveredIndex == index) return;
+    setState(() => _hoveredIndex = index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1178,10 +1190,27 @@ class _TarotFullDeckBoard extends StatelessWidget {
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final cardWidth = constraints.maxWidth >= 1500 ? 64.0 : 58.0;
+          final cardWidth = constraints.maxWidth >= 1500 ? 86.0 : 78.0;
           final cardHeight = cardWidth * 1.5;
-          final tableWidth = math.max(constraints.maxWidth, cardWidth * 24.5);
+          final overlapStep = cardWidth * 0.34;
+          final fanWidth = overlapStep * (widget.cards.length - 1) / 2;
+          final tableWidth = math.max(
+            constraints.maxWidth,
+            (fanWidth * 2) + cardWidth + 160,
+          );
           final tableHeight = math.max(constraints.maxHeight, 560.0);
+          final orderedIndexes =
+              List<int>.generate(widget.cards.length, (i) => i)..sort((a, b) {
+                int zRank(int index) {
+                  if (index == _hoveredIndex) return 3;
+                  if (widget.selectedIndexes.contains(index)) return 2;
+                  return 1;
+                }
+
+                final rankCompare = zRank(a).compareTo(zRank(b));
+                if (rankCompare != 0) return rankCompare;
+                return a.compareTo(b);
+              });
           return SingleChildScrollView(
             key: const Key('tarot-full-deck-grid'),
             scrollDirection: Axis.horizontal,
@@ -1197,10 +1226,13 @@ class _TarotFullDeckBoard extends StatelessWidget {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(28),
                           gradient: RadialGradient(
-                            center: const Alignment(0, -0.15),
-                            radius: 0.9,
+                            center: const Alignment(0, -0.1),
+                            radius: 0.98,
                             colors: [
-                              Colors.white.withValues(alpha: 0.18),
+                              Colors.white.withValues(alpha: 0.2),
+                              RynPalette.accent(
+                                context,
+                              ).withValues(alpha: 0.06),
                               Colors.transparent,
                             ],
                           ),
@@ -1208,19 +1240,24 @@ class _TarotFullDeckBoard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  for (var index = 0; index < cards.length; index++)
+                  for (final index in orderedIndexes)
                     _PositionedFanCard(
                       index: index,
+                      count: widget.cards.length,
                       cardWidth: cardWidth,
                       cardHeight: cardHeight,
                       tableWidth: tableWidth,
                       tableHeight: tableHeight,
-                      selected: selectedIndexes.contains(index),
-                      selectedOrder: selectedOrder[index],
-                      hasSelection: selectedIndexes.isNotEmpty,
+                      selected: widget.selectedIndexes.contains(index),
+                      selectedOrder: widget.selectedOrder[index],
+                      hasSelection: widget.selectedIndexes.isNotEmpty,
+                      hovered: _hoveredIndex == index,
                       disabled:
-                          targetReached && !selectedIndexes.contains(index),
-                      onTap: () => onSelected(index),
+                          widget.targetReached &&
+                          !widget.selectedIndexes.contains(index),
+                      onHoverChanged: (hovered) =>
+                          _setHoveredIndex(hovered ? index : null),
+                      onTap: () => widget.onSelected(index),
                     ),
                 ],
               ),
@@ -1235,6 +1272,7 @@ class _TarotFullDeckBoard extends StatelessWidget {
 class _PositionedFanCard extends StatelessWidget {
   const _PositionedFanCard({
     required this.index,
+    required this.count,
     required this.cardWidth,
     required this.cardHeight,
     required this.tableWidth,
@@ -1242,11 +1280,14 @@ class _PositionedFanCard extends StatelessWidget {
     required this.selected,
     required this.selectedOrder,
     required this.hasSelection,
+    required this.hovered,
     required this.disabled,
+    required this.onHoverChanged,
     required this.onTap,
   });
 
   final int index;
+  final int count;
   final double cardWidth;
   final double cardHeight;
   final double tableWidth;
@@ -1254,35 +1295,27 @@ class _PositionedFanCard extends StatelessWidget {
   final bool selected;
   final int? selectedOrder;
   final bool hasSelection;
+  final bool hovered;
   final bool disabled;
+  final ValueChanged<bool> onHoverChanged;
   final VoidCallback onTap;
-
-  static const _tierStarts = [0, 28, 56, 78];
 
   @override
   Widget build(BuildContext context) {
-    final tier = index < _tierStarts[1]
-        ? 0
-        : index < _tierStarts[2]
-        ? 1
-        : 2;
-    final tierStart = _tierStarts[tier];
-    final tierEnd = _tierStarts[tier + 1];
-    final localIndex = index - tierStart;
-    final tierCount = tierEnd - tierStart;
-    final t = tierCount <= 1 ? 0.5 : localIndex / (tierCount - 1);
-    final angle = -1.18 + (2.36 * t);
-    final radiusX = tableWidth * (0.38 + tier * 0.035);
-    final radiusY = 155.0 + tier * 22.0;
+    final centerIndex = (count - 1) / 2;
+    final normalized = centerIndex == 0
+        ? 0.0
+        : (index - centerIndex) / centerIndex;
     final centerX = tableWidth / 2;
-    final centerY = -44.0 + tier * 128.0;
-    final stagger = tier.isOdd ? cardWidth * 0.28 : 0.0;
-    final x = centerX + radiusX * math.sin(angle) - cardWidth / 2 + stagger;
-    final y = centerY + radiusY * math.cos(angle) + tier * 54;
-    final rotation = angle * 0.34;
+    final fanWidth = (tableWidth - cardWidth - 160) / 2;
+    final baseY = tableHeight * 0.16;
+    final curveDepth = tableHeight * 0.46;
+    final x = centerX + normalized * fanWidth - cardWidth / 2;
+    final y = baseY + curveDepth * normalized * normalized;
+    final rotation = normalized * (math.pi / 180) * 36;
     return Positioned(
-      left: x.clamp(0.0, tableWidth - cardWidth),
-      top: y.clamp(16.0, tableHeight - cardHeight - 18),
+      left: x.clamp(28.0, tableWidth - cardWidth - 28),
+      top: y.clamp(18.0, tableHeight - cardHeight - 28),
       width: cardWidth,
       height: cardHeight,
       child: _TarotFullDeckCard(
@@ -1292,14 +1325,16 @@ class _PositionedFanCard extends StatelessWidget {
         selected: selected,
         selectedOrder: selectedOrder,
         hasSelection: hasSelection,
+        hovered: hovered,
         disabled: disabled,
+        onHoverChanged: onHoverChanged,
         onTap: onTap,
       ),
     );
   }
 }
 
-class _TarotFullDeckCard extends StatefulWidget {
+class _TarotFullDeckCard extends StatelessWidget {
   const _TarotFullDeckCard({
     super.key,
     required this.index,
@@ -1307,7 +1342,9 @@ class _TarotFullDeckCard extends StatefulWidget {
     required this.selected,
     required this.selectedOrder,
     required this.hasSelection,
+    required this.hovered,
     required this.disabled,
+    required this.onHoverChanged,
     required this.onTap,
   });
 
@@ -1316,21 +1353,16 @@ class _TarotFullDeckCard extends StatefulWidget {
   final bool selected;
   final int? selectedOrder;
   final bool hasSelection;
+  final bool hovered;
   final bool disabled;
+  final ValueChanged<bool> onHoverChanged;
   final VoidCallback onTap;
 
   @override
-  State<_TarotFullDeckCard> createState() => _TarotFullDeckCardState();
-}
-
-class _TarotFullDeckCardState extends State<_TarotFullDeckCard> {
-  bool _hovered = false;
-
-  @override
   Widget build(BuildContext context) {
-    final lifted = _hovered && !widget.disabled;
-    final selected = widget.selected;
-    final liftAngle = widget.angle - math.pi / 2;
+    final lifted = hovered && !disabled;
+    final selected = this.selected;
+    final liftAngle = angle - math.pi / 2;
     final liftAmount = selected
         ? 18.0
         : lifted
@@ -1340,17 +1372,17 @@ class _TarotFullDeckCardState extends State<_TarotFullDeckCard> {
       math.cos(liftAngle) * liftAmount,
       math.sin(liftAngle) * liftAmount,
     );
-    final opacity = widget.disabled
+    final opacity = disabled
         ? 0.34
         : selected
         ? 1.0
-        : widget.hasSelection
+        : hasSelection
         ? 0.68
         : 1.0;
     return MouseRegion(
-      cursor: widget.disabled ? MouseCursor.defer : SystemMouseCursors.click,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
+      cursor: disabled ? MouseCursor.defer : SystemMouseCursors.click,
+      onEnter: (_) => onHoverChanged(true),
+      onExit: (_) => onHoverChanged(false),
       child: AnimatedScale(
         scale: selected
             ? 1.18
@@ -1362,16 +1394,14 @@ class _TarotFullDeckCardState extends State<_TarotFullDeckCard> {
         child: Transform.translate(
           offset: liftOffset,
           child: Transform.rotate(
-            angle: widget.angle,
+            angle: angle,
             child: Opacity(
               opacity: opacity,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   _TarotCardBackChoice(
-                        onTap: widget.disabled || selected
-                            ? () {}
-                            : widget.onTap,
+                        onTap: disabled || selected ? () {} : onTap,
                         compact: true,
                         glowing: selected || lifted,
                       )
@@ -1388,14 +1418,12 @@ class _TarotFullDeckCardState extends State<_TarotFullDeckCard> {
                           context,
                         ).withValues(alpha: 0.22),
                       ),
-                  if (selected && widget.selectedOrder != null)
+                  if (selected && selectedOrder != null)
                     Positioned(
                       right: -5,
                       top: -7,
                       child: Container(
-                        key: Key(
-                          'tarot-selected-order-${widget.selectedOrder}',
-                        ),
+                        key: Key('tarot-selected-order-$selectedOrder'),
                         width: 26,
                         height: 26,
                         alignment: Alignment.center,
@@ -1417,7 +1445,7 @@ class _TarotFullDeckCardState extends State<_TarotFullDeckCard> {
                           ],
                         ),
                         child: Text(
-                          '${widget.selectedOrder}',
+                          '$selectedOrder',
                           style: TextStyle(
                             color: RynPalette.iconOnAccent(context),
                             fontSize: 12,
