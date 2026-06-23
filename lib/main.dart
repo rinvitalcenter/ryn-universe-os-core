@@ -317,11 +317,20 @@ class CoreOsShell extends StatefulWidget {
 
 class _CoreOsShellState extends State<CoreOsShell> {
   String _selectedNav = UserText.navHome;
+  bool _readingTarotFocus = false;
 
   void _selectNav(String label) {
     setState(() {
       _selectedNav = label;
+      if (label != UserText.navReading) {
+        _readingTarotFocus = false;
+      }
     });
+  }
+
+  void _setReadingTarotFocus(bool focused) {
+    if (_readingTarotFocus == focused) return;
+    setState(() => _readingTarotFocus = focused);
   }
 
   @override
@@ -330,7 +339,9 @@ class _CoreOsShellState extends State<CoreOsShell> {
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final useRail = constraints.maxWidth >= 1600;
+            final readingImmersive =
+                _selectedNav == UserText.navReading && _readingTarotFocus;
+            final useRail = constraints.maxWidth >= 1600 && !readingImmersive;
             return Container(
               color: RynPalette.canvas(context),
               child: useRail
@@ -345,14 +356,16 @@ class _CoreOsShellState extends State<CoreOsShell> {
                           child: _ScrollableShellCanvas(
                             selectedLabel: _selectedNav,
                             onNavSelected: _selectNav,
+                            onReadingTarotFocusChanged: _setReadingTarotFocus,
                           ),
                         ),
                       ],
                     )
                   : _ScrollableShellCanvas(
-                      showCompactNav: true,
+                      showCompactNav: !readingImmersive,
                       selectedLabel: _selectedNav,
                       onNavSelected: _selectNav,
+                      onReadingTarotFocusChanged: _setReadingTarotFocus,
                     ),
             );
           },
@@ -367,11 +380,13 @@ class _ScrollableShellCanvas extends StatelessWidget {
     this.showCompactNav = false,
     required this.selectedLabel,
     required this.onNavSelected,
+    required this.onReadingTarotFocusChanged,
   });
 
   final bool showCompactNav;
   final String selectedLabel;
   final ValueChanged<String> onNavSelected;
+  final ValueChanged<bool> onReadingTarotFocusChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -416,6 +431,7 @@ class _ScrollableShellCanvas extends StatelessWidget {
                   showCompactNav: showCompactNav,
                   selectedLabel: selectedLabel,
                   onNavSelected: onNavSelected,
+                  onReadingTarotFocusChanged: onReadingTarotFocusChanged,
                 ),
               ),
             ),
@@ -431,11 +447,13 @@ class _ShellPageContent extends StatelessWidget {
     required this.showCompactNav,
     required this.selectedLabel,
     required this.onNavSelected,
+    required this.onReadingTarotFocusChanged,
   });
 
   final bool showCompactNav;
   final String selectedLabel;
   final ValueChanged<String> onNavSelected;
+  final ValueChanged<bool> onReadingTarotFocusChanged;
 
   bool get _isHome => selectedLabel == UserText.navHome;
   bool get _isStudy => selectedLabel == UserText.navStudy;
@@ -455,7 +473,12 @@ class _ShellPageContent extends StatelessWidget {
             StudyOsShell(),
           ]
         : selectedLabel == UserText.navReading
-        ? <Widget>[_BusinessAreaPage(label: selectedLabel)]
+        ? <Widget>[
+            _BusinessAreaPage(
+              label: selectedLabel,
+              onReadingTarotFocusChanged: onReadingTarotFocusChanged,
+            ),
+          ]
         : <Widget>[
             const _TopSystemBar(showDailyHome: false),
             const SizedBox(height: 16),
@@ -882,9 +905,13 @@ class _HomeQuickLinkChip extends StatelessWidget {
 }
 
 class _BusinessAreaPage extends StatelessWidget {
-  const _BusinessAreaPage({required this.label});
+  const _BusinessAreaPage({
+    required this.label,
+    this.onReadingTarotFocusChanged,
+  });
 
   final String label;
+  final ValueChanged<bool>? onReadingTarotFocusChanged;
 
   _BusinessActionSpec get _spec {
     return switch (label) {
@@ -975,7 +1002,9 @@ class _BusinessAreaPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (label == UserText.navReading) {
-      return const _ReadingWorkspacePage();
+      return _ReadingWorkspacePage(
+        onTarotFocusChanged: onReadingTarotFocusChanged,
+      );
     }
     final spec = _spec;
     final settingsMode = label == UserText.navSettings;
@@ -1077,7 +1106,9 @@ class _BusinessModuleSummary extends StatelessWidget {
 }
 
 class _ReadingWorkspacePage extends StatefulWidget {
-  const _ReadingWorkspacePage();
+  const _ReadingWorkspacePage({this.onTarotFocusChanged});
+
+  final ValueChanged<bool>? onTarotFocusChanged;
 
   @override
   State<_ReadingWorkspacePage> createState() => _ReadingWorkspacePageState();
@@ -1087,9 +1118,20 @@ class _ReadingWorkspacePageState extends State<_ReadingWorkspacePage> {
   bool _tarotOpen = false;
 
   @override
+  void dispose() {
+    widget.onTarotFocusChanged?.call(false);
+    super.dispose();
+  }
+
+  void _setTarotOpen(bool open) {
+    widget.onTarotFocusChanged?.call(open);
+    setState(() => _tarotOpen = open);
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (_tarotOpen) {
-      return TarotSpreadShell(onBack: () => setState(() => _tarotOpen = false));
+      return TarotSpreadShell(onBack: () => _setTarotOpen(false));
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1144,7 +1186,7 @@ class _ReadingWorkspacePageState extends State<_ReadingWorkspacePage> {
                     caption: UserText.tarotSubtitle,
                     icon: Icons.style_rounded,
                     prominent: true,
-                    onTap: () => setState(() => _tarotOpen = true),
+                    onTap: () => _setTarotOpen(true),
                   ),
                   const _ReadingToolCard(
                     label: UserText.readingToolSaju,
