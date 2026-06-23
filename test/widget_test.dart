@@ -304,16 +304,20 @@ void main() {
     expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
     expect(find.byKey(const Key('tarot-empty-slot')), findsNothing);
 
+    expect(find.text(UserText.tarotSpreadGroupFree), findsOneWidget);
+    expect(find.text(UserText.tarotSpreadGroupFixed), findsOneWidget);
     for (final spread in [
       UserText.tarotSpreadOne,
       UserText.tarotSpreadThree,
       UserText.tarotSpreadFour,
       UserText.tarotSpreadFive,
-      UserText.tarotSpreadCeltic,
       UserText.tarotSpreadBinary,
+      UserText.tarotSpreadCeltic,
     ]) {
       expect(find.text(spread), findsAtLeastNWidgets(1));
     }
+    expect(find.text('관계 리딩'), findsNothing);
+    expect(find.text('문제-원인-해결'), findsNothing);
     for (final deck in [
       UserText.tarotDeckUniversalWaite,
       UserText.tarotDeckOracle,

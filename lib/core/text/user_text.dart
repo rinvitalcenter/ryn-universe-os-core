@@ -159,6 +159,8 @@ abstract final class UserText {
   static const tarotSubtitle = '덱과 스프레드를 고르고 카드를 펼쳐봅니다.';
   static const tarotDeckSelect = '덱 선택';
   static const tarotSpreadSelect = '스프레드 선택';
+  static const tarotSpreadGroupFree = '자유배열법';
+  static const tarotSpreadGroupFixed = '고정배열법';
   static const tarotManualDraw = '수동 뽑기';
   static const tarotAutoDraw = '자동 뽑기';
   static const tarotUpright = '정방향';
@@ -191,6 +193,4 @@ abstract final class UserText {
   static const tarotSpreadFive = '5카드';
   static const tarotSpreadCeltic = '켈틱 크로스';
   static const tarotSpreadBinary = '양자택일';
-  static const tarotSpreadRelation = '관계 리딩';
-  static const tarotSpreadIssue = '문제-원인-해결';
 }

@@ -174,18 +174,21 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     ),
   ];
 
-  static const _spreadDefinitions = [
+  static const _freeSpreadDefinitions = [
     _TarotSpreadDefinition(UserText.tarotSpreadOne, _tarotSpreadOneSlots),
     _TarotSpreadDefinition(UserText.tarotSpreadThree, _tarotSpreadThreeSlots),
     _TarotSpreadDefinition(UserText.tarotSpreadFour, _tarotSpreadFourSlots),
     _TarotSpreadDefinition(UserText.tarotSpreadFive, _tarotSpreadFiveSlots),
-    _TarotSpreadDefinition(UserText.tarotSpreadCeltic, _tarotSpreadCelticSlots),
+  ];
+
+  static const _fixedSpreadDefinitions = [
     _TarotSpreadDefinition(UserText.tarotSpreadBinary, _tarotSpreadBinarySlots),
-    _TarotSpreadDefinition(
-      UserText.tarotSpreadRelation,
-      _tarotSpreadRelationSlots,
-    ),
-    _TarotSpreadDefinition(UserText.tarotSpreadIssue, _tarotSpreadIssueSlots),
+    _TarotSpreadDefinition(UserText.tarotSpreadCeltic, _tarotSpreadCelticSlots),
+  ];
+
+  static const _spreadDefinitions = [
+    ..._freeSpreadDefinitions,
+    ..._fixedSpreadDefinitions,
   ];
 
   static const _rwsCards = [
@@ -834,7 +837,8 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
               decks: _deckDefinitions,
               selectedDeckId: _selectedDeckId,
               onDeckSelected: _selectDeck,
-              spreads: _spreadDefinitions,
+              freeSpreads: _freeSpreadDefinitions,
+              fixedSpreads: _fixedSpreadDefinitions,
               selectedSpread: _selectedSpread,
               onSpreadSelected: _selectSpread,
               selectedDeck: _selectedDeck,
@@ -882,7 +886,8 @@ class _TarotSetupStage extends StatelessWidget {
     required this.decks,
     required this.selectedDeckId,
     required this.onDeckSelected,
-    required this.spreads,
+    required this.freeSpreads,
+    required this.fixedSpreads,
     required this.selectedSpread,
     required this.onSpreadSelected,
     required this.selectedDeck,
@@ -896,7 +901,8 @@ class _TarotSetupStage extends StatelessWidget {
   final List<_TarotDeckDefinition> decks;
   final String selectedDeckId;
   final ValueChanged<String> onDeckSelected;
-  final List<_TarotSpreadDefinition> spreads;
+  final List<_TarotSpreadDefinition> freeSpreads;
+  final List<_TarotSpreadDefinition> fixedSpreads;
   final String selectedSpread;
   final ValueChanged<String> onSpreadSelected;
   final _TarotDeckDefinition selectedDeck;
@@ -920,9 +926,10 @@ class _TarotSetupStage extends StatelessWidget {
           onSelected: onDeckSelected,
         ),
         const SizedBox(height: 14),
-        _TarotChoiceSection(
+        _TarotSpreadChoiceSection(
           title: UserText.tarotSpreadSelect,
-          options: [for (final spread in spreads) spread.label],
+          freeSpreads: freeSpreads,
+          fixedSpreads: fixedSpreads,
           selected: selectedSpread,
           onSelected: onSpreadSelected,
         ),
@@ -1820,16 +1827,18 @@ class _TarotDeckChoiceSection extends StatelessWidget {
   }
 }
 
-class _TarotChoiceSection extends StatelessWidget {
-  const _TarotChoiceSection({
+class _TarotSpreadChoiceSection extends StatelessWidget {
+  const _TarotSpreadChoiceSection({
     required this.title,
-    required this.options,
+    required this.freeSpreads,
+    required this.fixedSpreads,
     required this.selected,
     required this.onSelected,
   });
 
   final String title;
-  final List<String> options;
+  final List<_TarotSpreadDefinition> freeSpreads;
+  final List<_TarotSpreadDefinition> fixedSpreads;
   final String selected;
   final ValueChanged<String> onSelected;
 
@@ -1847,18 +1856,64 @@ class _TarotChoiceSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
+        _TarotSpreadGroup(
+          label: UserText.tarotSpreadGroupFree,
+          spreads: freeSpreads,
+          selected: selected,
+          onSelected: onSelected,
+        ),
+        const SizedBox(height: 10),
+        _TarotSpreadGroup(
+          label: UserText.tarotSpreadGroupFixed,
+          spreads: fixedSpreads,
+          selected: selected,
+          onSelected: onSelected,
+        ),
+      ],
+    );
+  }
+}
+
+class _TarotSpreadGroup extends StatelessWidget {
+  const _TarotSpreadGroup({
+    required this.label,
+    required this.spreads,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final String label;
+  final List<_TarotSpreadDefinition> spreads;
+  final String selected;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: RynPalette.subtext(context),
+            fontSize: 11,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.2,
+          ),
+        ),
+        const SizedBox(height: 7),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: [
-            for (final option in options)
+            for (final spread in spreads)
               ChoiceChip(
-                label: Text(option),
-                selected: option == selected,
-                onSelected: (_) => onSelected(option),
+                label: Text(spread.label),
+                selected: spread.label == selected,
+                onSelected: (_) => onSelected(spread.label),
                 showCheckmark: false,
                 labelStyle: TextStyle(
-                  color: option == selected
+                  color: spread.label == selected
                       ? RynPalette.iconOnAccent(context)
                       : RynPalette.text(context),
                   fontSize: 12,
@@ -2831,17 +2886,4 @@ const _tarotSpreadBinarySlots = [
   _TarotSlotSpec('A 결과', 0.22, 0.72),
   _TarotSlotSpec('B 과정', 0.78, 0.28),
   _TarotSlotSpec('B 결과', 0.78, 0.72),
-];
-
-const _tarotSpreadRelationSlots = [
-  _TarotSlotSpec('나', 0.18, 0.54),
-  _TarotSlotSpec('상대', 0.82, 0.54),
-  _TarotSlotSpec('관계', 0.5, 0.28),
-  _TarotSlotSpec('흐름', 0.5, 0.76),
-];
-
-const _tarotSpreadIssueSlots = [
-  _TarotSlotSpec('문제', 0.14, 0.5),
-  _TarotSlotSpec('원인', 0.5, 0.5),
-  _TarotSlotSpec('해결', 0.86, 0.5),
 ];
