@@ -161,6 +161,8 @@ abstract final class UserText {
   static const tarotSpreadSelect = '스프레드 선택';
   static const tarotSpreadGroupFree = '자유배열법';
   static const tarotSpreadGroupFixed = '고정배열법';
+  static const tarotPositionSetup = '자리 설정';
+  static const tarotPositionSetupHelper = '각 카드가 놓일 자리의 의미를 정합니다.';
   static const tarotManualDraw = '수동 뽑기';
   static const tarotAutoDraw = '자동 뽑기';
   static const tarotUpright = '정방향';

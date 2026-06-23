@@ -318,6 +318,40 @@ void main() {
     }
     expect(find.text('관계 리딩'), findsNothing);
     expect(find.text('문제-원인-해결'), findsNothing);
+
+    expect(find.text(UserText.tarotPositionSetup), findsOneWidget);
+    expect(find.text(UserText.tarotPositionSetupHelper), findsOneWidget);
+    expect(find.byType(TextFormField), findsNWidgets(3));
+    expect(find.text('과거'), findsWidgets);
+    expect(find.text('현재'), findsWidgets);
+    expect(find.text('미래'), findsWidgets);
+
+    await tester.enterText(
+      find.byKey(const ValueKey('tarot-position-label-input-3카드-1')),
+      '중심',
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('중심'), findsOneWidget);
+
+    await tester.tap(find.text(UserText.tarotSpreadFive));
+    await tester.pumpAndSettle();
+    expect(find.byType(TextFormField), findsNWidgets(5));
+    expect(find.text('원인'), findsWidgets);
+    expect(find.text('가능성'), findsWidgets);
+    expect(find.text('중심'), findsNothing);
+
+    await tester.tap(find.text(UserText.tarotSpreadThree));
+    await tester.pumpAndSettle();
+    expect(find.byType(TextFormField), findsNWidgets(3));
+    expect(find.text('과거'), findsWidgets);
+    expect(find.text('현재'), findsWidgets);
+    expect(find.text('미래'), findsWidgets);
+    await tester.enterText(
+      find.byKey(const ValueKey('tarot-position-label-input-3카드-1')),
+      '중심',
+    );
+    await tester.pumpAndSettle();
+
     for (final deck in [
       UserText.tarotDeckUniversalWaite,
       UserText.tarotDeckOracle,
@@ -367,6 +401,7 @@ void main() {
     expect(find.byKey(const Key('tarot-empty-slot')), findsNothing);
     expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
     expect(find.byKey(const Key('tarot-card-back-image')), findsNWidgets(3));
+    expect(find.text('중심'), findsOneWidget);
     expect(find.byKey(const Key('tarot-reveal-all-button')), findsOneWidget);
 
     await tester.tap(find.byKey(const Key('tarot-reveal-all-button')));
@@ -395,6 +430,8 @@ void main() {
     expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
 
     await tester.tap(find.text(UserText.tarotSpreadOne));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text(UserText.tarotAutoDraw));
     await tester.pumpAndSettle();
     await tester.tap(find.text(UserText.tarotAutoDraw));
     await tester.pumpAndSettle();

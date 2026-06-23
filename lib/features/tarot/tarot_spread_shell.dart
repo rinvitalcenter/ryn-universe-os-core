@@ -592,12 +592,14 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   final Set<int> _selectedDeckIndexes = {};
   final Set<int> _revealedResultIndexes = {};
   final Set<int> _revealFxIndexes = {};
+  late List<String> _positionLabels;
   _TarotDrawPhase _phase = _TarotDrawPhase.beforeShuffle;
   _TarotFlowStage _stage = _TarotFlowStage.setup;
 
   @override
   void initState() {
     super.initState();
+    _positionLabels = _defaultPositionLabelsFor(_selectedSpread);
     _prepareFreshDeck(clearDrawn: true);
   }
 
@@ -612,7 +614,35 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         orElse: () => _spreadDefinitions[1],
       );
 
-  List<_TarotSlotSpec> get _slots => _selectedSpreadDefinition.slots;
+  List<_TarotSlotSpec> get _slots => [
+    for (var index = 0; index < _selectedSpreadDefinition.slots.length; index++)
+      _selectedSpreadDefinition.slots[index].copyWith(
+        label: index < _positionLabels.length
+            ? _normalizedPositionLabel(
+                _positionLabels[index],
+                _selectedSpreadDefinition.slots[index].label,
+              )
+            : _selectedSpreadDefinition.slots[index].label,
+      ),
+  ];
+
+  List<String> _defaultPositionLabelsFor(String spreadLabel) {
+    final definition = _spreadDefinitions.firstWhere(
+      (spread) => spread.label == spreadLabel,
+      orElse: () => _spreadDefinitions[1],
+    );
+    return [for (final slot in definition.slots) slot.label];
+  }
+
+  String _normalizedPositionLabel(String value, String fallback) {
+    final normalized = value.trim();
+    return normalized.isEmpty ? fallback : normalized;
+  }
+
+  void _updatePositionLabel(int index, String value) {
+    if (index < 0 || index >= _positionLabels.length) return;
+    setState(() => _positionLabels[index] = value);
+  }
 
   bool get _isComplete => _drawnCards.length >= _slots.length;
 
@@ -757,6 +787,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   void _selectSpread(String spread) {
     setState(() {
       _selectedSpread = spread;
+      _positionLabels = _defaultPositionLabelsFor(spread);
       _prepareFreshDeck(clearDrawn: true);
       _phase = _TarotDrawPhase.beforeShuffle;
       _stage = _TarotFlowStage.setup;
@@ -847,6 +878,9 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
               isShuffling: _phase == _TarotDrawPhase.shuffling,
               directionMode: _directionMode,
               onDirectionModeSelected: _selectDirectionMode,
+              positionLabels: _positionLabels,
+              defaultPositionLabels: _defaultPositionLabelsFor(_selectedSpread),
+              onPositionLabelChanged: _updatePositionLabel,
             )
           else if (_stage == _TarotFlowStage.draw)
             _TarotFullDeckDrawStage(
@@ -896,6 +930,9 @@ class _TarotSetupStage extends StatelessWidget {
     required this.isShuffling,
     required this.directionMode,
     required this.onDirectionModeSelected,
+    required this.positionLabels,
+    required this.defaultPositionLabels,
+    required this.onPositionLabelChanged,
   });
 
   final List<_TarotDeckDefinition> decks;
@@ -911,6 +948,9 @@ class _TarotSetupStage extends StatelessWidget {
   final bool isShuffling;
   final _TarotDirectionMode directionMode;
   final ValueChanged<_TarotDirectionMode> onDirectionModeSelected;
+  final List<String> positionLabels;
+  final List<String> defaultPositionLabels;
+  final void Function(int index, String value) onPositionLabelChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -937,6 +977,13 @@ class _TarotSetupStage extends StatelessWidget {
         _TarotDirectionChoiceSection(
           selected: directionMode,
           onSelected: onDirectionModeSelected,
+        ),
+        const SizedBox(height: 14),
+        _TarotPositionSetupSection(
+          spreadLabel: selectedSpread,
+          labels: positionLabels,
+          defaultLabels: defaultPositionLabels,
+          onChanged: onPositionLabelChanged,
         ),
         const SizedBox(height: 16),
         LayoutBuilder(
@@ -967,6 +1014,130 @@ class _TarotSetupStage extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+}
+
+class _TarotPositionSetupSection extends StatelessWidget {
+  const _TarotPositionSetupSection({
+    required this.spreadLabel,
+    required this.labels,
+    required this.defaultLabels,
+    required this.onChanged,
+  });
+
+  final String spreadLabel;
+  final List<String> labels;
+  final List<String> defaultLabels;
+  final void Function(int index, String value) onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: RynPalette.surfaceElevated(context),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
+        border: Border.all(color: RynPalette.line(context)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.edit_note_rounded,
+                size: 18,
+                color: RynPalette.accent(context),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                UserText.tarotPositionSetup,
+                style: TextStyle(
+                  color: RynPalette.text(context),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              const SizedBox(width: 8),
+              _TarotSmallBadge(spreadLabel, compact: true),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            UserText.tarotPositionSetupHelper,
+            style: TextStyle(
+              color: RynPalette.subtext(context),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final itemWidth = constraints.maxWidth >= 900
+                  ? (constraints.maxWidth - 24) / 3
+                  : constraints.maxWidth >= 560
+                  ? (constraints.maxWidth - 12) / 2
+                  : constraints.maxWidth;
+              return Wrap(
+                spacing: 12,
+                runSpacing: 10,
+                children: [
+                  for (var index = 0; index < labels.length; index++)
+                    SizedBox(
+                      width: itemWidth,
+                      child: TextFormField(
+                        key: ValueKey(
+                          'tarot-position-label-input-$spreadLabel-$index',
+                        ),
+                        initialValue: labels[index],
+                        maxLength: 12,
+                        onChanged: (value) => onChanged(index, value),
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          counterText: '',
+                          isDense: true,
+                          labelText: '${index + 1}번 자리',
+                          hintText: index < defaultLabels.length
+                              ? defaultLabels[index]
+                              : null,
+                          filled: true,
+                          fillColor: RynPalette.surfaceSoft(context),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: RynPalette.line(context),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: RynPalette.line(context),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: BorderSide(
+                              color: RynPalette.accent(context),
+                              width: 1.4,
+                            ),
+                          ),
+                        ),
+                        style: TextStyle(
+                          color: RynPalette.text(context),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }
@@ -2842,6 +3013,9 @@ class _TarotSlotSpec {
   final String label;
   final double xRatio;
   final double yRatio;
+
+  _TarotSlotSpec copyWith({String? label}) =>
+      _TarotSlotSpec(label ?? this.label, xRatio, yRatio);
 }
 
 const _tarotSpreadOneSlots = [_TarotSlotSpec('핵심', 0.5, 0.5)];
