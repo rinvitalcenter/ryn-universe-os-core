@@ -489,6 +489,33 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Tarot focus cleanup is safe when app tree disposes', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 1100);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(UserText.navReading).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(UserText.readingToolTarot).last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('tarot-shuffle-button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text(UserText.tarotDrawPreparation), findsOneWidget);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
     'final IA workspaces expose operating, practice, and content tools',
     (WidgetTester tester) async {

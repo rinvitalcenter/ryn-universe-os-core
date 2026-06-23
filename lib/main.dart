@@ -329,7 +329,7 @@ class _CoreOsShellState extends State<CoreOsShell> {
   }
 
   void _setReadingTarotFocus(bool focused) {
-    if (_readingTarotFocus == focused) return;
+    if (!mounted || _readingTarotFocus == focused) return;
     setState(() => _readingTarotFocus = focused);
   }
 
@@ -1117,13 +1117,8 @@ class _ReadingWorkspacePage extends StatefulWidget {
 class _ReadingWorkspacePageState extends State<_ReadingWorkspacePage> {
   bool _tarotOpen = false;
 
-  @override
-  void dispose() {
-    widget.onTarotFocusChanged?.call(false);
-    super.dispose();
-  }
-
   void _setTarotOpen(bool open) {
+    if (_tarotOpen == open) return;
     widget.onTarotFocusChanged?.call(open);
     setState(() => _tarotOpen = open);
   }
