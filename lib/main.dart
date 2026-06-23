@@ -172,19 +172,16 @@ class RynMetrics {
 class RynFonts {
   const RynFonts._();
 
-  // Local preview only: these are system-installed family references on
-  // 린님's PC. No Apple font files are copied into the repo or bundled.
-  static const display = 'SF Pro Display';
-  static const text = 'SF Pro Text';
-  static const rounded = 'SF Pro Rounded';
+  static const display = 'Pretendard';
+  static const text = 'Pretendard';
+  static const rounded = 'Pretendard';
   static const displayFallback = <String>[
-    'SF Pro',
     'Segoe UI Variable Display',
     'Segoe UI Variable',
     'Segoe UI',
+    'Malgun Gothic',
   ];
   static const textFallback = <String>[
-    'SF Pro',
     'Segoe UI Variable Text',
     'Segoe UI Variable',
     'Segoe UI',

@@ -62,6 +62,23 @@ void main() {
     expect(studyShell.contains('dev_text.dart'), isFalse);
   });
 
+  test('production typography uses bundled Pretendard', () {
+    final pubspec = File('pubspec.yaml').readAsStringSync();
+    expect(RynFonts.text, 'Pretendard');
+    expect(RynFonts.display, 'Pretendard');
+    expect(RynFonts.rounded, 'Pretendard');
+    expect(RynFonts.textFallback, contains('Malgun Gothic'));
+    expect(pubspec.contains('family: Pretendard'), isTrue);
+    expect(
+      pubspec.contains('assets/fonts/pretendard/Pretendard-Regular.otf'),
+      isTrue,
+    );
+    expect(
+      File('assets/fonts/pretendard/Pretendard-Regular.otf').existsSync(),
+      isTrue,
+    );
+  });
+
   testWidgets('renders clean action Home, practical menu, and theme control', (
     WidgetTester tester,
   ) async {
