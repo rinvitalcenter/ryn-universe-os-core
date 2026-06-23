@@ -401,8 +401,33 @@ void main() {
     expect(find.byKey(const Key('tarot-empty-slot')), findsNothing);
     expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
     expect(find.byKey(const Key('tarot-card-back-image')), findsNWidgets(3));
+    expect(
+      find.byKey(const Key('tarot-result-card-back-slot')),
+      findsNWidgets(3),
+    );
+    final resultCardSize = tester.getSize(
+      find.byKey(const Key('tarot-drawn-card')).first,
+    );
+    final resultBackSize = tester.getSize(
+      find.byKey(const Key('tarot-card-back-image')).first,
+    );
+    expect(
+      (resultCardSize.width - resultBackSize.width).abs(),
+      lessThanOrEqualTo(1),
+    );
+    expect(
+      (resultCardSize.height - resultBackSize.height).abs(),
+      lessThanOrEqualTo(1),
+    );
     expect(find.text('중심'), findsOneWidget);
     expect(find.byKey(const Key('tarot-reveal-all-button')), findsOneWidget);
+
+    await tester.tap(
+      find.byKey(const Key('tarot-result-card-back-slot')).first,
+    );
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tarot-rws-card-image')), findsOneWidget);
+    expect(find.byKey(const Key('tarot-card-back-image')), findsNWidgets(2));
 
     await tester.tap(find.byKey(const Key('tarot-reveal-all-button')));
     await tester.pump(const Duration(milliseconds: 1200));

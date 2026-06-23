@@ -2701,19 +2701,16 @@ class _TarotDrawnCardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return DecoratedBox(
       key: const Key('tarot-drawn-card'),
-      padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: RynPalette.surfaceElevated(context),
         borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: RynPalette.accent(
-            context,
-          ).withValues(alpha: revealed ? 0.48 : 0.3),
-        ),
         boxShadow: [
-          ...RynPalette.panelShadow(context),
+          const BoxShadow(
+            color: Color(0x88000000),
+            blurRadius: 18,
+            offset: Offset(0, 10),
+          ),
           if (revealed || showRevealFx)
             BoxShadow(
               color: RynPalette.accent(context).withValues(alpha: 0.18),
@@ -2722,31 +2719,20 @@ class _TarotDrawnCardView extends StatelessWidget {
             ),
         ],
       ),
-      child: Column(
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(2),
-              child: ColoredBox(
-                color: RynPalette.surface(context),
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    _TarotFlipRevealFrame(
-                      revealed: revealed,
-                      back: _TarotUnrevealedResultCard(onReveal: onReveal),
-                      front: _TarotRevealedCardFace(drawnCard: drawnCard),
-                    ),
-                    if (showRevealFx)
-                      const Positioned.fill(
-                        child: _TarotFxBurst(particleCount: 8),
-                      ),
-                  ],
-                ),
-              ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            _TarotFlipRevealFrame(
+              revealed: revealed,
+              back: _TarotUnrevealedResultCard(onReveal: onReveal),
+              front: _TarotRevealedCardFace(drawnCard: drawnCard),
             ),
-          ),
-        ],
+            if (showRevealFx)
+              const Positioned.fill(child: _TarotFxBurst(particleCount: 8)),
+          ],
+        ),
       ),
     );
   }
@@ -2759,18 +2745,68 @@ class _TarotUnrevealedResultCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: FittedBox(
-        fit: BoxFit.contain,
-        child: _TarotCardBackChoice(
-          onTap: onReveal,
-          compact: false,
-          glowing: true,
-        ),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        key: const Key('tarot-result-card-back-slot'),
+        borderRadius: BorderRadius.circular(4),
+        onTap: onReveal,
+        child: const _TarotFullSlotCardBack(glowing: true),
       ),
     ).animate().shimmer(
       duration: 1600.ms,
       color: Colors.white.withValues(alpha: 0.16),
+    );
+  }
+}
+
+class _TarotFullSlotCardBack extends StatelessWidget {
+  const _TarotFullSlotCardBack({this.glowing = false});
+
+  final bool glowing;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [RynPalette.tarotViolet, RynPalette.tarotNavy],
+        ),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: RynPalette.tarotGold.withValues(alpha: glowing ? 0.92 : 0.58),
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(3),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              _TarotCardBack.defaultAssetPath,
+              key: const Key('tarot-card-back-image'),
+              fit: BoxFit.cover,
+            ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withValues(alpha: glowing ? 0.16 : 0.04),
+                    Colors.transparent,
+                    RynPalette.tarotGold.withValues(
+                      alpha: glowing ? 0.18 : 0.06,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
