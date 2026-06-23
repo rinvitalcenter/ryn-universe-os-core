@@ -2573,9 +2573,9 @@ class _TarotSpreadCanvas extends StatelessWidget {
 double _canvasHeightForSlots(int count) {
   if (count == 1) return 760;
   if (count <= 3) return 720;
-  if (count <= 5) return 900;
-  if (count <= 6) return 940;
-  return 1240;
+  if (count <= 5) return 1220;
+  if (count <= 6) return 1260;
+  return 1520;
 }
 
 Size _cardSizeForLayout(int count, BoxConstraints constraints) {
@@ -2585,23 +2585,26 @@ Size _cardSizeForLayout(int count, BoxConstraints constraints) {
   final preferredWidth = switch (count) {
     1 => 380.0,
     <= 3 => 276.0,
-    <= 5 => 212.0,
-    <= 6 => 196.0,
-    _ => 150.0,
+    4 => 230.0,
+    5 => 210.0,
+    6 => 198.0,
+    _ => 142.0,
   };
   final horizontalSlots = switch (count) {
     1 => 1.2,
     <= 3 => 3.0,
-    <= 5 => 3.05,
-    <= 6 => 3.35,
-    _ => 5.0,
+    4 => 2.95,
+    5 => 3.8,
+    6 => 3.9,
+    _ => 6.25,
   };
   final verticalSlots = switch (count) {
     1 => 1.02,
     <= 3 => 1.25,
-    <= 5 => 2.28,
-    <= 6 => 2.85,
-    _ => 4.25,
+    4 => 2.25,
+    5 => 3.15,
+    6 => 3.15,
+    _ => 5.4,
   };
   final widthLimit = maxWidth / horizontalSlots;
   final heightLimit = ((maxHeight / verticalSlots) - labelAllowance) / 1.62;
@@ -3080,37 +3083,37 @@ const _tarotSpreadThreeSlots = [
 ];
 
 const _tarotSpreadFourSlots = [
-  _TarotSlotSpec('기반', 0.24, 0.30),
-  _TarotSlotSpec('현재', 0.70, 0.22),
-  _TarotSlotSpec('조언', 0.30, 0.76),
-  _TarotSlotSpec('흐름', 0.76, 0.68),
+  _TarotSlotSpec('기반', 0.06, 0.04),
+  _TarotSlotSpec('현재', 0.68, 0.12),
+  _TarotSlotSpec('조언', 0.22, 0.72),
+  _TarotSlotSpec('흐름', 0.82, 0.64),
 ];
 
 const _tarotSpreadFiveSlots = [
-  _TarotSlotSpec('원인', 0.50, 0.08),
-  _TarotSlotSpec('현재', 0.17, 0.46),
-  _TarotSlotSpec('조언', 0.50, 0.46),
-  _TarotSlotSpec('가능성', 0.83, 0.46),
-  _TarotSlotSpec('결과', 0.50, 0.84),
+  _TarotSlotSpec('원인', 0.44, 0.02),
+  _TarotSlotSpec('현재', 0.06, 0.52),
+  _TarotSlotSpec('조언', 0.44, 0.52),
+  _TarotSlotSpec('가능성', 0.82, 0.52),
+  _TarotSlotSpec('결과', 0.44, 0.98),
 ];
 
 const _tarotSpreadCelticSlots = [
-  _TarotSlotSpec('현재', 0.30, 0.43),
+  _TarotSlotSpec('현재', 0.26, 0.43),
   _TarotSlotSpec('도전', 0.43, 0.43),
-  _TarotSlotSpec('기반', 0.36, 0.68),
-  _TarotSlotSpec('과거', 0.13, 0.43),
-  _TarotSlotSpec('목표', 0.36, 0.15),
-  _TarotSlotSpec('미래', 0.59, 0.43),
-  _TarotSlotSpec('자아', 0.84, 0.80),
-  _TarotSlotSpec('환경', 0.84, 0.58),
+  _TarotSlotSpec('기반', 0.34, 0.70),
+  _TarotSlotSpec('과거', 0.08, 0.43),
+  _TarotSlotSpec('목표', 0.34, 0.16),
+  _TarotSlotSpec('미래', 0.60, 0.43),
+  _TarotSlotSpec('자아', 0.84, 0.96),
+  _TarotSlotSpec('환경', 0.84, 0.66),
   _TarotSlotSpec('희망·두려움', 0.84, 0.34),
-  _TarotSlotSpec('결과', 0.84, 0.10),
+  _TarotSlotSpec('결과', 0.84, 0.02),
 ];
 
 const _tarotSpreadBinarySlots = [
-  _TarotSlotSpec('현재', 0.50, 0.48),
-  _TarotSlotSpec('A 과정', 0.22, 0.24),
-  _TarotSlotSpec('A 결과', 0.32, 0.74),
-  _TarotSlotSpec('B 과정', 0.78, 0.24),
-  _TarotSlotSpec('B 결과', 0.68, 0.74),
+  _TarotSlotSpec('현재', 0.44, 0.48),
+  _TarotSlotSpec('A 과정', 0.06, 0.10),
+  _TarotSlotSpec('A 결과', 0.22, 0.86),
+  _TarotSlotSpec('B 과정', 0.82, 0.10),
+  _TarotSlotSpec('B 결과', 0.66, 0.86),
 ];
