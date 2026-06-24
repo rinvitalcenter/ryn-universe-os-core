@@ -369,6 +369,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(find.byKey(const Key('tarot-deck-carousel')), findsOneWidget);
     for (final deck in [
       UserText.tarotDeckUniversalWaite,
       UserText.tarotDeckOracle,
@@ -378,6 +379,8 @@ void main() {
     }
 
     expect(find.byKey(const Key('tarot-shuffle-button')), findsOneWidget);
+    await tester.ensureVisible(find.byKey(const Key('tarot-shuffle-button')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('tarot-shuffle-button')));
     await tester.pumpAndSettle();
 
@@ -504,6 +507,8 @@ void main() {
     await tester.tap(find.text(UserText.navReading).first);
     await tester.pumpAndSettle();
     await tester.tap(find.text(UserText.readingToolTarot).last);
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.byKey(const Key('tarot-shuffle-button')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('tarot-shuffle-button')));
     await tester.pumpAndSettle();

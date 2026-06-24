@@ -1981,7 +1981,7 @@ class _TarotResultStage extends StatelessWidget {
   }
 }
 
-class _TarotDeckChoiceSection extends StatelessWidget {
+class _TarotDeckChoiceSection extends StatefulWidget {
   const _TarotDeckChoiceSection({
     required this.title,
     required this.decks,
@@ -1995,43 +1995,226 @@ class _TarotDeckChoiceSection extends StatelessWidget {
   final ValueChanged<String> onSelected;
 
   @override
+  State<_TarotDeckChoiceSection> createState() =>
+      _TarotDeckChoiceSectionState();
+}
+
+class _TarotDeckChoiceSectionState extends State<_TarotDeckChoiceSection> {
+  String? _hoveredDeckId;
+
+  String _deckSubtitle(_TarotDeckDefinition deck) {
+    if (deck.assetBacked) return 'RWS 이미지 · ${deck.cardCount}장';
+    if (deck.id == 'personal_scan') return '나만의 덱 자리';
+    if (deck.id == 'oracle') return '오라클 리딩';
+    if (deck.id == 'lenormand') return '레노먼드 리딩';
+    return '준비된 덱 자리';
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final selectedIndex = math.max(
+      0,
+      widget.decks.indexWhere((deck) => deck.id == widget.selectedDeckId),
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          title,
+          widget.title,
           style: TextStyle(
             color: RynPalette.text(context),
             fontSize: 15,
             fontWeight: FontWeight.w900,
           ),
         ),
-        const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final deck in decks)
-              ChoiceChip(
-                label: Text(deck.label),
-                selected: deck.id == selectedDeckId,
-                onSelected: (_) => onSelected(deck.id),
-                showCheckmark: false,
-                labelStyle: TextStyle(
-                  color: deck.id == selectedDeckId
-                      ? RynPalette.iconOnAccent(context)
-                      : RynPalette.text(context),
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                ),
-                selectedColor: RynPalette.accent(context),
-                backgroundColor: RynPalette.surfaceElevated(context),
-                side: BorderSide(color: RynPalette.line(context)),
-              ),
-          ],
+        const SizedBox(height: 6),
+        Text(
+          '상담에 사용할 덱을 고르세요.',
+          style: TextStyle(
+            color: RynPalette.subtext(context),
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 10),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                RynPalette.tarotNavy.withValues(alpha: 0.06),
+                RynPalette.lavenderStrong.withValues(alpha: 0.08),
+                RynPalette.tarotGold.withValues(alpha: 0.05),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
+            border: Border.all(
+              color: RynPalette.line(context).withValues(alpha: 0.82),
+            ),
+          ),
+          child: SingleChildScrollView(
+            key: const Key('tarot-deck-carousel'),
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
+            child: Row(
+              children: [
+                for (var index = 0; index < widget.decks.length; index++)
+                  Padding(
+                    padding: EdgeInsets.only(
+                      right: index == widget.decks.length - 1 ? 0 : 10,
+                    ),
+                    child: _TarotDeckCarouselCard(
+                      deck: widget.decks[index],
+                      subtitle: _deckSubtitle(widget.decks[index]),
+                      selected: widget.decks[index].id == widget.selectedDeckId,
+                      hovered: widget.decks[index].id == _hoveredDeckId,
+                      distanceFromSelected: index - selectedIndex,
+                      onTap: () => widget.onSelected(widget.decks[index].id),
+                      onHoverChanged: (hovered) {
+                        setState(() {
+                          _hoveredDeckId = hovered
+                              ? widget.decks[index].id
+                              : null;
+                        });
+                      },
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
       ],
+    );
+  }
+}
+
+class _TarotDeckCarouselCard extends StatelessWidget {
+  const _TarotDeckCarouselCard({
+    required this.deck,
+    required this.subtitle,
+    required this.selected,
+    required this.hovered,
+    required this.distanceFromSelected,
+    required this.onTap,
+    required this.onHoverChanged,
+  });
+
+  final _TarotDeckDefinition deck;
+  final String subtitle;
+  final bool selected;
+  final bool hovered;
+  final int distanceFromSelected;
+  final VoidCallback onTap;
+  final ValueChanged<bool> onHoverChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final distance = distanceFromSelected.clamp(-3, 3);
+    final tilt = selected ? 0.0 : distance * 0.035;
+    final lift = selected
+        ? -8.0
+        : hovered
+        ? -4.0
+        : 10.0 + distance.abs() * 3.0;
+    final scale = selected
+        ? 1.05
+        : hovered
+        ? 1.0
+        : 0.92;
+    final width = selected ? 154.0 : 136.0;
+    final glowColor = selected
+        ? RynPalette.tarotGold.withValues(alpha: 0.38)
+        : RynPalette.lavenderStrong.withValues(alpha: hovered ? 0.20 : 0.08);
+
+    return MouseRegion(
+      onEnter: (_) => onHoverChanged(true),
+      onExit: (_) => onHoverChanged(false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        width: width,
+        padding: const EdgeInsets.fromLTRB(10, 12, 10, 10),
+        transform: Matrix4.identity()
+          ..translateByDouble(0.0, lift, 0.0, 1.0)
+          ..rotateZ(tilt),
+        transformAlignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected
+              ? RynPalette.surfaceElevated(context)
+              : RynPalette.surfaceSoft(context).withValues(alpha: 0.92),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(
+            color: selected
+                ? RynPalette.tarotGold.withValues(alpha: 0.76)
+                : RynPalette.line(context),
+            width: selected ? 1.4 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: glowColor,
+              blurRadius: selected ? 28 : 16,
+              spreadRadius: selected ? 2 : 0,
+              offset: const Offset(0, 10),
+            ),
+            BoxShadow(
+              color: Colors.black.withValues(alpha: selected ? 0.14 : 0.08),
+              blurRadius: 18,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            key: ValueKey('tarot-deck-carousel-card-${deck.id}'),
+            borderRadius: BorderRadius.circular(18),
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Transform.scale(
+                    scale: scale,
+                    child: _TarotCardBack(
+                      compact: false,
+                      glowing: selected || hovered,
+                    ),
+                  ),
+                  SizedBox(height: selected ? 14 : 10),
+                  Text(
+                    deck.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: RynPalette.text(context),
+                      fontSize: selected ? 13 : 12,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: selected
+                          ? RynPalette.tarotGold
+                          : RynPalette.subtext(context),
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
