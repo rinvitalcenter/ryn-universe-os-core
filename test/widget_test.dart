@@ -336,6 +336,72 @@ void main() {
     expect(find.text('관계 리딩'), findsNothing);
     expect(find.text('문제-원인-해결'), findsNothing);
 
+    expect(find.text('카드 뒷면 선택'), findsOneWidget);
+    expect(find.text('코스믹 게이트'), findsOneWidget);
+    expect(find.text('이너 로터스'), findsOneWidget);
+    expect(find.text('생명의 나무'), findsOneWidget);
+    expect(
+      find.byKey(const ValueKey('tarot-card-back-option-cosmic_gate')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('tarot-card-back-option-inner_lotus')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('tarot-card-back-option-life_tree')),
+      findsOneWidget,
+    );
+    var setupBackImages = tester.widgetList<Image>(
+      find.byKey(const Key('tarot-card-back-image')),
+    );
+    expect(
+      setupBackImages
+          .map((image) => (image.image as AssetImage).assetName)
+          .where(
+            (assetName) =>
+                assetName ==
+                'assets/tarot/card_backs/ryn_cosmic_gate_back_v1.png',
+          ),
+      isNotEmpty,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('tarot-card-back-option-inner_lotus')),
+    );
+    await tester.pumpAndSettle();
+    setupBackImages = tester.widgetList<Image>(
+      find.byKey(const Key('tarot-card-back-image')),
+    );
+    expect(
+      setupBackImages
+          .map((image) => (image.image as AssetImage).assetName)
+          .where(
+            (assetName) =>
+                assetName ==
+                'assets/tarot/card_backs/ryn_inner_lotus_back_v1.png',
+          ),
+      isNotEmpty,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('tarot-card-back-option-life_tree')),
+    );
+    await tester.pumpAndSettle();
+    setupBackImages = tester.widgetList<Image>(
+      find.byKey(const Key('tarot-card-back-image')),
+    );
+    expect(
+      setupBackImages
+          .map((image) => (image.image as AssetImage).assetName)
+          .where(
+            (assetName) =>
+                assetName ==
+                'assets/tarot/card_backs/ryn_life_tree_back_v1.png',
+          ),
+      isNotEmpty,
+    );
+
     expect(find.text(UserText.tarotPositionSetup), findsOneWidget);
     expect(find.text(UserText.tarotPositionSetupHelper), findsOneWidget);
     expect(find.byType(TextFormField), findsNWidgets(3));
@@ -389,6 +455,13 @@ void main() {
     expect(find.byKey(const Key('tarot-full-deck-card-0')), findsOneWidget);
     expect(find.byKey(const Key('tarot-full-deck-card-77')), findsOneWidget);
     expect(find.byKey(const Key('tarot-card-back-image')), findsNWidgets(78));
+    final drawTableBackAssetNames = tester
+        .widgetList<Image>(find.byKey(const Key('tarot-card-back-image')))
+        .map((image) => (image.image as AssetImage).assetName)
+        .toSet();
+    expect(drawTableBackAssetNames, {
+      'assets/tarot/card_backs/ryn_life_tree_back_v1.png',
+    });
     expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
     expect(find.byKey(const Key('tarot-show-result-button')), findsOneWidget);
 
@@ -421,6 +494,13 @@ void main() {
     expect(find.byKey(const Key('tarot-empty-slot')), findsNothing);
     expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
     expect(find.byKey(const Key('tarot-card-back-image')), findsNWidgets(3));
+    final resultBackAssetNames = tester
+        .widgetList<Image>(find.byKey(const Key('tarot-card-back-image')))
+        .map((image) => (image.image as AssetImage).assetName)
+        .toSet();
+    expect(resultBackAssetNames, {
+      'assets/tarot/card_backs/ryn_life_tree_back_v1.png',
+    });
     expect(
       find.byKey(const Key('tarot-result-card-back-slot')),
       findsNWidgets(3),

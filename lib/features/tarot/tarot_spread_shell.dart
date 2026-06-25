@@ -174,6 +174,24 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     ),
   ];
 
+  static const _cardBackDefinitions = [
+    _TarotCardBackDefinition(
+      id: 'cosmic_gate',
+      label: '코스믹 게이트',
+      assetPath: 'assets/tarot/card_backs/ryn_cosmic_gate_back_v1.png',
+    ),
+    _TarotCardBackDefinition(
+      id: 'inner_lotus',
+      label: '이너 로터스',
+      assetPath: 'assets/tarot/card_backs/ryn_inner_lotus_back_v1.png',
+    ),
+    _TarotCardBackDefinition(
+      id: 'life_tree',
+      label: '생명의 나무',
+      assetPath: 'assets/tarot/card_backs/ryn_life_tree_back_v1.png',
+    ),
+  ];
+
   static const _freeSpreadDefinitions = [
     _TarotSpreadDefinition(UserText.tarotSpreadOne, _tarotSpreadOneSlots),
     _TarotSpreadDefinition(UserText.tarotSpreadThree, _tarotSpreadThreeSlots),
@@ -585,6 +603,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   ];
 
   String _selectedDeckId = 'rws_public_domain';
+  String _selectedCardBackId = 'cosmic_gate';
   String _selectedSpread = UserText.tarotSpreadThree;
   _TarotDirectionMode _directionMode = _TarotDirectionMode.auto;
   late List<_TarotCardDefinition> _remainingDeck;
@@ -607,6 +626,12 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     (deck) => deck.id == _selectedDeckId,
     orElse: () => _deckDefinitions.first,
   );
+
+  _TarotCardBackDefinition get _selectedCardBack =>
+      _cardBackDefinitions.firstWhere(
+        (cardBack) => cardBack.id == _selectedCardBackId,
+        orElse: () => _cardBackDefinitions.first,
+      );
 
   _TarotSpreadDefinition get _selectedSpreadDefinition =>
       _spreadDefinitions.firstWhere(
@@ -812,6 +837,10 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     });
   }
 
+  void _selectCardBack(String cardBackId) {
+    setState(() => _selectedCardBackId = cardBackId);
+  }
+
   @override
   Widget build(BuildContext context) {
     final immersive = _stage != _TarotFlowStage.setup;
@@ -876,6 +905,10 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
               decks: _deckDefinitions,
               selectedDeckId: _selectedDeckId,
               onDeckSelected: _selectDeck,
+              cardBacks: _cardBackDefinitions,
+              selectedCardBackId: _selectedCardBackId,
+              selectedCardBack: _selectedCardBack,
+              onCardBackSelected: _selectCardBack,
               freeSpreads: _freeSpreadDefinitions,
               fixedSpreads: _fixedSpreadDefinitions,
               selectedSpread: _selectedSpread,
@@ -904,6 +937,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
               onAutoDraw: _drawAll,
               onShowResult: _showResult,
               onReset: _resetDraw,
+              cardBack: _selectedCardBack,
             )
           else
             _TarotResultStage(
@@ -916,6 +950,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
               onRevealAll: _revealAllResultCards,
               onReset: _resetDraw,
               onDirectionToggle: _toggleDrawnDirection,
+              cardBack: _selectedCardBack,
             ),
         ],
       ),
@@ -960,6 +995,10 @@ class _TarotSetupStage extends StatelessWidget {
     required this.decks,
     required this.selectedDeckId,
     required this.onDeckSelected,
+    required this.cardBacks,
+    required this.selectedCardBackId,
+    required this.selectedCardBack,
+    required this.onCardBackSelected,
     required this.freeSpreads,
     required this.fixedSpreads,
     required this.selectedSpread,
@@ -978,6 +1017,10 @@ class _TarotSetupStage extends StatelessWidget {
   final List<_TarotDeckDefinition> decks;
   final String selectedDeckId;
   final ValueChanged<String> onDeckSelected;
+  final List<_TarotCardBackDefinition> cardBacks;
+  final String selectedCardBackId;
+  final _TarotCardBackDefinition selectedCardBack;
+  final ValueChanged<String> onCardBackSelected;
   final List<_TarotSpreadDefinition> freeSpreads;
   final List<_TarotSpreadDefinition> fixedSpreads;
   final String selectedSpread;
@@ -1004,6 +1047,13 @@ class _TarotSetupStage extends StatelessWidget {
           decks: decks,
           selectedDeckId: selectedDeckId,
           onSelected: onDeckSelected,
+          cardBack: selectedCardBack,
+        ),
+        const SizedBox(height: 14),
+        _TarotCardBackChoiceSection(
+          cardBacks: cardBacks,
+          selectedCardBackId: selectedCardBackId,
+          onSelected: onCardBackSelected,
         ),
         const SizedBox(height: 14),
         _TarotSpreadChoiceSection(
@@ -1035,6 +1085,7 @@ class _TarotSetupStage extends StatelessWidget {
               isShuffling: isShuffling,
               onShuffle: onShuffle,
               onAutoDraw: onAutoDraw,
+              cardBack: selectedCardBack,
             );
             final memo = const _TarotMemoPanel();
             if (wide) {
@@ -1320,6 +1371,7 @@ class _TarotPreparationPanel extends StatelessWidget {
     required this.isShuffling,
     required this.onShuffle,
     required this.onAutoDraw,
+    required this.cardBack,
   });
 
   final _TarotDeckDefinition selectedDeck;
@@ -1327,6 +1379,7 @@ class _TarotPreparationPanel extends StatelessWidget {
   final bool isShuffling;
   final VoidCallback onShuffle;
   final VoidCallback onAutoDraw;
+  final _TarotCardBackDefinition cardBack;
 
   @override
   Widget build(BuildContext context) {
@@ -1347,6 +1400,7 @@ class _TarotPreparationPanel extends StatelessWidget {
             child: _ShuffleDeckStack(
               isShuffling: isShuffling,
               onTap: onShuffle,
+              cardBack: cardBack,
             ),
           ),
           const SizedBox(height: 16),
@@ -1384,6 +1438,7 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
     required this.onAutoDraw,
     required this.onShowResult,
     required this.onReset,
+    required this.cardBack,
   });
 
   final _TarotDeckDefinition deck;
@@ -1398,6 +1453,7 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
   final VoidCallback onAutoDraw;
   final VoidCallback onShowResult;
   final VoidCallback onReset;
+  final _TarotCardBackDefinition cardBack;
 
   @override
   Widget build(BuildContext context) {
@@ -1506,6 +1562,7 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
                 selectedOrder: selectedOrder,
                 targetReached: canReveal,
                 onSelected: onSelected,
+                cardBack: cardBack,
               ),
             ],
           ),
@@ -1522,6 +1579,7 @@ class _TarotFullDeckBoard extends StatefulWidget {
     required this.selectedOrder,
     required this.targetReached,
     required this.onSelected,
+    required this.cardBack,
   });
 
   final List<_TarotCardDefinition> cards;
@@ -1529,6 +1587,7 @@ class _TarotFullDeckBoard extends StatefulWidget {
   final Map<int, int> selectedOrder;
   final bool targetReached;
   final ValueChanged<int> onSelected;
+  final _TarotCardBackDefinition cardBack;
 
   @override
   State<_TarotFullDeckBoard> createState() => _TarotFullDeckBoardState();
@@ -1640,6 +1699,7 @@ class _TarotFullDeckBoardState extends State<_TarotFullDeckBoard> {
                     onHoverChanged: (hovered) =>
                         _setHoveredIndex(hovered ? index : null),
                     onTap: () => widget.onSelected(index),
+                    cardBack: widget.cardBack,
                   ),
               ],
             ),
@@ -1665,6 +1725,7 @@ class _PositionedFanCard extends StatelessWidget {
     required this.disabled,
     required this.onHoverChanged,
     required this.onTap,
+    required this.cardBack,
   });
 
   final int index;
@@ -1680,6 +1741,7 @@ class _PositionedFanCard extends StatelessWidget {
   final bool disabled;
   final ValueChanged<bool> onHoverChanged;
   final VoidCallback onTap;
+  final _TarotCardBackDefinition cardBack;
 
   @override
   Widget build(BuildContext context) {
@@ -1710,6 +1772,7 @@ class _PositionedFanCard extends StatelessWidget {
         disabled: disabled,
         onHoverChanged: onHoverChanged,
         onTap: onTap,
+        cardBack: cardBack,
       ),
     );
   }
@@ -1727,6 +1790,7 @@ class _TarotFullDeckCard extends StatelessWidget {
     required this.disabled,
     required this.onHoverChanged,
     required this.onTap,
+    required this.cardBack,
   });
 
   final int index;
@@ -1738,6 +1802,7 @@ class _TarotFullDeckCard extends StatelessWidget {
   final bool disabled;
   final ValueChanged<bool> onHoverChanged;
   final VoidCallback onTap;
+  final _TarotCardBackDefinition cardBack;
 
   @override
   Widget build(BuildContext context) {
@@ -1794,6 +1859,7 @@ class _TarotFullDeckCard extends StatelessWidget {
                                     onTap: disabled ? () {} : onTap,
                                     compact: true,
                                     glowing: selected || lifted,
+                                    assetPath: cardBack.assetPath,
                                   )
                                   .animate(target: selected ? 1 : 0)
                                   .scale(
@@ -1869,6 +1935,7 @@ class _TarotResultStage extends StatelessWidget {
     required this.onRevealAll,
     required this.onReset,
     required this.onDirectionToggle,
+    required this.cardBack,
   });
 
   final String spreadLabel;
@@ -1880,6 +1947,7 @@ class _TarotResultStage extends StatelessWidget {
   final VoidCallback onRevealAll;
   final VoidCallback onReset;
   final ValueChanged<int> onDirectionToggle;
+  final _TarotCardBackDefinition cardBack;
 
   @override
   Widget build(BuildContext context) {
@@ -1971,6 +2039,7 @@ class _TarotResultStage extends StatelessWidget {
                   onDirectionToggle: onDirectionToggle,
                   showEmptySlots: false,
                   onEmptySlotTap: () {},
+                  cardBack: cardBack,
                 ),
               ),
             ],
@@ -1987,12 +2056,14 @@ class _TarotDeckChoiceSection extends StatefulWidget {
     required this.decks,
     required this.selectedDeckId,
     required this.onSelected,
+    required this.cardBack,
   });
 
   final String title;
   final List<_TarotDeckDefinition> decks;
   final String selectedDeckId;
   final ValueChanged<String> onSelected;
+  final _TarotCardBackDefinition cardBack;
 
   @override
   State<_TarotDeckChoiceSection> createState() =>
@@ -2071,6 +2142,7 @@ class _TarotDeckChoiceSectionState extends State<_TarotDeckChoiceSection> {
                       hovered: widget.decks[index].id == _hoveredDeckId,
                       distanceFromSelected: index - selectedIndex,
                       onTap: () => widget.onSelected(widget.decks[index].id),
+                      cardBack: widget.cardBack,
                       onHoverChanged: (hovered) {
                         setState(() {
                           _hoveredDeckId = hovered
@@ -2098,6 +2170,7 @@ class _TarotDeckCarouselCard extends StatelessWidget {
     required this.distanceFromSelected,
     required this.onTap,
     required this.onHoverChanged,
+    required this.cardBack,
   });
 
   final _TarotDeckDefinition deck;
@@ -2107,6 +2180,7 @@ class _TarotDeckCarouselCard extends StatelessWidget {
   final int distanceFromSelected;
   final VoidCallback onTap;
   final ValueChanged<bool> onHoverChanged;
+  final _TarotCardBackDefinition cardBack;
 
   @override
   Widget build(BuildContext context) {
@@ -2180,6 +2254,7 @@ class _TarotDeckCarouselCard extends StatelessWidget {
                     child: _TarotCardBack(
                       compact: false,
                       glowing: selected || hovered,
+                      assetPath: cardBack.assetPath,
                     ),
                   ),
                   SizedBox(height: selected ? 14 : 10),
@@ -2212,6 +2287,141 @@ class _TarotDeckCarouselCard extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TarotCardBackChoiceSection extends StatelessWidget {
+  const _TarotCardBackChoiceSection({
+    required this.cardBacks,
+    required this.selectedCardBackId,
+    required this.onSelected,
+  });
+
+  final List<_TarotCardBackDefinition> cardBacks;
+  final String selectedCardBackId;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: RynPalette.surfaceElevated(context),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
+        border: Border.all(color: RynPalette.line(context)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '카드 뒷면 선택',
+            style: TextStyle(
+              color: RynPalette.text(context),
+              fontSize: 15,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '드로우와 결과 공개 전 카드에 사용할 이미지를 고르세요.',
+            style: TextStyle(
+              color: RynPalette.subtext(context),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              for (final cardBack in cardBacks)
+                _TarotCardBackOption(
+                  cardBack: cardBack,
+                  selected: cardBack.id == selectedCardBackId,
+                  onTap: () => onSelected(cardBack.id),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotCardBackOption extends StatelessWidget {
+  const _TarotCardBackOption({
+    required this.cardBack,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final _TarotCardBackDefinition cardBack;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      width: 146,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: selected
+            ? RynPalette.tarotViolet.withValues(alpha: 0.18)
+            : RynPalette.surfaceSoft(context),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: selected
+              ? RynPalette.tarotGold.withValues(alpha: 0.86)
+              : RynPalette.line(context),
+          width: selected ? 1.4 : 1,
+        ),
+        boxShadow: selected
+            ? [
+                BoxShadow(
+                  color: RynPalette.tarotGold.withValues(alpha: 0.20),
+                  blurRadius: 22,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 10),
+                ),
+              ]
+            : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          key: ValueKey('tarot-card-back-option-${cardBack.id}'),
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _TarotCardBack(
+                compact: true,
+                glowing: selected,
+                assetPath: cardBack.assetPath,
+              ),
+              const SizedBox(height: 10),
+              Text(
+                cardBack.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: selected
+                      ? RynPalette.tarotGold
+                      : RynPalette.text(context),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.1,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -2409,10 +2619,15 @@ class _TarotSelectionSummary extends StatelessWidget {
 }
 
 class _ShuffleDeckStack extends StatelessWidget {
-  const _ShuffleDeckStack({required this.isShuffling, required this.onTap});
+  const _ShuffleDeckStack({
+    required this.isShuffling,
+    required this.onTap,
+    required this.cardBack,
+  });
 
   final bool isShuffling;
   final VoidCallback onTap;
+  final _TarotCardBackDefinition cardBack;
 
   @override
   Widget build(BuildContext context) {
@@ -2448,6 +2663,7 @@ class _ShuffleDeckStack extends StatelessWidget {
                             child: _TarotCardBack(
                               compact: false,
                               glowing: isShuffling || index == 0,
+                              assetPath: cardBack.assetPath,
                             ),
                           ),
                         ),
@@ -2478,11 +2694,13 @@ class _TarotCardBackChoice extends StatelessWidget {
     required this.onTap,
     this.compact = false,
     this.glowing = false,
+    this.assetPath = _TarotCardBack.defaultAssetPath,
   });
 
   final VoidCallback onTap;
   final bool compact;
   final bool glowing;
+  final String assetPath;
 
   @override
   Widget build(BuildContext context) {
@@ -2492,20 +2710,29 @@ class _TarotCardBackChoice extends StatelessWidget {
         key: const Key('tarot-card-back-choice'),
         borderRadius: BorderRadius.circular(4),
         onTap: onTap,
-        child: _TarotCardBack(compact: compact, glowing: glowing),
+        child: _TarotCardBack(
+          compact: compact,
+          glowing: glowing,
+          assetPath: assetPath,
+        ),
       ),
     );
   }
 }
 
 class _TarotCardBack extends StatelessWidget {
-  const _TarotCardBack({this.compact = false, this.glowing = false});
+  const _TarotCardBack({
+    this.compact = false,
+    this.glowing = false,
+    this.assetPath = defaultAssetPath,
+  });
 
   static const defaultAssetPath =
       'assets/tarot/card_backs/ryn_cosmic_gate_back_v1.png';
 
   final bool compact;
   final bool glowing;
+  final String assetPath;
 
   @override
   Widget build(BuildContext context) {
@@ -2551,7 +2778,7 @@ class _TarotCardBack extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               Image.asset(
-                defaultAssetPath,
+                assetPath,
                 key: const Key('tarot-card-back-image'),
                 fit: BoxFit.cover,
               ),
@@ -2637,6 +2864,7 @@ class _TarotSpreadCanvas extends StatelessWidget {
     required this.onRevealCard,
     required this.onDirectionToggle,
     required this.onEmptySlotTap,
+    required this.cardBack,
     this.showEmptySlots = true,
   });
 
@@ -2648,6 +2876,7 @@ class _TarotSpreadCanvas extends StatelessWidget {
   final ValueChanged<int> onRevealCard;
   final ValueChanged<int> onDirectionToggle;
   final VoidCallback onEmptySlotTap;
+  final _TarotCardBackDefinition cardBack;
   final bool showEmptySlots;
 
   @override
@@ -2730,6 +2959,7 @@ class _TarotSpreadCanvas extends StatelessWidget {
                                         ),
                                         onReveal: () => onRevealCard(index),
                                         onDirectionToggle: onDirectionToggle,
+                                        cardBack: cardBack,
                                       )
                                     : showEmptySlots
                                     ? _TarotEmptySlot(
@@ -2893,6 +3123,7 @@ class _TarotDrawnCardView extends StatelessWidget {
     required this.showRevealFx,
     required this.onReveal,
     required this.onDirectionToggle,
+    required this.cardBack,
   });
 
   final _DrawnTarotCard drawnCard;
@@ -2901,6 +3132,7 @@ class _TarotDrawnCardView extends StatelessWidget {
   final bool showRevealFx;
   final VoidCallback onReveal;
   final ValueChanged<int> onDirectionToggle;
+  final _TarotCardBackDefinition cardBack;
 
   @override
   Widget build(BuildContext context) {
@@ -2929,7 +3161,10 @@ class _TarotDrawnCardView extends StatelessWidget {
           children: [
             _TarotFlipRevealFrame(
               revealed: revealed,
-              back: _TarotUnrevealedResultCard(onReveal: onReveal),
+              back: _TarotUnrevealedResultCard(
+                onReveal: onReveal,
+                cardBack: cardBack,
+              ),
               front: _TarotRevealedCardFace(drawnCard: drawnCard),
             ),
             if (showRevealFx)
@@ -2942,9 +3177,13 @@ class _TarotDrawnCardView extends StatelessWidget {
 }
 
 class _TarotUnrevealedResultCard extends StatelessWidget {
-  const _TarotUnrevealedResultCard({required this.onReveal});
+  const _TarotUnrevealedResultCard({
+    required this.onReveal,
+    required this.cardBack,
+  });
 
   final VoidCallback onReveal;
+  final _TarotCardBackDefinition cardBack;
 
   @override
   Widget build(BuildContext context) {
@@ -2954,7 +3193,10 @@ class _TarotUnrevealedResultCard extends StatelessWidget {
         key: const Key('tarot-result-card-back-slot'),
         borderRadius: BorderRadius.circular(4),
         onTap: onReveal,
-        child: const _TarotFullSlotCardBack(glowing: true),
+        child: _TarotFullSlotCardBack(
+          glowing: true,
+          assetPath: cardBack.assetPath,
+        ),
       ),
     ).animate().shimmer(
       duration: 1600.ms,
@@ -2964,9 +3206,13 @@ class _TarotUnrevealedResultCard extends StatelessWidget {
 }
 
 class _TarotFullSlotCardBack extends StatelessWidget {
-  const _TarotFullSlotCardBack({this.glowing = false});
+  const _TarotFullSlotCardBack({
+    this.glowing = false,
+    this.assetPath = _TarotCardBack.defaultAssetPath,
+  });
 
   final bool glowing;
+  final String assetPath;
 
   @override
   Widget build(BuildContext context) {
@@ -2988,7 +3234,7 @@ class _TarotFullSlotCardBack extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             Image.asset(
-              _TarotCardBack.defaultAssetPath,
+              assetPath,
               key: const Key('tarot-card-back-image'),
               fit: BoxFit.cover,
             ),
@@ -3206,6 +3452,18 @@ class _TarotSmallBadge extends StatelessWidget {
       ),
     );
   }
+}
+
+class _TarotCardBackDefinition {
+  const _TarotCardBackDefinition({
+    required this.id,
+    required this.label,
+    required this.assetPath,
+  });
+
+  final String id;
+  final String label;
+  final String assetPath;
 }
 
 class _TarotDeckDefinition {
