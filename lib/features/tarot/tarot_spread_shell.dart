@@ -1037,7 +1037,17 @@ class _TarotSetupStage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final preparation = _TarotPreparationPanel(
+      selectedDeck: selectedDeck,
+      selectedSpread: selectedSpread,
+      isShuffling: isShuffling,
+      onShuffle: onShuffle,
+      onAutoDraw: onAutoDraw,
+      cardBack: selectedCardBack,
+    );
+    const memo = _TarotMemoPanel();
+
+    final setupControls = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _TarotSmallStageLabel(label: _TarotUiText.prepare),
@@ -1075,36 +1085,44 @@ class _TarotSetupStage extends StatelessWidget {
           defaultLabels: defaultPositionLabels,
           onChanged: onPositionLabelChanged,
         ),
-        const SizedBox(height: 16),
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final wide = constraints.maxWidth >= 960;
-            final preparation = _TarotPreparationPanel(
-              selectedDeck: selectedDeck,
-              selectedSpread: selectedSpread,
-              isShuffling: isShuffling,
-              onShuffle: onShuffle,
-              onAutoDraw: onAutoDraw,
-              cardBack: selectedCardBack,
-            );
-            final memo = const _TarotMemoPanel();
-            if (wide) {
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(flex: 5, child: preparation),
-                  const SizedBox(width: 16),
-                  Expanded(flex: 4, child: memo),
-                ],
-              );
-            }
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [preparation, const SizedBox(height: 16), memo],
-            );
-          },
-        ),
       ],
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= 1080) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: setupControls),
+              const SizedBox(width: 16),
+              SizedBox(
+                width: 330,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    preparation,
+                    const SizedBox(height: 14),
+                    memo,
+                    const SizedBox(height: 18),
+                  ],
+                ),
+              ),
+            ],
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            preparation,
+            const SizedBox(height: 16),
+            setupControls,
+            const SizedBox(height: 16),
+            memo,
+            const SizedBox(height: 24),
+          ],
+        );
+      },
     );
   }
 }
@@ -1395,15 +1413,7 @@ class _TarotPreparationPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _TarotSelectionSummary(deck: selectedDeck, spread: selectedSpread),
-          const SizedBox(height: 18),
-          Center(
-            child: _ShuffleDeckStack(
-              isShuffling: isShuffling,
-              onTap: onShuffle,
-              cardBack: cardBack,
-            ),
-          ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           FilledButton.icon(
             key: const Key('tarot-shuffle-button'),
             onPressed: isShuffling ? null : onShuffle,
@@ -1417,6 +1427,14 @@ class _TarotPreparationPanel extends StatelessWidget {
             onPressed: isShuffling ? null : onAutoDraw,
             icon: const Icon(Icons.auto_awesome_rounded, size: 18),
             label: const Text(UserText.tarotAutoDraw),
+          ),
+          const SizedBox(height: 14),
+          Center(
+            child: _ShuffleDeckStack(
+              isShuffling: isShuffling,
+              onTap: onShuffle,
+              cardBack: cardBack,
+            ),
           ),
         ],
       ),
@@ -2049,7 +2067,7 @@ class _TarotResultStage extends StatelessWidget {
                       drawnCards: drawnCards,
                       revealedIndexes: revealedIndexes,
                     );
-                    if (constraints.maxWidth >= 1120 && slots.length <= 3) {
+                    if (constraints.maxWidth >= 1500 && slots.length <= 3) {
                       return Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

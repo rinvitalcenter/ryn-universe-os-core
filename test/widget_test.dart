@@ -573,6 +573,38 @@ void main() {
   });
 
   testWidgets(
+    'Tarot setup keeps primary actions visible in constrained desktop size',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1280, 820);
+      tester.view.devicePixelRatio = 2.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(const RynUniverseApp());
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.navReading).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.readingToolTarot).last);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('tarot-shuffle-button')), findsOneWidget);
+      expect(find.text(UserText.tarotAutoDraw), findsOneWidget);
+      final shuffleRect = tester.getRect(
+        find.byKey(const Key('tarot-shuffle-button')),
+      );
+      final autoDrawRect = tester.getRect(find.text(UserText.tarotAutoDraw));
+      const logicalHeight = 410.0;
+      expect(shuffleRect.top, greaterThanOrEqualTo(0));
+      expect(shuffleRect.bottom, lessThanOrEqualTo(logicalHeight));
+      expect(autoDrawRect.top, greaterThanOrEqualTo(0));
+      expect(autoDrawRect.bottom, lessThanOrEqualTo(logicalHeight));
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
     'Tarot result surface keeps actions reachable with reflection shell',
     (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1200, 820);
