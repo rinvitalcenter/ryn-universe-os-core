@@ -1464,10 +1464,11 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         gradient: const RadialGradient(
-          center: Alignment(0, -0.58),
-          radius: 1.16,
+          center: Alignment(0, -0.62),
+          radius: 1.22,
           colors: [
-            Color(0x552D2463),
+            Color(0x66312275),
+            Color(0x1FD9BC7A),
             RynPalette.tarotNavy,
             RynPalette.tarotMidnight,
           ],
@@ -1488,22 +1489,24 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
+              Wrap(
+                spacing: 10,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   const _TarotStageProgress(activeIndex: 1),
-                  const SizedBox(width: 10),
                   TextButton.icon(
                     onPressed: onReset,
                     icon: const Icon(Icons.arrow_back_rounded, size: 18),
                     label: const Text(_TarotUiText.prepare),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 360),
                     child: Text(
                       '${deck.label} · $spread',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
                         fontWeight: FontWeight.w900,
@@ -1511,17 +1514,13 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
                   _TarotSmallBadge('$selectedCount / $targetCount 선택'),
-                  const SizedBox(width: 8),
                   _TarotSmallBadge('남은 선택 $remainingToSelect장'),
-                  const SizedBox(width: 10),
                   OutlinedButton.icon(
                     onPressed: isShuffling ? null : onAutoDraw,
                     icon: const Icon(Icons.auto_awesome_rounded, size: 18),
                     label: const Text(UserText.tarotAutoDraw),
                   ),
-                  const SizedBox(width: 8),
                   FilledButton.icon(
                     key: const Key('tarot-show-result-button'),
                     onPressed: canReveal ? onShowResult : null,
@@ -1956,10 +1955,11 @@ class _TarotResultStage extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         gradient: const RadialGradient(
-          center: Alignment(0, -0.62),
-          radius: 1.18,
+          center: Alignment(0, -0.66),
+          radius: 1.24,
           colors: [
-            Color(0x552D2463),
+            Color(0x66312275),
+            Color(0x222C204E),
             RynPalette.tarotNavy,
             RynPalette.tarotMidnight,
           ],
@@ -1980,21 +1980,23 @@ class _TarotResultStage extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
+              Wrap(
+                spacing: 10,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  const _TarotStageProgress(activeIndex: 2),
-                  const SizedBox(width: 10),
+                  _TarotStageProgress(activeIndex: allRevealed ? 3 : 2),
                   TextButton.icon(
                     onPressed: onReset,
                     icon: const Icon(Icons.arrow_back_rounded, size: 18),
                     label: const Text(UserText.tarotResetDraw),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 420),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           '리딩 결과',
                           style: TextStyle(
                             color: Colors.white,
@@ -2018,7 +2020,6 @@ class _TarotResultStage extends StatelessWidget {
                     ),
                   ),
                   const _TarotSmallStageLabel(label: _TarotUiText.revealPrompt),
-                  const SizedBox(width: 10),
                   OutlinedButton.icon(
                     key: const Key('tarot-reveal-all-button'),
                     onPressed: allRevealed ? null : onRevealAll,
@@ -2029,20 +2030,186 @@ class _TarotResultStage extends StatelessWidget {
               ),
               const SizedBox(height: 14),
               SingleChildScrollView(
-                child: _TarotSpreadCanvas(
-                  spreadLabel: spreadLabel,
-                  slots: slots,
-                  drawnCards: drawnCards,
-                  revealedIndexes: revealedIndexes,
-                  revealFxIndexes: revealFxIndexes,
-                  onRevealCard: onRevealCard,
-                  onDirectionToggle: onDirectionToggle,
-                  showEmptySlots: false,
-                  onEmptySlotTap: () {},
-                  cardBack: cardBack,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final canvas = _TarotSpreadCanvas(
+                      spreadLabel: spreadLabel,
+                      slots: slots,
+                      drawnCards: drawnCards,
+                      revealedIndexes: revealedIndexes,
+                      revealFxIndexes: revealFxIndexes,
+                      onRevealCard: onRevealCard,
+                      onDirectionToggle: onDirectionToggle,
+                      showEmptySlots: false,
+                      onEmptySlotTap: () {},
+                      cardBack: cardBack,
+                    );
+                    final reflection = _TarotReadingReflectionPanel(
+                      slots: slots,
+                      drawnCards: drawnCards,
+                      revealedIndexes: revealedIndexes,
+                    );
+                    if (constraints.maxWidth >= 1120 && slots.length <= 3) {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(flex: 7, child: canvas),
+                          const SizedBox(width: 14),
+                          Expanded(flex: 3, child: reflection),
+                        ],
+                      );
+                    }
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        canvas,
+                        const SizedBox(height: 14),
+                        reflection,
+                      ],
+                    );
+                  },
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotReadingReflectionPanel extends StatelessWidget {
+  const _TarotReadingReflectionPanel({
+    required this.slots,
+    required this.drawnCards,
+    required this.revealedIndexes,
+  });
+
+  final List<_TarotSlotSpec> slots;
+  final List<_DrawnTarotCard> drawnCards;
+  final Set<int> revealedIndexes;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('tarot-interpretation-panel'),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: 0.08),
+            RynPalette.tarotViolet.withValues(alpha: 0.24),
+            RynPalette.tarotMidnight.withValues(alpha: 0.34),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
+        border: Border.all(color: RynPalette.tarotGold.withValues(alpha: 0.24)),
+        boxShadow: [
+          BoxShadow(
+            color: RynPalette.lavenderStrong.withValues(alpha: 0.14),
+            blurRadius: 28,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.auto_stories_rounded,
+                size: 18,
+                color: RynPalette.tarotGold,
+              ),
+              const SizedBox(width: 8),
+              const Text(
+                '리딩 포인트',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.2,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '이미지에서 먼저 눈에 들어오는 상징과 감정을 천천히 살펴보세요.',
+            style: TextStyle(
+              color: RynPalette.tarotLavender,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              height: 1.35,
+            ),
+          ),
+          const SizedBox(height: 12),
+          for (var index = 0; index < drawnCards.length; index++) ...[
+            _TarotReflectionLine(
+              label: index < slots.length
+                  ? slots[index].label
+                  : '${index + 1}번',
+              card: drawnCards[index],
+              revealed: revealedIndexes.contains(index),
+            ),
+            if (index != drawnCards.length - 1) const SizedBox(height: 8),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotReflectionLine extends StatelessWidget {
+  const _TarotReflectionLine({
+    required this.label,
+    required this.card,
+    required this.revealed,
+  });
+
+  final String label;
+  final _DrawnTarotCard card;
+  final bool revealed;
+
+  @override
+  Widget build(BuildContext context) {
+    final direction = card.reversed
+        ? UserText.tarotReversed
+        : UserText.tarotUpright;
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: RynPalette.tarotGold,
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            revealed ? '${card.card.label} · $direction' : '아직 펼치기 전',
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: revealed ? Colors.white : RynPalette.tarotLavender,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              height: 1.3,
+            ),
           ),
         ],
       ),
@@ -3225,8 +3392,22 @@ class _TarotFullSlotCardBack extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
-          color: RynPalette.tarotGold.withValues(alpha: glowing ? 0.92 : 0.58),
+          color: RynPalette.tarotGold.withValues(alpha: glowing ? 0.96 : 0.58),
+          width: glowing ? 1.4 : 1,
         ),
+        boxShadow: glowing
+            ? [
+                BoxShadow(
+                  color: RynPalette.tarotGold.withValues(alpha: 0.24),
+                  blurRadius: 28,
+                  spreadRadius: 1,
+                ),
+                BoxShadow(
+                  color: RynPalette.lavenderStrong.withValues(alpha: 0.18),
+                  blurRadius: 34,
+                ),
+              ]
+            : null,
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(3),

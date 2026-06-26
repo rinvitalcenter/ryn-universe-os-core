@@ -519,7 +519,7 @@ void main() {
       (resultCardSize.height - resultBackSize.height).abs(),
       lessThanOrEqualTo(1),
     );
-    expect(find.text('중심'), findsOneWidget);
+    expect(find.text('중심'), findsAtLeastNWidgets(1));
     expect(find.byKey(const Key('tarot-reveal-all-button')), findsOneWidget);
 
     await tester.tap(
@@ -571,6 +571,47 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'Tarot result surface keeps actions reachable with reflection shell',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 820);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(const RynUniverseApp());
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.navReading).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.readingToolTarot).last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.tarotSpreadOne));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text(UserText.tarotAutoDraw));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.tarotAutoDraw));
+      await tester.pumpAndSettle();
+
+      expect(find.text(UserText.tarotResultTable), findsOneWidget);
+      expect(find.byKey(const Key('tarot-reveal-all-button')), findsOneWidget);
+      expect(
+        find.byKey(const Key('tarot-interpretation-panel')),
+        findsOneWidget,
+      );
+      expect(find.text('리딩 포인트'), findsOneWidget);
+      expect(find.text('핵심'), findsAtLeastNWidgets(1));
+
+      final revealAllRect = tester.getRect(
+        find.byKey(const Key('tarot-reveal-all-button')),
+      );
+      expect(revealAllRect.right, lessThanOrEqualTo(1200));
+      expect(revealAllRect.left, greaterThanOrEqualTo(0));
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('Tarot focus cleanup is safe when app tree disposes', (
     WidgetTester tester,
