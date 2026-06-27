@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ryn_universe_os_core/core/text/user_text.dart';
+import 'package:ryn_universe_os_core/features/tarot/tarot_spread_shell.dart';
 import 'package:ryn_universe_os_core/main.dart';
 
 void main() {
@@ -312,16 +314,64 @@ void main() {
     await tester.tap(find.text(UserText.readingToolTarot).last);
     await tester.pumpAndSettle();
 
-    expect(find.text(UserText.tarotDeckSelect), findsOneWidget);
-    expect(find.text(UserText.tarotSpreadSelect), findsOneWidget);
-    expect(find.text('준비하기'), findsOneWidget);
-    expect(find.text('셔플하기'), findsAtLeastNWidgets(1));
+    expect(find.byKey(const Key('tarot-active-setup-step-0')), findsOneWidget);
     expect(find.text(UserText.tarotQuestion), findsOneWidget);
     expect(find.text(UserText.tarotMemo), findsOneWidget);
+    expect(find.text(UserText.tarotDeckSelect), findsNothing);
+    expect(find.text(UserText.tarotSpreadSelect), findsNothing);
+    expect(find.byKey(const Key('tarot-shuffle-button')), findsNothing);
     expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
     expect(find.byKey(const Key('tarot-empty-slot')), findsNothing);
 
-    expect(find.text(UserText.tarotSpreadGroupFree), findsOneWidget);
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('tarot-active-setup-step-1')), findsOneWidget);
+    expect(find.text('2 덱 선택'), findsOneWidget);
+    expect(find.byKey(const Key('tarot-deck-carousel')), findsOneWidget);
+    expect(find.byKey(const Key('tarot-deck-fan-carousel')), findsOneWidget);
+    expect(find.byKey(const Key('tarot-deck-fan-left')), findsOneWidget);
+    expect(find.byKey(const Key('tarot-deck-fan-right')), findsOneWidget);
+    expect(find.byKey(const Key('tarot-deck-fan-dot-0')), findsOneWidget);
+    final centerDeckRect = tester.getRect(
+      find.byKey(const ValueKey('tarot-deck-carousel-card-rws_public_domain')),
+    );
+    final neighborDeckRect = tester.getRect(
+      find.byKey(const ValueKey('tarot-deck-carousel-card-thoth')),
+    );
+    expect(centerDeckRect.width, greaterThan(neighborDeckRect.width));
+    expect(centerDeckRect.top, lessThan(neighborDeckRect.top));
+    expect(
+      find.text(UserText.tarotDeckUniversalWaite),
+      findsAtLeastNWidgets(1),
+    );
+    for (var index = 0; index < 8; index++) {
+      expect(find.byKey(Key('tarot-deck-fan-dot-$index')), findsOneWidget);
+    }
+    expect(find.byKey(const Key('tarot-coverflow-hero-card')), findsOneWidget);
+    expect(
+      find.byKey(const Key('tarot-selected-card-edge-glow')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('tarot-coverflow-near-card-thoth')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('tarot-coverflow-side-card-marseille')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('tarot-coverflow-far-card-oracle')),
+      findsOneWidget,
+    );
+    expect(find.text(UserText.tarotSpreadSelect), findsNothing);
+
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('tarot-active-setup-step-2')), findsOneWidget);
+    expect(find.text(UserText.tarotSpreadSelect), findsOneWidget);
     expect(find.text(UserText.tarotSpreadGroupFixed), findsOneWidget);
     for (final spread in [
       UserText.tarotSpreadOne,
@@ -435,15 +485,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('tarot-deck-carousel')), findsOneWidget);
-    for (final deck in [
-      UserText.tarotDeckUniversalWaite,
-      UserText.tarotDeckOracle,
-      UserText.tarotDeckPersonalScan,
-    ]) {
-      expect(find.text(deck), findsAtLeastNWidgets(1));
-    }
-
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tarot-active-setup-step-3')), findsOneWidget);
     expect(find.byKey(const Key('tarot-shuffle-button')), findsOneWidget);
     await tester.ensureVisible(find.byKey(const Key('tarot-shuffle-button')));
     await tester.pumpAndSettle();
@@ -551,10 +595,16 @@ void main() {
 
     await tester.tap(find.text(UserText.tarotResetDraw));
     await tester.pumpAndSettle();
-    expect(find.text('준비하기'), findsOneWidget);
+    expect(find.byKey(const Key('tarot-active-setup-step-0')), findsOneWidget);
     expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
 
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text(UserText.tarotSpreadOne));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text(UserText.tarotAutoDraw));
     await tester.pumpAndSettle();
@@ -588,9 +638,19 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text(UserText.readingToolTarot).last);
       await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('tarot-shuffle-button')), findsOneWidget);
       expect(find.text(UserText.tarotAutoDraw), findsOneWidget);
+      await tester.ensureVisible(find.byKey(const Key('tarot-shuffle-button')));
+      await tester.pumpAndSettle();
       final shuffleRect = tester.getRect(
         find.byKey(const Key('tarot-shuffle-button')),
       );
@@ -620,7 +680,17 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text(UserText.readingToolTarot).last);
       await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text(UserText.tarotSpreadOne));
+      await tester.pumpAndSettle();
       await tester.tap(find.text(UserText.tarotSpreadOne));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text(UserText.tarotAutoDraw));
       await tester.pumpAndSettle();
@@ -629,18 +699,292 @@ void main() {
 
       expect(find.text(UserText.tarotResultTable), findsOneWidget);
       expect(find.byKey(const Key('tarot-reveal-all-button')), findsOneWidget);
-      expect(
-        find.byKey(const Key('tarot-interpretation-panel')),
-        findsOneWidget,
-      );
-      expect(find.text('리딩 포인트'), findsOneWidget);
-      expect(find.text('핵심'), findsAtLeastNWidgets(1));
+      expect(find.byKey(const Key('tarot-interpretation-shell')), findsNothing);
+      expect(find.text('해석 패널'), findsNothing);
+      expect(find.text('해석 보기'), findsOneWidget);
 
       final revealAllRect = tester.getRect(
         find.byKey(const Key('tarot-reveal-all-button')),
       );
       expect(revealAllRect.right, lessThanOrEqualTo(1200));
       expect(revealAllRect.left, greaterThanOrEqualTo(0));
+      await tester.tap(find.text('해석 보기'));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('tarot-interpretation-shell')),
+        findsOneWidget,
+      );
+      expect(find.text('해석 패널'), findsAtLeastNWidgets(1));
+      expect(find.text('핵심'), findsAtLeastNWidgets(1));
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'Tarot owner review flow exposes step panels and dedicated result layouts',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1920, 1080);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: TarotSpreadShell(key: UniqueKey(), onBack: () {}),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('tarot-active-setup-step-0')),
+        findsOneWidget,
+      );
+      expect(find.text('1 질문과 목적'), findsOneWidget);
+      expect(find.byKey(const Key('tarot-setup-progress')), findsOneWidget);
+      expect(
+        find.byKey(const Key('tarot-setup-step-chip-0-active')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-setup-step-chip-2-active')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('tarot-setup-guidance-layout')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('tarot-deck-carousel')), findsNothing);
+      expect(find.text(UserText.tarotSpreadSelect), findsNothing);
+      expect(find.byKey(const Key('tarot-shuffle-button')), findsNothing);
+      expect(find.text('리딩 포인트'), findsNothing);
+
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('tarot-active-setup-step-1')),
+        findsOneWidget,
+      );
+      expect(find.text('2 덱 선택'), findsOneWidget);
+      expect(find.text('덱 선택'), findsNothing);
+      expect(
+        find.byKey(const Key('tarot-setup-step-chip-1-active')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('tarot-deck-carousel')), findsOneWidget);
+      expect(find.byKey(const Key('tarot-jukebox-deck-stage')), findsOneWidget);
+      expect(
+        find.byKey(const Key('tarot-jukebox-center-card')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-coverflow-hero-card')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-selected-card-edge-glow')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-coverflow-near-card-thoth')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-coverflow-side-card-marseille')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-coverflow-far-card-oracle')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-immersive-deck-stage')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('tarot-deck-fan-carousel')), findsOneWidget);
+      expect(find.byKey(const Key('tarot-deck-bento-tile')), findsNothing);
+      expect(find.text(UserText.tarotSpreadSelect), findsNothing);
+      expect(find.byKey(const Key('tarot-shuffle-button')), findsNothing);
+
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('tarot-active-setup-step-2')),
+        findsOneWidget,
+      );
+      expect(find.text('3 카드 세부 설정'), findsOneWidget);
+      expect(
+        find.byKey(const Key('tarot-setup-step-chip-2-active')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-setup-step-chip-reveal-active')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('tarot-card-detail-balanced-layout')),
+        findsOneWidget,
+      );
+      expect(find.text(UserText.tarotSpreadSelect), findsOneWidget);
+      expect(find.byKey(const Key('tarot-deck-carousel')), findsNothing);
+      expect(find.byKey(const Key('tarot-shuffle-button')), findsNothing);
+
+      await tester.tap(find.text(UserText.tarotSpreadFour));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('tarot-active-setup-step-3')),
+        findsOneWidget,
+      );
+      expect(find.text('4 셔플과 드로우'), findsOneWidget);
+      expect(
+        find.byKey(const Key('tarot-setup-step-chip-3-active')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-setup-step-chip-interpret-active')),
+        findsNothing,
+      );
+      expect(
+        find.byKey(const Key('tarot-ritual-shuffle-stage')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-unified-ritual-layout')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-ritual-deck-preview')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-ritual-hero-deck-stack')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('tarot-shuffle-button')), findsOneWidget);
+      expect(find.byKey(const Key('tarot-deck-carousel')), findsNothing);
+      expect(find.text(UserText.tarotSpreadSelect), findsNothing);
+      await tester.ensureVisible(find.text(UserText.tarotAutoDraw));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('tarot-shuffle-button')));
+      await tester.pumpAndSettle();
+      expect(find.text(UserText.tarotDrawPreparation), findsOneWidget);
+      expect(find.byKey(const Key('tarot-full-deck-stage')), findsOneWidget);
+      expect(
+        find.byKey(const Key('tarot-face-down-card-identity-major_00')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-draw-face-down-card-back-image-0')),
+        findsOneWidget,
+      );
+      await tester.tap(find.text(UserText.tarotAutoDraw));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('tarot-result-layout-4')), findsOneWidget);
+      expect(find.byKey(const Key('tarot-interpretation-shell')), findsNothing);
+      expect(find.text('해석 패널'), findsNothing);
+      expect(find.text('해석 보기'), findsOneWidget);
+      expect(find.textContaining('저장', findRichText: true), findsNothing);
+      expect(find.textContaining('export', findRichText: true), findsNothing);
+      expect(find.textContaining('history', findRichText: true), findsNothing);
+      expect(find.textContaining('AI', findRichText: true), findsNothing);
+
+      final rowRects = List<Rect>.generate(
+        4,
+        (index) =>
+            tester.getRect(find.byKey(Key('tarot-result-slot-4-$index'))),
+      );
+      final maxTopDelta = rowRects
+          .map((rect) => (rect.top - rowRects.first.top).abs())
+          .reduce(math.max);
+      expect(maxTopDelta, lessThan(28));
+      await tester.tap(find.text('해석 보기'));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('tarot-interpretation-shell')),
+        findsOneWidget,
+      );
+      expect(find.text('해석 패널'), findsAtLeastNWidgets(1));
+      expect(find.byKey(const Key('tarot-result-layout-4')), findsNothing);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: TarotSpreadShell(key: UniqueKey(), onBack: () {}),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.tarotSpreadFive));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text(UserText.tarotAutoDraw));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.tarotAutoDraw));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('tarot-result-layout-5')), findsOneWidget);
+      for (var index = 0; index < 5; index++) {
+        final slotRect = tester.getRect(
+          find.byKey(Key('tarot-result-slot-5-$index')),
+        );
+        expect(slotRect.left, greaterThanOrEqualTo(0));
+        expect(slotRect.right, lessThanOrEqualTo(1920));
+        expect(slotRect.bottom, lessThanOrEqualTo(1080));
+      }
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: TarotSpreadShell(key: UniqueKey(), onBack: () {}),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.tarotSpreadCeltic));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text(UserText.tarotAutoDraw));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.tarotAutoDraw));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('tarot-result-layout-10')), findsOneWidget);
+      final rightColumnRects = [
+        for (var index = 6; index < 10; index++)
+          tester.getRect(find.byKey(Key('tarot-result-slot-10-$index'))),
+      ];
+      for (var index = 1; index < rightColumnRects.length; index++) {
+        expect(
+          (rightColumnRects[index].center.dx -
+                  rightColumnRects[index - 1].center.dx)
+              .abs(),
+          greaterThan(24),
+        );
+        expect(
+          (rightColumnRects[index].center.dy -
+                  rightColumnRects[index - 1].center.dy)
+              .abs(),
+          greaterThan(rightColumnRects[index].height * 0.72),
+        );
+      }
+
+      expect(find.text('관계 리딩'), findsNothing);
+      expect(find.text('문제-원인-해결'), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );
@@ -660,6 +1004,14 @@ void main() {
     await tester.tap(find.text(UserText.navReading).first);
     await tester.pumpAndSettle();
     await tester.tap(find.text(UserText.readingToolTarot).last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('다음'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.byKey(const Key('tarot-shuffle-button')));
     await tester.pumpAndSettle();
