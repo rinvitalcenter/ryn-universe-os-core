@@ -135,7 +135,6 @@ class _TarotUiText {
   static const directionMode = '방향 선택';
   static const uprightOnly = '정방향만';
   static const autoDirection = '정/역방향';
-  static const changeDirection = '방향 바꾸기';
   static const revealPrompt = '카드를 펼쳐보세요';
   static const revealAll = '모두 펼치기';
 }
@@ -956,6 +955,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         onBack: widget.onBack,
         onDirectionToggle: _toggleDrawnDirection,
         cardBack: _selectedCardBack,
+        deckLabel: _selectedDeck.label,
       ),
       _TarotFlowStage.interpretation => _TarotInterpretationStage(
         spreadLabel: _selectedSpread,
@@ -2679,6 +2679,7 @@ class _TarotResultStage extends StatelessWidget {
     required this.onBack,
     required this.onDirectionToggle,
     required this.cardBack,
+    required this.deckLabel,
   });
 
   final _TarotSpreadDefinition spreadDefinition;
@@ -2694,6 +2695,7 @@ class _TarotResultStage extends StatelessWidget {
   final VoidCallback onBack;
   final ValueChanged<int> onDirectionToggle;
   final _TarotCardBackDefinition cardBack;
+  final String deckLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -2751,6 +2753,7 @@ class _TarotResultStage extends StatelessWidget {
                   fillAvailable: true,
                   onEmptySlotTap: () {},
                   cardBack: cardBack,
+                  deckLabel: deckLabel,
                 ),
               ),
             ],
@@ -4346,6 +4349,7 @@ class _TarotSpreadCanvas extends StatefulWidget {
     required this.onDirectionToggle,
     required this.onEmptySlotTap,
     required this.cardBack,
+    required this.deckLabel,
     this.showEmptySlots = true,
     this.fillAvailable = false,
   });
@@ -4360,6 +4364,7 @@ class _TarotSpreadCanvas extends StatefulWidget {
   final ValueChanged<int> onDirectionToggle;
   final VoidCallback onEmptySlotTap;
   final _TarotCardBackDefinition cardBack;
+  final String deckLabel;
   final bool showEmptySlots;
   final bool fillAvailable;
 
@@ -4373,6 +4378,7 @@ class _TarotSpreadCanvasState extends State<_TarotSpreadCanvas> {
   int _dragSequence = 100;
   bool _adjustmentMode = false;
   int? _hoveredIndex;
+  int? _focusedCardIndex;
 
   bool get _supportsDrag => widget.spreadDefinition.supportsDrag;
   bool get _canMoveCards => _supportsDrag || _adjustmentMode;
@@ -4435,6 +4441,7 @@ class _TarotSpreadCanvasState extends State<_TarotSpreadCanvas> {
       _temporaryOffsets.clear();
       _dragZ.clear();
       _dragSequence = 100;
+      _focusedCardIndex = null;
     }
   }
 
@@ -4452,6 +4459,7 @@ class _TarotSpreadCanvasState extends State<_TarotSpreadCanvas> {
       _temporaryOffsets.clear();
       _dragZ.clear();
       _dragSequence = 100;
+      _focusedCardIndex = null;
       _hoveredIndex = null;
     });
   }
@@ -4459,6 +4467,16 @@ class _TarotSpreadCanvasState extends State<_TarotSpreadCanvas> {
   void _setHoveredIndex(int? index) {
     if (_hoveredIndex == index) return;
     setState(() => _hoveredIndex = index);
+  }
+
+  void _openFocusedCard(int index) {
+    if (!widget.revealedIndexes.contains(index)) return;
+    setState(() => _focusedCardIndex = index);
+  }
+
+  void _closeFocusedCard() {
+    if (_focusedCardIndex == null) return;
+    setState(() => _focusedCardIndex = null);
   }
 
   List<int> _paintOrder() {
@@ -4770,6 +4788,16 @@ class _TarotSpreadCanvasState extends State<_TarotSpreadCanvas> {
               onReset: _resetTemporaryLayout,
             ),
           ),
+          if (_focusedCardIndex case final focusedIndex?
+              when focusedIndex < widget.drawnCards.length)
+            Positioned.fill(
+              child: _TarotFocusedCardOverlay(
+                drawnCard: widget.drawnCards[focusedIndex],
+                slotLabel: widget.slots[focusedIndex].label,
+                deckLabel: widget.deckLabel,
+                onClose: _closeFocusedCard,
+              ),
+            ),
         ],
       ),
     );
@@ -4832,6 +4860,7 @@ class _TarotSpreadCanvasState extends State<_TarotSpreadCanvas> {
               revealed: widget.revealedIndexes.contains(index),
               showRevealFx: widget.revealFxIndexes.contains(index),
               onReveal: () => widget.onRevealCard(index),
+              onFocus: () => _openFocusedCard(index),
               onDirectionToggle: widget.onDirectionToggle,
               cardBack: widget.cardBack,
             )
@@ -5414,6 +5443,7 @@ class _TarotDrawnCardView extends StatelessWidget {
     required this.revealed,
     required this.showRevealFx,
     required this.onReveal,
+    required this.onFocus,
     required this.onDirectionToggle,
     required this.cardBack,
   });
@@ -5423,6 +5453,7 @@ class _TarotDrawnCardView extends StatelessWidget {
   final bool revealed;
   final bool showRevealFx;
   final VoidCallback onReveal;
+  final VoidCallback onFocus;
   final ValueChanged<int> onDirectionToggle;
   final _TarotCardBackDefinition cardBack;
 
@@ -5457,7 +5488,11 @@ class _TarotDrawnCardView extends StatelessWidget {
                 onReveal: onReveal,
                 cardBack: cardBack,
               ),
-              front: _TarotRevealedCardFace(drawnCard: drawnCard),
+              front: _TarotRevealedCardFace(
+                drawnCard: drawnCard,
+                index: index,
+                onFocus: onFocus,
+              ),
             ),
             if (showRevealFx)
               const Positioned.fill(child: _TarotFxBurst(particleCount: 8)),
@@ -5567,9 +5602,15 @@ class _TarotFullSlotCardBack extends StatelessWidget {
 }
 
 class _TarotRevealedCardFace extends StatelessWidget {
-  const _TarotRevealedCardFace({required this.drawnCard});
+  const _TarotRevealedCardFace({
+    required this.drawnCard,
+    required this.index,
+    required this.onFocus,
+  });
 
   final _DrawnTarotCard drawnCard;
+  final int index;
+  final VoidCallback onFocus;
 
   @override
   Widget build(BuildContext context) {
@@ -5577,22 +5618,224 @@ class _TarotRevealedCardFace extends StatelessWidget {
         ? UserText.tarotReversed
         : UserText.tarotUpright;
     return Tooltip(
-      message:
-          '${drawnCard.card.label} · $orientation · ${_TarotUiText.changeDirection}',
-      child: _TarotRevealReadyFrame(
-        child: AnimatedRotation(
-          turns: drawnCard.reversed ? 0.5 : 0,
-          duration: const Duration(milliseconds: 180),
-          curve: Curves.easeOutCubic,
-          child: Image.asset(
-            drawnCard.card.imagePath,
-            key: const Key('tarot-rws-card-image'),
-            fit: BoxFit.contain,
-            width: double.infinity,
-            height: double.infinity,
-            alignment: Alignment.center,
+      message: '${drawnCard.card.label} · $orientation · 크게 보기',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          key: Key('tarot-focusable-result-card-$index'),
+          borderRadius: BorderRadius.circular(4),
+          onTap: onFocus,
+          child: _TarotRevealReadyFrame(
+            child: AnimatedRotation(
+              turns: drawnCard.reversed ? 0.5 : 0,
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              child: Image.asset(
+                drawnCard.card.imagePath,
+                key: const Key('tarot-rws-card-image'),
+                fit: BoxFit.contain,
+                width: double.infinity,
+                height: double.infinity,
+                alignment: Alignment.center,
+              ),
+            ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _TarotFocusedCardOverlay extends StatelessWidget {
+  const _TarotFocusedCardOverlay({
+    required this.drawnCard,
+    required this.slotLabel,
+    required this.deckLabel,
+    required this.onClose,
+  });
+
+  final _DrawnTarotCard drawnCard;
+  final String slotLabel;
+  final String deckLabel;
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) {
+    final orientation = drawnCard.reversed
+        ? UserText.tarotReversed
+        : UserText.tarotUpright;
+    return Material(
+      key: const Key('tarot-focus-detail-overlay'),
+      color: Colors.black.withValues(alpha: 0.68),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 920, maxHeight: 760),
+          child: Container(
+            margin: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF080B1A),
+                  Color(0xFF111936),
+                  Color(0xFF211747),
+                ],
+              ),
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(
+                color: RynPalette.tarotGold.withValues(alpha: 0.34),
+              ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0xCC000000),
+                  blurRadius: 42,
+                  offset: Offset(0, 22),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Flexible(
+                  flex: 5,
+                  child: Center(
+                    child: AspectRatio(
+                      aspectRatio: 1 / 1.62,
+                      child: _TarotRevealReadyFrame(
+                        child: AnimatedRotation(
+                          turns: drawnCard.reversed ? 0.5 : 0,
+                          duration: const Duration(milliseconds: 180),
+                          curve: Curves.easeOutCubic,
+                          child: Image.asset(
+                            drawnCard.card.imagePath,
+                            key: const Key('tarot-focus-card-image'),
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 24),
+                Flexible(
+                  flex: 4,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '카드 집중 보기',
+                              style: TextStyle(
+                                color: RynPalette.tarotLavender,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            key: const Key('tarot-focus-close-button'),
+                            tooltip: '닫기',
+                            onPressed: onClose,
+                            icon: const Icon(Icons.close_rounded),
+                            color: Colors.white.withValues(alpha: 0.88),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        drawnCard.card.label,
+                        key: const Key('tarot-focus-card-name'),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      _TarotFocusInfoChip(
+                        icon: Icons.swap_vert_rounded,
+                        label: orientation,
+                        valueKey: const Key('tarot-focus-card-orientation'),
+                      ),
+                      const SizedBox(height: 10),
+                      _TarotFocusInfoChip(
+                        icon: Icons.place_rounded,
+                        label: slotLabel,
+                        valueKey: const Key('tarot-focus-slot-label'),
+                      ),
+                      const SizedBox(height: 10),
+                      _TarotFocusInfoChip(
+                        icon: Icons.style_rounded,
+                        label: deckLabel,
+                        valueKey: const Key('tarot-focus-deck-label'),
+                      ),
+                      const Spacer(),
+                      Text(
+                        '확대한 카드만 확인합니다. 현재 배열과 임시 조정은 그대로 유지됩니다.',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.64),
+                          fontSize: 12,
+                          height: 1.45,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TarotFocusInfoChip extends StatelessWidget {
+  const _TarotFocusInfoChip({
+    required this.icon,
+    required this.label,
+    required this.valueKey,
+  });
+
+  final IconData icon;
+  final String label;
+  final Key valueKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: RynPalette.tarotGold),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              label,
+              key: valueKey,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

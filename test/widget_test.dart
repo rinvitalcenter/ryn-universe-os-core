@@ -2510,6 +2510,97 @@ void main() {
     },
   );
 
+  testWidgets(
+    'Tarot revealed result card opens and closes focus detail overlay',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1920, 1080);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: TarotSpreadShell(key: UniqueKey(), onBack: () {}),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text(UserText.tarotAutoDraw));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.tarotAutoDraw));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('모두 펼치기'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('tarot-focus-detail-overlay')), findsNothing);
+
+      final boardCardRect = tester.getRect(
+        find.byKey(const Key('tarot-focusable-result-card-0')),
+      );
+      await tester.tap(find.byKey(const Key('tarot-focusable-result-card-0')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('tarot-focus-detail-overlay')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('tarot-focus-card-image')), findsOneWidget);
+      final focusedCardRect = tester.getRect(
+        find.byKey(const Key('tarot-focus-card-image')),
+      );
+      expect(focusedCardRect.height, greaterThan(boardCardRect.height * 1.25));
+      expect(find.byKey(const Key('tarot-focus-card-name')), findsOneWidget);
+      expect(
+        find.byKey(const Key('tarot-focus-card-orientation')),
+        findsOneWidget,
+      );
+      expect(find.text(UserText.tarotUpright), findsOneWidget);
+      expect(find.text('과거'), findsWidgets);
+      expect(find.text(UserText.tarotDeckUniversalWaite), findsOneWidget);
+      expect(
+        find.byKey(const Key('tarot-layout-adjustment-toolbar')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-reading-back-command')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-fixed-spread-board-three_card')),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.byKey(const Key('tarot-focus-close-button')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('tarot-focus-detail-overlay')), findsNothing);
+      expect(
+        find.byKey(const Key('tarot-fixed-spread-board-three_card')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-layout-adjustment-toolbar')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-reading-back-command')),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('Tarot all 22 spreads render from manual geometry blueprints', (
     WidgetTester tester,
   ) async {
