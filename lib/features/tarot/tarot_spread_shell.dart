@@ -4404,12 +4404,18 @@ class _TarotSpreadCanvasState extends State<_TarotSpreadCanvas> {
     'tandem',
     'relationship',
     'cup_of_relationship',
+    'seven_card',
+    'binary_choice',
+    'horseshoe',
+    'horoscope',
+    'year_ahead',
   };
 
   static const Set<String> _denseSpreadIds = {
     'celtic_cross',
     'mini_celtic_cross',
     'cross',
+    'seven_card',
     'horseshoe',
     'magic_seven',
     'binary_choice',
@@ -5014,6 +5020,14 @@ double _canvasHeightForDefinition(_TarotSpreadDefinition definition) {
   if (definition.id == 'tandem' || definition.id == 'relationship') {
     return 920;
   }
+  if (definition.id == 'seven_card') return 820;
+  if (definition.id == 'binary_choice') return 860;
+  if (definition.id == 'horseshoe') {
+    return 840;
+  }
+  if (definition.id == 'horoscope' || definition.id == 'year_ahead') {
+    return 1020;
+  }
   if (definition.canvasStyle == _TarotResultCanvasStyle.radial) return 880;
   if (definition.canvasStyle == _TarotResultCanvasStyle.grid) {
     return definition.cardCount == 9 ? 780 : 720;
@@ -5159,9 +5173,10 @@ const _manualSpreadGeometryBlueprints = <String, _TarotSpreadGeometryBlueprint>{
   ),
   'seven_card': _TarotSpreadGeometryBlueprint(
     layout: _EffectiveSpreadLayout(columns: 4.0, rows: 2.0),
-    preferredCardWidth: 190,
-    minimumCardWidth: 138,
+    preferredCardWidth: 188,
+    minimumCardWidth: 168,
     occupancyTarget: 0.90,
+    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
   ),
   'grid_6': _TarotSpreadGeometryBlueprint(
     layout: _EffectiveSpreadLayout(columns: 3.0, rows: 2.0),
@@ -5209,8 +5224,9 @@ const _manualSpreadGeometryBlueprints = <String, _TarotSpreadGeometryBlueprint>{
   'horseshoe': _TarotSpreadGeometryBlueprint(
     layout: _EffectiveSpreadLayout(columns: 3.85, rows: 2.65),
     preferredCardWidth: 176,
-    minimumCardWidth: 126,
+    minimumCardWidth: 154,
     occupancyTarget: 0.89,
+    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
   ),
   'magic_seven': _TarotSpreadGeometryBlueprint(
     layout: _EffectiveSpreadLayout(columns: 3.55, rows: 3.15),
@@ -5221,8 +5237,9 @@ const _manualSpreadGeometryBlueprints = <String, _TarotSpreadGeometryBlueprint>{
   'binary_choice': _TarotSpreadGeometryBlueprint(
     layout: _EffectiveSpreadLayout(columns: 3.10, rows: 2.75),
     preferredCardWidth: 184,
-    minimumCardWidth: 134,
+    minimumCardWidth: 152,
     occupancyTarget: 0.88,
+    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
   ),
   'reading_mind': _TarotSpreadGeometryBlueprint(
     layout: _EffectiveSpreadLayout(columns: 3.55, rows: 3.85),
@@ -5255,15 +5272,15 @@ const _manualSpreadGeometryBlueprints = <String, _TarotSpreadGeometryBlueprint>{
   ),
   'horoscope': _TarotSpreadGeometryBlueprint(
     layout: _EffectiveSpreadLayout(columns: 4.20, rows: 4.05),
-    preferredCardWidth: 134,
-    minimumCardWidth: 98,
+    preferredCardWidth: 130,
+    minimumCardWidth: 112,
     occupancyTarget: 0.88,
     padding: EdgeInsets.symmetric(horizontal: 18, vertical: 16),
   ),
   'year_ahead': _TarotSpreadGeometryBlueprint(
     layout: _EffectiveSpreadLayout(columns: 4.20, rows: 4.05),
-    preferredCardWidth: 134,
-    minimumCardWidth: 98,
+    preferredCardWidth: 130,
+    minimumCardWidth: 112,
     occupancyTarget: 0.88,
     padding: EdgeInsets.symmetric(horizontal: 18, vertical: 16),
   ),
@@ -6104,15 +6121,25 @@ List<_TarotSlotSpec> _radialSlots({
   required String centerLabel,
   required String outerLabel,
 }) {
-  const centerX = 0.5;
-  const centerY = 0.52;
-  const radiusX = 0.37;
-  const radiusY = 0.36;
+  const ringOffsets = <Offset>[
+    Offset(0.20, 0.08),
+    Offset(0.40, 0.08),
+    Offset(0.60, 0.08),
+    Offset(0.80, 0.08),
+    Offset(0.88, 0.36),
+    Offset(0.88, 0.64),
+    Offset(0.80, 0.92),
+    Offset(0.60, 0.92),
+    Offset(0.40, 0.92),
+    Offset(0.20, 0.92),
+    Offset(0.12, 0.64),
+    Offset(0.12, 0.36),
+  ];
   return [
     _TarotSlotSpec(
       centerLabel,
-      centerX,
-      centerY,
+      0.50,
+      0.50,
       slotId: '${prefix}_center',
       zIndex: 20,
       widthFactor: 1.0,
@@ -6120,15 +6147,15 @@ List<_TarotSlotSpec> _radialSlots({
       labelAnchor: _TarotSlotAnchor.inside,
       infoAnchor: _TarotSlotAnchor.inside,
     ),
-    for (var index = 0; index < 12; index++)
+    for (var index = 0; index < ringOffsets.length; index++)
       _TarotSlotSpec(
         prefix == 'month' ? '${index + 1}월' : '$outerLabel ${index + 1}',
-        centerX + math.cos(-math.pi / 2 + index * math.pi * 2 / 12) * radiusX,
-        centerY + math.sin(-math.pi / 2 + index * math.pi * 2 / 12) * radiusY,
+        ringOffsets[index].dx,
+        ringOffsets[index].dy,
         slotId: '${prefix}_${index + 1}',
         zIndex: index,
-        widthFactor: 0.88,
-        heightFactor: 0.88,
+        widthFactor: 0.95,
+        heightFactor: 0.95,
         preferredSide: _TarotSlotAnchor.outside,
         labelAnchor: _TarotSlotAnchor.outside,
         infoAnchor: _TarotSlotAnchor.outside,
@@ -6340,8 +6367,8 @@ const _tarotSpreadFiveSlots = [
 const _tarotSpreadSevenSlots = [
   _TarotSlotSpec(
     '상단 1',
-    0.18,
-    0.28,
+    0.14,
+    0.20,
     slotId: 'seven_1',
     labelAnchor: _TarotSlotAnchor.bottom,
     widthFactor: 1.0,
@@ -6349,8 +6376,8 @@ const _tarotSpreadSevenSlots = [
   ),
   _TarotSlotSpec(
     '상단 2',
-    0.39,
-    0.28,
+    0.38,
+    0.20,
     slotId: 'seven_2',
     labelAnchor: _TarotSlotAnchor.bottom,
     widthFactor: 1.0,
@@ -6358,8 +6385,8 @@ const _tarotSpreadSevenSlots = [
   ),
   _TarotSlotSpec(
     '상단 3',
-    0.61,
-    0.28,
+    0.62,
+    0.20,
     slotId: 'seven_3',
     labelAnchor: _TarotSlotAnchor.bottom,
     widthFactor: 1.0,
@@ -6367,8 +6394,8 @@ const _tarotSpreadSevenSlots = [
   ),
   _TarotSlotSpec(
     '상단 4',
-    0.82,
-    0.28,
+    0.86,
+    0.20,
     slotId: 'seven_4',
     labelAnchor: _TarotSlotAnchor.bottom,
     widthFactor: 1.0,
@@ -6376,28 +6403,28 @@ const _tarotSpreadSevenSlots = [
   ),
   _TarotSlotSpec(
     '하단 1',
-    0.30,
-    0.72,
+    0.26,
+    0.80,
     slotId: 'seven_5',
-    labelAnchor: _TarotSlotAnchor.bottom,
+    labelAnchor: _TarotSlotAnchor.top,
     widthFactor: 1.0,
     heightFactor: 1.0,
   ),
   _TarotSlotSpec(
     '하단 2',
     0.50,
-    0.72,
+    0.80,
     slotId: 'seven_6',
-    labelAnchor: _TarotSlotAnchor.bottom,
+    labelAnchor: _TarotSlotAnchor.top,
     widthFactor: 1.0,
     heightFactor: 1.0,
   ),
   _TarotSlotSpec(
     '하단 3',
-    0.70,
-    0.72,
+    0.74,
+    0.80,
     slotId: 'seven_7',
-    labelAnchor: _TarotSlotAnchor.bottom,
+    labelAnchor: _TarotSlotAnchor.top,
     widthFactor: 1.0,
     heightFactor: 1.0,
   ),
@@ -6833,52 +6860,48 @@ const _tarotSpreadCrossSlots = [
 const _tarotSpreadHorseshoeSlots = [
   _TarotSlotSpec(
     '왼쪽 기둥',
-    0.18,
-    0.72,
+    0.16,
+    0.82,
     slotId: 'horse_left_base',
-    rotationDeg: -6,
     labelAnchor: _TarotSlotAnchor.right,
-    widthFactor: 0.86,
-    heightFactor: 0.86,
+    widthFactor: 1.0,
+    heightFactor: 1.0,
   ),
   _TarotSlotSpec(
     '왼쪽 흐름',
-    0.28,
-    0.38,
+    0.32,
+    0.46,
     slotId: 'horse_left_arc',
-    rotationDeg: -4,
     labelAnchor: _TarotSlotAnchor.right,
-    widthFactor: 0.86,
-    heightFactor: 0.86,
+    widthFactor: 1.0,
+    heightFactor: 1.0,
   ),
   _TarotSlotSpec(
     '상단',
     0.50,
-    0.20,
+    0.14,
     slotId: 'horse_top',
     labelAnchor: _TarotSlotAnchor.bottom,
-    widthFactor: 0.86,
-    heightFactor: 0.86,
+    widthFactor: 1.0,
+    heightFactor: 1.0,
   ),
   _TarotSlotSpec(
     '오른쪽 흐름',
-    0.72,
-    0.38,
+    0.68,
+    0.46,
     slotId: 'horse_right_arc',
-    rotationDeg: 4,
     labelAnchor: _TarotSlotAnchor.left,
-    widthFactor: 0.86,
-    heightFactor: 0.86,
+    widthFactor: 1.0,
+    heightFactor: 1.0,
   ),
   _TarotSlotSpec(
     '오른쪽 기둥',
+    0.84,
     0.82,
-    0.72,
     slotId: 'horse_right_base',
-    rotationDeg: 6,
     labelAnchor: _TarotSlotAnchor.left,
-    widthFactor: 0.86,
-    heightFactor: 0.86,
+    widthFactor: 1.0,
+    heightFactor: 1.0,
   ),
 ];
 
@@ -6952,49 +6975,49 @@ const _tarotSpreadMagicSevenSlots = [
 const _tarotSpreadBinarySlots = [
   _TarotSlotSpec(
     'A 시작',
-    0.24,
-    0.24,
+    0.22,
+    0.12,
     slotId: 'choice_a_top',
     labelAnchor: _TarotSlotAnchor.bottom,
-    widthFactor: 0.94,
-    heightFactor: 0.94,
+    widthFactor: 1.0,
+    heightFactor: 1.0,
   ),
   _TarotSlotSpec(
     'B 시작',
-    0.76,
-    0.24,
+    0.78,
+    0.12,
     slotId: 'choice_b_top',
     labelAnchor: _TarotSlotAnchor.bottom,
-    widthFactor: 0.94,
-    heightFactor: 0.94,
+    widthFactor: 1.0,
+    heightFactor: 1.0,
   ),
   _TarotSlotSpec(
     'A 흐름',
-    0.24,
-    0.58,
+    0.22,
+    0.64,
     slotId: 'choice_a_mid',
     labelAnchor: _TarotSlotAnchor.right,
-    widthFactor: 0.94,
-    heightFactor: 0.94,
+    widthFactor: 1.0,
+    heightFactor: 1.0,
   ),
   _TarotSlotSpec(
     'B 흐름',
-    0.76,
-    0.58,
+    0.78,
+    0.64,
     slotId: 'choice_b_mid',
     labelAnchor: _TarotSlotAnchor.left,
-    widthFactor: 0.94,
-    heightFactor: 0.94,
+    widthFactor: 1.0,
+    heightFactor: 1.0,
   ),
   _TarotSlotSpec(
     '중심 조언',
     0.50,
-    0.86,
+    0.92,
     slotId: 'choice_advice',
     zIndex: 2,
     labelAnchor: _TarotSlotAnchor.top,
-    widthFactor: 0.94,
-    heightFactor: 0.94,
+    widthFactor: 1.0,
+    heightFactor: 1.0,
   ),
 ];
 

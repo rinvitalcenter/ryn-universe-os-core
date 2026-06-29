@@ -2319,6 +2319,197 @@ void main() {
     },
   );
 
+  testWidgets(
+    'Tarot remaining owner-polish spreads keep readable default geometry',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1920, 1080);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      Future<void> mountAtSpreadStep() async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: TarotSpreadShell(key: UniqueKey(), onBack: () {}),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('다음'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('다음'));
+        await tester.pumpAndSettle();
+      }
+
+      Future<void> selectSpreadAndAutoDraw(String label) async {
+        await tester.ensureVisible(find.text(label).first);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(label).first);
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(find.text('다음'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('다음'));
+        await tester.pumpAndSettle();
+        await tester.ensureVisible(find.text(UserText.tarotAutoDraw));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(UserText.tarotAutoDraw));
+        await tester.pumpAndSettle();
+      }
+
+      bool overlaps(Rect a, Rect b) =>
+          a.left < b.right &&
+          a.right > b.left &&
+          a.top < b.bottom &&
+          a.bottom > b.top;
+
+      double horizontalGap(Rect a, Rect b) {
+        if (a.right <= b.left) return b.left - a.right;
+        if (b.right <= a.left) return a.left - b.right;
+        return 0;
+      }
+
+      double verticalGap(Rect a, Rect b) {
+        if (a.bottom <= b.top) return b.top - a.bottom;
+        if (b.bottom <= a.top) return a.top - b.bottom;
+        return 0;
+      }
+
+      void expectPolishedGeometry({
+        required String spreadId,
+        required String label,
+        required int count,
+        required double minCardWidth,
+        required double minSeparation,
+      }) {
+        final board = tester.getRect(
+          find.byKey(Key('tarot-fixed-spread-board-$spreadId')),
+        );
+        final cardRects = [
+          for (var index = 0; index < count; index++)
+            tester.getRect(
+              find.byKey(Key('tarot-fixed-card-visual-$spreadId-$index')),
+            ),
+        ];
+        expect(cardRects, hasLength(count), reason: spreadId);
+        for (final rect in cardRects) {
+          expect(
+            rect.width,
+            greaterThanOrEqualTo(minCardWidth),
+            reason: '$spreadId readable card width',
+          );
+          expect(
+            rect.left,
+            greaterThanOrEqualTo(board.left + 8),
+            reason: '$spreadId inside left',
+          );
+          expect(
+            rect.right,
+            lessThanOrEqualTo(board.right - 8),
+            reason: '$spreadId inside right',
+          );
+          expect(
+            rect.top,
+            greaterThanOrEqualTo(board.top + 8),
+            reason: '$spreadId inside top',
+          );
+          expect(
+            rect.bottom,
+            lessThanOrEqualTo(board.bottom - 8),
+            reason: '$spreadId inside bottom',
+          );
+        }
+        for (var a = 0; a < cardRects.length; a++) {
+          for (var b = a + 1; b < cardRects.length; b++) {
+            expect(
+              overlaps(cardRects[a], cardRects[b]),
+              isFalse,
+              reason: '$spreadId accidental overlap $a:$b',
+            );
+            expect(
+              math.max(
+                horizontalGap(cardRects[a], cardRects[b]),
+                verticalGap(cardRects[a], cardRects[b]),
+              ),
+              greaterThanOrEqualTo(minSeparation),
+              reason: '$spreadId near-overlap $a:$b',
+            );
+          }
+        }
+        expect(
+          find.byKey(const Key('tarot-layout-adjustment-toolbar')),
+          findsOneWidget,
+          reason: label,
+        );
+        expect(
+          find.byKey(const Key('tarot-reading-back-command')),
+          findsOneWidget,
+          reason: label,
+        );
+        expect(tester.takeException(), isNull, reason: spreadId);
+      }
+
+      for (final spread
+          in <
+            ({
+              String id,
+              String label,
+              int count,
+              double minWidth,
+              double minSeparation,
+            })
+          >[
+            (
+              id: 'seven_card',
+              label: '7카드',
+              count: 7,
+              minWidth: 168,
+              minSeparation: 16,
+            ),
+            (
+              id: 'binary_choice',
+              label: UserText.tarotSpreadBinary,
+              count: 5,
+              minWidth: 152,
+              minSeparation: 16,
+            ),
+            (
+              id: 'horseshoe',
+              label: '말발굽',
+              count: 5,
+              minWidth: 154,
+              minSeparation: 16,
+            ),
+            (
+              id: 'horoscope',
+              label: '호로스코프',
+              count: 13,
+              minWidth: 112,
+              minSeparation: 4,
+            ),
+            (
+              id: 'year_ahead',
+              label: '1년 운세',
+              count: 13,
+              minWidth: 112,
+              minSeparation: 4,
+            ),
+          ]) {
+        await mountAtSpreadStep();
+        await selectSpreadAndAutoDraw(spread.label);
+        expectPolishedGeometry(
+          spreadId: spread.id,
+          label: spread.label,
+          count: spread.count,
+          minCardWidth: spread.minWidth,
+          minSeparation: spread.minSeparation,
+        );
+      }
+    },
+  );
+
   testWidgets('Tarot all 22 spreads render from manual geometry blueprints', (
     WidgetTester tester,
   ) async {
