@@ -2986,6 +2986,7 @@ class _TarotInterpretationShell extends StatelessWidget {
         ],
       ),
       child: Column(
+        key: const Key('tarot-interpretation-workspace-shell'),
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -3009,7 +3010,7 @@ class _TarotInterpretationShell extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '카드를 펼친 뒤 이름, 자리, 방향을 확인하며 자신의 해석을 정리하세요.',
+            '카드 이미지와 자리 정보를 나란히 보며 오늘의 해석 흐름을 정리하세요.',
             style: TextStyle(
               color: RynPalette.tarotLavender,
               fontSize: 12,
@@ -3018,21 +3019,118 @@ class _TarotInterpretationShell extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Wrap(
-            key: const Key('tarot-interpretation-static-future-shell'),
-            spacing: 8,
-            runSpacing: 8,
-            children: const [
-              _TarotFutureShellBadge('카드 요약'),
-              _TarotFutureShellBadge('자리 의미'),
-              _TarotFutureShellBadge('개인 해석 메모'),
-              _TarotFutureShellBadge('카드 의미·상징 연구'),
-              _TarotFutureShellBadge('AI/붙여넣기 영역 예정'),
-            ],
+          const _TarotInterpretationScopeBanner(),
+          const SizedBox(height: 14),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth >= 820;
+              final cardRail = _TarotInterpretationCardRail(
+                slots: slots,
+                drawnCards: drawnCards,
+                revealedIndexes: revealedIndexes,
+              );
+              final notesPanel = const _TarotInterpretationNotesPanel();
+              final synthesisPanel = const _TarotInterpretationSynthesisPanel();
+              if (!wide) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    cardRail,
+                    const SizedBox(height: 12),
+                    notesPanel,
+                    const SizedBox(height: 12),
+                    synthesisPanel,
+                  ],
+                );
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(flex: 5, child: cardRail),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    flex: 4,
+                    child: Column(
+                      children: [
+                        notesPanel,
+                        const SizedBox(height: 12),
+                        synthesisPanel,
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotInterpretationScopeBanner extends StatelessWidget {
+  const _TarotInterpretationScopeBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('tarot-interpretation-scope-banner'),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: RynPalette.tarotGold.withValues(alpha: 0.18)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.visibility_rounded, size: 16, color: RynPalette.tarotGold),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              '현재 화면에서 카드별 관찰과 전체 흐름만 정리합니다.',
+              style: TextStyle(
+                color: RynPalette.tarotLavender,
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                height: 1.3,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotInterpretationCardRail extends StatelessWidget {
+  const _TarotInterpretationCardRail({
+    required this.slots,
+    required this.drawnCards,
+    required this.revealedIndexes,
+  });
+
+  final List<_TarotSlotSpec> slots;
+  final List<_DrawnTarotCard> drawnCards;
+  final Set<int> revealedIndexes;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('tarot-interpretation-card-rail'),
+      padding: const EdgeInsets.all(12),
+      decoration: _tarotInterpretationPanelDecoration(context),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _TarotInterpretationPanelTitle(
+            icon: Icons.style_rounded,
+            title: '카드별 해석',
+            subtitle: '자리 · 카드 · 방향을 한눈에 확인',
           ),
           const SizedBox(height: 12),
           for (var index = 0; index < drawnCards.length; index++) ...[
-            _TarotReflectionLine(
+            _TarotInterpretationCardPreview(
+              index: index,
               label: index < slots.length
                   ? slots[index].label
                   : '${index + 1}번',
@@ -3047,39 +3145,15 @@ class _TarotInterpretationShell extends StatelessWidget {
   }
 }
 
-class _TarotFutureShellBadge extends StatelessWidget {
-  const _TarotFutureShellBadge(this.label);
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.16),
-        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: RynPalette.tarotLavender,
-          fontSize: 11,
-          fontWeight: FontWeight.w900,
-        ),
-      ),
-    );
-  }
-}
-
-class _TarotReflectionLine extends StatelessWidget {
-  const _TarotReflectionLine({
+class _TarotInterpretationCardPreview extends StatelessWidget {
+  const _TarotInterpretationCardPreview({
+    required this.index,
     required this.label,
     required this.card,
     required this.revealed,
   });
 
+  final int index;
   final String label;
   final _DrawnTarotCard card;
   final bool revealed;
@@ -3090,41 +3164,232 @@ class _TarotReflectionLine extends StatelessWidget {
         ? UserText.tarotReversed
         : UserText.tarotUpright;
     return Container(
+      key: Key('tarot-interpretation-card-preview-$index'),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: RynPalette.tarotGold,
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-            ),
+          SizedBox(
+            width: 52,
+            height: 84,
+            child: revealed
+                ? _TarotRevealReadyFrame(
+                    child: AnimatedRotation(
+                      turns: card.reversed ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 180),
+                      curve: Curves.easeOutCubic,
+                      child: Image.asset(
+                        card.card.imagePath,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  )
+                : _TarotFullSlotCardBack(),
           ),
-          const SizedBox(height: 4),
-          Text(
-            revealed ? '${card.card.label} · $direction' : '아직 펼치기 전',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              color: revealed ? Colors.white : RynPalette.tarotLavender,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              height: 1.3,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: RynPalette.tarotGold,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  revealed ? card.card.label : '아직 펼치기 전',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  revealed ? direction : '결과 보드에서 먼저 공개하세요',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: RynPalette.tarotLavender,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    height: 1.3,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
+}
+
+class _TarotInterpretationNotesPanel extends StatelessWidget {
+  const _TarotInterpretationNotesPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('tarot-interpretation-notes-panel'),
+      padding: const EdgeInsets.all(12),
+      decoration: _tarotInterpretationPanelDecoration(context),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _TarotInterpretationPanelTitle(
+            icon: Icons.edit_note_rounded,
+            title: '리딩 노트',
+            subtitle: '질문 · 인상 · 몸의 반응을 차분히 정리',
+          ),
+          SizedBox(height: 12),
+          _TarotVisualNoteLine('질문에서 가장 중요한 단어'),
+          SizedBox(height: 8),
+          _TarotVisualNoteLine('카드가 먼저 말하는 분위기'),
+          SizedBox(height: 8),
+          _TarotVisualNoteLine('상담에서 확인할 다음 문장'),
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotInterpretationSynthesisPanel extends StatelessWidget {
+  const _TarotInterpretationSynthesisPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('tarot-interpretation-synthesis-panel'),
+      padding: const EdgeInsets.all(12),
+      decoration: _tarotInterpretationPanelDecoration(context),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _TarotInterpretationPanelTitle(
+            icon: Icons.account_tree_rounded,
+            title: '전체 흐름',
+            subtitle: '시작점 · 전환점 · 다음 행동을 분리',
+          ),
+          SizedBox(height: 12),
+          _TarotVisualNoteLine('첫 인상'),
+          SizedBox(height: 8),
+          _TarotVisualNoteLine('긴장과 전환'),
+          SizedBox(height: 8),
+          _TarotVisualNoteLine('오늘의 작은 실천'),
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotInterpretationPanelTitle extends StatelessWidget {
+  const _TarotInterpretationPanelTitle({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 18, color: RynPalette.tarotGold),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: TextStyle(
+                  color: RynPalette.tarotLavender,
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  height: 1.25,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TarotVisualNoteLine extends StatelessWidget {
+  const _TarotVisualNoteLine(this.label);
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.055),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              color: RynPalette.tarotGold.withValues(alpha: 0.86),
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.82),
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+BoxDecoration _tarotInterpretationPanelDecoration(BuildContext context) {
+  return BoxDecoration(
+    color: Colors.black.withValues(alpha: 0.16),
+    borderRadius: BorderRadius.circular(22),
+    border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
+  );
 }
 
 class _TarotDeckChoiceSection extends StatefulWidget {

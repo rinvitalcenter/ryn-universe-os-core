@@ -713,8 +713,36 @@ void main() {
         find.byKey(const Key('tarot-interpretation-shell')),
         findsOneWidget,
       );
+      expect(
+        find.byKey(const Key('tarot-interpretation-workspace-shell')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-interpretation-card-rail')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-interpretation-notes-panel')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-interpretation-synthesis-panel')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-interpretation-scope-banner')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-interpretation-card-preview-0')),
+        findsOneWidget,
+      );
       expect(find.text('해석 패널'), findsAtLeastNWidgets(1));
       expect(find.text('핵심'), findsAtLeastNWidgets(1));
+      expect(find.textContaining('저장', findRichText: true), findsNothing);
+      expect(find.textContaining('export', findRichText: true), findsNothing);
+      expect(find.textContaining('PDF', findRichText: true), findsNothing);
+      expect(find.textContaining('AI', findRichText: true), findsNothing);
       expect(tester.takeException(), isNull);
     },
   );
