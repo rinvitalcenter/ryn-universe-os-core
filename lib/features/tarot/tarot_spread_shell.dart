@@ -125,6 +125,90 @@ enum _TarotFlowStage { setup, draw, result, interpretation }
 
 enum _TarotDirectionMode { uprightOnly, auto }
 
+class _TarotTableClothDefinition {
+  const _TarotTableClothDefinition({
+    required this.id,
+    required this.label,
+    required this.intent,
+    required this.primary,
+    required this.secondary,
+    required this.shadow,
+  });
+
+  final String id;
+  final String label;
+  final String intent;
+  final Color primary;
+  final Color secondary;
+  final Color shadow;
+}
+
+const _tarotTableClothDefinitions = [
+  _TarotTableClothDefinition(
+    id: 'deep_purple',
+    label: '딥 퍼플',
+    intent: '직관 · 영성 · 내면',
+    primary: Color(0xFF4B267A),
+    secondary: Color(0xFF1F1644),
+    shadow: Color(0xFF8F6BE8),
+  ),
+  _TarotTableClothDefinition(
+    id: 'deep_green',
+    label: '딥 그린',
+    intent: '재물 · 성장 · 회복',
+    primary: Color(0xFF1F5F46),
+    secondary: Color(0xFF0E2F28),
+    shadow: Color(0xFF71D6A0),
+  ),
+  _TarotTableClothDefinition(
+    id: 'rose_wine',
+    label: '로즈 와인',
+    intent: '연애 · 관계 · 감정',
+    primary: Color(0xFF7D2E50),
+    secondary: Color(0xFF35182B),
+    shadow: Color(0xFFE88AAE),
+  ),
+  _TarotTableClothDefinition(
+    id: 'midnight_navy',
+    label: '미드나잇 네이비',
+    intent: '진로 · 선택 · 장기 방향',
+    primary: Color(0xFF1B3D70),
+    secondary: Color(0xFF101B36),
+    shadow: Color(0xFF7AA7E8),
+  ),
+  _TarotTableClothDefinition(
+    id: 'charcoal_black',
+    label: '차콜 블랙',
+    intent: '보호 · 정화 · 냉정한 판단',
+    primary: Color(0xFF34363D),
+    secondary: Color(0xFF12141A),
+    shadow: Color(0xFFB9BDC8),
+  ),
+  _TarotTableClothDefinition(
+    id: 'muted_gold',
+    label: '뮤티드 골드',
+    intent: '성취 · 기회 · 자신감',
+    primary: Color(0xFFB88B3B),
+    secondary: Color(0xFF7A5426),
+    shadow: Color(0xFFF6CF77),
+  ),
+];
+
+bool _isMutedGoldCloth(_TarotTableClothDefinition cloth) =>
+    cloth.id == 'muted_gold';
+
+Color _tarotClothTableBase(_TarotTableClothDefinition cloth) =>
+    _isMutedGoldCloth(cloth) ? const Color(0xFF302313) : RynPalette.tarotNavy;
+
+Color _tarotClothTableEdge(_TarotTableClothDefinition cloth) =>
+    _isMutedGoldCloth(cloth) ? const Color(0xFF6A4821) : cloth.secondary;
+
+double _tarotClothPrimaryAlpha(_TarotTableClothDefinition cloth) =>
+    _isMutedGoldCloth(cloth) ? 0.52 : 0.38;
+
+double _tarotClothShadowAlpha(_TarotTableClothDefinition cloth) =>
+    _isMutedGoldCloth(cloth) ? 0.16 : 0.08;
+
 class _TarotUiText {
   const _TarotUiText._();
 
@@ -598,6 +682,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
 
   String _selectedDeckId = 'rws_public_domain';
   String _selectedCardBackId = 'cosmic_gate';
+  String _selectedTableClothId = 'deep_purple';
   String _selectedSpread = UserText.tarotSpreadThree;
   int _selectedFreeDrawCount = 5;
   _TarotDirectionMode _directionMode = _TarotDirectionMode.auto;
@@ -628,6 +713,12 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
       _cardBackDefinitions.firstWhere(
         (cardBack) => cardBack.id == _selectedCardBackId,
         orElse: () => _cardBackDefinitions.first,
+      );
+
+  _TarotTableClothDefinition get _selectedTableCloth =>
+      _tarotTableClothDefinitions.firstWhere(
+        (cloth) => cloth.id == _selectedTableClothId,
+        orElse: () => _tarotTableClothDefinitions.first,
       );
 
   _TarotSpreadDefinition get _selectedSpreadDefinition =>
@@ -896,6 +987,11 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     setState(() => _selectedCardBackId = cardBackId);
   }
 
+  void _selectTableCloth(String clothId) {
+    if (_selectedTableClothId == clothId) return;
+    setState(() => _selectedTableClothId = clothId);
+  }
+
   @override
   Widget build(BuildContext context) {
     final immersive = _stage != _TarotFlowStage.setup;
@@ -908,6 +1004,9 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         selectedCardBackId: _selectedCardBackId,
         selectedCardBack: _selectedCardBack,
         onCardBackSelected: _selectCardBack,
+        tableCloths: _tarotTableClothDefinitions,
+        selectedTableClothId: _selectedTableClothId,
+        onTableClothSelected: _selectTableCloth,
         freeSpreads: _freeSpreadDefinitions,
         fixedSpreads: _fixedSpreadDefinitions,
         selectedSpread: _selectedSpread,
@@ -940,6 +1039,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         onShowResult: _showResult,
         onReset: _resetDraw,
         cardBack: _selectedCardBack,
+        tableCloth: _selectedTableCloth,
       ),
       _TarotFlowStage.result => _TarotResultStage(
         spreadDefinition: _selectedSpreadDefinition,
@@ -956,12 +1056,14 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         onDirectionToggle: _toggleDrawnDirection,
         cardBack: _selectedCardBack,
         deckLabel: _selectedDeck.label,
+        tableCloth: _selectedTableCloth,
       ),
       _TarotFlowStage.interpretation => _TarotInterpretationStage(
         spreadLabel: _selectedSpread,
         slots: _slots,
         drawnCards: _drawnCards,
         revealedIndexes: _revealedResultIndexes,
+        tableCloth: _selectedTableCloth,
         onBackToResult: () => setState(() => _stage = _TarotFlowStage.result),
         onReset: _resetDraw,
       ),
@@ -1178,6 +1280,9 @@ class _TarotSetupStage extends StatefulWidget {
     required this.selectedCardBackId,
     required this.selectedCardBack,
     required this.onCardBackSelected,
+    required this.tableCloths,
+    required this.selectedTableClothId,
+    required this.onTableClothSelected,
     required this.freeSpreads,
     required this.fixedSpreads,
     required this.selectedSpread,
@@ -1204,6 +1309,9 @@ class _TarotSetupStage extends StatefulWidget {
   final String selectedCardBackId;
   final _TarotCardBackDefinition selectedCardBack;
   final ValueChanged<String> onCardBackSelected;
+  final List<_TarotTableClothDefinition> tableCloths;
+  final String selectedTableClothId;
+  final ValueChanged<String> onTableClothSelected;
   final List<_TarotSpreadDefinition> freeSpreads;
   final List<_TarotSpreadDefinition> fixedSpreads;
   final String selectedSpread;
@@ -1254,6 +1362,9 @@ class _TarotSetupStageState extends State<_TarotSetupStage> {
         cardBacks: widget.cardBacks,
         selectedCardBackId: widget.selectedCardBackId,
         onCardBackSelected: widget.onCardBackSelected,
+        tableCloths: widget.tableCloths,
+        selectedTableClothId: widget.selectedTableClothId,
+        onTableClothSelected: widget.onTableClothSelected,
         freeSpreads: widget.freeSpreads,
         fixedSpreads: widget.fixedSpreads,
         selectedSpread: widget.selectedSpread,
@@ -1571,6 +1682,9 @@ class _TarotCardDetailSetupLayout extends StatelessWidget {
     required this.cardBacks,
     required this.selectedCardBackId,
     required this.onCardBackSelected,
+    required this.tableCloths,
+    required this.selectedTableClothId,
+    required this.onTableClothSelected,
     required this.freeSpreads,
     required this.fixedSpreads,
     required this.selectedSpread,
@@ -1587,6 +1701,9 @@ class _TarotCardDetailSetupLayout extends StatelessWidget {
   final List<_TarotCardBackDefinition> cardBacks;
   final String selectedCardBackId;
   final ValueChanged<String> onCardBackSelected;
+  final List<_TarotTableClothDefinition> tableCloths;
+  final String selectedTableClothId;
+  final ValueChanged<String> onTableClothSelected;
   final List<_TarotSpreadDefinition> freeSpreads;
   final List<_TarotSpreadDefinition> fixedSpreads;
   final String selectedSpread;
@@ -1611,6 +1728,12 @@ class _TarotCardDetailSetupLayout extends StatelessWidget {
               cardBacks: cardBacks,
               selectedCardBackId: selectedCardBackId,
               onSelected: onCardBackSelected,
+            ),
+            const SizedBox(height: 14),
+            _TarotTableClothChoiceSection(
+              cloths: tableCloths,
+              selectedClothId: selectedTableClothId,
+              onSelected: onTableClothSelected,
             ),
             const SizedBox(height: 14),
             _TarotDirectionChoiceSection(
@@ -2164,6 +2287,7 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
     required this.onShowResult,
     required this.onReset,
     required this.cardBack,
+    required this.tableCloth,
   });
 
   final _TarotDeckDefinition deck;
@@ -2179,6 +2303,7 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
   final VoidCallback onShowResult;
   final VoidCallback onReset;
   final _TarotCardBackDefinition cardBack;
+  final _TarotTableClothDefinition tableCloth;
 
   @override
   Widget build(BuildContext context) {
@@ -2186,16 +2311,21 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
     final remainingToSelect = math.max(0, targetCount - selectedCount);
     final guideText = canReveal ? '카드를 모두 선택했습니다' : '$targetCount장을 골라주세요';
     return Container(
+      key: Key('tarot-draw-table-cloth-${tableCloth.id}'),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        gradient: const RadialGradient(
-          center: Alignment(0, -0.62),
+        gradient: RadialGradient(
+          center: const Alignment(0, -0.62),
           radius: 1.22,
           colors: [
-            Color(0x66312275),
-            Color(0x1FD9BC7A),
-            RynPalette.tarotNavy,
-            RynPalette.tarotMidnight,
+            tableCloth.primary.withValues(
+              alpha: _tarotClothPrimaryAlpha(tableCloth) + 0.02,
+            ),
+            tableCloth.shadow.withValues(
+              alpha: _tarotClothShadowAlpha(tableCloth),
+            ),
+            _tarotClothTableBase(tableCloth),
+            _tarotClothTableEdge(tableCloth),
           ],
         ),
         borderRadius: BorderRadius.circular(34),
@@ -2289,6 +2419,7 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
                 targetReached: canReveal,
                 onSelected: onSelected,
                 cardBack: cardBack,
+                tableCloth: tableCloth,
               ),
             ],
           ),
@@ -2306,6 +2437,7 @@ class _TarotFullDeckBoard extends StatefulWidget {
     required this.targetReached,
     required this.onSelected,
     required this.cardBack,
+    required this.tableCloth,
   });
 
   final List<_TarotCardDefinition> cards;
@@ -2314,6 +2446,7 @@ class _TarotFullDeckBoard extends StatefulWidget {
   final bool targetReached;
   final ValueChanged<int> onSelected;
   final _TarotCardBackDefinition cardBack;
+  final _TarotTableClothDefinition tableCloth;
 
   @override
   State<_TarotFullDeckBoard> createState() => _TarotFullDeckBoardState();
@@ -2334,10 +2467,18 @@ class _TarotFullDeckBoardState extends State<_TarotFullDeckBoard> {
       height: 720,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF070A18), Color(0xFF111735), Color(0xFF201747)],
+          colors: [
+            _isMutedGoldCloth(widget.tableCloth)
+                ? const Color(0xFF1D160C)
+                : const Color(0xFF070A18),
+            _tarotClothTableEdge(widget.tableCloth),
+            widget.tableCloth.primary.withValues(
+              alpha: _isMutedGoldCloth(widget.tableCloth) ? 0.82 : 0.72,
+            ),
+          ],
         ),
         borderRadius: BorderRadius.circular(34),
         border: Border.all(color: RynPalette.tarotGold.withValues(alpha: 0.16)),
@@ -2398,8 +2539,16 @@ class _TarotFullDeckBoardState extends State<_TarotFullDeckBoard> {
                           center: const Alignment(0, -0.1),
                           radius: 0.98,
                           colors: [
-                            RynPalette.tarotLavender.withValues(alpha: 0.16),
-                            RynPalette.lavenderStrong.withValues(alpha: 0.075),
+                            widget.tableCloth.shadow.withValues(
+                              alpha: _isMutedGoldCloth(widget.tableCloth)
+                                  ? 0.22
+                                  : 0.16,
+                            ),
+                            widget.tableCloth.primary.withValues(
+                              alpha: _isMutedGoldCloth(widget.tableCloth)
+                                  ? 0.12
+                                  : 0.075,
+                            ),
                             Colors.transparent,
                           ],
                         ),
@@ -2680,6 +2829,7 @@ class _TarotResultStage extends StatelessWidget {
     required this.onDirectionToggle,
     required this.cardBack,
     required this.deckLabel,
+    required this.tableCloth,
   });
 
   final _TarotSpreadDefinition spreadDefinition;
@@ -2696,69 +2846,78 @@ class _TarotResultStage extends StatelessWidget {
   final ValueChanged<int> onDirectionToggle;
   final _TarotCardBackDefinition cardBack;
   final String deckLabel;
+  final _TarotTableClothDefinition tableCloth;
 
   @override
   Widget build(BuildContext context) {
     final allRevealed = revealedIndexes.length >= drawnCards.length;
-    return Container(
+    return KeyedSubtree(
       key: const Key('tarot-reading-workspace'),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        gradient: const RadialGradient(
-          center: Alignment(0, -0.58),
-          radius: 1.18,
-          colors: [
-            Color(0x66312275),
-            Color(0x22151B3C),
-            RynPalette.tarotNavy,
-            RynPalette.tarotMidnight,
-          ],
-        ),
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.095)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x99000000),
-            blurRadius: 34,
-            offset: Offset(0, 18),
-          ),
-        ],
-      ),
-      child: Stack(
-        children: [
-          const Positioned.fill(child: _TarotCosmicParticles()),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _TarotReadingCommandBar(
-                spreadLabel: spreadLabel,
-                allRevealed: allRevealed,
-                onReset: onReset,
-                onBack: onBack,
-                onRevealAll: onRevealAll,
-                onInterpret: onInterpret,
+      child: Container(
+        key: Key('tarot-result-table-cloth-${tableCloth.id}'),
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            center: const Alignment(0, -0.58),
+            radius: 1.18,
+            colors: [
+              tableCloth.primary.withValues(
+                alpha: _tarotClothPrimaryAlpha(tableCloth),
               ),
-              const SizedBox(height: 8),
-              Expanded(
-                child: _TarotSpreadCanvas(
-                  spreadDefinition: spreadDefinition,
-                  spreadLabel: spreadLabel,
-                  slots: slots,
-                  drawnCards: drawnCards,
-                  revealedIndexes: revealedIndexes,
-                  revealFxIndexes: revealFxIndexes,
-                  onRevealCard: onRevealCard,
-                  onDirectionToggle: onDirectionToggle,
-                  showEmptySlots: false,
-                  fillAvailable: true,
-                  onEmptySlotTap: () {},
-                  cardBack: cardBack,
-                  deckLabel: deckLabel,
-                ),
+              tableCloth.shadow.withValues(
+                alpha: _tarotClothShadowAlpha(tableCloth),
               ),
+              _tarotClothTableBase(tableCloth),
+              _tarotClothTableEdge(tableCloth),
             ],
           ),
-        ],
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.095)),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x99000000),
+              blurRadius: 34,
+              offset: Offset(0, 18),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            const Positioned.fill(child: _TarotCosmicParticles()),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _TarotReadingCommandBar(
+                  spreadLabel: spreadLabel,
+                  allRevealed: allRevealed,
+                  onReset: onReset,
+                  onBack: onBack,
+                  onRevealAll: onRevealAll,
+                  onInterpret: onInterpret,
+                ),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: _TarotSpreadCanvas(
+                    spreadDefinition: spreadDefinition,
+                    spreadLabel: spreadLabel,
+                    slots: slots,
+                    drawnCards: drawnCards,
+                    revealedIndexes: revealedIndexes,
+                    revealFxIndexes: revealFxIndexes,
+                    onRevealCard: onRevealCard,
+                    onDirectionToggle: onDirectionToggle,
+                    showEmptySlots: false,
+                    fillAvailable: true,
+                    onEmptySlotTap: () {},
+                    cardBack: cardBack,
+                    deckLabel: deckLabel,
+                    tableCloth: tableCloth,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -2845,6 +3004,7 @@ class _TarotInterpretationStage extends StatelessWidget {
     required this.slots,
     required this.drawnCards,
     required this.revealedIndexes,
+    required this.tableCloth,
     required this.onBackToResult,
     required this.onReset,
   });
@@ -2853,23 +3013,28 @@ class _TarotInterpretationStage extends StatelessWidget {
   final List<_TarotSlotSpec> slots;
   final List<_DrawnTarotCard> drawnCards;
   final Set<int> revealedIndexes;
+  final _TarotTableClothDefinition tableCloth;
   final VoidCallback onBackToResult;
   final VoidCallback onReset;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      key: const Key('tarot-interpretation-stage'),
+      key: Key('tarot-interpretation-table-cloth-${tableCloth.id}'),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const RadialGradient(
-          center: Alignment(0, -0.72),
+        gradient: RadialGradient(
+          center: const Alignment(0, -0.72),
           radius: 1.18,
           colors: [
-            Color(0x66312275),
-            Color(0x22151B3C),
-            RynPalette.tarotNavy,
-            RynPalette.tarotMidnight,
+            tableCloth.primary.withValues(
+              alpha: _tarotClothPrimaryAlpha(tableCloth),
+            ),
+            tableCloth.shadow.withValues(
+              alpha: _tarotClothShadowAlpha(tableCloth),
+            ),
+            _tarotClothTableBase(tableCloth),
+            _tarotClothTableEdge(tableCloth),
           ],
         ),
         borderRadius: BorderRadius.circular(34),
@@ -2940,6 +3105,7 @@ class _TarotInterpretationStage extends StatelessWidget {
                 slots: slots,
                 drawnCards: drawnCards,
                 revealedIndexes: revealedIndexes,
+                tableCloth: tableCloth,
               ),
             ],
           ),
@@ -2954,11 +3120,13 @@ class _TarotInterpretationShell extends StatelessWidget {
     required this.slots,
     required this.drawnCards,
     required this.revealedIndexes,
+    required this.tableCloth,
   });
 
   final List<_TarotSlotSpec> slots;
   final List<_DrawnTarotCard> drawnCards;
   final Set<int> revealedIndexes;
+  final _TarotTableClothDefinition tableCloth;
 
   @override
   Widget build(BuildContext context) {
@@ -2971,8 +3139,12 @@ class _TarotInterpretationShell extends StatelessWidget {
           end: Alignment.bottomRight,
           colors: [
             Colors.white.withValues(alpha: 0.08),
-            RynPalette.tarotViolet.withValues(alpha: 0.24),
-            RynPalette.tarotMidnight.withValues(alpha: 0.34),
+            tableCloth.primary.withValues(
+              alpha: _isMutedGoldCloth(tableCloth) ? 0.34 : 0.22,
+            ),
+            _tarotClothTableEdge(
+              tableCloth,
+            ).withValues(alpha: _isMutedGoldCloth(tableCloth) ? 0.46 : 0.36),
           ],
         ),
         borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
@@ -4152,6 +4324,185 @@ class _TarotCardBackOption extends StatelessWidget {
   }
 }
 
+class _TarotTableClothChoiceSection extends StatelessWidget {
+  const _TarotTableClothChoiceSection({
+    required this.cloths,
+    required this.selectedClothId,
+    required this.onSelected,
+  });
+
+  final List<_TarotTableClothDefinition> cloths;
+  final String selectedClothId;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('tarot-table-cloth-selector'),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: RynPalette.surfaceElevated(context),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
+        border: Border.all(color: RynPalette.line(context)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.texture_rounded,
+                size: 18,
+                color: RynPalette.accent(context),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '리딩 천 색상',
+                style: TextStyle(
+                  color: RynPalette.text(context),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '질문 분위기에 맞춰 테이블의 색감을 은은하게 바꿉니다.',
+            style: TextStyle(
+              color: RynPalette.subtext(context),
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              height: 1.35,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final cloth in cloths)
+                _TarotTableClothOption(
+                  cloth: cloth,
+                  selected: cloth.id == selectedClothId,
+                  onTap: () => onSelected(cloth.id),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotTableClothOption extends StatelessWidget {
+  const _TarotTableClothOption({
+    required this.cloth,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final _TarotTableClothDefinition cloth;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      key: selected ? Key('tarot-selected-table-cloth-${cloth.id}') : null,
+      duration: const Duration(milliseconds: 180),
+      width: 172,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            cloth.primary.withValues(alpha: selected ? 0.42 : 0.26),
+            cloth.secondary.withValues(alpha: selected ? 0.74 : 0.52),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: selected
+              ? RynPalette.tarotGold.withValues(alpha: 0.82)
+              : Colors.white.withValues(alpha: 0.10),
+          width: selected ? 1.4 : 1,
+        ),
+        boxShadow: selected
+            ? [
+                BoxShadow(
+                  color: cloth.shadow.withValues(alpha: 0.18),
+                  blurRadius: 22,
+                  offset: const Offset(0, 10),
+                ),
+              ]
+            : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          key: Key('tarot-table-cloth-${cloth.id}'),
+          borderRadius: BorderRadius.circular(18),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: Row(
+              children: [
+                Container(
+                  width: 28,
+                  height: 28,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        cloth.shadow.withValues(alpha: 0.82),
+                        cloth.primary,
+                      ],
+                    ),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.22),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 9),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        cloth.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        cloth.intent,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.72),
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _TarotSpreadChoiceSection extends StatelessWidget {
   const _TarotSpreadChoiceSection({
     required this.title,
@@ -4615,6 +4966,7 @@ class _TarotSpreadCanvas extends StatefulWidget {
     required this.onEmptySlotTap,
     required this.cardBack,
     required this.deckLabel,
+    required this.tableCloth,
     this.showEmptySlots = true,
     this.fillAvailable = false,
   });
@@ -4630,6 +4982,7 @@ class _TarotSpreadCanvas extends StatefulWidget {
   final VoidCallback onEmptySlotTap;
   final _TarotCardBackDefinition cardBack;
   final String deckLabel;
+  final _TarotTableClothDefinition tableCloth;
   final bool showEmptySlots;
   final bool fillAvailable;
 
@@ -4981,10 +5334,18 @@ class _TarotSpreadCanvasState extends State<_TarotSpreadCanvas> {
       constraints: widget.fillAvailable ? const BoxConstraints.expand() : null,
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF090D1F), Color(0xFF151B3C), Color(0xFF211747)],
+          colors: [
+            _isMutedGoldCloth(widget.tableCloth)
+                ? const Color(0xFF1E160C)
+                : const Color(0xFF090D1F),
+            _tarotClothTableEdge(widget.tableCloth),
+            widget.tableCloth.primary.withValues(
+              alpha: _isMutedGoldCloth(widget.tableCloth) ? 0.74 : 0.62,
+            ),
+          ],
         ),
         borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
         border: Border.all(color: RynPalette.tarotGold.withValues(alpha: 0.13)),
@@ -5010,8 +5371,12 @@ class _TarotSpreadCanvasState extends State<_TarotSpreadCanvas> {
                   center: const Alignment(0, -0.18),
                   radius: 0.98,
                   colors: [
-                    RynPalette.lavenderStrong.withValues(alpha: 0.14),
-                    const Color(0xFF070A18),
+                    widget.tableCloth.shadow.withValues(
+                      alpha: _isMutedGoldCloth(widget.tableCloth) ? 0.22 : 0.14,
+                    ),
+                    _isMutedGoldCloth(widget.tableCloth)
+                        ? const Color(0xFF20170D)
+                        : const Color(0xFF070A18),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(26),
@@ -5301,6 +5666,14 @@ class _TarotFloatingAdjustmentControls extends StatelessWidget {
   }
 }
 
+const _compactTallTableSpreadIds = <String>{
+  'one_card',
+  'two_card',
+  'three_card',
+  'four_card',
+  'five_card',
+};
+
 double _canvasHeightForDefinition(_TarotSpreadDefinition definition) {
   if (definition.supportsDrag) return 760;
   if (definition.id == 'mini_celtic_cross' || definition.id == 'cross') {
@@ -5315,6 +5688,7 @@ double _canvasHeightForDefinition(_TarotSpreadDefinition definition) {
     return 920;
   }
   if (definition.id == 'seven_card') return 820;
+  if (_compactTallTableSpreadIds.contains(definition.id)) return 820;
   if (definition.id == 'binary_choice') return 860;
   if (definition.id == 'horseshoe') {
     return 840;
@@ -5437,7 +5811,7 @@ _TarotSpreadGeometryBlueprint _blueprintForSpread(
 const _manualSpreadGeometryBlueprints = <String, _TarotSpreadGeometryBlueprint>{
   'one_card': _TarotSpreadGeometryBlueprint(
     layout: _EffectiveSpreadLayout(columns: 1.0, rows: 1.0),
-    preferredCardWidth: 380,
+    preferredCardWidth: 330,
     minimumCardWidth: 260,
     occupancyTarget: 0.90,
   ),
@@ -6744,7 +7118,7 @@ const _tarotSpreadOneSlots = [
   _TarotSlotSpec(
     '핵심',
     0.5,
-    0.46,
+    0.52,
     slotId: 'one_center',
     widthFactor: 1.10,
     heightFactor: 1.10,
@@ -6756,14 +7130,14 @@ const _tarotSpreadTwoSlots = [
   _TarotSlotSpec(
     '왼쪽',
     0.32,
-    0.5,
+    0.52,
     slotId: 'two_left',
     labelAnchor: _TarotSlotAnchor.bottom,
   ),
   _TarotSlotSpec(
     '오른쪽',
     0.68,
-    0.5,
+    0.52,
     slotId: 'two_right',
     labelAnchor: _TarotSlotAnchor.bottom,
   ),
@@ -6773,21 +7147,21 @@ const _tarotSpreadThreeSlots = [
   _TarotSlotSpec(
     '과거',
     0.18,
-    0.5,
+    0.52,
     slotId: 'three_past',
     labelAnchor: _TarotSlotAnchor.bottom,
   ),
   _TarotSlotSpec(
     '현재',
     0.5,
-    0.5,
+    0.52,
     slotId: 'three_present',
     labelAnchor: _TarotSlotAnchor.bottom,
   ),
   _TarotSlotSpec(
     '미래',
     0.82,
-    0.5,
+    0.52,
     slotId: 'three_future',
     labelAnchor: _TarotSlotAnchor.bottom,
   ),
@@ -6797,28 +7171,28 @@ const _tarotSpreadFourSlots = [
   _TarotSlotSpec(
     '기반',
     0.06,
-    0.5,
+    0.52,
     slotId: 'four_1',
     labelAnchor: _TarotSlotAnchor.bottom,
   ),
   _TarotSlotSpec(
     '현재',
     0.35,
-    0.5,
+    0.52,
     slotId: 'four_2',
     labelAnchor: _TarotSlotAnchor.bottom,
   ),
   _TarotSlotSpec(
     '조언',
     0.65,
-    0.5,
+    0.52,
     slotId: 'four_3',
     labelAnchor: _TarotSlotAnchor.bottom,
   ),
   _TarotSlotSpec(
     '흐름',
     0.94,
-    0.5,
+    0.52,
     slotId: 'four_4',
     labelAnchor: _TarotSlotAnchor.bottom,
   ),
@@ -6828,7 +7202,7 @@ const _tarotSpreadFiveSlots = [
   _TarotSlotSpec(
     '1',
     0.10,
-    0.50,
+    0.52,
     slotId: 'five_1',
     labelAnchor: _TarotSlotAnchor.bottom,
     widthFactor: 1.0,
@@ -6837,7 +7211,7 @@ const _tarotSpreadFiveSlots = [
   _TarotSlotSpec(
     '2',
     0.30,
-    0.50,
+    0.52,
     slotId: 'five_2',
     labelAnchor: _TarotSlotAnchor.bottom,
     widthFactor: 1.0,
@@ -6846,7 +7220,7 @@ const _tarotSpreadFiveSlots = [
   _TarotSlotSpec(
     '3',
     0.50,
-    0.50,
+    0.52,
     slotId: 'five_3',
     labelAnchor: _TarotSlotAnchor.bottom,
     widthFactor: 1.0,
@@ -6855,7 +7229,7 @@ const _tarotSpreadFiveSlots = [
   _TarotSlotSpec(
     '4',
     0.70,
-    0.50,
+    0.52,
     slotId: 'five_4',
     labelAnchor: _TarotSlotAnchor.bottom,
     widthFactor: 1.0,
@@ -6864,7 +7238,7 @@ const _tarotSpreadFiveSlots = [
   _TarotSlotSpec(
     '5',
     0.90,
-    0.50,
+    0.52,
     slotId: 'five_5',
     labelAnchor: _TarotSlotAnchor.bottom,
     widthFactor: 1.0,

@@ -707,6 +707,8 @@ void main() {
       );
       expect(revealAllRect.right, lessThanOrEqualTo(1200));
       expect(revealAllRect.left, greaterThanOrEqualTo(0));
+      await tester.ensureVisible(find.text('해석 보기'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('해석 보기'));
       await tester.pumpAndSettle();
       expect(
@@ -746,6 +748,228 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+
+  testWidgets('Tarot table cloth color applies through reading flow', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1920, 1080);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: TarotSpreadShell(key: UniqueKey(), onBack: () {}),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('tarot-table-cloth-selector')), findsOneWidget);
+    for (final label in [
+      '딥 퍼플',
+      '딥 그린',
+      '로즈 와인',
+      '미드나잇 네이비',
+      '차콜 블랙',
+      '뮤티드 골드',
+    ]) {
+      expect(find.text(label), findsOneWidget);
+    }
+
+    await tester.ensureVisible(
+      find.byKey(const Key('tarot-table-cloth-muted_gold')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('tarot-table-cloth-muted_gold')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('tarot-selected-table-cloth-muted_gold')),
+      findsOneWidget,
+    );
+
+    await tester.ensureVisible(find.text('다음'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tarot-shuffle-button')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('tarot-shuffle-button')));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('tarot-draw-table-cloth-muted_gold')),
+      findsOneWidget,
+    );
+
+    await tester.ensureVisible(find.text(UserText.tarotAutoDraw));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(UserText.tarotAutoDraw));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('tarot-result-table-cloth-muted_gold')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('tarot-result-layout-3')), findsOneWidget);
+    expect(
+      find.byKey(const Key('tarot-layout-adjustment-toolbar')),
+      findsOneWidget,
+    );
+    expect(find.text('해석 보기'), findsOneWidget);
+
+    await tester.tap(find.text('모두 펼치기'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('tarot-focusable-result-card-0')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tarot-focus-detail-overlay')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('tarot-focus-close-button')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('해석 보기'));
+    await tester.pumpAndSettle();
+    expect(
+      find.byKey(const Key('tarot-interpretation-table-cloth-muted_gold')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('tarot-interpretation-workspace-shell')),
+      findsOneWidget,
+    );
+    expect(find.textContaining('저장', findRichText: true), findsNothing);
+    expect(find.textContaining('export', findRichText: true), findsNothing);
+    expect(find.textContaining('PDF', findRichText: true), findsNothing);
+    expect(find.textContaining('AI', findRichText: true), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Tarot compact spreads use tall centered muted-gold tables', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1920, 1080);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    Future<({Rect board, Rect card})> renderSpread({
+      required String label,
+      required String spreadId,
+      required int count,
+    }) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: TarotSpreadShell(key: UniqueKey(), onBack: () {}),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(
+        find.byKey(const Key('tarot-table-cloth-muted_gold')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('tarot-table-cloth-muted_gold')));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text(label).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(label).first);
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('tarot-shuffle-button')));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text(UserText.tarotAutoDraw));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.tarotAutoDraw));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('모두 펼치기'));
+      await tester.pumpAndSettle();
+
+      final board = tester.getRect(
+        find.byKey(Key('tarot-result-layout-$count')),
+      );
+      final card = tester.getRect(
+        find.byKey(const Key('tarot-focusable-result-card-0')),
+      );
+      expect(
+        find.byKey(const Key('tarot-result-table-cloth-muted_gold')),
+        findsOneWidget,
+        reason: spreadId,
+      );
+      expect(
+        find.byKey(const Key('tarot-layout-adjustment-toolbar')),
+        findsOneWidget,
+        reason: spreadId,
+      );
+      expect(tester.takeException(), isNull, reason: spreadId);
+      return (board: board, card: card);
+    }
+
+    final seven = await renderSpread(
+      label: '7카드',
+      spreadId: 'seven_card',
+      count: 7,
+    );
+    final compactSpreads =
+        <({String label, String spreadId, int count, double minCardWidth})>[
+          (
+            label: UserText.tarotSpreadOne,
+            spreadId: 'one_card',
+            count: 1,
+            minCardWidth: 360,
+          ),
+          (
+            label: UserText.tarotSpreadThree,
+            spreadId: 'three_card',
+            count: 3,
+            minCardWidth: 270,
+          ),
+          (
+            label: UserText.tarotSpreadFive,
+            spreadId: 'five_card',
+            count: 5,
+            minCardWidth: 210,
+          ),
+        ];
+
+    for (final spread in compactSpreads) {
+      final rendered = await renderSpread(
+        label: spread.label,
+        spreadId: spread.spreadId,
+        count: spread.count,
+      );
+      expect(
+        rendered.board.height,
+        greaterThanOrEqualTo(seven.board.height - 4),
+        reason: '${spread.spreadId} table should align with seven-card height',
+      );
+      expect(
+        rendered.card.width,
+        greaterThanOrEqualTo(spread.minCardWidth),
+        reason: '${spread.spreadId} card size must not be reduced',
+      );
+      final cardCenterRatio =
+          (rendered.card.center.dy - rendered.board.top) /
+          rendered.board.height;
+      expect(
+        cardCenterRatio,
+        inInclusiveRange(0.46, 0.58),
+        reason: '${spread.spreadId} card should sit in the visual middle zone',
+      );
+    }
+  });
 
   testWidgets(
     'Tarot owner review flow exposes step panels and dedicated result layouts',
