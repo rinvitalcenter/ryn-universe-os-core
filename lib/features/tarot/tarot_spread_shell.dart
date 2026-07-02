@@ -5,6 +5,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:newton_particles/newton_particles.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:ryn_universe_os_core/core/text/user_text.dart';
+import 'package:ryn_universe_os_core/features/tarot/data/tarot_deck_registry.dart';
+import 'package:ryn_universe_os_core/features/tarot/models/tarot_card_definition.dart';
+import 'package:ryn_universe_os_core/features/tarot/models/tarot_deck_definition.dart';
 import 'package:ryn_universe_os_core/core/theme/ryn_tokens.dart';
 
 class RynPalette {
@@ -238,26 +241,7 @@ class TarotSpreadShell extends StatefulWidget {
 }
 
 class _TarotSpreadShellState extends State<TarotSpreadShell> {
-  static const _deckDefinitions = [
-    _TarotDeckDefinition(
-      id: 'rws_public_domain',
-      label: UserText.tarotDeckUniversalWaite,
-      cardCount: 78,
-      assetBacked: true,
-      representativeAssetPath:
-          'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_00_Fool.jpg',
-    ),
-    _TarotDeckDefinition(id: 'thoth', label: UserText.tarotDeckThoth),
-    _TarotDeckDefinition(id: 'marseille', label: UserText.tarotDeckMarseille),
-    _TarotDeckDefinition(id: 'manshin_1', label: UserText.tarotDeckManshin1),
-    _TarotDeckDefinition(id: 'manshin_2', label: UserText.tarotDeckManshin2),
-    _TarotDeckDefinition(id: 'oracle', label: UserText.tarotDeckOracle),
-    _TarotDeckDefinition(id: 'lenormand', label: UserText.tarotDeckLenormand),
-    _TarotDeckDefinition(
-      id: 'personal_scan',
-      label: UserText.tarotDeckPersonalScan,
-    ),
-  ];
+  static const _deckDefinitions = TarotDeckRegistry.decks;
 
   static const _cardBackDefinitions = [
     _TarotCardBackDefinition(
@@ -287,398 +271,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
 
   static final _spreadDefinitions = _buildTarotSpreadRegistry();
 
-  static const _rwsCards = [
-    _TarotCardDefinition(
-      'cups_01',
-      'Ace of Cups',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups01.jpg',
-    ),
-    _TarotCardDefinition(
-      'cups_02',
-      '2 of Cups',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups02.jpg',
-    ),
-    _TarotCardDefinition(
-      'cups_03',
-      '3 of Cups',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups03.jpg',
-    ),
-    _TarotCardDefinition(
-      'cups_04',
-      '4 of Cups',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups04.jpg',
-    ),
-    _TarotCardDefinition(
-      'cups_05',
-      '5 of Cups',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups05.jpg',
-    ),
-    _TarotCardDefinition(
-      'cups_06',
-      '6 of Cups',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups06.jpg',
-    ),
-    _TarotCardDefinition(
-      'cups_07',
-      '7 of Cups',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups07.jpg',
-    ),
-    _TarotCardDefinition(
-      'cups_08',
-      '8 of Cups',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups08.jpg',
-    ),
-    _TarotCardDefinition(
-      'cups_09',
-      '9 of Cups',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups09.jpg',
-    ),
-    _TarotCardDefinition(
-      'cups_10',
-      '10 of Cups',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups10.jpg',
-    ),
-    _TarotCardDefinition(
-      'cups_11',
-      'Page of Cups',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups11.jpg',
-    ),
-    _TarotCardDefinition(
-      'cups_12',
-      'Knight of Cups',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups12.jpg',
-    ),
-    _TarotCardDefinition(
-      'cups_13',
-      'Queen of Cups',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups13.jpg',
-    ),
-    _TarotCardDefinition(
-      'cups_14',
-      'King of Cups',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups14.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_00',
-      'The Fool',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_00_Fool.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_01',
-      'The Magician',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_01_Magician.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_02',
-      'The High Priestess',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_02_High_Priestess.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_03',
-      'The Empress',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_03_Empress.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_04',
-      'The Emperor',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_04_Emperor.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_05',
-      'The Hierophant',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_05_Hierophant.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_06',
-      'The Lovers',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_06_Lovers.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_07',
-      'The Chariot',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_07_Chariot.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_08',
-      'Strength',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_08_Strength.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_09',
-      'The Hermit',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_09_Hermit.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_10',
-      'Wheel of Fortune',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_10_Wheel_of_Fortune.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_11',
-      'Justice',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_11_Justice.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_12',
-      'The Hanged Man',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_12_Hanged_Man.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_13',
-      'Death',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_13_Death.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_14',
-      'Temperance',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_14_Temperance.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_15',
-      'The Devil',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_15_Devil.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_16',
-      'The Tower',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_16_Tower.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_17',
-      'The Star',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_17_Star.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_18',
-      'The Moon',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_18_Moon.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_19',
-      'The Sun',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_19_Sun.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_20',
-      'Judgement',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_20_Judgement.jpg',
-    ),
-    _TarotCardDefinition(
-      'major_21',
-      'The World',
-      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_21_World.jpg',
-    ),
-    _TarotCardDefinition(
-      'pents_01',
-      'Ace of Pentacles',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents01.jpg',
-    ),
-    _TarotCardDefinition(
-      'pents_02',
-      '2 of Pentacles',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents02.jpg',
-    ),
-    _TarotCardDefinition(
-      'pents_03',
-      '3 of Pentacles',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents03.jpg',
-    ),
-    _TarotCardDefinition(
-      'pents_04',
-      '4 of Pentacles',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents04.jpg',
-    ),
-    _TarotCardDefinition(
-      'pents_05',
-      '5 of Pentacles',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents05.jpg',
-    ),
-    _TarotCardDefinition(
-      'pents_06',
-      '6 of Pentacles',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents06.jpg',
-    ),
-    _TarotCardDefinition(
-      'pents_07',
-      '7 of Pentacles',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents07.jpg',
-    ),
-    _TarotCardDefinition(
-      'pents_08',
-      '8 of Pentacles',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents08.jpg',
-    ),
-    _TarotCardDefinition(
-      'pents_09',
-      '9 of Pentacles',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents09.jpg',
-    ),
-    _TarotCardDefinition(
-      'pents_10',
-      '10 of Pentacles',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents10.jpg',
-    ),
-    _TarotCardDefinition(
-      'pents_11',
-      'Page of Pentacles',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents11.jpg',
-    ),
-    _TarotCardDefinition(
-      'pents_12',
-      'Knight of Pentacles',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents12.jpg',
-    ),
-    _TarotCardDefinition(
-      'pents_13',
-      'Queen of Pentacles',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents13.jpg',
-    ),
-    _TarotCardDefinition(
-      'pents_14',
-      'King of Pentacles',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents14.jpg',
-    ),
-    _TarotCardDefinition(
-      'swords_01',
-      'Ace of Swords',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Swords01.jpg',
-    ),
-    _TarotCardDefinition(
-      'swords_02',
-      '2 of Swords',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Swords02.jpg',
-    ),
-    _TarotCardDefinition(
-      'swords_03',
-      '3 of Swords',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Swords03.jpg',
-    ),
-    _TarotCardDefinition(
-      'swords_04',
-      '4 of Swords',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Swords04.jpg',
-    ),
-    _TarotCardDefinition(
-      'swords_05',
-      '5 of Swords',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Swords05.jpg',
-    ),
-    _TarotCardDefinition(
-      'swords_06',
-      '6 of Swords',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Swords06.jpg',
-    ),
-    _TarotCardDefinition(
-      'swords_07',
-      '7 of Swords',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Swords07.jpg',
-    ),
-    _TarotCardDefinition(
-      'swords_08',
-      '8 of Swords',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Swords08.jpg',
-    ),
-    _TarotCardDefinition(
-      'swords_09',
-      '9 of Swords',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Swords09.jpg',
-    ),
-    _TarotCardDefinition(
-      'swords_10',
-      '10 of Swords',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Swords10.jpg',
-    ),
-    _TarotCardDefinition(
-      'swords_11',
-      'Page of Swords',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Swords11.jpg',
-    ),
-    _TarotCardDefinition(
-      'swords_12',
-      'Knight of Swords',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Swords12.jpg',
-    ),
-    _TarotCardDefinition(
-      'swords_13',
-      'Queen of Swords',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Swords13.jpg',
-    ),
-    _TarotCardDefinition(
-      'swords_14',
-      'King of Swords',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Swords14.jpg',
-    ),
-    _TarotCardDefinition(
-      'wands_01',
-      'Ace of Wands',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Wands01.jpg',
-    ),
-    _TarotCardDefinition(
-      'wands_02',
-      '2 of Wands',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Wands02.jpg',
-    ),
-    _TarotCardDefinition(
-      'wands_03',
-      '3 of Wands',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Wands03.jpg',
-    ),
-    _TarotCardDefinition(
-      'wands_04',
-      '4 of Wands',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Wands04.jpg',
-    ),
-    _TarotCardDefinition(
-      'wands_05',
-      '5 of Wands',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Wands05.jpg',
-    ),
-    _TarotCardDefinition(
-      'wands_06',
-      '6 of Wands',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Wands06.jpg',
-    ),
-    _TarotCardDefinition(
-      'wands_07',
-      '7 of Wands',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Wands07.jpg',
-    ),
-    _TarotCardDefinition(
-      'wands_08',
-      '8 of Wands',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Wands08.jpg',
-    ),
-    _TarotCardDefinition(
-      'wands_09',
-      '9 of Wands',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Wands09.jpg',
-    ),
-    _TarotCardDefinition(
-      'wands_10',
-      '10 of Wands',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Wands10.jpg',
-    ),
-    _TarotCardDefinition(
-      'wands_11',
-      'Page of Wands',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Wands11.jpg',
-    ),
-    _TarotCardDefinition(
-      'wands_12',
-      'Knight of Wands',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Wands12.jpg',
-    ),
-    _TarotCardDefinition(
-      'wands_13',
-      'Queen of Wands',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Wands13.jpg',
-    ),
-    _TarotCardDefinition(
-      'wands_14',
-      'King of Wands',
-      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Wands14.jpg',
-    ),
-  ];
+  static const _rwsCards = TarotDeckRegistry.rwsCards;
 
   String _selectedDeckId = 'rws_public_domain';
   String _selectedCardBackId = 'cosmic_gate';
@@ -686,7 +279,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   String _selectedSpread = UserText.tarotSpreadThree;
   int _selectedFreeDrawCount = 5;
   _TarotDirectionMode _directionMode = _TarotDirectionMode.auto;
-  late List<_TarotCardDefinition> _remainingDeck;
+  late List<TarotCardDefinition> _remainingDeck;
   final List<_DrawnTarotCard> _drawnCards = [];
 
   final Set<int> _selectedDeckIndexes = {};
@@ -704,7 +297,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     _prepareFreshDeck(clearDrawn: true);
   }
 
-  _TarotDeckDefinition get _selectedDeck => _deckDefinitions.firstWhere(
+  TarotDeckDefinition get _selectedDeck => _deckDefinitions.firstWhere(
     (deck) => deck.id == _selectedDeckId,
     orElse: () => _deckDefinitions.first,
   );
@@ -803,7 +396,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   }
 
   void _prepareFreshDeck({required bool clearDrawn}) {
-    _remainingDeck = List<_TarotCardDefinition>.of(_rwsCards)
+    _remainingDeck = List<TarotCardDefinition>.of(_rwsCards)
       ..shuffle(math.Random());
     if (clearDrawn) {
       _drawnCards.clear();
@@ -1302,7 +895,7 @@ class _TarotSetupStage extends StatefulWidget {
     required this.onStepChanged,
   });
 
-  final List<_TarotDeckDefinition> decks;
+  final List<TarotDeckDefinition> decks;
   final String selectedDeckId;
   final ValueChanged<String> onDeckSelected;
   final List<_TarotCardBackDefinition> cardBacks;
@@ -1316,7 +909,7 @@ class _TarotSetupStage extends StatefulWidget {
   final List<_TarotSpreadDefinition> fixedSpreads;
   final String selectedSpread;
   final ValueChanged<String> onSpreadSelected;
-  final _TarotDeckDefinition selectedDeck;
+  final TarotDeckDefinition selectedDeck;
   final VoidCallback onShuffle;
   final VoidCallback onAutoDraw;
   final bool isShuffling;
@@ -2100,7 +1693,7 @@ class _TarotPreparationPanel extends StatelessWidget {
     required this.cardBack,
   });
 
-  final _TarotDeckDefinition selectedDeck;
+  final TarotDeckDefinition selectedDeck;
   final String selectedSpread;
   final bool isShuffling;
   final VoidCallback onShuffle;
@@ -2290,9 +1883,9 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
     required this.tableCloth,
   });
 
-  final _TarotDeckDefinition deck;
+  final TarotDeckDefinition deck;
   final String spread;
-  final List<_TarotCardDefinition> cards;
+  final List<TarotCardDefinition> cards;
   final Set<int> selectedIndexes;
   final Map<int, int> selectedOrder;
   final int selectedCount;
@@ -2440,7 +2033,7 @@ class _TarotFullDeckBoard extends StatefulWidget {
     required this.tableCloth,
   });
 
-  final List<_TarotCardDefinition> cards;
+  final List<TarotCardDefinition> cards;
   final Set<int> selectedIndexes;
   final Map<int, int> selectedOrder;
   final bool targetReached;
@@ -3574,7 +3167,7 @@ class _TarotDeckChoiceSection extends StatefulWidget {
   });
 
   final String title;
-  final List<_TarotDeckDefinition> decks;
+  final List<TarotDeckDefinition> decks;
   final String selectedDeckId;
   final ValueChanged<String> onSelected;
   final _TarotCardBackDefinition cardBack;
@@ -3613,7 +3206,7 @@ class _TarotDeckChoiceSectionState extends State<_TarotDeckChoiceSection> {
     return math.max(0, index);
   }
 
-  String _deckSubtitle(_TarotDeckDefinition deck) {
+  String _deckSubtitle(TarotDeckDefinition deck) {
     if (deck.assetBacked) return 'RWS 이미지 · ${deck.cardCount}장';
     if (deck.id == 'personal_scan') return '나만의 덱 자리';
     if (deck.id == 'oracle') return '오라클 리딩';
@@ -3828,7 +3421,7 @@ class _PositionedDeckFanCard extends StatelessWidget {
     required this.cardBack,
   });
 
-  final _TarotDeckDefinition deck;
+  final TarotDeckDefinition deck;
   final String subtitle;
   final bool selected;
   final bool hovered;
@@ -3955,7 +3548,7 @@ class _TarotDeckCarouselCard extends StatelessWidget {
     required this.cardBack,
   });
 
-  final _TarotDeckDefinition deck;
+  final TarotDeckDefinition deck;
   final String subtitle;
   final bool selected;
   final bool hovered;
@@ -4125,7 +3718,7 @@ class _TarotRepresentativeDeckArtwork extends StatelessWidget {
     required this.height,
   });
 
-  final _TarotDeckDefinition deck;
+  final TarotDeckDefinition deck;
   final _TarotCardBackDefinition cardBack;
   final bool glowing;
   final double width;
@@ -4654,7 +4247,7 @@ class _TarotDirectionChoiceSection extends StatelessWidget {
 class _TarotSelectionSummary extends StatelessWidget {
   const _TarotSelectionSummary({required this.deck, required this.spread});
 
-  final _TarotDeckDefinition deck;
+  final TarotDeckDefinition deck;
   final String spread;
 
   @override
@@ -6654,22 +6247,6 @@ class _TarotCardBackDefinition {
   final String assetPath;
 }
 
-class _TarotDeckDefinition {
-  const _TarotDeckDefinition({
-    required this.id,
-    required this.label,
-    this.cardCount = 0,
-    this.assetBacked = false,
-    this.representativeAssetPath,
-  });
-
-  final String id;
-  final String label;
-  final int cardCount;
-  final bool assetBacked;
-  final String? representativeAssetPath;
-}
-
 enum _TarotSpreadFamily { freeLayout, fixedMeaning }
 
 enum _TarotPositionMeaningMode { userDefined, predefined }
@@ -6718,18 +6295,10 @@ class _TarotSpreadDefinition {
   int get cardCount => slots.length;
 }
 
-class _TarotCardDefinition {
-  const _TarotCardDefinition(this.id, this.label, this.imagePath);
-
-  final String id;
-  final String label;
-  final String imagePath;
-}
-
 class _DrawnTarotCard {
   const _DrawnTarotCard({required this.card, required this.reversed});
 
-  final _TarotCardDefinition card;
+  final TarotCardDefinition card;
   final bool reversed;
 }
 

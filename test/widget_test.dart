@@ -5,10 +5,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ryn_universe_os_core/core/text/user_text.dart';
+import 'package:ryn_universe_os_core/features/tarot/data/tarot_deck_registry.dart';
 import 'package:ryn_universe_os_core/features/tarot/tarot_spread_shell.dart';
 import 'package:ryn_universe_os_core/main.dart';
 
 void main() {
+  test('tarot deck registry preserves existing RWS asset baseline', () {
+    final rwsDeck = TarotDeckRegistry.rwsPublicDomain;
+
+    expect(TarotDeckRegistry.decks, contains(rwsDeck));
+    expect(rwsDeck.deckId, 'rws_public_domain');
+    expect(rwsDeck.cards, hasLength(78));
+    expect(
+      rwsDeck.representativeAssetPath,
+      'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_00_Fool.jpg',
+    );
+    expect(
+      rwsDeck.cards.first.assetPath,
+      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups01.jpg',
+    );
+    expect(
+      rwsDeck.cards
+          .firstWhere((card) => card.semanticId == 'pents_01')
+          .assetPath,
+      'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents01.jpg',
+    );
+  });
+
   test('text registries keep user copy separated from developer copy', () {
     final userTextFile = File('lib/core/text/user_text.dart');
     final devTextFile = File('lib/core/text/dev_text.dart');
@@ -1505,6 +1528,9 @@ void main() {
       final source = File(
         'lib/features/tarot/tarot_spread_shell.dart',
       ).readAsStringSync();
+      final registrySource = File(
+        'lib/features/tarot/data/tarot_deck_registry.dart',
+      ).readAsStringSync();
       final expectedLiteralLabels = <String>[
         '자유 드로우',
         '2카드',
@@ -1607,7 +1633,7 @@ void main() {
       expect(source, contains('tarot-layout-adjustment-reset'));
       expect(source, contains('tarot-representative-deck-image'));
       expect(source, contains('representativeAssetPath'));
-      expect(source, contains('RWS_Tarot_00_Fool.jpg'));
+      expect(registrySource, contains('RWS_Tarot_00_Fool.jpg'));
       expect(source, contains('tarot-adjustable-result-card-'));
       expect(source, contains('final Map<int, Offset> _temporaryOffsets'));
       expect(source, contains('bool _adjustmentMode = false'));
