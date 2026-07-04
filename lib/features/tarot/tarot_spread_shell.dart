@@ -7438,12 +7438,13 @@ class _TarotPositionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       key: const Key('tarot-position-label'),
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: RynPalette.tarotViolet.withValues(alpha: 0.38),
+        // TAROT-RESULT-LABEL-POLISH1: label-only polish; table surface unchanged.
+        color: RynPalette.tarotViolet.withValues(alpha: 0.30),
         borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
         border: Border.all(
-          color: RynPalette.tarotGoldAccent(context).withValues(alpha: 0.22),
+          color: RynPalette.tarotGoldAccent(context).withValues(alpha: 0.18),
         ),
       ),
       child: Text(
@@ -7452,10 +7453,10 @@ class _TarotPositionLabel extends StatelessWidget {
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.center,
         style: TextStyle(
-          color: RynPalette.tarotPurpleAccent(context),
-          fontSize: 11,
+          color: RynPalette.tarotIvory.withValues(alpha: 0.88),
+          fontSize: 11.2,
           fontWeight: FontWeight.w800,
-          letterSpacing: -0.1,
+          letterSpacing: -0.05,
         ),
       ),
     );

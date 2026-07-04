@@ -157,6 +157,31 @@ void main() {
     expect(tarotShell.contains('http'), isFalse);
   });
 
+  test('Tarot result label polish is label-only and keeps table surface', () {
+    final tarotShell = File(
+      'lib/features/tarot/tarot_spread_shell.dart',
+    ).readAsStringSync();
+
+    expect(tarotShell.contains('TAROT-RESULT-LABEL-POLISH1'), isTrue);
+    expect(tarotShell.contains('label-only polish'), isTrue);
+    expect(tarotShell.contains('table surface unchanged'), isTrue);
+    expect(
+      tarotShell.contains("key: const Key('tarot-position-label')"),
+      isTrue,
+    );
+    expect(
+      tarotShell.contains('tarot-result-dark-table-retained-marker'),
+      isFalse,
+    );
+    expect(tarotShell.contains('premium result spread table frame'), isFalse);
+    expect(tarotShell.contains('AppData'), isFalse);
+    expect(tarotShell.contains('schema'), isFalse);
+    expect(tarotShell.contains('migration'), isFalse);
+    expect(tarotShell.contains('export'), isFalse);
+    expect(tarotShell.contains('PDF'), isFalse);
+    expect(tarotShell.contains('http'), isFalse);
+  });
+
   test('text registries keep user copy separated from developer copy', () {
     final userTextFile = File('lib/core/text/user_text.dart');
     final devTextFile = File('lib/core/text/dev_text.dart');
