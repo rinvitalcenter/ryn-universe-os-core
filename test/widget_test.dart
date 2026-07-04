@@ -32,6 +32,44 @@ void main() {
     );
   });
 
+  test('Tarot setup flow uses honest visible step keys only', () {
+    final tarotShell = File(
+      'lib/features/tarot/tarot_spread_shell.dart',
+    ).readAsStringSync();
+
+    expect(tarotShell.contains('tarot-global-flow-정리'), isFalse);
+    expect(
+      tarotShell.contains("key: Key('tarot-active-setup-step-1')"),
+      isFalse,
+    );
+    expect(
+      tarotShell.contains("key: Key('tarot-active-setup-step-2')"),
+      isFalse,
+    );
+    expect(
+      tarotShell.contains("key: Key('tarot-active-setup-step-3')"),
+      isFalse,
+    );
+    expect(tarotShell.contains('stepIndex == 0 ? 5 : stepIndex + 1'), isFalse);
+  });
+
+  test('Tarot intake follows Midnight Atelier design-system markers', () {
+    final tarotShell = File(
+      'lib/features/tarot/tarot_spread_shell.dart',
+    ).readAsStringSync();
+
+    expect(tarotShell.contains('tarot-midnight-atelier-stepper'), isTrue);
+    expect(tarotShell.contains('질문 준비'), isTrue);
+    expect(tarotShell.contains('테이블'), isTrue);
+    expect(tarotShell.contains('해석'), isTrue);
+    expect(tarotShell.contains('tarot-free-question-hero-surface'), isTrue);
+    expect(tarotShell.contains('tarot-reading-intake-receipt-card'), isTrue);
+    expect(
+      tarotShell.contains("key: const Key('tarot-global-flow-nav')"),
+      isFalse,
+    );
+  });
+
   test('text registries keep user copy separated from developer copy', () {
     final userTextFile = File('lib/core/text/user_text.dart');
     final devTextFile = File('lib/core/text/dev_text.dart');
@@ -301,6 +339,148 @@ void main() {
     expect(find.text(UserText.readingToolSaju), findsOneWidget);
   });
 
+  testWidgets(
+    'Tarot intake navigation preserves values and summarizes caution',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1440, 1100);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: TarotSpreadShell(key: UniqueKey(), onBack: () {}),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('tarot-active-setup-step-0')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-midnight-atelier-stepper')),
+        findsOneWidget,
+      );
+      expect(find.text('질문 준비'), findsOneWidget);
+      expect(find.text('테이블'), findsOneWidget);
+      expect(find.text('해석'), findsAtLeastNWidgets(1));
+      expect(find.byKey(const Key('tarot-intro-panel')), findsOneWidget);
+      expect(find.text('바로 덱 선택'), findsOneWidget);
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('tarot-active-setup-step-1')),
+        findsOneWidget,
+      );
+      expect(find.text('연애'), findsOneWidget);
+      expect(find.text('자유 질문'), findsOneWidget);
+      for (final categoryLabel in [
+        '연애',
+        '금전',
+        '일·승진·진로',
+        '관계',
+        '가족',
+        '영적 성장',
+        '예·아니오',
+        '시기',
+        '선택',
+        '자유 질문',
+      ]) {
+        expect(find.text(categoryLabel), findsOneWidget);
+      }
+      final stageRect = tester.getRect(
+        find.byKey(const Key('tarot-unified-intake-stage-frame')),
+      );
+      final freeQuestionCardRect = tester.getRect(
+        find.byKey(const ValueKey('tarot-question-category-open_question')),
+      );
+      expect(freeQuestionCardRect.bottom <= stageRect.bottom, isTrue);
+      await tester.tap(
+        find.byKey(const ValueKey('tarot-question-category-money')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('tarot-active-setup-step-2')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-free-question-hero-surface')),
+        findsOneWidget,
+      );
+      await tester.enterText(
+        find.byKey(const Key('tarot-free-question-input')),
+        '내 마음이 제일 먼저 묻고 싶은 것은 무엇일까요?',
+      );
+      await tester.enterText(
+        find.byKey(const Key('tarot-question-title-input')),
+        '이번 선택의 핵심',
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('tarot-active-setup-step-3')),
+        findsOneWidget,
+      );
+      await tester.tap(find.text('이전'));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('tarot-active-setup-step-2')),
+        findsOneWidget,
+      );
+      expect(find.text('내 마음이 제일 먼저 묻고 싶은 것은 무엇일까요?'), findsOneWidget);
+      expect(find.text('이번 선택의 핵심'), findsOneWidget);
+
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('tarot-session-context-input')),
+        '짧고 차분한 상담 흐름이 필요합니다.',
+      );
+      await tester.enterText(
+        find.byKey(const Key('tarot-sensitivity-note-input')),
+        '확정적으로 단정하지 않기',
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('tarot-active-setup-step-4')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-reading-intake-receipt-card')),
+        findsOneWidget,
+      );
+      expect(find.text('금전'), findsAtLeastNWidgets(1));
+      expect(find.text('내 마음이 제일 먼저 묻고 싶은 것은 무엇일까요?'), findsAtLeastNWidgets(1));
+      expect(find.text('이번 선택의 핵심'), findsAtLeastNWidgets(1));
+      expect(find.text('짧고 차분한 상담 흐름이 필요합니다.'), findsAtLeastNWidgets(1));
+      expect(find.text('확정적으로 단정하지 않기'), findsAtLeastNWidgets(1));
+      await tester.ensureVisible(find.text('덱과 스프레드 선택하기'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('덱과 스프레드 선택하기'));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('tarot-active-setup-step-5')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('tarot-deck-carousel')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('Reading workspace opens RWS Tarot draw flow without storage', (
     WidgetTester tester,
   ) async {
@@ -338,18 +518,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('tarot-active-setup-step-0')), findsOneWidget);
-    expect(find.text(UserText.tarotQuestion), findsOneWidget);
-    expect(find.text(UserText.tarotMemo), findsOneWidget);
+    expect(find.byKey(const Key('tarot-intro-panel')), findsOneWidget);
+    expect(find.text('바로 덱 선택'), findsOneWidget);
     expect(find.text(UserText.tarotDeckSelect), findsNothing);
     expect(find.text(UserText.tarotSpreadSelect), findsNothing);
     expect(find.byKey(const Key('tarot-shuffle-button')), findsNothing);
     expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
     expect(find.byKey(const Key('tarot-empty-slot')), findsNothing);
 
-    await tester.tap(find.text('다음'));
+    await tester.tap(find.text('바로 덱 선택'));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('tarot-active-setup-step-1')), findsOneWidget);
+    expect(find.byKey(const Key('tarot-active-setup-step-5')), findsOneWidget);
     expect(find.text('2 덱 선택'), findsOneWidget);
     expect(find.byKey(const Key('tarot-deck-carousel')), findsOneWidget);
     expect(find.byKey(const Key('tarot-deck-fan-carousel')), findsOneWidget);
@@ -393,7 +573,7 @@ void main() {
     await tester.tap(find.text('다음'));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('tarot-active-setup-step-2')), findsOneWidget);
+    expect(find.byKey(const Key('tarot-active-setup-step-6')), findsOneWidget);
     expect(find.text(UserText.tarotSpreadSelect), findsOneWidget);
     expect(find.text(UserText.tarotSpreadGroupFixed), findsOneWidget);
     for (final spread in [
@@ -509,7 +689,7 @@ void main() {
 
     await tester.tap(find.text('다음'));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('tarot-active-setup-step-3')), findsOneWidget);
+    expect(find.byKey(const Key('tarot-active-setup-step-7')), findsOneWidget);
     expect(find.byKey(const Key('tarot-shuffle-button')), findsOneWidget);
     await tester.ensureVisible(find.byKey(const Key('tarot-shuffle-button')));
     await tester.pumpAndSettle();
@@ -620,7 +800,9 @@ void main() {
     expect(find.byKey(const Key('tarot-active-setup-step-0')), findsOneWidget);
     expect(find.byKey(const Key('tarot-rws-card-image')), findsNothing);
 
-    await tester.tap(find.text('다음'));
+    await tester.ensureVisible(find.text('바로 덱 선택'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('바로 덱 선택'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('다음'));
     await tester.pumpAndSettle();
@@ -660,7 +842,11 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text(UserText.readingToolTarot).last);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('다음'));
+      await tester.ensureVisible(find.text('바로 덱 선택'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('바로 덱 선택'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('다음'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('다음'));
       await tester.pumpAndSettle();
@@ -702,7 +888,9 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text(UserText.readingToolTarot).last);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('다음'));
+      await tester.ensureVisible(find.text('바로 덱 선택'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('바로 덱 선택'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('다음'));
       await tester.pumpAndSettle();
@@ -790,7 +978,9 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.text('다음'));
+    await tester.ensureVisible(find.text('바로 덱 선택'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('바로 덱 선택'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('다음'));
     await tester.pumpAndSettle();
@@ -893,7 +1083,9 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('다음'));
+      await tester.ensureVisible(find.text('바로 덱 선택'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('바로 덱 선택'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('다음'));
       await tester.pumpAndSettle();
@@ -1017,8 +1209,22 @@ void main() {
         findsOneWidget,
       );
       expect(find.text('1 질문과 목적'), findsOneWidget);
-      expect(find.byKey(const Key('tarot-global-flow-nav')), findsOneWidget);
-      for (final label in ['정리', '덱', '세부 설정', '셔플', '공개', '해석']) {
+      expect(
+        find.byKey(const Key('tarot-midnight-atelier-stepper')),
+        findsOneWidget,
+      );
+      for (final label in [
+        '인트로',
+        '카테고리',
+        '질문',
+        '상담 정보',
+        '요약',
+        '덱',
+        '세부 설정',
+        '셔플',
+        '공개',
+        '해석',
+      ]) {
         expect(find.byKey(Key('tarot-global-flow-$label')), findsOneWidget);
       }
       expect(
@@ -1030,10 +1236,10 @@ void main() {
       expect(find.byKey(const Key('tarot-shuffle-button')), findsNothing);
       expect(find.text('리딩 포인트'), findsNothing);
 
-      await tester.tap(find.text('다음'));
+      await tester.tap(find.text('바로 덱 선택'));
       await tester.pumpAndSettle();
       expect(
-        find.byKey(const Key('tarot-active-setup-step-1')),
+        find.byKey(const Key('tarot-active-setup-step-5')),
         findsOneWidget,
       );
       expect(find.text('2 덱 선택'), findsOneWidget);
@@ -1077,7 +1283,7 @@ void main() {
       await tester.tap(find.text('다음'));
       await tester.pumpAndSettle();
       expect(
-        find.byKey(const Key('tarot-active-setup-step-2')),
+        find.byKey(const Key('tarot-active-setup-step-6')),
         findsOneWidget,
       );
       expect(find.text('3 카드 세부 설정'), findsOneWidget);
@@ -1095,7 +1301,7 @@ void main() {
       await tester.tap(find.text('다음'));
       await tester.pumpAndSettle();
       expect(
-        find.byKey(const Key('tarot-active-setup-step-3')),
+        find.byKey(const Key('tarot-active-setup-step-7')),
         findsOneWidget,
       );
       expect(find.text('4 셔플과 드로우'), findsOneWidget);
@@ -1234,7 +1440,9 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('다음'));
+      await tester.ensureVisible(find.text('바로 덱 선택'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('바로 덱 선택'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('다음'));
       await tester.pumpAndSettle();
@@ -1264,7 +1472,9 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('다음'));
+      await tester.ensureVisible(find.text('바로 덱 선택'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('바로 덱 선택'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('다음'));
       await tester.pumpAndSettle();
@@ -1320,7 +1530,11 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text(UserText.readingToolTarot).last);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('다음'));
+    await tester.ensureVisible(find.text('바로 덱 선택'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('바로 덱 선택'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('다음'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('다음'));
     await tester.pumpAndSettle();
@@ -1833,12 +2047,14 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        await tester.tap(find.text('다음'));
+        await tester.ensureVisible(find.text('바로 덱 선택'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('바로 덱 선택'));
         await tester.pumpAndSettle();
         await tester.tap(find.text('다음'));
         await tester.pumpAndSettle();
         expect(
-          find.byKey(const Key('tarot-active-setup-step-2')),
+          find.byKey(const Key('tarot-active-setup-step-6')),
           findsOneWidget,
         );
       }
@@ -2042,7 +2258,9 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        await tester.tap(find.text('다음'));
+        await tester.ensureVisible(find.text('바로 덱 선택'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('바로 덱 선택'));
         await tester.pumpAndSettle();
         await tester.tap(find.text('다음'));
         await tester.pumpAndSettle();
@@ -2238,7 +2456,9 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('다음'));
+      await tester.ensureVisible(find.text('바로 덱 선택'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('바로 덱 선택'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('다음'));
       await tester.pumpAndSettle();
@@ -2423,7 +2643,9 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        await tester.tap(find.text('다음'));
+        await tester.ensureVisible(find.text('바로 덱 선택'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('바로 덱 선택'));
         await tester.pumpAndSettle();
         await tester.tap(find.text('다음'));
         await tester.pumpAndSettle();
@@ -2616,7 +2838,9 @@ void main() {
           ),
         );
         await tester.pumpAndSettle();
-        await tester.tap(find.text('다음'));
+        await tester.ensureVisible(find.text('바로 덱 선택'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('바로 덱 선택'));
         await tester.pumpAndSettle();
         await tester.tap(find.text('다음'));
         await tester.pumpAndSettle();
@@ -2806,7 +3030,11 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('다음'));
+      await tester.ensureVisible(find.text('바로 덱 선택'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('바로 덱 선택'));
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('다음'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('다음'));
       await tester.pumpAndSettle();
@@ -2958,7 +3186,9 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('다음'));
+      await tester.ensureVisible(find.text('바로 덱 선택'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('바로 덱 선택'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('다음'));
       await tester.pumpAndSettle();

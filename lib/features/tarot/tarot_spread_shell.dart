@@ -44,6 +44,8 @@ class RynPalette {
   static const tarotViolet = Color(0xFF211848);
   static const tarotLavender = Color(0xFFB3A8F0);
   static const tarotGold = Color(0xFFD9BC7A);
+  static const tarotIvory = Color(0xFFF4EDDF);
+  static const tarotMist = Color(0xFFC8C0D8);
   static const accentBlue = RynTokens.lightAccent;
   static const accentBlueDark = RynTokens.oledAccent;
   static const accentSoftDark = RynTokens.oledAccentSoft;
@@ -127,6 +129,83 @@ enum _TarotDrawPhase { beforeShuffle, shuffling, ready, drawing, complete }
 enum _TarotFlowStage { setup, draw, result, interpretation }
 
 enum _TarotDirectionMode { uprightOnly, auto }
+
+class _TarotQuestionCategory {
+  const _TarotQuestionCategory({
+    required this.id,
+    required this.label,
+    required this.helper,
+    required this.icon,
+  });
+
+  final String id;
+  final String label;
+  final String helper;
+  final IconData icon;
+}
+
+const _tarotQuestionCategories = [
+  _TarotQuestionCategory(
+    id: 'love',
+    label: '연애',
+    helper: '마음의 방향과 관계의 온도를 봅니다.',
+    icon: Icons.favorite_rounded,
+  ),
+  _TarotQuestionCategory(
+    id: 'money',
+    label: '금전',
+    helper: '돈, 기회, 안정감을 차분히 정리합니다.',
+    icon: Icons.monetization_on_rounded,
+  ),
+  _TarotQuestionCategory(
+    id: 'career',
+    label: '일·승진·진로',
+    helper: '일, 성장, 선택의 다음 단계를 봅니다.',
+    icon: Icons.trending_up_rounded,
+  ),
+  _TarotQuestionCategory(
+    id: 'social_relation',
+    label: '관계',
+    helper: '사람 사이 흐름과 거리감을 살핍니다.',
+    icon: Icons.people_alt_rounded,
+  ),
+  _TarotQuestionCategory(
+    id: 'family',
+    label: '가족',
+    helper: '가정 안의 감정과 균형을 정리합니다.',
+    icon: Icons.home_rounded,
+  ),
+  _TarotQuestionCategory(
+    id: 'spiritual_growth',
+    label: '영적 성장',
+    helper: '내면의 배움과 수련 방향을 묻습니다.',
+    icon: Icons.auto_awesome_rounded,
+  ),
+  _TarotQuestionCategory(
+    id: 'yes_no',
+    label: '예·아니오',
+    helper: '선택의 가능성과 조건을 단순하게 봅니다.',
+    icon: Icons.rule_rounded,
+  ),
+  _TarotQuestionCategory(
+    id: 'timing',
+    label: '시기',
+    helper: '흐름이 열리는 때와 준비 신호를 봅니다.',
+    icon: Icons.schedule_rounded,
+  ),
+  _TarotQuestionCategory(
+    id: 'choice',
+    label: '선택',
+    helper: '갈림길의 기준과 주의점을 정리합니다.',
+    icon: Icons.alt_route_rounded,
+  ),
+  _TarotQuestionCategory(
+    id: 'open_question',
+    label: '자유 질문',
+    helper: '정해진 틀 없이 떠오른 질문에서 시작합니다.',
+    icon: Icons.edit_note_rounded,
+  ),
+];
 
 class _TarotTableClothDefinition {
   const _TarotTableClothDefinition({
@@ -277,6 +356,17 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   String _selectedCardBackId = 'cosmic_gate';
   String _selectedTableClothId = 'deep_purple';
   String _selectedSpread = UserText.tarotSpreadThree;
+  String _selectedQuestionCategoryId = 'love';
+  String _freeQuestion = '';
+  String _questionTitle = '';
+  String _questionDetail = '';
+  String _currentSituation = '';
+  String _desiredClarity = '';
+  String _querentAlias = '';
+  String _querentRelationship = '';
+  String _querentBirthNote = '';
+  String _sessionContext = '';
+  String _sensitivityNote = '';
   int _selectedFreeDrawCount = 5;
   _TarotDirectionMode _directionMode = _TarotDirectionMode.auto;
   late List<TarotCardDefinition> _remainingDeck;
@@ -319,6 +409,37 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         (spread) => spread.label == _selectedSpread,
         orElse: () => _spreadDefinitions[1],
       );
+
+  _TarotQuestionCategory get _selectedQuestionCategory =>
+      _tarotQuestionCategories.firstWhere(
+        (category) => category.id == _selectedQuestionCategoryId,
+        orElse: () => _tarotQuestionCategories.first,
+      );
+
+  void _updateQuestionCategory(String categoryId) {
+    setState(() => _selectedQuestionCategoryId = categoryId);
+  }
+
+  void _updateFreeQuestion(String value) =>
+      setState(() => _freeQuestion = value);
+  void _updateQuestionTitle(String value) =>
+      setState(() => _questionTitle = value);
+  void _updateQuestionDetail(String value) =>
+      setState(() => _questionDetail = value);
+  void _updateCurrentSituation(String value) =>
+      setState(() => _currentSituation = value);
+  void _updateDesiredClarity(String value) =>
+      setState(() => _desiredClarity = value);
+  void _updateQuerentAlias(String value) =>
+      setState(() => _querentAlias = value);
+  void _updateQuerentRelationship(String value) =>
+      setState(() => _querentRelationship = value);
+  void _updateQuerentBirthNote(String value) =>
+      setState(() => _querentBirthNote = value);
+  void _updateSessionContext(String value) =>
+      setState(() => _sessionContext = value);
+  void _updateSensitivityNote(String value) =>
+      setState(() => _sensitivityNote = value);
 
   bool get _isFreeDrawSelected => _selectedSpreadDefinition.id == 'free_draw';
 
@@ -526,25 +647,25 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
       _prepareFreshDeck(clearDrawn: true);
       _phase = _TarotDrawPhase.beforeShuffle;
       _stage = _TarotFlowStage.setup;
-      _setupStepIndex = 2;
+      _setupStepIndex = 6;
     });
   }
 
   void _selectSetupStep(int index) {
     setState(() {
       _stage = _TarotFlowStage.setup;
-      _setupStepIndex = index.clamp(0, 3);
+      _setupStepIndex = index.clamp(0, 7);
     });
   }
 
   void _selectFlowIndex(int index) {
-    if (index <= 3) {
+    if (index <= 7) {
       _selectSetupStep(index);
       return;
     }
     if (!_isComplete) return;
     setState(() {
-      _stage = index == 4
+      _stage = index == 8
           ? _TarotFlowStage.result
           : _TarotFlowStage.interpretation;
     });
@@ -552,9 +673,9 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
 
   int get _activeFlowIndex => switch (_stage) {
     _TarotFlowStage.setup => _setupStepIndex,
-    _TarotFlowStage.draw => 3,
-    _TarotFlowStage.result => 4,
-    _TarotFlowStage.interpretation => 5,
+    _TarotFlowStage.draw => 7,
+    _TarotFlowStage.result => 8,
+    _TarotFlowStage.interpretation => 9,
   };
 
   Map<int, int> _selectedDeckOrder() {
@@ -572,7 +693,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
       _prepareFreshDeck(clearDrawn: true);
       _phase = _TarotDrawPhase.beforeShuffle;
       _stage = _TarotFlowStage.setup;
-      _setupStepIndex = 1;
+      _setupStepIndex = 5;
     });
   }
 
@@ -605,6 +726,30 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         selectedSpread: _selectedSpread,
         onSpreadSelected: _selectSpread,
         selectedDeck: _selectedDeck,
+        questionCategories: _tarotQuestionCategories,
+        selectedQuestionCategoryId: _selectedQuestionCategoryId,
+        selectedQuestionCategory: _selectedQuestionCategory,
+        onQuestionCategorySelected: _updateQuestionCategory,
+        freeQuestion: _freeQuestion,
+        questionTitle: _questionTitle,
+        questionDetail: _questionDetail,
+        currentSituation: _currentSituation,
+        desiredClarity: _desiredClarity,
+        onFreeQuestionChanged: _updateFreeQuestion,
+        onQuestionTitleChanged: _updateQuestionTitle,
+        onQuestionDetailChanged: _updateQuestionDetail,
+        onCurrentSituationChanged: _updateCurrentSituation,
+        onDesiredClarityChanged: _updateDesiredClarity,
+        querentAlias: _querentAlias,
+        querentRelationship: _querentRelationship,
+        querentBirthNote: _querentBirthNote,
+        sessionContext: _sessionContext,
+        sensitivityNote: _sensitivityNote,
+        onQuerentAliasChanged: _updateQuerentAlias,
+        onQuerentRelationshipChanged: _updateQuerentRelationship,
+        onQuerentBirthNoteChanged: _updateQuerentBirthNote,
+        onSessionContextChanged: _updateSessionContext,
+        onSensitivityNoteChanged: _updateSensitivityNote,
         onShuffle: _startShuffle,
         onAutoDraw: _drawAll,
         isShuffling: _phase == _TarotDrawPhase.shuffling,
@@ -725,8 +870,12 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
                     1,
                     2,
                     3,
-                    if (_isComplete) 4,
-                    if (_isComplete) 5,
+                    4,
+                    5,
+                    6,
+                    7,
+                    if (_isComplete) 8,
+                    if (_isComplete) 9,
                   },
                   onSelected: _selectFlowIndex,
                 ),
@@ -790,7 +939,18 @@ class _TarotGlobalFlowNav extends StatelessWidget {
     required this.onSelected,
   });
 
-  static const labels = ['정리', '덱', '세부 설정', '셔플', '공개', '해석'];
+  static const labels = [
+    '인트로',
+    '카테고리',
+    '질문',
+    '상담 정보',
+    '요약',
+    '덱',
+    '세부 설정',
+    '셔플',
+    '공개',
+    '해석',
+  ];
 
   final int activeIndex;
   final Set<int> enabledIndexes;
@@ -798,38 +958,170 @@ class _TarotGlobalFlowNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      key: const Key('tarot-global-flow-nav'),
-      spacing: 8,
-      runSpacing: 8,
-      children: [
-        for (var index = 0; index < labels.length; index++)
-          ChoiceChip(
-            key: Key('tarot-global-flow-${labels[index]}'),
-            label: Text(labels[index]),
-            selected: activeIndex == index,
-            onSelected: enabledIndexes.contains(index)
-                ? (_) => onSelected(index)
-                : null,
-            showCheckmark: false,
-            selectedColor: RynPalette.tarotGold,
-            disabledColor: RynPalette.surfaceSoft(context),
-            backgroundColor: RynPalette.surfaceElevated(context),
-            side: BorderSide(
-              color: activeIndex == index
-                  ? RynPalette.tarotGold
-                  : RynPalette.line(context),
-            ),
-            labelStyle: TextStyle(
-              color: activeIndex == index
-                  ? RynPalette.tarotMidnight
-                  : enabledIndexes.contains(index)
-                  ? RynPalette.text(context)
-                  : RynPalette.subtext(context).withValues(alpha: 0.55),
-              fontWeight: FontWeight.w900,
+    const phases = [
+      _TarotAtelierPhase('질문 준비', 0, 4),
+      _TarotAtelierPhase('테이블', 5, 8),
+      _TarotAtelierPhase('해석', 9, 9),
+    ];
+    return Container(
+      key: const Key('tarot-midnight-atelier-stepper'),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: RynPalette.tarotMidnight.withValues(alpha: 0.88),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: RynPalette.tarotLavender.withValues(alpha: 0.18),
+        ),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 960;
+          return Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              for (final phase in phases)
+                SizedBox(
+                  width: compact
+                      ? constraints.maxWidth
+                      : (constraints.maxWidth - 20) / 3,
+                  child: _TarotAtelierPhaseGroup(
+                    phase: phase,
+                    labels: labels,
+                    activeIndex: activeIndex,
+                    enabledIndexes: enabledIndexes,
+                    onSelected: onSelected,
+                  ),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _TarotAtelierPhase {
+  const _TarotAtelierPhase(this.label, this.start, this.end);
+
+  final String label;
+  final int start;
+  final int end;
+}
+
+class _TarotAtelierPhaseGroup extends StatelessWidget {
+  const _TarotAtelierPhaseGroup({
+    required this.phase,
+    required this.labels,
+    required this.activeIndex,
+    required this.enabledIndexes,
+    required this.onSelected,
+  });
+
+  final _TarotAtelierPhase phase;
+  final List<String> labels;
+  final int activeIndex;
+  final Set<int> enabledIndexes;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final current = activeIndex >= phase.start && activeIndex <= phase.end;
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: current
+            ? RynPalette.tarotViolet.withValues(alpha: 0.48)
+            : Colors.white.withValues(alpha: 0.04),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: current
+              ? RynPalette.tarotGold.withValues(alpha: 0.42)
+              : Colors.white.withValues(alpha: 0.08),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            phase.label,
+            style: TextStyle(
+              color: current ? RynPalette.tarotIvory : RynPalette.tarotMist,
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.1,
             ),
           ),
-      ],
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (var index = phase.start; index <= phase.end; index++)
+                _TarotAtelierStepDot(
+                  index: index,
+                  label: labels[index],
+                  active: activeIndex == index,
+                  enabled: enabledIndexes.contains(index),
+                  onSelected: onSelected,
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotAtelierStepDot extends StatelessWidget {
+  const _TarotAtelierStepDot({
+    required this.index,
+    required this.label,
+    required this.active,
+    required this.enabled,
+    required this.onSelected,
+  });
+
+  final int index;
+  final String label;
+  final bool active;
+  final bool enabled;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final foreground = active
+        ? RynPalette.tarotMidnight
+        : enabled
+        ? RynPalette.tarotIvory
+        : RynPalette.tarotMist.withValues(alpha: 0.48);
+    return InkWell(
+      key: Key('tarot-global-flow-$label'),
+      onTap: enabled ? () => onSelected(index) : null,
+      borderRadius: BorderRadius.circular(999),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+        decoration: BoxDecoration(
+          color: active
+              ? RynPalette.tarotGold
+              : Colors.white.withValues(alpha: enabled ? 0.08 : 0.035),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: active
+                ? RynPalette.tarotGold
+                : Colors.white.withValues(alpha: enabled ? 0.14 : 0.06),
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: foreground,
+            fontSize: 11,
+            fontWeight: active ? FontWeight.w800 : FontWeight.w700,
+          ),
+        ),
+      ),
     );
   }
 }
@@ -881,6 +1173,30 @@ class _TarotSetupStage extends StatefulWidget {
     required this.selectedSpread,
     required this.onSpreadSelected,
     required this.selectedDeck,
+    required this.questionCategories,
+    required this.selectedQuestionCategoryId,
+    required this.selectedQuestionCategory,
+    required this.onQuestionCategorySelected,
+    required this.freeQuestion,
+    required this.questionTitle,
+    required this.questionDetail,
+    required this.currentSituation,
+    required this.desiredClarity,
+    required this.onFreeQuestionChanged,
+    required this.onQuestionTitleChanged,
+    required this.onQuestionDetailChanged,
+    required this.onCurrentSituationChanged,
+    required this.onDesiredClarityChanged,
+    required this.querentAlias,
+    required this.querentRelationship,
+    required this.querentBirthNote,
+    required this.sessionContext,
+    required this.sensitivityNote,
+    required this.onQuerentAliasChanged,
+    required this.onQuerentRelationshipChanged,
+    required this.onQuerentBirthNoteChanged,
+    required this.onSessionContextChanged,
+    required this.onSensitivityNoteChanged,
     required this.onShuffle,
     required this.onAutoDraw,
     required this.isShuffling,
@@ -910,6 +1226,30 @@ class _TarotSetupStage extends StatefulWidget {
   final String selectedSpread;
   final ValueChanged<String> onSpreadSelected;
   final TarotDeckDefinition selectedDeck;
+  final List<_TarotQuestionCategory> questionCategories;
+  final String selectedQuestionCategoryId;
+  final _TarotQuestionCategory selectedQuestionCategory;
+  final ValueChanged<String> onQuestionCategorySelected;
+  final String freeQuestion;
+  final String questionTitle;
+  final String questionDetail;
+  final String currentSituation;
+  final String desiredClarity;
+  final ValueChanged<String> onFreeQuestionChanged;
+  final ValueChanged<String> onQuestionTitleChanged;
+  final ValueChanged<String> onQuestionDetailChanged;
+  final ValueChanged<String> onCurrentSituationChanged;
+  final ValueChanged<String> onDesiredClarityChanged;
+  final String querentAlias;
+  final String querentRelationship;
+  final String querentBirthNote;
+  final String sessionContext;
+  final String sensitivityNote;
+  final ValueChanged<String> onQuerentAliasChanged;
+  final ValueChanged<String> onQuerentRelationshipChanged;
+  final ValueChanged<String> onQuerentBirthNoteChanged;
+  final ValueChanged<String> onSessionContextChanged;
+  final ValueChanged<String> onSensitivityNoteChanged;
   final VoidCallback onShuffle;
   final VoidCallback onAutoDraw;
   final bool isShuffling;
@@ -928,14 +1268,80 @@ class _TarotSetupStage extends StatefulWidget {
 }
 
 class _TarotSetupStageState extends State<_TarotSetupStage> {
-  void _goToStep(int step) => widget.onStepChanged(step.clamp(0, 3));
+  void _goToStep(int step) => widget.onStepChanged(step.clamp(0, 7));
 
   @override
   Widget build(BuildContext context) {
-    final purposeStep = _TarotStepPanel(
+    final introStep = _TarotStepPanel(
       title: '1 질문과 목적',
-      subtitle: '오늘 리딩의 중심을 먼저 잡고 덱 선택으로 넘어갑니다.',
-      child: const _TarotQuestionGuidanceLayout(),
+      subtitle: '카드를 뽑기 전 질문의 결을 차분히 정리합니다.',
+      useUnifiedIntakeFrame: true,
+      child: _TarotIntroPanel(
+        onStart: () => _goToStep(1),
+        onSkipToDeck: () => _goToStep(5),
+      ),
+    );
+    final categoryStep = _TarotStepPanel(
+      title: '2 질문 카테고리',
+      subtitle: '오늘 리딩의 중심 주제를 고르세요.',
+      useUnifiedIntakeFrame: true,
+      child: _TarotCategorySelectionPanel(
+        categories: widget.questionCategories,
+        selectedCategoryId: widget.selectedQuestionCategoryId,
+        onSelected: widget.onQuestionCategorySelected,
+      ),
+    );
+    final questionStep = _TarotStepPanel(
+      title: '3 자세한 질문',
+      subtitle: '떠오르는 질문을 먼저 적고, 필요한 만큼만 구조화합니다.',
+      useUnifiedIntakeFrame: true,
+      child: _TarotQuestionInputPanel(
+        freeQuestion: widget.freeQuestion,
+        questionTitle: widget.questionTitle,
+        questionDetail: widget.questionDetail,
+        currentSituation: widget.currentSituation,
+        desiredClarity: widget.desiredClarity,
+        onFreeQuestionChanged: widget.onFreeQuestionChanged,
+        onQuestionTitleChanged: widget.onQuestionTitleChanged,
+        onQuestionDetailChanged: widget.onQuestionDetailChanged,
+        onCurrentSituationChanged: widget.onCurrentSituationChanged,
+        onDesiredClarityChanged: widget.onDesiredClarityChanged,
+      ),
+    );
+    final querentStep = _TarotStepPanel(
+      title: '4 상담 정보',
+      subtitle: '필요한 만큼만 참고 정보를 적어둡니다.',
+      useUnifiedIntakeFrame: true,
+      child: _TarotQuerentInputPanel(
+        querentAlias: widget.querentAlias,
+        querentRelationship: widget.querentRelationship,
+        querentBirthNote: widget.querentBirthNote,
+        sessionContext: widget.sessionContext,
+        sensitivityNote: widget.sensitivityNote,
+        onQuerentAliasChanged: widget.onQuerentAliasChanged,
+        onQuerentRelationshipChanged: widget.onQuerentRelationshipChanged,
+        onQuerentBirthNoteChanged: widget.onQuerentBirthNoteChanged,
+        onSessionContextChanged: widget.onSessionContextChanged,
+        onSensitivityNoteChanged: widget.onSensitivityNoteChanged,
+      ),
+    );
+    final summaryStep = _TarotStepPanel(
+      title: '5 질문 요약',
+      subtitle: '리딩을 시작하기 전 질문과 상담 맥락을 확인합니다.',
+      useUnifiedIntakeFrame: true,
+      child: _TarotIntakeSummaryPanel(
+        category: widget.selectedQuestionCategory,
+        freeQuestion: widget.freeQuestion,
+        questionTitle: widget.questionTitle,
+        questionDetail: widget.questionDetail,
+        currentSituation: widget.currentSituation,
+        desiredClarity: widget.desiredClarity,
+        querentAlias: widget.querentAlias,
+        querentRelationship: widget.querentRelationship,
+        sessionContext: widget.sessionContext,
+        sensitivityNote: widget.sensitivityNote,
+        onContinue: () => _goToStep(5),
+      ),
     );
     final deckStep = _TarotStepPanel(
       title: '2 덱 선택',
@@ -983,7 +1389,16 @@ class _TarotSetupStageState extends State<_TarotSetupStage> {
         cardBack: widget.selectedCardBack,
       ),
     );
-    final steps = [purposeStep, deckStep, detailStep, drawStep];
+    final steps = [
+      introStep,
+      categoryStep,
+      questionStep,
+      querentStep,
+      summaryStep,
+      deckStep,
+      detailStep,
+      drawStep,
+    ];
     final stepIndex = widget.stepIndex.clamp(0, steps.length - 1);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1024,48 +1439,97 @@ class _TarotStepPanel extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.child,
+    this.useUnifiedIntakeFrame = false,
   });
 
   final String title;
   final String subtitle;
   final Widget child;
+  final bool useUnifiedIntakeFrame;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: RynPalette.surfaceElevated(context),
-        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
-        border: Border.all(color: RynPalette.line(context)),
-        boxShadow: RynPalette.panelShadow(context),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            RynPalette.tarotMidnight,
+            RynPalette.tarotNavy,
+            RynPalette.tarotViolet.withValues(alpha: 0.82),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(
+          color: RynPalette.tarotLavender.withValues(alpha: 0.18),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: RynPalette.tarotMidnight.withValues(alpha: 0.34),
+            blurRadius: 28,
+            offset: const Offset(0, 18),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             title,
-            style: TextStyle(
-              color: RynPalette.text(context),
+            style: const TextStyle(
+              color: RynPalette.tarotIvory,
               fontSize: 16,
-              fontWeight: FontWeight.w900,
+              fontWeight: FontWeight.w800,
               letterSpacing: -0.2,
             ),
           ),
           const SizedBox(height: 5),
           Text(
             subtitle,
-            style: TextStyle(
-              color: RynPalette.subtext(context),
+            style: const TextStyle(
+              color: RynPalette.tarotMist,
               fontSize: 12,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w600,
               height: 1.35,
             ),
           ),
           const SizedBox(height: 14),
-          child,
+          if (useUnifiedIntakeFrame)
+            _TarotUnifiedIntakeStageFrame(child: child)
+          else
+            child,
         ],
       ),
+    );
+  }
+}
+
+class _TarotUnifiedIntakeStageFrame extends StatelessWidget {
+  const _TarotUnifiedIntakeStageFrame({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final wide = constraints.maxWidth >= 900;
+        final height = wide ? 540.0 : 680.0;
+        return SizedBox(
+          key: const Key('tarot-unified-intake-stage-frame'),
+          height: height,
+          child: SingleChildScrollView(
+            primary: false,
+            padding: EdgeInsets.zero,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: height),
+              child: child,
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -1148,124 +1612,1006 @@ ButtonStyle _tarotFilledSetupActionStyle(BuildContext context) {
 
 ButtonStyle _tarotOutlinedSetupActionStyle(BuildContext context) {
   return OutlinedButton.styleFrom(
-    foregroundColor: RynPalette.text(context),
-    disabledForegroundColor: RynPalette.subtext(
-      context,
-    ).withValues(alpha: 0.55),
-    side: BorderSide(color: RynPalette.line(context)),
-    textStyle: const TextStyle(fontWeight: FontWeight.w900),
+    foregroundColor: RynPalette.tarotIvory,
+    disabledForegroundColor: RynPalette.tarotMist.withValues(alpha: 0.45),
+    side: BorderSide(color: RynPalette.tarotMist.withValues(alpha: 0.22)),
+    textStyle: const TextStyle(fontWeight: FontWeight.w700),
   );
 }
 
-class _TarotQuestionGuidanceLayout extends StatelessWidget {
-  const _TarotQuestionGuidanceLayout();
+class _TarotIntroPanel extends StatelessWidget {
+  const _TarotIntroPanel({required this.onStart, required this.onSkipToDeck});
+
+  final VoidCallback onStart;
+  final VoidCallback onSkipToDeck;
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final wide = constraints.maxWidth >= 900;
-        final guide = Container(
-          key: const Key('tarot-consultation-guidance-panel'),
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                RynPalette.tarotViolet.withValues(alpha: 0.10),
-                RynPalette.tarotGold.withValues(alpha: 0.08),
-              ],
-            ),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: RynPalette.line(context)),
+    return Container(
+      key: const Key('tarot-intro-panel'),
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            RynPalette.tarotMidnight.withValues(alpha: 0.98),
+            RynPalette.tarotViolet.withValues(alpha: 0.90),
+            RynPalette.tarotGold.withValues(alpha: 0.22),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(color: RynPalette.tarotGold.withValues(alpha: 0.34)),
+        boxShadow: [
+          BoxShadow(
+            color: RynPalette.tarotViolet.withValues(alpha: 0.18),
+            blurRadius: 28,
+            offset: const Offset(0, 18),
           ),
-          child: Column(
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            right: -18,
+            top: -24,
+            child: Icon(
+              Icons.auto_awesome_rounded,
+              color: Colors.white.withValues(alpha: 0.08),
+              size: 160,
+            ),
+          ),
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(
+                key: Key('tarot-setup-guidance-layout'),
+                width: 1,
+                height: 1,
+              ),
               Row(
                 children: [
                   Container(
-                    width: 44,
-                    height: 44,
+                    width: 58,
+                    height: 58,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          RynPalette.tarotGold.withValues(alpha: 0.32),
-                          RynPalette.tarotViolet.withValues(alpha: 0.10),
-                        ],
-                      ),
+                      color: RynPalette.tarotGold.withValues(alpha: 0.18),
                       border: Border.all(
-                        color: RynPalette.tarotGold.withValues(alpha: 0.28),
+                        color: RynPalette.tarotGold.withValues(alpha: 0.52),
                       ),
                     ),
                     child: Icon(
-                      Icons.spa_rounded,
+                      Icons.local_fire_department_rounded,
                       color: RynPalette.tarotGold,
-                      size: 22,
+                      size: 29,
                     ),
                   ),
-                  const SizedBox(width: 10),
-                  _TarotSmallBadge('상담 전 정렬', compact: true),
+                  const SizedBox(width: 12),
+                  const _TarotSmallBadge('프리미엄 리딩 준비', compact: true),
                 ],
               ),
-              const SizedBox(height: 14),
-              Text(
-                '질문은 짧게, 목적은 분명하게 잡아두세요.',
+              const SizedBox(height: 58),
+              const Text(
+                '오늘의 리딩을 시작합니다',
                 style: TextStyle(
-                  color: RynPalette.text(context),
-                  fontSize: 20,
+                  color: Colors.white,
+                  fontSize: 32,
                   fontWeight: FontWeight.w900,
-                  letterSpacing: -0.5,
+                  letterSpacing: -1.0,
+                  height: 1.08,
                 ),
               ),
-              const SizedBox(height: 10),
-              Text(
-                '카드를 뽑기 전 오늘 알고 싶은 방향을 한 문장으로 정하면 덱 선택과 해석 흐름이 선명해집니다.',
-                style: TextStyle(
-                  color: RynPalette.subtext(context),
-                  fontSize: 13,
-                  height: 1.45,
-                  fontWeight: FontWeight.w700,
+              const SizedBox(height: 12),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: Text(
+                  '주제를 고르고 질문을 정리한 뒤, 덱을 준비하는 하나의 상담 입장 흐름입니다.\n입력한 내용은 이번 리딩 흐름 안에서만 참고합니다.',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.80),
+                    fontSize: 14,
+                    height: 1.5,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 22),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: const [
+                  _TarotSmallBadge('주제 선택', compact: true),
+                  _TarotSmallBadge('질문 정리', compact: true),
+                  _TarotSmallBadge('덱 준비', compact: true),
+                ],
+              ),
+              const SizedBox(height: 28),
               Row(
                 children: [
-                  Icon(Icons.auto_awesome_rounded, color: RynPalette.tarotGold),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      '이 화면의 메모는 현재 상담 준비를 돕는 정리 공간입니다.',
-                      style: TextStyle(
-                        color: RynPalette.subtext(context),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                  FilledButton.icon(
+                    style: _tarotFilledSetupActionStyle(context),
+                    onPressed: onStart,
+                    icon: const Icon(Icons.play_arrow_rounded),
+                    label: const Text('질문 시작하기'),
+                  ),
+                  const SizedBox(width: 10),
+                  OutlinedButton.icon(
+                    style: _tarotOutlinedActionStyle(),
+                    onPressed: onSkipToDeck,
+                    icon: const Icon(Icons.style_rounded, size: 18),
+                    label: const Text('바로 덱 선택'),
                   ),
                 ],
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotCategorySelectionPanel extends StatelessWidget {
+  const _TarotCategorySelectionPanel({
+    required this.categories,
+    required this.selectedCategoryId,
+    required this.onSelected,
+  });
+
+  final List<_TarotQuestionCategory> categories;
+  final String selectedCategoryId;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = categories.firstWhere(
+      (category) => category.id == selectedCategoryId,
+      orElse: () => categories.first,
+    );
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final wide = constraints.maxWidth >= 960;
+        final spacious = constraints.maxWidth >= 1180;
+        final cards = GridView.builder(
+          key: const Key('tarot-question-category-panel'),
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: categories.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: spacious ? 5 : (wide ? 3 : 2),
+            crossAxisSpacing: spacious ? 10 : 12,
+            mainAxisSpacing: spacious ? 10 : 12,
+            mainAxisExtent: spacious ? 88 : null,
+            childAspectRatio: wide ? 2.95 : 2.55,
+          ),
+          itemBuilder: (context, index) {
+            final category = categories[index];
+            return _TarotCategoryCard(
+              category: category,
+              selected: selectedCategoryId == category.id,
+              onTap: () => onSelected(category.id),
+            );
+          },
         );
-        final memo = const _TarotMemoPanel();
-        return SizedBox(
-          key: const Key('tarot-setup-guidance-layout'),
-          height: wide ? 430 : null,
-          child: wide
-              ? Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Expanded(flex: 4, child: guide),
-                    const SizedBox(width: 16),
-                    Expanded(flex: 6, child: memo),
+        final guide = _TarotIntakeSectionCard(
+          icon: selected.icon,
+          title: '${selected.label} 리딩 가이드',
+          subtitle: selected.helper,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _TarotConsultationNote(
+                icon: Icons.lightbulb_rounded,
+                text: '오늘 가장 궁금한 장면 하나를 떠올리고 다음 단계에서 질문을 짧게 정리해요.',
+              ),
+              const SizedBox(height: 10),
+              _TarotConsultationNote(
+                icon: Icons.lock_clock_rounded,
+                text: '입력한 내용은 이번 리딩 흐름 안에서만 참고합니다.',
+              ),
+            ],
+          ),
+        );
+        return wide
+            ? Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(flex: 8, child: cards),
+                  const SizedBox(width: 14),
+                  Expanded(flex: 3, child: guide),
+                ],
+              )
+            : Column(children: [cards, const SizedBox(height: 14), guide]);
+      },
+    );
+  }
+}
+
+class _TarotCategoryCard extends StatelessWidget {
+  const _TarotCategoryCard({
+    required this.category,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final _TarotQuestionCategory category;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      key: ValueKey('tarot-question-category-${category.id}'),
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(22),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          gradient: selected
+              ? LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    RynPalette.tarotGold,
+                    RynPalette.tarotGold.withValues(alpha: 0.78),
                   ],
                 )
-              : Column(children: [guide, const SizedBox(height: 14), memo]),
+              : LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    RynPalette.tarotNavy.withValues(alpha: 0.94),
+                    RynPalette.tarotViolet.withValues(alpha: 0.50),
+                  ],
+                ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: selected
+                ? RynPalette.tarotGold
+                : RynPalette.tarotLavender.withValues(alpha: 0.16),
+          ),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: RynPalette.tarotGold.withValues(alpha: 0.18),
+                    blurRadius: 18,
+                    offset: const Offset(0, 10),
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: selected
+                    ? RynPalette.tarotMidnight.withValues(alpha: 0.12)
+                    : RynPalette.tarotLavender.withValues(alpha: 0.12),
+              ),
+              child: Icon(
+                category.icon,
+                color: selected
+                    ? RynPalette.tarotMidnight
+                    : RynPalette.tarotLavender,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    category.label,
+                    style: TextStyle(
+                      color: selected
+                          ? RynPalette.tarotMidnight
+                          : RynPalette.tarotIvory,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    category.helper,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: selected
+                          ? RynPalette.tarotMidnight.withValues(alpha: 0.74)
+                          : RynPalette.tarotMist,
+                      fontSize: 11,
+                      height: 1.25,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TarotQuestionInputPanel extends StatelessWidget {
+  const _TarotQuestionInputPanel({
+    required this.freeQuestion,
+    required this.questionTitle,
+    required this.questionDetail,
+    required this.currentSituation,
+    required this.desiredClarity,
+    required this.onFreeQuestionChanged,
+    required this.onQuestionTitleChanged,
+    required this.onQuestionDetailChanged,
+    required this.onCurrentSituationChanged,
+    required this.onDesiredClarityChanged,
+  });
+
+  final String freeQuestion;
+  final String questionTitle;
+  final String questionDetail;
+  final String currentSituation;
+  final String desiredClarity;
+  final ValueChanged<String> onFreeQuestionChanged;
+  final ValueChanged<String> onQuestionTitleChanged;
+  final ValueChanged<String> onQuestionDetailChanged;
+  final ValueChanged<String> onCurrentSituationChanged;
+  final ValueChanged<String> onDesiredClarityChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final wide = constraints.maxWidth >= 980;
+        final left = KeyedSubtree(
+          key: const Key('tarot-free-question-hero-surface'),
+          child: _TarotIntakeSectionCard(
+            icon: Icons.mode_edit_outline_rounded,
+            title: '떠오른 질문 그대로',
+            subtitle: '먼저 자연어로 적고, 아래에서 한 줄로 정리해요.',
+            child: Column(
+              children: [
+                _TarotIntakeTextField(
+                  fieldKey: const Key('tarot-free-question-input'),
+                  label: '자유 질문',
+                  hint: '예: 지금 내 마음이 가장 먼저 묻고 싶은 것은?',
+                  initialValue: freeQuestion,
+                  onChanged: onFreeQuestionChanged,
+                  minLines: 3,
+                  helperText: '떠오르는 질문을 그대로 적어도 좋아요.',
+                ),
+                const SizedBox(height: 12),
+                _TarotIntakeTextField(
+                  fieldKey: const Key('tarot-question-title-input'),
+                  label: '질문 한 줄',
+                  hint: '예: 이번 선택에서 가장 중요한 기준은?',
+                  initialValue: questionTitle,
+                  onChanged: onQuestionTitleChanged,
+                ),
+                const SizedBox(height: 12),
+                _TarotIntakeTextField(
+                  fieldKey: const Key('tarot-question-detail-input'),
+                  label: '자세한 질문',
+                  hint: '상황과 궁금한 점을 조금 더 적어주세요.',
+                  initialValue: questionDetail,
+                  onChanged: onQuestionDetailChanged,
+                  minLines: 4,
+                ),
+              ],
+            ),
+          ),
         );
+        final right = _TarotIntakeSectionCard(
+          icon: Icons.center_focus_strong_rounded,
+          title: '현재 흐름과 초점',
+          subtitle: '지금 놓인 상황과 가장 보고 싶은 지점을 나눠 적어요.',
+          child: Column(
+            children: [
+              _TarotIntakeTextField(
+                fieldKey: const Key('tarot-question-current-situation-input'),
+                label: '현재 상황',
+                hint: '지금 놓인 상황을 짧게 정리해요.',
+                initialValue: currentSituation,
+                onChanged: onCurrentSituationChanged,
+                minLines: 3,
+              ),
+              const SizedBox(height: 12),
+              _TarotIntakeTextField(
+                fieldKey: const Key('tarot-question-desired-clarity-input'),
+                label: '알고 싶은 핵심',
+                hint: '가장 선명하게 보고 싶은 지점',
+                initialValue: desiredClarity,
+                onChanged: onDesiredClarityChanged,
+              ),
+            ],
+          ),
+        );
+        return wide
+            ? Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: left),
+                  const SizedBox(width: 14),
+                  Expanded(child: right),
+                ],
+              )
+            : Column(children: [left, const SizedBox(height: 14), right]);
       },
+    );
+  }
+}
+
+class _TarotQuerentInputPanel extends StatelessWidget {
+  const _TarotQuerentInputPanel({
+    required this.querentAlias,
+    required this.querentRelationship,
+    required this.querentBirthNote,
+    required this.sessionContext,
+    required this.sensitivityNote,
+    required this.onQuerentAliasChanged,
+    required this.onQuerentRelationshipChanged,
+    required this.onQuerentBirthNoteChanged,
+    required this.onSessionContextChanged,
+    required this.onSensitivityNoteChanged,
+  });
+
+  final String querentAlias;
+  final String querentRelationship;
+  final String querentBirthNote;
+  final String sessionContext;
+  final String sensitivityNote;
+  final ValueChanged<String> onQuerentAliasChanged;
+  final ValueChanged<String> onQuerentRelationshipChanged;
+  final ValueChanged<String> onQuerentBirthNoteChanged;
+  final ValueChanged<String> onSessionContextChanged;
+  final ValueChanged<String> onSensitivityNoteChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final wide = constraints.maxWidth >= 980;
+        final identity = _TarotIntakeSectionCard(
+          icon: Icons.person_outline_rounded,
+          title: '내담자 기본 맥락',
+          subtitle: '리딩에 도움이 되는 최소 정보만 적습니다.',
+          trailing: const _TarotSmallBadge('이번 리딩 안에서만 참고해요', compact: true),
+          child: Column(
+            children: [
+              _TarotIntakeTextField(
+                fieldKey: const Key('tarot-querent-alias-input'),
+                label: '이름 또는 별칭',
+                hint: '예: 린님, 내담자 A',
+                initialValue: querentAlias,
+                onChanged: onQuerentAliasChanged,
+              ),
+              const SizedBox(height: 12),
+              _TarotIntakeTextField(
+                fieldKey: const Key('tarot-querent-relationship-input'),
+                label: '나와의 관계',
+                hint: '예: 본인, 지인, 상담 대상',
+                initialValue: querentRelationship,
+                onChanged: onQuerentRelationshipChanged,
+              ),
+              const SizedBox(height: 12),
+              _TarotIntakeTextField(
+                fieldKey: const Key('tarot-querent-birth-note-input'),
+                label: '나이·생년 참고',
+                hint: '필요할 때만 가볍게 적어요.',
+                initialValue: querentBirthNote,
+                onChanged: onQuerentBirthNoteChanged,
+              ),
+            ],
+          ),
+        );
+        final contextCard = _TarotIntakeSectionCard(
+          icon: Icons.forum_outlined,
+          title: '상담 진행 참고',
+          subtitle: '오늘 리딩의 톤과 조심할 지점을 미리 정리합니다.',
+          child: Column(
+            children: [
+              _TarotIntakeTextField(
+                fieldKey: const Key('tarot-session-context-input'),
+                label: '상담 맥락',
+                hint: '오늘 리딩이 필요한 배경',
+                initialValue: sessionContext,
+                onChanged: onSessionContextChanged,
+                minLines: 3,
+              ),
+              const SizedBox(height: 12),
+              _TarotIntakeTextField(
+                fieldKey: const Key('tarot-sensitivity-note-input'),
+                label: '주의할 점',
+                hint: '조심스럽게 다뤄야 할 표현이나 상황',
+                initialValue: sensitivityNote,
+                onChanged: onSensitivityNoteChanged,
+                minLines: 2,
+              ),
+            ],
+          ),
+        );
+        return wide
+            ? Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: identity),
+                  const SizedBox(width: 14),
+                  Expanded(child: contextCard),
+                ],
+              )
+            : Column(
+                children: [identity, const SizedBox(height: 14), contextCard],
+              );
+      },
+    );
+  }
+}
+
+class _TarotIntakeSummaryPanel extends StatelessWidget {
+  const _TarotIntakeSummaryPanel({
+    required this.category,
+    required this.freeQuestion,
+    required this.questionTitle,
+    required this.questionDetail,
+    required this.currentSituation,
+    required this.desiredClarity,
+    required this.querentAlias,
+    required this.querentRelationship,
+    required this.sessionContext,
+    required this.sensitivityNote,
+    required this.onContinue,
+  });
+
+  final _TarotQuestionCategory category;
+  final String freeQuestion;
+  final String questionTitle;
+  final String questionDetail;
+  final String currentSituation;
+  final String desiredClarity;
+  final String querentAlias;
+  final String querentRelationship;
+  final String sessionContext;
+  final String sensitivityNote;
+  final VoidCallback onContinue;
+
+  String _fallback(String value) =>
+      value.trim().isEmpty ? '아직 적지 않았어요' : value.trim();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('tarot-reading-intake-receipt-card'),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            RynPalette.tarotMidnight,
+            RynPalette.tarotNavy,
+            RynPalette.tarotViolet.withValues(alpha: 0.72),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: RynPalette.tarotGold.withValues(alpha: 0.22)),
+        boxShadow: RynPalette.panelShadow(context),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final wide = constraints.maxWidth >= 920;
+          final header = Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: RynPalette.tarotGold.withValues(alpha: 0.16),
+                ),
+                child: Icon(
+                  category.icon,
+                  color: RynPalette.tarotGold,
+                  size: 26,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '리딩 접수 요약',
+                      style: TextStyle(
+                        color: RynPalette.tarotIvory,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.4,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${category.label} · ${category.helper}',
+                      style: TextStyle(
+                        color: RynPalette.tarotMist,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+          final question = _TarotSummaryGroup(
+            title: '질문 흐름',
+            icon: Icons.help_outline_rounded,
+            children: [
+              _TarotSummaryPill(label: '자유 질문', value: _fallback(freeQuestion)),
+              _TarotSummaryPill(
+                label: '질문 한 줄',
+                value: _fallback(questionTitle),
+              ),
+              _TarotSummaryPill(
+                label: '자세한 질문',
+                value: _fallback(questionDetail),
+              ),
+              _TarotSummaryPill(
+                label: '현재 상황',
+                value: _fallback(currentSituation),
+              ),
+              _TarotSummaryPill(
+                label: '알고 싶은 핵심',
+                value: _fallback(desiredClarity),
+              ),
+            ],
+          );
+          final querent = _TarotSummaryGroup(
+            title: '상담 맥락',
+            icon: Icons.person_search_rounded,
+            children: [
+              _TarotSummaryPill(label: '카테고리', value: category.label),
+              _TarotSummaryPill(
+                label: '이름 또는 별칭',
+                value: _fallback(querentAlias),
+              ),
+              _TarotSummaryPill(
+                label: '나와의 관계',
+                value: _fallback(querentRelationship),
+              ),
+              _TarotSummaryPill(
+                label: '상담 맥락',
+                value: _fallback(sessionContext),
+              ),
+              _TarotSummaryPill(
+                label: '주의할 점',
+                value: _fallback(sensitivityNote),
+              ),
+            ],
+          );
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              header,
+              const SizedBox(height: 16),
+              wide
+                  ? Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(child: question),
+                        const SizedBox(width: 14),
+                        Expanded(child: querent),
+                      ],
+                    )
+                  : Column(
+                      children: [question, const SizedBox(height: 14), querent],
+                    ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: _TarotConsultationNote(
+                      icon: Icons.lock_clock_rounded,
+                      text: '입력한 내용은 이번 리딩 흐름 안에서만 참고합니다.',
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  FilledButton.icon(
+                    style: _tarotFilledSetupActionStyle(context),
+                    onPressed: onContinue,
+                    icon: const Icon(Icons.style_rounded),
+                    label: const Text('덱과 스프레드 선택하기'),
+                  ),
+                ],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _TarotIntakeSectionCard extends StatelessWidget {
+  const _TarotIntakeSectionCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.child,
+    this.trailing,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Widget child;
+  final Widget? trailing;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: RynPalette.tarotNavy.withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: RynPalette.tarotLavender.withValues(alpha: 0.14),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(icon, color: RynPalette.tarotLavender, size: 22),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: RynPalette.tarotIvory,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(
+                        color: RynPalette.tarotMist,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        height: 1.35,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (trailing != null) ...[const SizedBox(width: 8), trailing!],
+            ],
+          ),
+          const SizedBox(height: 14),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotConsultationNote extends StatelessWidget {
+  const _TarotConsultationNote({required this.icon, required this.text});
+
+  final IconData icon;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: RynPalette.tarotViolet.withValues(alpha: 0.26),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: RynPalette.tarotLavender.withValues(alpha: 0.12),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: RynPalette.tarotLavender, size: 18),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: RynPalette.tarotMist,
+                fontSize: 12,
+                height: 1.35,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotIntakeTextField extends StatelessWidget {
+  const _TarotIntakeTextField({
+    required this.fieldKey,
+    required this.label,
+    required this.hint,
+    required this.initialValue,
+    required this.onChanged,
+    this.minLines = 1,
+    this.helperText,
+  });
+
+  final Key fieldKey;
+  final String label;
+  final String hint;
+  final String initialValue;
+  final ValueChanged<String> onChanged;
+  final int minLines;
+  final String? helperText;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      key: fieldKey,
+      initialValue: initialValue,
+      minLines: minLines,
+      maxLines: minLines == 1 ? 1 : 5,
+      onChanged: onChanged,
+      style: TextStyle(
+        color: RynPalette.tarotIvory,
+        fontWeight: FontWeight.w700,
+      ),
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        helperText: helperText ?? (minLines > 1 ? '필요한 만큼만 짧게 적어도 좋아요.' : null),
+        filled: true,
+        fillColor: RynPalette.tarotMidnight.withValues(alpha: 0.58),
+        labelStyle: const TextStyle(
+          color: RynPalette.tarotMist,
+          fontWeight: FontWeight.w600,
+        ),
+        hintStyle: TextStyle(
+          color: RynPalette.tarotMist.withValues(alpha: 0.58),
+        ),
+        helperStyle: TextStyle(
+          color: RynPalette.tarotMist.withValues(alpha: 0.70),
+        ),
+        floatingLabelStyle: TextStyle(
+          color: RynPalette.tarotGold,
+          fontWeight: FontWeight.w800,
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(
+            color: RynPalette.tarotLavender.withValues(alpha: 0.14),
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: RynPalette.tarotGold, width: 1.4),
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(
+            color: RynPalette.tarotLavender.withValues(alpha: 0.14),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TarotSummaryGroup extends StatelessWidget {
+  const _TarotSummaryGroup({
+    required this.title,
+    required this.icon,
+    required this.children,
+  });
+
+  final String title;
+  final IconData icon;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: RynPalette.tarotNavy.withValues(alpha: 0.68),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: RynPalette.tarotLavender.withValues(alpha: 0.14),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: RynPalette.tarotLavender, size: 19),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: const TextStyle(
+                  color: RynPalette.tarotIvory,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...children,
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotSummaryPill extends StatelessWidget {
+  const _TarotSummaryPill({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: RynPalette.tarotMidnight.withValues(alpha: 0.50),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: RynPalette.tarotLavender.withValues(alpha: 0.12),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              color: RynPalette.tarotMist,
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: RynPalette.tarotIvory,
+              fontSize: 13,
+              height: 1.35,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -6118,6 +7464,7 @@ class _TarotFlipRevealFrame extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _TarotMemoPanel extends StatelessWidget {
   const _TarotMemoPanel();
 
