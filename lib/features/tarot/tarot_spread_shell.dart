@@ -144,6 +144,30 @@ class _TarotQuestionCategory {
   final IconData icon;
 }
 
+class _TarotReadingContext {
+  const _TarotReadingContext({
+    required this.category,
+    required this.freeQuestion,
+    required this.querentAlias,
+    required this.sensitivityNote,
+  });
+
+  final _TarotQuestionCategory category;
+  final String freeQuestion;
+  final String querentAlias;
+  final String sensitivityNote;
+
+  String get question {
+    final value = freeQuestion.trim();
+    if (value.isNotEmpty) return value;
+    return '오늘 가장 먼저 비춰볼 질문';
+  }
+
+  String get quotedQuestion => '“$question”';
+  String get alias => querentAlias.trim();
+  String get caution => sensitivityNote.trim();
+}
+
 const _tarotQuestionCategories = [
   _TarotQuestionCategory(
     id: 'love',
@@ -415,6 +439,13 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         (category) => category.id == _selectedQuestionCategoryId,
         orElse: () => _tarotQuestionCategories.first,
       );
+
+  _TarotReadingContext get _readingContext => _TarotReadingContext(
+    category: _selectedQuestionCategory,
+    freeQuestion: _freeQuestion,
+    querentAlias: _querentAlias,
+    sensitivityNote: _sensitivityNote,
+  );
 
   void _updateQuestionCategory(String categoryId) {
     setState(() => _selectedQuestionCategoryId = categoryId);
@@ -753,6 +784,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         onShuffle: _startShuffle,
         onAutoDraw: _drawAll,
         isShuffling: _phase == _TarotDrawPhase.shuffling,
+        readingContext: _readingContext,
         directionMode: _directionMode,
         onDirectionModeSelected: _selectDirectionMode,
         positionLabels: _positionLabels,
@@ -778,6 +810,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         onReset: _resetDraw,
         cardBack: _selectedCardBack,
         tableCloth: _selectedTableCloth,
+        readingContext: _readingContext,
       ),
       _TarotFlowStage.result => _TarotResultStage(
         spreadDefinition: _selectedSpreadDefinition,
@@ -795,6 +828,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         cardBack: _selectedCardBack,
         deckLabel: _selectedDeck.label,
         tableCloth: _selectedTableCloth,
+        readingContext: _readingContext,
       ),
       _TarotFlowStage.interpretation => _TarotInterpretationStage(
         spreadLabel: _selectedSpread,
@@ -802,6 +836,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         drawnCards: _drawnCards,
         revealedIndexes: _revealedResultIndexes,
         tableCloth: _selectedTableCloth,
+        readingContext: _readingContext,
         onBackToResult: () => setState(() => _stage = _TarotFlowStage.result),
         onReset: _resetDraw,
       ),
@@ -1200,6 +1235,7 @@ class _TarotSetupStage extends StatefulWidget {
     required this.onShuffle,
     required this.onAutoDraw,
     required this.isShuffling,
+    required this.readingContext,
     required this.directionMode,
     required this.onDirectionModeSelected,
     required this.positionLabels,
@@ -1253,6 +1289,7 @@ class _TarotSetupStage extends StatefulWidget {
   final VoidCallback onShuffle;
   final VoidCallback onAutoDraw;
   final bool isShuffling;
+  final _TarotReadingContext readingContext;
   final _TarotDirectionMode directionMode;
   final ValueChanged<_TarotDirectionMode> onDirectionModeSelected;
   final List<String> positionLabels;
@@ -1387,6 +1424,7 @@ class _TarotSetupStageState extends State<_TarotSetupStage> {
         onShuffle: widget.onShuffle,
         onAutoDraw: widget.onAutoDraw,
         cardBack: widget.selectedCardBack,
+        readingContext: widget.readingContext,
       ),
     );
     final steps = [
@@ -3029,6 +3067,135 @@ class _TarotCosmicParticles extends StatelessWidget {
   }
 }
 
+class _TarotReadingContextRibbon extends StatelessWidget {
+  const _TarotReadingContextRibbon({required this.readingContext});
+
+  final _TarotReadingContext readingContext;
+
+  @override
+  Widget build(BuildContext context) {
+    final chips = <Widget>[
+      _TarotContextChip(
+        icon: readingContext.category.icon,
+        label: '이번 리딩의 주제',
+        value: readingContext.category.label,
+      ),
+      if (readingContext.alias.isNotEmpty)
+        _TarotContextChip(
+          icon: Icons.person_outline_rounded,
+          label: '함께 볼 점',
+          value: readingContext.alias,
+        ),
+      if (readingContext.caution.isNotEmpty)
+        _TarotContextChip(
+          icon: Icons.visibility_outlined,
+          label: '주의해서 볼 점',
+          value: readingContext.caution,
+        ),
+    ];
+    return Container(
+      key: const Key('tarot-reading-context-ribbon'),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(
+                Icons.format_quote_rounded,
+                size: 18,
+                color: RynPalette.tarotGold.withValues(alpha: 0.86),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '오늘의 질문',
+                      style: TextStyle(
+                        color: RynPalette.tarotLavender.withValues(alpha: 0.94),
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      readingContext.quotedQuestion,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w900,
+                        height: 1.28,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Wrap(spacing: 8, runSpacing: 6, children: chips),
+        ],
+      ),
+    );
+  }
+}
+
+class _TarotContextChip extends StatelessWidget {
+  const _TarotContextChip({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 280),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.055),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.075)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: RynPalette.tarotLavender),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              '$label · $value',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: RynPalette.tarotLavender.withValues(alpha: 0.96),
+                fontSize: 11.5,
+                fontWeight: FontWeight.w800,
+                height: 1.15,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _TarotPreparationPanel extends StatelessWidget {
   const _TarotPreparationPanel({
     required this.selectedDeck,
@@ -3037,6 +3204,7 @@ class _TarotPreparationPanel extends StatelessWidget {
     required this.onShuffle,
     required this.onAutoDraw,
     required this.cardBack,
+    required this.readingContext,
   });
 
   final TarotDeckDefinition selectedDeck;
@@ -3045,6 +3213,7 @@ class _TarotPreparationPanel extends StatelessWidget {
   final VoidCallback onShuffle;
   final VoidCallback onAutoDraw;
   final _TarotCardBackDefinition cardBack;
+  final _TarotReadingContext readingContext;
 
   @override
   Widget build(BuildContext context) {
@@ -3109,6 +3278,8 @@ class _TarotPreparationPanel extends StatelessWidget {
                       height: 1.45,
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  _TarotReadingContextRibbon(readingContext: readingContext),
                 ],
               ),
             ),
@@ -3227,6 +3398,7 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
     required this.onReset,
     required this.cardBack,
     required this.tableCloth,
+    required this.readingContext,
   });
 
   final TarotDeckDefinition deck;
@@ -3243,6 +3415,7 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
   final VoidCallback onReset;
   final _TarotCardBackDefinition cardBack;
   final _TarotTableClothDefinition tableCloth;
+  final _TarotReadingContext readingContext;
 
   @override
   Widget build(BuildContext context) {
@@ -3325,6 +3498,8 @@ class _TarotFullDeckDrawStage extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 8),
+              _TarotReadingContextRibbon(readingContext: readingContext),
               const SizedBox(height: 8),
               Center(
                 child: Column(
@@ -3769,6 +3944,7 @@ class _TarotResultStage extends StatelessWidget {
     required this.cardBack,
     required this.deckLabel,
     required this.tableCloth,
+    required this.readingContext,
   });
 
   final _TarotSpreadDefinition spreadDefinition;
@@ -3786,6 +3962,7 @@ class _TarotResultStage extends StatelessWidget {
   final _TarotCardBackDefinition cardBack;
   final String deckLabel;
   final _TarotTableClothDefinition tableCloth;
+  final _TarotReadingContext readingContext;
 
   @override
   Widget build(BuildContext context) {
@@ -3823,6 +4000,16 @@ class _TarotResultStage extends StatelessWidget {
         child: Stack(
           children: [
             const Positioned.fill(child: _TarotCosmicParticles()),
+            Positioned(
+              top: 56,
+              left: 12,
+              right: 12,
+              child: IgnorePointer(
+                child: _TarotReadingContextRibbon(
+                  readingContext: readingContext,
+                ),
+              ),
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -3944,6 +4131,7 @@ class _TarotInterpretationStage extends StatelessWidget {
     required this.drawnCards,
     required this.revealedIndexes,
     required this.tableCloth,
+    required this.readingContext,
     required this.onBackToResult,
     required this.onReset,
   });
@@ -3953,6 +4141,7 @@ class _TarotInterpretationStage extends StatelessWidget {
   final List<_DrawnTarotCard> drawnCards;
   final Set<int> revealedIndexes;
   final _TarotTableClothDefinition tableCloth;
+  final _TarotReadingContext readingContext;
   final VoidCallback onBackToResult;
   final VoidCallback onReset;
 
@@ -4039,6 +4228,8 @@ class _TarotInterpretationStage extends StatelessWidget {
                   ),
                 ],
               ),
+              const SizedBox(height: 14),
+              _TarotReadingContextRibbon(readingContext: readingContext),
               const SizedBox(height: 14),
               _TarotInterpretationShell(
                 slots: slots,

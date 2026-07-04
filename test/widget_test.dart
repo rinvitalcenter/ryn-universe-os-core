@@ -481,6 +481,93 @@ void main() {
     },
   );
 
+  testWidgets('Tarot reading context follows the question into later flow', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 1100);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: TarotSpreadShell(key: UniqueKey(), onBack: () {}),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('tarot-question-category-money')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('tarot-free-question-input')),
+      '지금 선택에서 가장 조심해서 볼 흐름은 무엇일까요?',
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('tarot-querent-alias-input')),
+      '린',
+    );
+    await tester.enterText(
+      find.byKey(const Key('tarot-sensitivity-note-input')),
+      '결과를 단정하지 않기',
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('덱과 스프레드 선택하기'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('덱과 스프레드 선택하기'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('tarot-reading-context-ribbon')),
+      findsOneWidget,
+    );
+    expect(find.text('오늘의 질문'), findsOneWidget);
+    expect(find.text('“지금 선택에서 가장 조심해서 볼 흐름은 무엇일까요?”'), findsOneWidget);
+    expect(find.textContaining('금전'), findsWidgets);
+    expect(find.textContaining('린'), findsWidgets);
+    expect(find.textContaining('결과를 단정하지 않기'), findsWidgets);
+    expect(find.textContaining('AppData'), findsNothing);
+    expect(find.textContaining('persistence'), findsNothing);
+
+    await tester.ensureVisible(find.text(UserText.tarotAutoDraw));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(UserText.tarotAutoDraw));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('tarot-reading-context-ribbon')),
+      findsOneWidget,
+    );
+    expect(find.text('“지금 선택에서 가장 조심해서 볼 흐름은 무엇일까요?”'), findsOneWidget);
+
+    await tester.tap(find.text('해석 보기'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('tarot-reading-context-ribbon')),
+      findsOneWidget,
+    );
+    expect(find.text('“지금 선택에서 가장 조심해서 볼 흐름은 무엇일까요?”'), findsOneWidget);
+  });
+
   testWidgets('Reading workspace opens RWS Tarot draw flow without storage', (
     WidgetTester tester,
   ) async {
