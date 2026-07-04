@@ -64,10 +64,97 @@ void main() {
     expect(tarotShell.contains('해석'), isTrue);
     expect(tarotShell.contains('tarot-free-question-hero-surface'), isTrue);
     expect(tarotShell.contains('tarot-reading-intake-receipt-card'), isTrue);
+    expect(tarotShell.contains('오늘의 리딩 준비'), isTrue);
+    expect(tarotShell.contains('프리미엄 리딩 준비'), isFalse);
+    expect(tarotShell.contains('준비된 덱 자리'), isFalse);
+    expect(tarotShell.contains('Icons.monetization_on_rounded'), isFalse);
+    expect(tarotShell.contains('가능성과 조건을 봅니다'), isTrue);
+    expect(tarotShell.contains('방향과 선택을 봅니다'), isTrue);
+    expect(tarotShell.contains('내면의 신호를 봅니다'), isTrue);
+    expect(
+      tarotShell.contains('tarotAppBackground(BuildContext context)'),
+      isTrue,
+    );
+    expect(tarotShell.contains('tarotPageShell(BuildContext context)'), isTrue);
+    expect(
+      tarotShell.contains('tarotReadingStage(BuildContext context)'),
+      isTrue,
+    );
+    expect(
+      tarotShell.contains('tarotInputField(BuildContext context)'),
+      isTrue,
+    );
+    expect(
+      tarotShell.contains('tarotSummaryPanel(BuildContext context)'),
+      isTrue,
+    );
+    expect(
+      tarotShell.contains('tarotPurpleAccent(BuildContext context)'),
+      isTrue,
+    );
+    expect(
+      tarotShell.contains('tarotLightBackground = Color(0xFFF7F3EC)'),
+      isTrue,
+    );
+    expect(tarotShell.contains('tarotLightStage = Color(0xFFF1EDF8)'), isTrue);
+    expect(tarotShell.contains('tarotLightPurple = Color(0xFF6E56A3)'), isTrue);
+    expect(tarotShell.contains('tarot-light-intake-shell-surface'), isTrue);
+    expect(tarotShell.contains('tarot-dark-reading-table-surface'), isTrue);
+    expect(
+      tarotShell.contains('tarot-reading-table-forced-dark-theme'),
+      isTrue,
+    );
+    expect(
+      tarotShell.contains('color: RynPalette.tarotTextPrimary(context)'),
+      isTrue,
+      reason: 'Light intake hero copy must use warm ink, not white text.',
+    );
+    expect(
+      tarotShell.contains(
+        'color: Colors.white,\n                  fontSize: 32',
+      ),
+      isFalse,
+      reason: 'The light intake hero title must not remain white-on-pale.',
+    );
     expect(
       tarotShell.contains("key: const Key('tarot-global-flow-nav')"),
       isFalse,
     );
+  });
+
+  test('Tarot table chrome polish keeps visual hierarchy markers', () {
+    final tarotShell = File(
+      'lib/features/tarot/tarot_spread_shell.dart',
+    ).readAsStringSync();
+
+    expect(tarotShell.contains('TAROT-TABLE-CHROME-POLISH1'), isTrue);
+    expect(tarotShell.contains('tarot-table-chrome-polish-marker'), isTrue);
+    expect(tarotShell.contains('tarot-status-chip-unified'), isTrue);
+    expect(
+      tarotShell.contains('primary reading-table action hierarchy'),
+      isTrue,
+    );
+    expect(
+      tarotShell.contains('secondary actions stay dark translucent'),
+      isTrue,
+    );
+    expect(
+      tarotShell.contains('context ribbon retained, readable, subdued'),
+      isTrue,
+    );
+    expect(
+      tarotShell.contains('tarot-reading-table-forced-dark-theme'),
+      isTrue,
+    );
+    expect(tarotShell.contains('tarot-reading-context-ribbon'), isTrue);
+    expect(tarotShell.contains('tarot-reading-command-bar'), isTrue);
+    expect(tarotShell.contains('tarot-layout-adjustment-toolbar'), isTrue);
+    expect(tarotShell.contains('AppData'), isFalse);
+    expect(tarotShell.contains('schema'), isFalse);
+    expect(tarotShell.contains('migration'), isFalse);
+    expect(tarotShell.contains('export'), isFalse);
+    expect(tarotShell.contains('PDF'), isFalse);
+    expect(tarotShell.contains('http'), isFalse);
   });
 
   test('text registries keep user copy separated from developer copy', () {
@@ -1074,7 +1161,7 @@ void main() {
 
     expect(find.byKey(const Key('tarot-table-cloth-selector')), findsOneWidget);
     for (final label in [
-      '딥 퍼플',
+      '미드나잇 바이올렛',
       '딥 그린',
       '로즈 와인',
       '미드나잇 네이비',
