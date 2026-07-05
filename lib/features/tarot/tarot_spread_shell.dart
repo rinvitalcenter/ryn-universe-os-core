@@ -1,6 +1,10 @@
+import 'dart:io';
 import 'dart:math' as math;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:newton_particles/newton_particles.dart';
 import 'package:shimmer/shimmer.dart';
@@ -4225,7 +4229,7 @@ class _TarotFullDeckCard extends StatelessWidget {
   }
 }
 
-class _TarotResultStage extends StatelessWidget {
+class _TarotResultStage extends StatefulWidget {
   const _TarotResultStage({
     required this.spreadDefinition,
     required this.spreadLabel,
@@ -4263,26 +4267,38 @@ class _TarotResultStage extends StatelessWidget {
   final _TarotReadingContext readingContext;
 
   @override
+  State<_TarotResultStage> createState() => _TarotResultStageState();
+}
+
+class _TarotResultStageState extends State<_TarotResultStage> {
+  // TAROT-READING-IMAGE-EXPORT1-R3-FLICKER-FIX: stable capture key avoids
+  // remounting the board RepaintBoundary during card reveal rebuilds.
+  final GlobalKey _imageBoundaryKey = GlobalKey(
+    debugLabel: 'tarot-result-image-boundary',
+  );
+
+  @override
   Widget build(BuildContext context) {
-    final allRevealed = revealedIndexes.length >= drawnCards.length;
+    final allRevealed =
+        widget.revealedIndexes.length >= widget.drawnCards.length;
     return KeyedSubtree(
       key: const Key('tarot-reading-workspace'),
       child: Container(
-        key: Key('tarot-result-table-cloth-${tableCloth.id}'),
+        key: Key('tarot-result-table-cloth-${widget.tableCloth.id}'),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           gradient: RadialGradient(
             center: const Alignment(0, -0.58),
             radius: 1.18,
             colors: [
-              tableCloth.primary.withValues(
-                alpha: _tarotClothPrimaryAlpha(tableCloth),
+              widget.tableCloth.primary.withValues(
+                alpha: _tarotClothPrimaryAlpha(widget.tableCloth),
               ),
-              tableCloth.shadow.withValues(
-                alpha: _tarotClothShadowAlpha(tableCloth),
+              widget.tableCloth.shadow.withValues(
+                alpha: _tarotClothShadowAlpha(widget.tableCloth),
               ),
-              _tarotClothTableBase(context, tableCloth),
-              _tarotClothTableEdge(context, tableCloth),
+              _tarotClothTableBase(context, widget.tableCloth),
+              _tarotClothTableEdge(context, widget.tableCloth),
             ],
           ),
           borderRadius: BorderRadius.circular(30),
@@ -4304,7 +4320,7 @@ class _TarotResultStage extends StatelessWidget {
               right: 12,
               child: IgnorePointer(
                 child: _TarotReadingContextRibbon(
-                  readingContext: readingContext,
+                  readingContext: widget.readingContext,
                 ),
               ),
             ),
@@ -4312,30 +4328,36 @@ class _TarotResultStage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 _TarotReadingCommandBar(
-                  spreadLabel: spreadLabel,
+                  spreadLabel: widget.spreadLabel,
                   allRevealed: allRevealed,
-                  onReset: onReset,
-                  onBack: onBack,
-                  onRevealAll: onRevealAll,
-                  onInterpret: onInterpret,
+                  onReset: widget.onReset,
+                  onBack: widget.onBack,
+                  onRevealAll: widget.onRevealAll,
+                  onInterpret: widget.onInterpret,
+                  onSaveImage: () => _saveTarotResultBoardPng(
+                    context: context,
+                    boundaryKey: _imageBoundaryKey,
+                    spreadLabel: widget.spreadLabel,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Expanded(
                   child: _TarotSpreadCanvas(
-                    spreadDefinition: spreadDefinition,
-                    spreadLabel: spreadLabel,
-                    slots: slots,
-                    drawnCards: drawnCards,
-                    revealedIndexes: revealedIndexes,
-                    revealFxIndexes: revealFxIndexes,
-                    onRevealCard: onRevealCard,
-                    onDirectionToggle: onDirectionToggle,
+                    spreadDefinition: widget.spreadDefinition,
+                    spreadLabel: widget.spreadLabel,
+                    slots: widget.slots,
+                    drawnCards: widget.drawnCards,
+                    revealedIndexes: widget.revealedIndexes,
+                    revealFxIndexes: widget.revealFxIndexes,
+                    onRevealCard: widget.onRevealCard,
+                    onDirectionToggle: widget.onDirectionToggle,
                     showEmptySlots: false,
                     fillAvailable: true,
                     onEmptySlotTap: () {},
-                    cardBack: cardBack,
-                    deckLabel: deckLabel,
-                    tableCloth: tableCloth,
+                    cardBack: widget.cardBack,
+                    deckLabel: widget.deckLabel,
+                    tableCloth: widget.tableCloth,
+                    captureBoundaryKey: _imageBoundaryKey,
                   ),
                 ),
               ],
@@ -4347,6 +4369,78 @@ class _TarotResultStage extends StatelessWidget {
   }
 }
 
+Future<void> _saveTarotResultBoardPng({
+  required BuildContext context,
+  required GlobalKey boundaryKey,
+  required String spreadLabel,
+}) async {
+  try {
+    final bytes = await _captureTarotResultBoardPng(boundaryKey);
+    final file = await _writeTarotResultBoardPng(bytes, spreadLabel);
+    if (!context.mounted) return;
+    _showTarotImageSaveMessage(context, '이미지를 저장했어요: ${file.path}');
+  } catch (_) {
+    if (!context.mounted) return;
+    _showTarotImageSaveMessage(context, '이미지 저장에 실패했어요. 다시 시도해 주세요.');
+  }
+}
+
+Future<Uint8List> _captureTarotResultBoardPng(GlobalKey boundaryKey) async {
+  // TAROT-READING-IMAGE-EXPORT1: PNG save captures only the visible result board boundary.
+  final renderObject = boundaryKey.currentContext?.findRenderObject();
+  if (renderObject is! RenderRepaintBoundary) {
+    throw StateError('result image boundary is not ready');
+  }
+  final image = await renderObject.toImage(pixelRatio: 2);
+  final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+  image.dispose();
+  if (byteData == null) {
+    throw StateError('result image bytes are empty');
+  }
+  return byteData.buffer.asUint8List();
+}
+
+Future<File> _writeTarotResultBoardPng(
+  Uint8List bytes,
+  String spreadLabel,
+) async {
+  final directory = await _tarotImageSaveDirectory();
+  await directory.create(recursive: true);
+  final filename =
+      'tarot_result_${_safeTarotFilenamePart(spreadLabel)}_${_tarotTimestamp()}.png';
+  final file = File('${directory.path}${Platform.pathSeparator}$filename');
+  return file.writeAsBytes(bytes, flush: true);
+}
+
+Future<Directory> _tarotImageSaveDirectory() async {
+  final home =
+      Platform.environment['USERPROFILE'] ?? Platform.environment['HOME'];
+  if (home == null || home.trim().isEmpty) {
+    return Directory.current;
+  }
+  return Directory(
+    '${home.trim()}${Platform.pathSeparator}Downloads${Platform.pathSeparator}Ryn Tarot',
+  );
+}
+
+String _safeTarotFilenamePart(String value) {
+  final normalized = value.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '_');
+  final safe = normalized.replaceAll(RegExp(r'[^a-z0-9가-힣_\-]+'), '');
+  return safe.isEmpty ? 'spread' : safe;
+}
+
+String _tarotTimestamp() {
+  String two(int value) => value.toString().padLeft(2, '0');
+  final now = DateTime.now();
+  return '${now.year}${two(now.month)}${two(now.day)}_${two(now.hour)}${two(now.minute)}${two(now.second)}';
+}
+
+void _showTarotImageSaveMessage(BuildContext context, String message) {
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(SnackBar(content: Text(message)));
+}
+
 class _TarotReadingCommandBar extends StatelessWidget {
   const _TarotReadingCommandBar({
     required this.spreadLabel,
@@ -4355,6 +4449,7 @@ class _TarotReadingCommandBar extends StatelessWidget {
     required this.onBack,
     required this.onRevealAll,
     required this.onInterpret,
+    required this.onSaveImage,
   });
 
   final String spreadLabel;
@@ -4363,6 +4458,7 @@ class _TarotReadingCommandBar extends StatelessWidget {
   final VoidCallback onBack;
   final VoidCallback onRevealAll;
   final VoidCallback onInterpret;
+  final VoidCallback onSaveImage;
 
   @override
   Widget build(BuildContext context) {
@@ -4401,6 +4497,13 @@ class _TarotReadingCommandBar extends StatelessWidget {
             onPressed: allRevealed ? null : onRevealAll,
             icon: const Icon(Icons.auto_awesome_rounded, size: 16),
             label: const Text(_TarotUiText.revealAll),
+          ),
+          OutlinedButton.icon(
+            key: const Key('tarot-save-result-image-button'),
+            style: _tarotCompactOutlinedActionStyle(context),
+            onPressed: onSaveImage,
+            icon: const Icon(Icons.download_rounded, size: 16),
+            label: const Text('이미지 저장'),
           ),
           FilledButton.icon(
             key: const Key('tarot-open-interpretation-button'),
@@ -6418,6 +6521,7 @@ class _TarotSpreadCanvas extends StatefulWidget {
     required this.cardBack,
     required this.deckLabel,
     required this.tableCloth,
+    this.captureBoundaryKey,
     this.showEmptySlots = true,
     this.fillAvailable = false,
   });
@@ -6434,6 +6538,7 @@ class _TarotSpreadCanvas extends StatefulWidget {
   final _TarotCardBackDefinition cardBack;
   final String deckLabel;
   final _TarotTableClothDefinition tableCloth;
+  final GlobalKey? captureBoundaryKey;
   final bool showEmptySlots;
   final bool fillAvailable;
 
@@ -6813,50 +6918,60 @@ class _TarotSpreadCanvasState extends State<_TarotSpreadCanvas> {
       child: Stack(
         children: [
           Positioned.fill(
-            child: Container(
-              key: Key(
-                _supportsDrag
-                    ? 'tarot-free-draw-board'
-                    : 'tarot-fixed-spread-board-${widget.spreadDefinition.id}',
-              ),
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(0, -0.18),
-                  radius: 0.98,
-                  colors: [
-                    widget.tableCloth.shadow.withValues(
-                      alpha: _isMutedGoldCloth(widget.tableCloth) ? 0.04 : 0.06,
-                    ),
-                    _isMutedGoldCloth(widget.tableCloth)
-                        ? RynPalette.tarotInputField(context)
-                        : RynPalette.tarotInputField(context),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(26),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-              ),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final baseCardSize = _cardSizeForLayout(
-                    widget.slots.length,
-                    constraints,
-                    widget.spreadDefinition,
-                  );
-                  const labelHeight = 36.0;
-                  return Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      for (final index in _paintOrder())
-                        _buildPositionedSlot(
-                          context: context,
-                          index: index,
-                          constraints: constraints,
-                          baseCardSize: baseCardSize,
-                          labelHeight: labelHeight,
+            child: RepaintBoundary(
+              key: widget.captureBoundaryKey,
+              child: KeyedSubtree(
+                key: const Key('tarot-result-image-capture-boundary'),
+                child: Container(
+                  key: Key(
+                    _supportsDrag
+                        ? 'tarot-free-draw-board'
+                        : 'tarot-fixed-spread-board-${widget.spreadDefinition.id}',
+                  ),
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: const Alignment(0, -0.18),
+                      radius: 0.98,
+                      colors: [
+                        widget.tableCloth.shadow.withValues(
+                          alpha: _isMutedGoldCloth(widget.tableCloth)
+                              ? 0.04
+                              : 0.06,
                         ),
-                    ],
-                  );
-                },
+                        _isMutedGoldCloth(widget.tableCloth)
+                            ? RynPalette.tarotInputField(context)
+                            : RynPalette.tarotInputField(context),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(26),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.08),
+                    ),
+                  ),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final baseCardSize = _cardSizeForLayout(
+                        widget.slots.length,
+                        constraints,
+                        widget.spreadDefinition,
+                      );
+                      const labelHeight = 36.0;
+                      return Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          for (final index in _paintOrder())
+                            _buildPositionedSlot(
+                              context: context,
+                              index: index,
+                              constraints: constraints,
+                              baseCardSize: baseCardSize,
+                              labelHeight: labelHeight,
+                            ),
+                        ],
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
           ),

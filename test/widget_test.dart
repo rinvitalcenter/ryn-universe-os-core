@@ -201,6 +201,50 @@ void main() {
     expect(tarotShell.contains('http'), isFalse);
   });
 
+  test('Tarot result board PNG save keeps board-only capture markers', () {
+    final tarotShell = File(
+      'lib/features/tarot/tarot_spread_shell.dart',
+    ).readAsStringSync();
+
+    expect(tarotShell.contains('TAROT-READING-IMAGE-EXPORT1'), isTrue);
+    expect(tarotShell.contains('tarot-save-result-image-button'), isTrue);
+    expect(tarotShell.contains('이미지 저장'), isTrue);
+    expect(tarotShell.contains('tarot-result-image-capture-boundary'), isTrue);
+    expect(tarotShell.contains('RenderRepaintBoundary'), isTrue);
+    expect(tarotShell.contains('ui.ImageByteFormat.png'), isTrue);
+    expect(tarotShell.contains('tarot_result_'), isTrue);
+    expect(tarotShell.contains('Downloads'), isTrue);
+    expect(tarotShell.contains('tarot-reading-context-ribbon'), isTrue);
+    expect(tarotShell.contains('tarot-focus-detail-overlay'), isTrue);
+    expect(
+      tarotShell.contains('TAROT-READING-IMAGE-EXPORT1-R3-FLICKER-FIX'),
+      isTrue,
+    );
+    expect(tarotShell.contains('class _TarotResultStageState'), isTrue);
+    expect(tarotShell.contains('final GlobalKey _imageBoundaryKey'), isTrue);
+    expect(
+      tarotShell.contains('captureBoundaryKey: _imageBoundaryKey'),
+      isTrue,
+    );
+    expect(tarotShell.contains('boundaryKey: _imageBoundaryKey'), isTrue);
+    expect(tarotShell.contains('final imageBoundaryKey = GlobalKey'), isFalse);
+    final captureMarker = tarotShell.indexOf(
+      "key: const Key('tarot-result-image-capture-boundary')",
+    );
+    final adjustmentToolbar = tarotShell.indexOf(
+      'child: _TarotFloatingAdjustmentControls(',
+    );
+    expect(captureMarker, isNonNegative);
+    expect(adjustmentToolbar, isNonNegative);
+    expect(captureMarker, lessThan(adjustmentToolbar));
+    expect(tarotShell.contains('AppData'), isFalse);
+    expect(tarotShell.contains('schema'), isFalse);
+    expect(tarotShell.contains('migration'), isFalse);
+    expect(tarotShell.contains('export'), isFalse);
+    expect(tarotShell.contains('PDF'), isFalse);
+    expect(tarotShell.contains('http'), isFalse);
+  });
+
   test('text registries keep user copy separated from developer copy', () {
     final userTextFile = File('lib/core/text/user_text.dart');
     final devTextFile = File('lib/core/text/dev_text.dart');
@@ -1127,6 +1171,11 @@ void main() {
 
       expect(find.text(UserText.tarotResultTable), findsOneWidget);
       expect(find.byKey(const Key('tarot-reveal-all-button')), findsOneWidget);
+      expect(
+        find.byKey(const Key('tarot-save-result-image-button')),
+        findsOneWidget,
+      );
+      expect(find.text('이미지 저장'), findsOneWidget);
       expect(find.byKey(const Key('tarot-interpretation-shell')), findsNothing);
       expect(find.text('해석 패널'), findsNothing);
       expect(find.text('해석 보기'), findsOneWidget);
@@ -1627,7 +1676,7 @@ void main() {
       );
       expect(find.text('해석 패널'), findsNothing);
       expect(find.text('해석 보기'), findsOneWidget);
-      expect(find.textContaining('저장', findRichText: true), findsNothing);
+      expect(find.text('이미지 저장'), findsOneWidget);
       expect(find.textContaining('export', findRichText: true), findsNothing);
       expect(find.textContaining('history', findRichText: true), findsNothing);
       expect(find.textContaining('AI', findRichText: true), findsNothing);
@@ -2136,8 +2185,6 @@ void main() {
       expect(source, contains("'year_ahead': _TarotSpreadGeometryBlueprint("));
       expect(source, isNot(contains('관계 리딩')));
       expect(source, isNot(contains('문제-원인-해결')));
-      expect(source, isNot(contains('save')));
-      expect(source, isNot(contains('export')));
       expect(source, isNot(contains('history')));
       expect(source, contains("id: 'one_card',"));
       expect(source, contains('family: _TarotSpreadFamily.freeLayout'));
@@ -2450,7 +2497,7 @@ void main() {
         find.byKey(const Key('tarot-spread-slot-horoscope-house_12')),
         findsOneWidget,
       );
-      expect(find.textContaining('저장', findRichText: true), findsNothing);
+      expect(find.text('이미지 저장'), findsOneWidget);
       expect(find.textContaining('export', findRichText: true), findsNothing);
       expect(find.textContaining('history', findRichText: true), findsNothing);
       expect(find.textContaining('AI', findRichText: true), findsNothing);
