@@ -201,6 +201,102 @@ void main() {
     expect(tarotShell.contains('http'), isFalse);
   });
 
+  test(
+    'Tarot interpretation story workspace removes duplicate question and expands preview',
+    () {
+      final tarotShell = File(
+        'lib/features/tarot/tarot_spread_shell.dart',
+      ).readAsStringSync();
+      final interpretationStageStart = tarotShell.indexOf(
+        'class _TarotInterpretationStage',
+      );
+      final interpretationShellStart = tarotShell.indexOf(
+        'class _TarotInterpretationShell',
+      );
+      final interpretationStageSource = tarotShell.substring(
+        interpretationStageStart,
+        interpretationShellStart,
+      );
+
+      expect(
+        tarotShell.contains('tarot-interpretation-story-workspace'),
+        isTrue,
+      );
+      expect(
+        tarotShell.contains('tarot-interpretation-spread-snapshot-preview'),
+        isTrue,
+      );
+      expect(
+        tarotShell.contains('tarot-interpretation-snapshot-image'),
+        isTrue,
+      );
+      expect(
+        tarotShell.contains('tarot-interpretation-deduped-question-context'),
+        isTrue,
+      );
+      expect(
+        tarotShell.contains('tarot-interpretation-expanded-workspace'),
+        isTrue,
+      );
+      expect(tarotShell.contains('tarot-interpretation-font-audit'), isTrue);
+      expect(
+        interpretationStageSource.contains('_TarotReadingContextRibbon'),
+        isFalse,
+      );
+      expect(tarotShell.contains('height: 660'), isTrue);
+      expect(
+        tarotShell.contains(
+          'constraints: const BoxConstraints(minHeight: 660)',
+        ),
+        isTrue,
+      );
+      expect(
+        tarotShell.contains('tarot-interpretation-story-notes-panel'),
+        isTrue,
+      );
+      expect(
+        tarotShell.contains('tarot-interpretation-in-memory-note'),
+        isTrue,
+      );
+      expect(tarotShell.contains('no-persistence-interpretation-note'), isTrue);
+      expect(tarotShell.contains('Image.memory'), isTrue);
+      expect(tarotShell.contains('BoxFit.contain'), isTrue);
+      expect(tarotShell.contains('spreadSnapshotBytes'), isTrue);
+      expect(
+        tarotShell.contains('Uint8List? _interpretationSnapshotBytes'),
+        isTrue,
+      );
+      expect(tarotShell.contains('_captureTarotResultBoardPng'), isTrue);
+      expect(tarotShell.contains('스프레드 이미지를 준비하지 못했습니다'), isTrue);
+      expect(
+        tarotShell.contains('tarot-interpretation-spread-preview-card'),
+        isFalse,
+      );
+      expect(
+        tarotShell.contains('_PositionedInterpretationPreviewCard'),
+        isFalse,
+      );
+      expect(tarotShell.contains('interpretation_history'), isFalse);
+      expect(tarotShell.contains('saveInterpretation'), isFalse);
+      expect(tarotShell.contains('writeInterpretation'), isFalse);
+      expect(tarotShell.contains('_writeTarotResultBoardPng'), isTrue);
+      expect(tarotShell.contains('Downloads'), isTrue);
+      expect(tarotShell.contains('오늘의 질문'), isTrue);
+      expect(tarotShell.contains('이번 리딩의 주제'), isTrue);
+      expect(tarotShell.contains('전체 이미지 관찰'), isTrue);
+      expect(tarotShell.contains('흐름 해석'), isTrue);
+      expect(tarotShell.contains('핵심 메시지'), isTrue);
+      expect(tarotShell.contains('오늘의 조언 / 작은 실천'), isTrue);
+      expect(tarotShell.contains('현재 화면 안에서만 유지됩니다'), isTrue);
+      expect(tarotShell.contains('카드별 상세 의미는 이후 DB 연결 뒤 팝업'), isTrue);
+      expect(tarotShell.contains('AppData'), isFalse);
+      expect(tarotShell.contains('schema'), isFalse);
+      expect(tarotShell.contains('migration'), isFalse);
+      expect(tarotShell.contains('PDF'), isFalse);
+      expect(tarotShell.contains('http'), isFalse);
+    },
+  );
+
   test('Tarot result board PNG save keeps board-only capture markers', () {
     final tarotShell = File(
       'lib/features/tarot/tarot_spread_shell.dart',
@@ -736,11 +832,15 @@ void main() {
     await tester.tap(find.text('해석 보기'));
     await tester.pumpAndSettle();
 
+    expect(find.byKey(const Key('tarot-reading-context-ribbon')), findsNothing);
     expect(
-      find.byKey(const Key('tarot-reading-context-ribbon')),
+      find.byKey(const Key('tarot-interpretation-context-summary')),
       findsOneWidget,
     );
-    expect(find.text('“지금 선택에서 가장 조심해서 볼 흐름은 무엇일까요?”'), findsOneWidget);
+    expect(
+      find.text('“지금 선택에서 가장 조심해서 볼 흐름은 무엇일까요?”'),
+      findsAtLeastNWidgets(1),
+    );
   });
 
   testWidgets('Reading workspace opens RWS Tarot draw flow without storage', (
@@ -1198,29 +1298,49 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.byKey(const Key('tarot-interpretation-card-rail')),
+        find.byKey(const Key('tarot-interpretation-spread-snapshot-preview')),
         findsOneWidget,
       );
       expect(
-        find.byKey(const Key('tarot-interpretation-notes-panel')),
+        find.byKey(const Key('tarot-interpretation-deduped-question-context')),
         findsOneWidget,
       );
       expect(
-        find.byKey(const Key('tarot-interpretation-synthesis-panel')),
+        find.byKey(const Key('tarot-interpretation-expanded-workspace')),
         findsOneWidget,
       );
       expect(
-        find.byKey(const Key('tarot-interpretation-scope-banner')),
+        find.byKey(const Key('tarot-interpretation-font-audit')),
         findsOneWidget,
       );
       expect(
-        find.byKey(const Key('tarot-interpretation-card-preview-0')),
+        find.byKey(const Key('tarot-interpretation-whole-spread-reading')),
         findsOneWidget,
       );
-      expect(find.text('해석 패널'), findsAtLeastNWidgets(1));
-      expect(find.text('핵심'), findsAtLeastNWidgets(1));
-      expect(find.textContaining('저장', findRichText: true), findsNothing);
-      expect(find.textContaining('export', findRichText: true), findsNothing);
+      expect(
+        find.byKey(const Key('tarot-interpretation-story-notes-panel')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-interpretation-in-memory-note')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-interpretation-context-summary')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-interpretation-two-column-layout')),
+        findsOneWidget,
+      );
+      expect(find.text('오늘의 질문'), findsAtLeastNWidgets(1));
+      expect(find.textContaining('이번 리딩의 주제'), findsAtLeastNWidgets(1));
+      expect(find.text('전체 스프레드 보기'), findsOneWidget);
+      expect(find.text('전체 이미지 관찰'), findsOneWidget);
+      expect(find.text('흐름 해석'), findsOneWidget);
+      expect(find.text('핵심 메시지'), findsOneWidget);
+      expect(find.text('오늘의 조언 / 작은 실천'), findsOneWidget);
+      expect(find.textContaining('현재 화면 안에서만 유지됩니다'), findsOneWidget);
       expect(find.textContaining('PDF', findRichText: true), findsNothing);
       expect(find.textContaining('AI', findRichText: true), findsNothing);
       expect(tester.takeException(), isNull);
@@ -1320,7 +1440,7 @@ void main() {
       find.byKey(const Key('tarot-interpretation-workspace-shell')),
       findsOneWidget,
     );
-    expect(find.textContaining('저장', findRichText: true), findsNothing);
+    expect(find.textContaining('현재 화면 안에서만 유지됩니다'), findsOneWidget);
     expect(find.textContaining('export', findRichText: true), findsNothing);
     expect(find.textContaining('PDF', findRichText: true), findsNothing);
     expect(find.textContaining('AI', findRichText: true), findsNothing);
