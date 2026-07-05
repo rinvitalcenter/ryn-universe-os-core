@@ -7762,6 +7762,7 @@ class _TarotFocusedCardOverlay extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 920, maxHeight: 760),
           child: Container(
+            key: const Key('tarot-card-focus-panel-marker'),
             margin: const EdgeInsets.all(24),
             padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
@@ -7823,6 +7824,7 @@ class _TarotFocusedCardOverlay extends StatelessWidget {
                           Expanded(
                             child: Text(
                               '카드 집중 보기',
+                              key: const Key('tarot-card-focus-panel-title'),
                               style: TextStyle(
                                 color: RynPalette.tarotPurpleAccent(context),
                                 fontSize: 13,
@@ -7869,9 +7871,12 @@ class _TarotFocusedCardOverlay extends StatelessWidget {
                         label: deckLabel,
                         valueKey: const Key('tarot-focus-deck-label'),
                       ),
+                      const SizedBox(height: 16),
+                      const _TarotFocusReadingPrompt(),
                       const Spacer(),
                       Text(
-                        '확대한 카드만 확인합니다. 현재 배열과 임시 조정은 그대로 유지됩니다.',
+                        '해석 공간에서 이 카드를 먼저 살펴보세요. 현재 배열과 임시 조정은 그대로 유지됩니다.',
+                        key: const Key('tarot-focus-panel-guidance'),
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.64),
                           fontSize: 12,
@@ -7886,6 +7891,50 @@ class _TarotFocusedCardOverlay extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _TarotFocusReadingPrompt extends StatelessWidget {
+  const _TarotFocusReadingPrompt();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('tarot-card-focus-reading-prompt'),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        // TAROT-CARD-FOCUS-PANEL1: focused card detail panel; selected card preview retained.
+        color: Colors.white.withValues(alpha: 0.055),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '이 카드가 먼저 말하는 장면',
+            style: TextStyle(
+              color: RynPalette.tarotGoldAccent(
+                context,
+              ).withValues(alpha: 0.90),
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.1,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '오늘의 질문에 비추어 자리와 방향을 함께 살펴보세요.',
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.72),
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              height: 1.35,
+            ),
+          ),
+        ],
       ),
     );
   }

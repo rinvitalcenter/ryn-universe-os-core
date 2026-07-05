@@ -182,6 +182,25 @@ void main() {
     expect(tarotShell.contains('http'), isFalse);
   });
 
+  test('Tarot card focus panel keeps selected card detail shell markers', () {
+    final tarotShell = File(
+      'lib/features/tarot/tarot_spread_shell.dart',
+    ).readAsStringSync();
+
+    expect(tarotShell.contains('TAROT-CARD-FOCUS-PANEL1'), isTrue);
+    expect(tarotShell.contains('tarot-card-focus-panel-marker'), isTrue);
+    expect(tarotShell.contains('focused card detail panel'), isTrue);
+    expect(tarotShell.contains('selected card preview retained'), isTrue);
+    expect(tarotShell.contains('tarot-card-focus-reading-prompt'), isTrue);
+    expect(tarotShell.contains('tarot-reading-context-ribbon'), isTrue);
+    expect(tarotShell.contains('AppData'), isFalse);
+    expect(tarotShell.contains('schema'), isFalse);
+    expect(tarotShell.contains('migration'), isFalse);
+    expect(tarotShell.contains('export'), isFalse);
+    expect(tarotShell.contains('PDF'), isFalse);
+    expect(tarotShell.contains('http'), isFalse);
+  });
+
   test('text registries keep user copy separated from developer copy', () {
     final userTextFile = File('lib/core/text/user_text.dart');
     final devTextFile = File('lib/core/text/dev_text.dart');
@@ -3260,7 +3279,20 @@ void main() {
         find.byKey(const Key('tarot-focus-detail-overlay')),
         findsOneWidget,
       );
+      expect(
+        find.byKey(const Key('tarot-card-focus-panel-marker')),
+        findsOneWidget,
+      );
       expect(find.byKey(const Key('tarot-focus-card-image')), findsOneWidget);
+      expect(
+        find.byKey(const Key('tarot-card-focus-reading-prompt')),
+        findsOneWidget,
+      );
+      expect(find.text('이 카드가 먼저 말하는 장면'), findsOneWidget);
+      expect(
+        find.byKey(const Key('tarot-focus-panel-guidance')),
+        findsOneWidget,
+      );
       final focusedCardRect = tester.getRect(
         find.byKey(const Key('tarot-focus-card-image')),
       );
