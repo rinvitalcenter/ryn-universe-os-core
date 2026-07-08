@@ -9,6 +9,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:newton_particles/newton_particles.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:ryn_universe_os_core/core/text/user_text.dart';
+import 'package:ryn_universe_os_core/features/tarot/data/tarot_card_meaning_registry.dart';
 import 'package:ryn_universe_os_core/features/tarot/data/tarot_deck_registry.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_card_definition.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_deck_definition.dart';
@@ -206,6 +207,15 @@ class _TarotReadingTableTheme extends StatelessWidget {
 }
 
 enum _TarotDrawPhase { beforeShuffle, shuffling, ready, drawing, complete }
+
+enum _ShuffleRitualMotionPhase {
+  idle,
+  hoverReady,
+  shuffleStart,
+  shuffleActive,
+  settle,
+  transitionToFan,
+}
 
 enum _TarotFlowStage { setup, draw, result, interpretation }
 
@@ -417,6 +427,7 @@ class _TarotUiText {
   static const uprightOnly = '정방향만';
   static const autoDirection = '정/역방향';
   static const revealPrompt = '카드를 펼쳐보세요';
+  static const interpretationPrompt = '해석 보기로 이어가세요';
   static const revealAll = '모두 펼치기';
 }
 
@@ -468,7 +479,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   static const _rwsCards = TarotDeckRegistry.rwsCards;
 
   String _selectedDeckId = 'rws_public_domain';
-  String _selectedCardBackId = 'cosmic_gate';
+  String? _selectedCardBackOverrideId;
   String _selectedTableClothId = 'deep_purple';
   String _selectedSpread = UserText.tarotSpreadThree;
   String _selectedQuestionCategoryId = 'love';
@@ -508,8 +519,28 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     orElse: () => _deckDefinitions.first,
   );
 
+  _TarotCardBackDefinition? get _selectedDeckCardBack {
+    final assetPath = _selectedDeck.cardBackAssetPath;
+    if (assetPath == null || assetPath.trim().isEmpty) return null;
+    return _TarotCardBackDefinition(
+      id: 'deck-${_selectedDeck.id}',
+      label: '덱 기본',
+      assetPath: assetPath,
+    );
+  }
+
+  List<_TarotCardBackDefinition> get _effectiveCardBackDefinitions => [
+    ?_selectedDeckCardBack,
+    ..._cardBackDefinitions,
+  ];
+
+  String get _selectedCardBackId =>
+      _selectedCardBackOverrideId ??
+      _selectedDeckCardBack?.id ??
+      _cardBackDefinitions.first.id;
+
   _TarotCardBackDefinition get _selectedCardBack =>
-      _cardBackDefinitions.firstWhere(
+      _effectiveCardBackDefinitions.firstWhere(
         (cardBack) => cardBack.id == _selectedCardBackId,
         orElse: () => _cardBackDefinitions.first,
       );
@@ -640,7 +671,8 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   }
 
   void _prepareFreshDeck({required bool clearDrawn}) {
-    _remainingDeck = List<TarotCardDefinition>.of(_rwsCards)
+    final cards = _selectedDeck.cards.isEmpty ? _rwsCards : _selectedDeck.cards;
+    _remainingDeck = List<TarotCardDefinition>.of(cards)
       ..shuffle(math.Random());
     if (clearDrawn) {
       _drawnCards.clear();
@@ -657,7 +689,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
       _prepareFreshDeck(clearDrawn: true);
       _phase = _TarotDrawPhase.shuffling;
     });
-    await Future<void>.delayed(const Duration(milliseconds: 760));
+    await Future<void>.delayed(const Duration(milliseconds: 1200));
     if (!mounted) return;
     setState(() {
       _phase = _TarotDrawPhase.ready;
@@ -828,6 +860,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   void _selectDeck(String deckId) {
     setState(() {
       _selectedDeckId = deckId;
+      _selectedCardBackOverrideId = null;
       _prepareFreshDeck(clearDrawn: true);
       _phase = _TarotDrawPhase.beforeShuffle;
       _stage = _TarotFlowStage.setup;
@@ -836,7 +869,11 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   }
 
   void _selectCardBack(String cardBackId) {
-    setState(() => _selectedCardBackId = cardBackId);
+    setState(() {
+      _selectedCardBackOverrideId = cardBackId == _selectedDeckCardBack?.id
+          ? null
+          : cardBackId;
+    });
   }
 
   void _selectTableCloth(String clothId) {
@@ -852,7 +889,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         decks: _deckDefinitions,
         selectedDeckId: _selectedDeckId,
         onDeckSelected: _selectDeck,
-        cardBacks: _cardBackDefinitions,
+        cardBacks: _effectiveCardBackDefinitions,
         selectedCardBackId: _selectedCardBackId,
         selectedCardBack: _selectedCardBack,
         onCardBackSelected: _selectCardBack,
@@ -1501,7 +1538,6 @@ class _TarotSetupStageState extends State<_TarotSetupStage> {
         decks: widget.decks,
         selectedDeckId: widget.selectedDeckId,
         onSelected: widget.onDeckSelected,
-        cardBack: widget.selectedCardBack,
       ),
     );
     final detailStep = _TarotStepPanel(
@@ -3533,11 +3569,11 @@ class _TarotPreparationPanel extends StatelessWidget {
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
         gradient: RadialGradient(
-          center: const Alignment(0, -0.28),
-          radius: 1.12,
+          center: const Alignment(0.34, 0.08),
+          radius: 1.08,
           colors: [
-            RynPalette.tarotGuidePanel(context).withValues(alpha: 0.34),
-            RynPalette.tarotGoldAccent(context).withValues(alpha: 0.10),
+            RynPalette.tarotGuidePanel(context).withValues(alpha: 0.22),
+            RynPalette.tarotGoldAccent(context).withValues(alpha: 0.055),
             RynPalette.tarotReadingStage(context),
             RynPalette.tarotPageShell(context),
           ],
@@ -3608,10 +3644,10 @@ class _TarotPreparationPanel extends StatelessWidget {
             ),
           );
           final deck = Align(
-            alignment: wide ? const Alignment(0.18, 0.03) : Alignment.center,
+            alignment: wide ? const Alignment(0.42, 0.02) : Alignment.center,
             child: SizedBox(
               key: const Key('tarot-ritual-deck-preview'),
-              width: wide ? 440 : 320,
+              width: wide ? 400 : 320,
               height: wide ? 500 : 380,
               child: Center(
                 child: KeyedSubtree(
@@ -3665,21 +3701,53 @@ class _TarotPreparationPanel extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 Positioned.fill(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      gradient: RadialGradient(
-                        center: wide
-                            ? const Alignment(0.2, 0.08)
-                            : Alignment.center,
-                        radius: 0.92,
-                        colors: [
-                          RynPalette.tarotGoldAccent(
-                            context,
-                          ).withValues(alpha: 0.18),
-                          const Color(0x66312275),
-                          Colors.transparent,
-                        ],
+                  child: KeyedSubtree(
+                    key: const Key('tarot-premium-static-ambient'),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        gradient: RadialGradient(
+                          center: wide
+                              ? const Alignment(0.38, 0.12)
+                              : Alignment.center,
+                          radius: 0.78,
+                          colors: [
+                            RynPalette.tarotGoldAccent(
+                              context,
+                            ).withValues(alpha: 0.095),
+                            const Color(0x4A312275),
+                            Colors.transparent,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: AnimatedOpacity(
+                      key: const Key('tarot-premium-active-ambient'),
+                      duration: const Duration(milliseconds: 220),
+                      opacity: isShuffling ? 1 : 0,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          gradient: RadialGradient(
+                            center: wide
+                                ? const Alignment(0.48, 0.16)
+                                : Alignment.center,
+                            radius: 0.62,
+                            colors: [
+                              RynPalette.tarotGoldAccent(
+                                context,
+                              ).withValues(alpha: 0.12),
+                              RynPalette.tarotPurpleAccent(
+                                context,
+                              ).withValues(alpha: 0.07),
+                              Colors.transparent,
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -4185,12 +4253,6 @@ class _TarotFullDeckCard extends StatelessWidget {
                                         end: const Offset(1.04, 1.04),
                                         duration: 220.ms,
                                         curve: Curves.easeOutCubic,
-                                      )
-                                      .shimmer(
-                                        duration: 520.ms,
-                                        color: RynPalette.accent(
-                                          context,
-                                        ).withValues(alpha: 0.22),
                                       ),
                             ),
                           ),
@@ -4499,7 +4561,9 @@ class _TarotReadingCommandBar extends StatelessWidget {
           ),
           _TarotStatusChip('공개 · $spreadLabel', completed: allRevealed),
           Text(
-            _TarotUiText.revealPrompt,
+            allRevealed
+                ? _TarotUiText.interpretationPrompt
+                : _TarotUiText.revealPrompt,
             style: TextStyle(
               color: RynPalette.tarotPurpleAccent(
                 context,
@@ -4855,7 +4919,7 @@ class _TarotInterpretationSpreadPreview extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            '카드별 상세 의미는 이후 DB 연결 뒤 팝업으로 확장합니다. 지금은 결과 보드 snapshot의 장면과 흐름을 먼저 읽어주세요.',
+            '각 카드를 자세히 보려면 결과 보드에서 카드를 눌러 집중 보기를 여세요. 여기서는 전체 장면과 흐름을 먼저 읽어주세요.',
             style: TextStyle(
               color: RynPalette.tarotPurpleAccent(context),
               fontSize: 11.5,
@@ -5051,7 +5115,7 @@ class _TarotInterpretationInMemoryNote extends StatelessWidget {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              '작성한 해석은 현재 화면 안에서만 유지됩니다. 저장 기능은 이후 단계에서 연결합니다.',
+              '작성한 해석은 이 화면을 벗어나면 남지 않습니다. 필요한 내용은 지금 흐름 안에서 정리해 주세요.',
               key: const Key('no-persistence-interpretation-note'),
               style: TextStyle(
                 color: RynPalette.tarotPurpleAccent(context),
@@ -5256,14 +5320,12 @@ class _TarotDeckChoiceSection extends StatefulWidget {
     required this.decks,
     required this.selectedDeckId,
     required this.onSelected,
-    required this.cardBack,
   });
 
   final String title;
   final List<TarotDeckDefinition> decks;
   final String selectedDeckId;
   final ValueChanged<String> onSelected;
-  final _TarotCardBackDefinition cardBack;
 
   @override
   State<_TarotDeckChoiceSection> createState() =>
@@ -5300,7 +5362,7 @@ class _TarotDeckChoiceSectionState extends State<_TarotDeckChoiceSection> {
   }
 
   String _deckSubtitle(TarotDeckDefinition deck) {
-    if (deck.assetBacked) return 'RWS 이미지 · ${deck.cardCount}장';
+    if (deck.assetBacked) return 'RWS 계열 · ${deck.cardCount}장';
     if (deck.id == 'personal_scan') return '나만의 덱 준비 중';
     if (deck.id == 'oracle') return '오라클 리딩';
     if (deck.id == 'lenormand') return '레노먼드 리딩';
@@ -5434,7 +5496,6 @@ class _TarotDeckChoiceSectionState extends State<_TarotDeckChoiceSection> {
                                 canvasWidth: constraints.maxWidth,
                                 canvasHeight: constraints.maxHeight,
                                 onTap: () => _centerDeck(entry.deckIndex),
-                                cardBack: widget.cardBack,
                                 onHoverChanged: (hovered) {
                                   setState(() {
                                     _hoveredDeckId = hovered
@@ -5512,7 +5573,6 @@ class _PositionedDeckFanCard extends StatelessWidget {
     required this.canvasHeight,
     required this.onTap,
     required this.onHoverChanged,
-    required this.cardBack,
   });
 
   final TarotDeckDefinition deck;
@@ -5526,7 +5586,6 @@ class _PositionedDeckFanCard extends StatelessWidget {
   final double canvasHeight;
   final VoidCallback onTap;
   final ValueChanged<bool> onHoverChanged;
-  final _TarotCardBackDefinition cardBack;
 
   @override
   Widget build(BuildContext context) {
@@ -5555,7 +5614,6 @@ class _PositionedDeckFanCard extends StatelessWidget {
         distanceFromSelected: distance,
         onTap: onTap,
         onHoverChanged: onHoverChanged,
-        cardBack: cardBack,
       ),
     );
   }
@@ -5643,7 +5701,6 @@ class _TarotDeckCarouselCard extends StatelessWidget {
     required this.distanceFromSelected,
     required this.onTap,
     required this.onHoverChanged,
-    required this.cardBack,
   });
 
   final TarotDeckDefinition deck;
@@ -5653,7 +5710,6 @@ class _TarotDeckCarouselCard extends StatelessWidget {
   final int distanceFromSelected;
   final VoidCallback onTap;
   final ValueChanged<bool> onHoverChanged;
-  final _TarotCardBackDefinition cardBack;
 
   @override
   Widget build(BuildContext context) {
@@ -5763,7 +5819,6 @@ class _TarotDeckCarouselCard extends StatelessWidget {
                       hovered: hovered,
                       child: _TarotRepresentativeDeckArtwork(
                         deck: deck,
-                        cardBack: cardBack,
                         glowing: selected || hovered,
                         width: cardImageWidth,
                         height: cardImageHeight,
@@ -5812,26 +5867,23 @@ class _TarotDeckCarouselCard extends StatelessWidget {
 class _TarotRepresentativeDeckArtwork extends StatelessWidget {
   const _TarotRepresentativeDeckArtwork({
     required this.deck,
-    required this.cardBack,
     required this.glowing,
     required this.width,
     required this.height,
   });
 
   final TarotDeckDefinition deck;
-  final _TarotCardBackDefinition cardBack;
   final bool glowing;
   final double width;
   final double height;
 
   @override
   Widget build(BuildContext context) {
-    final representativeAsset = deck.representativeAssetPath;
+    final representativeAsset =
+        deck.coverAssetPath ?? deck.representativeAssetPath;
     if (representativeAsset == null) {
-      return _TarotCardBack(
-        compact: false,
+      return _TarotUnavailableDeckPreview(
         glowing: glowing,
-        assetPath: cardBack.assetPath,
         width: width,
         height: height,
       );
@@ -5870,6 +5922,98 @@ class _TarotRepresentativeDeckArtwork extends StatelessWidget {
           representativeAsset,
           key: const Key('tarot-representative-deck-image'),
           fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+}
+
+class _TarotUnavailableDeckPreview extends StatelessWidget {
+  const _TarotUnavailableDeckPreview({
+    required this.glowing,
+    required this.width,
+    required this.height,
+  });
+
+  final bool glowing;
+  final double width;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      key: const Key('tarot-unavailable-deck-preview'),
+      duration: const Duration(milliseconds: 220),
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            RynPalette.tarotBentoPanel(context),
+            RynPalette.tarotGuidePanel(context),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(4),
+        border: Border.all(
+          color: RynPalette.tarotBorder(
+            context,
+          ).withValues(alpha: glowing ? 0.82 : 0.46),
+        ),
+        boxShadow: [
+          const BoxShadow(
+            color: Color(0x99000000),
+            blurRadius: 14,
+            offset: Offset(0, 7),
+          ),
+          if (glowing)
+            BoxShadow(
+              color: RynPalette.tarotGoldAccent(
+                context,
+              ).withValues(alpha: 0.16),
+              blurRadius: 22,
+              spreadRadius: 1,
+            ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(3),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: RynPalette.tarotPageShell(
+                  context,
+                ).withValues(alpha: 0.36),
+              ),
+            ),
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.auto_awesome_motion_rounded,
+                    color: RynPalette.tarotGoldAccent(
+                      context,
+                    ).withValues(alpha: 0.72),
+                    size: width >= 180 ? 34 : 24,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '준비 중',
+                    key: const Key('tarot-unavailable-deck-preview-label'),
+                    style: TextStyle(
+                      color: RynPalette.tarotTextPrimary(context),
+                      fontSize: width >= 180 ? 13 : 10,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -6399,7 +6543,7 @@ class _TarotSelectionSummary extends StatelessWidget {
   }
 }
 
-class _ShuffleDeckStack extends StatelessWidget {
+class _ShuffleDeckStack extends StatefulWidget {
   const _ShuffleDeckStack({
     required this.isShuffling,
     required this.onTap,
@@ -6413,76 +6557,225 @@ class _ShuffleDeckStack extends StatelessWidget {
   final bool large;
 
   @override
+  State<_ShuffleDeckStack> createState() => _ShuffleDeckStackState();
+}
+
+class _ShuffleDeckStackState extends State<_ShuffleDeckStack> {
+  bool _hoverReady = false;
+
+  _ShuffleRitualMotionPhase _phaseFor(double progress) {
+    if (!widget.isShuffling) {
+      return _hoverReady
+          ? _ShuffleRitualMotionPhase.hoverReady
+          : _ShuffleRitualMotionPhase.idle; // Still Altar idle
+    }
+    if (progress < 0.14) return _ShuffleRitualMotionPhase.shuffleStart;
+    if (progress < 0.76) {
+      return _ShuffleRitualMotionPhase.shuffleActive; // Ritual Cut active
+    }
+    if (progress < 0.92) {
+      return _ShuffleRitualMotionPhase.settle; // Settle signal
+    }
+    return _ShuffleRitualMotionPhase.transitionToFan;
+  }
+
+  double _phaseT(double progress, double begin, double end) {
+    return ((progress - begin) / (end - begin)).clamp(0.0, 1.0);
+  }
+
+  Offset _ritualCutOffset(int index, double progress) {
+    final phase = _phaseFor(progress);
+    if (phase == _ShuffleRitualMotionPhase.idle ||
+        phase == _ShuffleRitualMotionPhase.hoverReady) {
+      return Offset.zero;
+    }
+    final startLift = Curves.easeOutCubic.transform(_phaseT(progress, 0, 0.14));
+    if (phase == _ShuffleRitualMotionPhase.shuffleStart) {
+      return Offset(0, -8 * startLift);
+    }
+
+    final cutOut = Curves.easeInOutCubic.transform(
+      _phaseT(progress, 0.14, 0.42),
+    );
+    final cross = Curves.easeInOutCubic.transform(
+      _phaseT(progress, 0.42, 0.68),
+    );
+    final settle = Curves.easeOutCubic.transform(_phaseT(progress, 0.68, 0.92));
+    final group = index % 3;
+    final direction = switch (group) {
+      0 => const Offset(-22, -9),
+      1 => const Offset(10, -16),
+      _ => const Offset(20, 10),
+    };
+    final crossDrift = switch (group) {
+      0 => const Offset(18, 7),
+      1 => const Offset(-8, 13),
+      _ => const Offset(-14, -6),
+    };
+    final separated = Offset.lerp(Offset.zero, direction, cutOut)!;
+    final crossed = Offset.lerp(separated, crossDrift, cross)!;
+    final restored = Offset.lerp(crossed, Offset.zero, settle)!;
+    return restored + Offset(0, -8 * (1 - settle));
+  }
+
+  double _ritualCutAngle(int index, double progress) {
+    final idleAngle = (index - 4) * 0.004;
+    final phase = _phaseFor(progress);
+    if (phase == _ShuffleRitualMotionPhase.idle ||
+        phase == _ShuffleRitualMotionPhase.hoverReady) {
+      return idleAngle;
+    }
+    final cutOut = Curves.easeInOutCubic.transform(
+      _phaseT(progress, 0.14, 0.42),
+    );
+    final settle = Curves.easeOutCubic.transform(_phaseT(progress, 0.68, 0.92));
+    final groupAngle = switch (index % 3) {
+      0 => -0.052,
+      1 => 0.026,
+      _ => 0.061,
+    };
+    return idleAngle + groupAngle * cutOut * (1 - settle);
+  }
+
+  double _ritualCutScale(double progress) {
+    final phase = _phaseFor(progress);
+    if (phase == _ShuffleRitualMotionPhase.idle) return 1;
+    if (phase == _ShuffleRitualMotionPhase.hoverReady) return 1.01;
+    final lift = Curves.easeOutCubic.transform(_phaseT(progress, 0, 0.16));
+    final settle = Curves.easeOutCubic.transform(_phaseT(progress, 0.70, 0.92));
+    return 1 + (0.035 * lift * (1 - settle));
+  }
+
+  Offset _stableAltarOffset(int index) {
+    // tarot-stable-altar-idle-marker
+    if (index == 8) return Offset.zero;
+    final depth = 8 - index;
+    return Offset(depth * 1.25, depth * 1.05);
+  }
+
+  double _stableAltarAngle(int index) {
+    if (index == 8) return 0;
+    return (index - 4) * 0.0014;
+  }
+
+  double _stableAltarOpacity(int index) {
+    if (index == 8) return 1;
+    return 0.28 + index * 0.052;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: isShuffling ? null : onTap,
-      child: TweenAnimationBuilder<double>(
-        key: ValueKey(isShuffling),
-        tween: Tween(begin: 0, end: isShuffling ? 1 : 0),
-        duration: const Duration(milliseconds: 720),
-        curve: Curves.easeInOutCubic,
-        builder: (context, value, child) {
-          final shake = math.sin(value * math.pi * 8) * 0.08;
-          final scale = 1 + math.sin(value * math.pi) * 0.05;
-          return Transform.rotate(
-            angle: shake,
-            child: Transform.scale(scale: scale, child: child),
-          );
-        },
-        child: SizedBox(
-          key: const Key('tarot-shuffle-stack'),
-          width: large ? 340 : 116,
-          height: large ? 460 : 156,
-          child:
-              Stack(
+    return MouseRegion(
+      cursor: widget.isShuffling ? MouseCursor.defer : SystemMouseCursors.click,
+      onEnter: (_) {
+        if (!widget.isShuffling) setState(() => _hoverReady = true);
+      },
+      onExit: (_) {
+        if (_hoverReady) setState(() => _hoverReady = false);
+      },
+      child: GestureDetector(
+        onTap: widget.isShuffling ? null : widget.onTap,
+        child: TweenAnimationBuilder<double>(
+          key: ValueKey(widget.isShuffling),
+          tween: Tween(begin: 0, end: widget.isShuffling ? 1 : 0),
+          duration: 1080.ms,
+          curve: Curves.linear,
+          builder: (context, progress, child) {
+            final phase = _phaseFor(progress);
+            final hoverLift = phase == _ShuffleRitualMotionPhase.hoverReady;
+            final hoverOffset = hoverLift
+                ? const Offset(0, -0.01)
+                : Offset.zero;
+            final baseScale = _ritualCutScale(progress);
+            return AnimatedSlide(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              offset: hoverOffset,
+              child: AnimatedScale(
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeOutCubic,
+                scale: baseScale,
+                child: child,
+              ),
+            );
+          },
+          child: RepaintBoundary(
+            key: const Key('tarot-premium-ritual-pile-boundary'),
+            child: SizedBox(
+              key: const Key('tarot-shuffle-stack'),
+              width: widget.large ? 320 : 116,
+              height: widget.large ? 430 : 156,
+              child: TweenAnimationBuilder<double>(
+                key: ValueKey('ritual-cut-${widget.isShuffling}'),
+                tween: Tween(begin: 0, end: widget.isShuffling ? 1 : 0),
+                duration: 1080.ms,
+                curve: Curves.linear,
+                builder: (context, progress, _) {
+                  final idle = !widget.isShuffling;
+                  final phase = _phaseFor(progress);
+                  final active =
+                      widget.isShuffling &&
+                      phase != _ShuffleRitualMotionPhase.transitionToFan;
+                  return Stack(
                     alignment: Alignment.center,
                     children: [
-                      for (var index = 5; index >= 0; index--)
+                      for (var index = 8; index >= 0; index--)
                         Positioned(
-                          left: large ? 48 + index * 8 : 14 + index * 3,
-                          top: large ? 28 + index * 7 : 10 + index * 3,
+                          left: widget.large
+                              ? (idle ? 58 + index * 1.35 : 42 + index * 4.5)
+                              : 14 + index * 2.5,
+                          top: widget.large
+                              ? (idle ? 34 + index * 1.12 : 20 + index * 4.4)
+                              : 10 + index * 2.6,
                           child: Opacity(
-                            opacity: 0.48 + index * 0.08,
+                            // opacity: idle ? _stableAltarOpacity(index) : 0.62 + index * 0.035
+                            opacity: idle
+                                ? _stableAltarOpacity(index)
+                                : 0.62 + index * 0.035,
                             child: Transform.translate(
-                              offset: isShuffling && large
-                                  ? Offset(
-                                      (index.isEven ? -1 : 1) *
-                                          math.sin(index + 1) *
-                                          8,
-                                      -math.sin(index + 1) * 4,
-                                    )
+                              // offset: idle ? _stableAltarOffset(index) : _ritualCutOffset(index, progress)
+                              offset: widget.large
+                                  ? (idle
+                                        ? _stableAltarOffset(index)
+                                        : _ritualCutOffset(index, progress))
                                   : Offset.zero,
                               child: Transform.rotate(
-                                angle: isShuffling && large
-                                    ? (index - 2.5) * 0.018
-                                    : (index - 2.5) * 0.006,
+                                // angle: idle ? _stableAltarAngle(index) : _ritualCutAngle(index, progress)
+                                angle: widget.large
+                                    ? (idle
+                                          ? _stableAltarAngle(index)
+                                          : _ritualCutAngle(index, progress))
+                                    : (index - 4) * 0.004,
                                 child: _TarotCardBack(
                                   compact: false,
-                                  glowing: isShuffling || index == 0,
-                                  assetPath: cardBack.assetPath,
-                                  width: large ? 218 : null,
-                                  height: large ? 334 : null,
+                                  glowing: active,
+                                  assetPath: widget.cardBack.assetPath,
+                                  width: widget.large ? 202 : null,
+                                  height: widget.large ? 310 : null,
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      if (isShuffling)
-                        const Positioned.fill(
-                          child: _TarotFxBurst(
-                            particleCount: 10,
-                            origin: Offset(0.5, 0.48),
+                      if (widget.isShuffling)
+                        Positioned.fill(
+                          child: IgnorePointer(
+                            child: AnimatedOpacity(
+                              duration: const Duration(milliseconds: 220),
+                              opacity: active ? 1 : 0,
+                              child: const _TarotFxBurst(
+                                particleCount: 6,
+                                origin: Offset(0.48, 0.46),
+                              ),
+                            ),
                           ),
                         ),
                     ],
-                  )
-                  .animate(target: isShuffling ? 1 : 0)
-                  .scale(
-                    begin: const Offset(1, 1),
-                    end: const Offset(1.05, 1.05),
-                    duration: 360.ms,
-                    curve: Curves.easeOutCubic,
-                  ),
+                  );
+                },
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -6543,6 +6836,19 @@ class _TarotCardBack extends StatelessWidget {
     final accent = RynPalette.tarotGoldAccent(context);
     final displayWidth = width ?? (compact ? 58.0 : 86.0);
     final displayHeight = height ?? (compact ? 87.0 : 132.0);
+    final highlightOverlay = DecoratedBox(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: glowing ? 0.16 : 0.04),
+            Colors.transparent,
+            accent.withValues(alpha: glowing ? 0.18 : 0.06),
+          ],
+        ),
+      ),
+    );
     return AnimatedContainer(
       key: const Key('tarot-card-back'),
       duration: const Duration(milliseconds: 220),
@@ -6574,37 +6880,32 @@ class _TarotCardBack extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(3),
-        child: Shimmer.fromColors(
-          enabled: compact || glowing,
-          loop: 1,
-          period: const Duration(milliseconds: 1800),
-          baseColor: RynPalette.tarotPurpleAccent(
-            context,
-          ).withValues(alpha: 0.08),
-          highlightColor: Colors.white.withValues(alpha: glowing ? 0.42 : 0.22),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Image.asset(
-                assetPath,
-                key: const Key('tarot-card-back-image'),
-                fit: BoxFit.cover,
-              ),
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white.withValues(alpha: glowing ? 0.16 : 0.04),
-                      Colors.transparent,
-                      accent.withValues(alpha: glowing ? 0.18 : 0.06),
-                    ],
-                  ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              assetPath,
+              key: const Key('tarot-card-back-image'),
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) =>
+                  const SizedBox.shrink(),
+            ),
+            if (compact || glowing)
+              Shimmer.fromColors(
+                enabled: true,
+                loop: 1,
+                period: const Duration(milliseconds: 1800),
+                baseColor: RynPalette.tarotPurpleAccent(
+                  context,
+                ).withValues(alpha: 0.08),
+                highlightColor: Colors.white.withValues(
+                  alpha: glowing ? 0.42 : 0.22,
                 ),
-              ),
-            ],
-          ),
+                child: highlightOverlay,
+              )
+            else
+              highlightOverlay,
+          ],
         ),
       ),
     );
@@ -8025,6 +8326,7 @@ class _TarotFocusedCardOverlay extends StatelessWidget {
     final orientation = drawnCard.reversed
         ? UserText.tarotReversed
         : UserText.tarotUpright;
+    final meaning = TarotCardMeaningRegistry.resolve(drawnCard.card.semanticId);
     return Material(
       key: const Key('tarot-focus-detail-overlay'),
       color: Colors.black.withValues(alpha: 0.68),
@@ -8142,7 +8444,10 @@ class _TarotFocusedCardOverlay extends StatelessWidget {
                         valueKey: const Key('tarot-focus-deck-label'),
                       ),
                       const SizedBox(height: 16),
-                      const _TarotFocusReadingPrompt(),
+                      _TarotFocusReadingPrompt(
+                        meaning: meaning,
+                        reversed: drawnCard.reversed,
+                      ),
                       const Spacer(),
                       Text(
                         '해석 공간에서 이 카드를 먼저 살펴보세요. 현재 배열과 임시 조정은 그대로 유지됩니다.',
@@ -8167,7 +8472,13 @@ class _TarotFocusedCardOverlay extends StatelessWidget {
 }
 
 class _TarotFocusReadingPrompt extends StatelessWidget {
-  const _TarotFocusReadingPrompt();
+  const _TarotFocusReadingPrompt({
+    required this.meaning,
+    required this.reversed,
+  });
+
+  final TarotCardMeaning meaning;
+  final bool reversed;
 
   @override
   Widget build(BuildContext context) {
@@ -8184,7 +8495,8 @@ class _TarotFocusReadingPrompt extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '이 카드가 먼저 말하는 장면',
+            meaning.titleKo,
+            key: const Key('tarot-focus-meaning-title'),
             style: TextStyle(
               color: RynPalette.tarotGoldAccent(
                 context,
@@ -8194,9 +8506,37 @@ class _TarotFocusReadingPrompt extends StatelessWidget {
               letterSpacing: -0.1,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 7),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: [
+              for (final keyword in meaning.keywords)
+                _TarotMeaningKeywordChip(keyword: keyword),
+            ],
+          ),
+          const SizedBox(height: 10),
+          _TarotMeaningLine(
+            label: reversed ? '역방향' : '정방향',
+            text: reversed ? meaning.reversed : meaning.upright,
+            valueKey: const Key('tarot-focus-meaning-orientation-text'),
+          ),
+          const SizedBox(height: 8),
+          _TarotMeaningLine(
+            label: '질문 렌즈',
+            text: meaning.questionLens,
+            valueKey: const Key('tarot-focus-meaning-question-lens'),
+          ),
+          const SizedBox(height: 8),
+          _TarotMeaningLine(
+            label: '자리 렌즈',
+            text: meaning.positionLens,
+            valueKey: const Key('tarot-focus-meaning-position-lens'),
+          ),
+          const SizedBox(height: 8),
           Text(
-            '오늘의 질문에 비추어 자리와 방향을 함께 살펴보세요.',
+            meaning.smallAction,
+            key: const Key('tarot-focus-meaning-small-action'),
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.72),
               fontSize: 12,
@@ -8206,6 +8546,77 @@ class _TarotFocusReadingPrompt extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _TarotMeaningKeywordChip extends StatelessWidget {
+  const _TarotMeaningKeywordChip({required this.keyword});
+
+  final String keyword;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const Key('tarot-focus-meaning-keyword'),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: RynPalette.tarotGoldAccent(context).withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        border: Border.all(
+          color: RynPalette.tarotGoldAccent(context).withValues(alpha: 0.22),
+        ),
+      ),
+      child: Text(
+        keyword,
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.84),
+          fontSize: 10.5,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+}
+
+class _TarotMeaningLine extends StatelessWidget {
+  const _TarotMeaningLine({
+    required this.label,
+    required this.text,
+    required this.valueKey,
+  });
+
+  final String label;
+  final String text;
+  final Key valueKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: RynPalette.tarotPurpleAccent(context),
+            fontSize: 10.5,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(height: 3),
+        Text(
+          text,
+          key: valueKey,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.73),
+            fontSize: 11.3,
+            fontWeight: FontWeight.w600,
+            height: 1.32,
+          ),
+        ),
+      ],
     );
   }
 }

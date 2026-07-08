@@ -72,6 +72,18 @@ flutter:
     - assets/tarot/decks/rws_public_domain/
     - assets/tarot/decks/rws_public_domain/major/
     - assets/tarot/decks/rws_public_domain/minor/
+    - assets/tarot/decks/rws_public_domain/back/
+    - assets/tarot/decks/rws_public_domain/cover/
+    - assets/tarot/decks/universal_waite/
+    - assets/tarot/decks/universal_waite/major/
+    - assets/tarot/decks/universal_waite/minor/
+    - assets/tarot/decks/universal_waite/back/
+    - assets/tarot/decks/universal_waite/cover/
+    - assets/tarot/decks/golden_art_nouveau_tarot/
+    - assets/tarot/decks/golden_art_nouveau_tarot/major/
+    - assets/tarot/decks/golden_art_nouveau_tarot/minor/
+    - assets/tarot/decks/golden_art_nouveau_tarot/back/
+    - assets/tarot/decks/golden_art_nouveau_tarot/cover/
 
   fonts:
     - family: Pretendard

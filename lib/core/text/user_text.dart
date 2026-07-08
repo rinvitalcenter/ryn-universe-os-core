@@ -181,7 +181,9 @@ abstract final class UserText {
   static const tarotResetDraw = '다시 뽑기';
   static const tarotEmptySlot = '빈 자리';
   static const tarotDrawnCard = '뽑은 카드';
-  static const tarotDeckUniversalWaite = '유니버셜 웨이트';
+  static const tarotDeckUniversalWaite = 'RWS Public Domain';
+  static const tarotDeckUniversalWaiteStudy = 'Universal Waite';
+  static const tarotDeckGoldenArtNouveau = 'Golden Art Nouveau';
   static const tarotDeckThoth = '토트 타로';
   static const tarotDeckMarseille = '마르세유 타로';
   static const tarotDeckManshin1 = '만신타로 1';

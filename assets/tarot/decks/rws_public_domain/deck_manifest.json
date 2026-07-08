@@ -2,7 +2,7 @@
   "deckId": "rws_public_domain",
   "deckName": "유니버셜 웨이트",
   "cardCount": 78,
-  "sourceNote": "local personal study asset copied from C:/Pictures/tarot/rws; review rights again before distribution",
+  "sourceNote": "local personal study asset copied from C:/Pictures/tarot/rws; cover/back from C:/Pictures/tarot/rws/originals; review rights again before distribution",
   "cards": [
     {
       "id": "cups_01",
@@ -394,5 +394,8 @@
       "label": "King of Wands",
       "image": "assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Wands14.jpg"
     }
-  ]
+  ],
+  "deckType": "tarot_78",
+  "cardBackAssetPath": "assets/tarot/decks/rws_public_domain/back/back.png",
+  "coverAssetPath": "assets/tarot/decks/rws_public_domain/cover/cover.jpg"
 }

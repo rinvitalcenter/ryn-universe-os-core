@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ryn_universe_os_core/core/text/user_text.dart';
+import 'package:ryn_universe_os_core/features/tarot/data/tarot_card_meaning_registry.dart';
 import 'package:ryn_universe_os_core/features/tarot/data/tarot_deck_registry.dart';
 import 'package:ryn_universe_os_core/features/tarot/tarot_spread_shell.dart';
 import 'package:ryn_universe_os_core/main.dart';
@@ -21,6 +22,14 @@ void main() {
       'assets/tarot/decks/rws_public_domain/major/RWS_Tarot_00_Fool.jpg',
     );
     expect(
+      rwsDeck.coverAssetPath,
+      'assets/tarot/decks/rws_public_domain/cover/cover.jpg',
+    );
+    expect(
+      rwsDeck.cardBackAssetPath,
+      'assets/tarot/decks/rws_public_domain/back/back.png',
+    );
+    expect(
       rwsDeck.cards.first.assetPath,
       'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Cups01.jpg',
     );
@@ -29,6 +38,516 @@ void main() {
           .firstWhere((card) => card.semanticId == 'pents_01')
           .assetPath,
       'assets/tarot/decks/rws_public_domain/minor/RWS_Tarot_Pents01.jpg',
+    );
+  });
+
+  test(
+    'tarot deck registry integrates Universal Waite and Golden Art Nouveau',
+    () {
+      final rwsDeck = TarotDeckRegistry.rwsPublicDomain;
+      final rwsIds = rwsDeck.cards.map((card) => card.semanticId).toSet();
+
+      final integratedDecks = <String, String>{
+        'universal_waite': 'assets/tarot/decks/universal_waite/',
+        'golden_art_nouveau_tarot':
+            'assets/tarot/decks/golden_art_nouveau_tarot/',
+      };
+
+      for (final entry in integratedDecks.entries) {
+        final deck = TarotDeckRegistry.decks.firstWhere(
+          (candidate) => candidate.deckId == entry.key,
+        );
+        final ids = deck.cards.map((card) => card.semanticId).toSet();
+
+        expect(deck.cards, hasLength(78), reason: entry.key);
+        expect(ids, rwsIds, reason: entry.key);
+        expect(deck.representativeAssetPath, isNotNull, reason: entry.key);
+        expect(deck.cardBackAssetPath, isNotNull, reason: entry.key);
+        expect(deck.coverAssetPath, isNotNull, reason: entry.key);
+        expect(deck.representativeAssetPath, startsWith(entry.value));
+        expect(deck.cardBackAssetPath, startsWith('${entry.value}back/'));
+        expect(deck.coverAssetPath, startsWith('${entry.value}cover/'));
+        expect(
+          deck.cards
+              .firstWhere((card) => card.semanticId == 'pents_05')
+              .assetPath,
+          startsWith(entry.value),
+          reason:
+              '${entry.key} pents_05 must resolve inside selected deck assets',
+        );
+        expect(
+          deck.cards
+              .firstWhere((card) => card.semanticId == 'pents_05')
+              .assetPath,
+          isNot(contains('rws_public_domain')),
+          reason: '${entry.key} pents_05 must not fall back to RWS assets',
+        );
+        expect(
+          deck.cards.where((card) => card.semanticId.startsWith('major_')),
+          hasLength(22),
+          reason: entry.key,
+        );
+        for (final suit in ['cups', 'pents', 'swords', 'wands']) {
+          expect(
+            deck.cards.where((card) => card.semanticId.startsWith('${suit}_')),
+            hasLength(14),
+            reason: '${entry.key} $suit',
+          );
+        }
+      }
+
+      expect(
+        TarotDeckRegistry.decks.where((deck) => deck.deckId.contains('oracle')),
+        hasLength(1),
+      );
+    },
+  );
+
+  test('pubspec registers integrated tarot deck asset folders only', () {
+    final pubspec = File('pubspec.yaml').readAsStringSync();
+
+    for (final deckRoot in [
+      'assets/tarot/decks/rws_public_domain',
+      'assets/tarot/decks/universal_waite',
+      'assets/tarot/decks/golden_art_nouveau_tarot',
+    ]) {
+      expect(pubspec.contains('- $deckRoot/'), isTrue, reason: deckRoot);
+      expect(pubspec.contains('- $deckRoot/major/'), isTrue, reason: deckRoot);
+      expect(pubspec.contains('- $deckRoot/minor/'), isTrue, reason: deckRoot);
+      expect(pubspec.contains('- $deckRoot/back/'), isTrue, reason: deckRoot);
+      expect(pubspec.contains('- $deckRoot/cover/'), isTrue, reason: deckRoot);
+    }
+
+    expect(pubspec.contains('horoscope_belline_oracle'), isFalse);
+  });
+
+  test('Tarot runtime binding source keeps deck-first image resolution', () {
+    final tarotShell = File(
+      'lib/features/tarot/tarot_spread_shell.dart',
+    ).readAsStringSync();
+
+    expect(
+      tarotShell.contains(
+        'deck.coverAssetPath ?? deck.representativeAssetPath',
+      ),
+      isTrue,
+    );
+    expect(
+      tarotShell.contains(
+        '_selectedDeck.cards.isEmpty ? _rwsCards : _selectedDeck.cards',
+      ),
+      isTrue,
+    );
+    expect(tarotShell.contains('_selectedCardBackOverrideId ??'), isTrue);
+    expect(tarotShell.contains('_selectedDeckCardBack?.id'), isTrue);
+    expect(tarotShell.contains('_selectedCardBackOverrideId = null;'), isTrue);
+    expect(tarotShell.contains('..._cardBackDefinitions'), isTrue);
+    expect(tarotShell.contains("id: 'deck-\${_selectedDeck.id}'"), isTrue);
+  });
+
+  test(
+    'Tarot hidden card backs render deck image without purple shimmer masking',
+    () {
+      final tarotShell = File(
+        'lib/features/tarot/tarot_spread_shell.dart',
+      ).readAsStringSync();
+      final cardBackStart = tarotShell.indexOf('class _TarotCardBack extends');
+      final cardBackEnd = tarotShell.indexOf('class _TarotFxBurst extends');
+      final faceDownStart = tarotShell.indexOf(
+        'class _TarotFullDeckCard extends',
+      );
+      final faceDownEnd = tarotShell.indexOf('class _TarotResultStage extends');
+
+      expect(cardBackStart, isNonNegative);
+      expect(cardBackEnd, greaterThan(cardBackStart));
+      expect(faceDownStart, isNonNegative);
+      expect(faceDownEnd, greaterThan(faceDownStart));
+
+      final cardBackSource = tarotShell.substring(cardBackStart, cardBackEnd);
+      final faceDownSource = tarotShell.substring(faceDownStart, faceDownEnd);
+
+      expect(
+        cardBackSource.indexOf("key: const Key('tarot-card-back-image')"),
+        lessThan(cardBackSource.indexOf('Shimmer.fromColors')),
+      );
+      expect(cardBackSource.contains('errorBuilder:'), isTrue);
+      expect(faceDownSource.contains('.shimmer('), isFalse);
+    },
+  );
+
+  test(
+    'Tarot shuffle pile starts idle and unavailable deck previews stay isolated',
+    () {
+      final tarotShell = File(
+        'lib/features/tarot/tarot_spread_shell.dart',
+      ).readAsStringSync();
+      final shuffleStart = tarotShell.indexOf(
+        'class _ShuffleDeckStack extends',
+      );
+      final shuffleEnd = tarotShell.indexOf(
+        'class _TarotCardBackChoice extends',
+      );
+      final artworkStart = tarotShell.indexOf(
+        'class _TarotRepresentativeDeckArtwork extends',
+      );
+      final artworkEnd = tarotShell.indexOf(
+        'class _TarotCardBackChoiceSection extends',
+      );
+
+      expect(shuffleStart, isNonNegative);
+      expect(shuffleEnd, greaterThan(shuffleStart));
+      expect(artworkStart, isNonNegative);
+      expect(artworkEnd, greaterThan(artworkStart));
+
+      final shuffleSource = tarotShell.substring(shuffleStart, shuffleEnd);
+      final artworkSource = tarotShell.substring(artworkStart, artworkEnd);
+
+      expect(
+        shuffleSource.contains('glowing: isShuffling || index == 0'),
+        isFalse,
+      );
+      expect(shuffleSource.contains('glowing: active,'), isTrue);
+      expect(shuffleSource.contains('if (widget.isShuffling)'), isTrue);
+      expect(
+        artworkSource.contains(
+          'deck.coverAssetPath ?? deck.representativeAssetPath',
+        ),
+        isTrue,
+      );
+      expect(artworkSource.contains('assetPath: cardBack.assetPath'), isFalse);
+      expect(artworkSource.contains('tarot-unavailable-deck-preview'), isTrue);
+    },
+  );
+
+  test(
+    'Tarot premium shuffle ritual motion keeps idle still and active one-shot',
+    () {
+      final tarotShell = File(
+        'lib/features/tarot/tarot_spread_shell.dart',
+      ).readAsStringSync();
+      final preparationStart = tarotShell.indexOf(
+        'class _TarotPreparationPanel extends StatelessWidget',
+      );
+      final preparationEnd = tarotShell.indexOf(
+        'class _TarotFullDeckDrawStage extends StatelessWidget',
+      );
+      final shuffleStart = tarotShell.indexOf(
+        'class _ShuffleDeckStack extends',
+      );
+      final shuffleEnd = tarotShell.indexOf(
+        'class _TarotCardBackChoice extends',
+      );
+
+      expect(preparationStart, isNonNegative);
+      expect(preparationEnd, greaterThan(preparationStart));
+      expect(shuffleStart, isNonNegative);
+      expect(shuffleEnd, greaterThan(shuffleStart));
+
+      final preparationSource = tarotShell.substring(
+        preparationStart,
+        preparationEnd,
+      );
+      final shuffleSource = tarotShell.substring(shuffleStart, shuffleEnd);
+
+      expect(tarotShell.contains('enum _ShuffleRitualMotionPhase'), isTrue);
+      expect(shuffleSource.contains('Still Altar idle'), isTrue);
+      expect(shuffleSource.contains('Ritual Cut active'), isTrue);
+      expect(shuffleSource.contains('Settle signal'), isTrue);
+      expect(shuffleSource.contains('transitionToFan'), isTrue);
+      expect(shuffleSource.contains('repeat('), isFalse);
+      expect(shuffleSource.contains('TweenAnimationBuilder<double>'), isTrue);
+      expect(shuffleSource.contains('duration: 1080.ms'), isTrue);
+      expect(shuffleSource.contains('_ritualCutOffset'), isTrue);
+      expect(shuffleSource.contains('_ritualCutAngle'), isTrue);
+      expect(shuffleSource.contains('_ritualCutScale'), isTrue);
+      expect(shuffleSource.contains('RepaintBoundary'), isTrue);
+      expect(shuffleSource.contains('MouseRegion'), isTrue);
+      expect(
+        shuffleSource.contains('assetPath: widget.cardBack.assetPath'),
+        isTrue,
+      );
+      expect(
+        preparationSource.contains('tarot-premium-static-ambient'),
+        isTrue,
+      );
+      expect(
+        preparationSource.contains('tarot-premium-active-ambient'),
+        isTrue,
+      );
+    },
+  );
+
+  test('Tarot shuffle idle stillness uses stable altar transforms only', () {
+    final tarotShell = File(
+      'lib/features/tarot/tarot_spread_shell.dart',
+    ).readAsStringSync();
+    final shuffleStart = tarotShell.indexOf('class _ShuffleDeckStack extends');
+    final shuffleEnd = tarotShell.indexOf('class _TarotCardBackChoice extends');
+
+    expect(shuffleStart, isNonNegative);
+    expect(shuffleEnd, greaterThan(shuffleStart));
+
+    final shuffleSource = tarotShell.substring(shuffleStart, shuffleEnd);
+
+    expect(shuffleSource.contains('_stableAltarOffset'), isTrue);
+    expect(shuffleSource.contains('_stableAltarAngle'), isTrue);
+    expect(shuffleSource.contains('_stableAltarOpacity'), isTrue);
+    expect(shuffleSource.contains('final idle = !widget.isShuffling;'), isTrue);
+    expect(
+      shuffleSource.contains(
+        'offset: idle ? _stableAltarOffset(index) : _ritualCutOffset(index, progress)',
+      ),
+      isTrue,
+    );
+    expect(
+      shuffleSource.contains(
+        'angle: idle ? _stableAltarAngle(index) : _ritualCutAngle(index, progress)',
+      ),
+      isTrue,
+    );
+    expect(
+      shuffleSource.contains(
+        'opacity: idle ? _stableAltarOpacity(index) : 0.62 + index * 0.035',
+      ),
+      isTrue,
+    );
+    expect(shuffleSource.contains('tarot-stable-altar-idle-marker'), isTrue);
+    expect(shuffleSource.contains('glowing: active,'), isTrue);
+    expect(shuffleSource.contains('repeat('), isFalse);
+    expect(shuffleSource.contains('Shimmer.fromColors'), isFalse);
+  });
+
+  test(
+    'tarot card meaning registry resolves semantic content and fallback',
+    () {
+      final registrySource = File(
+        'lib/features/tarot/data/tarot_card_meaning_registry.dart',
+      ).readAsStringSync();
+      expect(
+        RegExp(
+          r"'((major|wands|cups|swords|pents)_\d{2})': TarotCardMeaning",
+        ).allMatches(registrySource),
+        hasLength(78),
+      );
+
+      final semanticIds = TarotDeckRegistry.rwsPublicDomain.cards
+          .map((card) => card.semanticId)
+          .toSet();
+      expect(semanticIds, hasLength(78));
+      for (final semanticId in semanticIds) {
+        final meaning = TarotCardMeaningRegistry.resolve(semanticId);
+        expect(meaning.semanticId, semanticId);
+        expect(meaning.titleKo, isNot('카드 메시지'));
+        expect(meaning.titleKo.trim(), isNotEmpty);
+        expect(meaning.keywords, hasLength(greaterThanOrEqualTo(3)));
+        expect(meaning.upright.trim(), isNotEmpty);
+        expect(meaning.reversed.trim(), isNotEmpty);
+        expect(meaning.questionLens.trim(), isNotEmpty);
+        expect(meaning.positionLens.trim(), isNotEmpty);
+        expect(meaning.smallAction.trim(), isNotEmpty);
+      }
+
+      const representative = <String, String>{
+        'major_00': '바보',
+        'major_13': '죽음',
+        'major_16': '탑',
+        'swords_02': '소드 2',
+        'swords_10': '소드 10',
+        'pents_14': '펜타클 왕',
+      };
+      for (final entry in representative.entries) {
+        expect(
+          TarotCardMeaningRegistry.resolve(entry.key).titleKo,
+          entry.value,
+        );
+      }
+
+      for (final forbidden in [
+        'DB',
+        'snapshot',
+        'storage',
+        'persistence',
+        'schema',
+        '반드시',
+        '무조건',
+        '틀림없이',
+        '운명적으로',
+      ]) {
+        expect(registrySource.contains(forbidden), isFalse);
+      }
+
+      final fool = TarotCardMeaningRegistry.resolve('major_00');
+      expect(fool.titleKo, isNotEmpty);
+      expect(fool.keywords, isNotEmpty);
+      expect(fool.upright, isNotEmpty);
+      expect(fool.reversed, isNotEmpty);
+      expect(fool.questionLens, isNotEmpty);
+      expect(fool.positionLens, isNotEmpty);
+      expect(fool.smallAction, isNotEmpty);
+
+      final pentsKing = TarotCardMeaningRegistry.resolve('pents_14');
+      expect(pentsKing.titleKo, contains('펜타클'));
+
+      final fallback = TarotCardMeaningRegistry.resolve('unknown_99');
+      expect(fallback.titleKo, '카드 메시지');
+      expect(fallback.keywords, isNotEmpty);
+    },
+  );
+
+  testWidgets('Tarot runtime binds integrated deck cover, back, and fronts', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 1100);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: TarotSpreadShell(key: UniqueKey(), onBack: () {}),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('바로 덱 선택'));
+    await tester.pumpAndSettle();
+
+    final deckSelectorAssets = tester
+        .widgetList<Image>(
+          find.byKey(const Key('tarot-representative-deck-image')),
+        )
+        .map((image) => (image.image as AssetImage).assetName)
+        .toSet();
+    expect(
+      deckSelectorAssets,
+      contains('assets/tarot/decks/rws_public_domain/cover/cover.jpg'),
+    );
+    expect(
+      deckSelectorAssets,
+      contains(
+        'assets/tarot/decks/universal_waite/cover/Universal_Waite_Tarot_Card_Cover.png',
+      ),
+    );
+    expect(
+      deckSelectorAssets,
+      contains(
+        'assets/tarot/decks/golden_art_nouveau_tarot/cover/Golden_Art_Nouveau_Tarot_Cover.jpg',
+      ),
+    );
+
+    await tester.tap(
+      find.byKey(
+        const ValueKey('tarot-deck-carousel-card-golden_art_nouveau_tarot'),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(
+        const ValueKey('tarot-card-back-option-deck-golden_art_nouveau_tarot'),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('tarot-card-back-option-cosmic_gate')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('tarot-card-back-option-inner_lotus')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('tarot-card-back-option-life_tree')),
+      findsOneWidget,
+    );
+
+    final setupBackAssets = tester
+        .widgetList<Image>(find.byKey(const Key('tarot-card-back-image')))
+        .map((image) => (image.image as AssetImage).assetName)
+        .toSet();
+    expect(
+      setupBackAssets,
+      contains(
+        'assets/tarot/decks/golden_art_nouveau_tarot/back/Golden_Art_Nouveau_Tarot_Back.jpg',
+      ),
+    );
+
+    await tester.ensureVisible(find.text('다음'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tarot-shuffle-button')), findsOneWidget);
+    var runtimeBackAssets = tester
+        .widgetList<Image>(find.byKey(const Key('tarot-card-back-image')))
+        .map((image) => (image.image as AssetImage).assetName)
+        .toSet();
+    expect(runtimeBackAssets, {
+      'assets/tarot/decks/golden_art_nouveau_tarot/back/Golden_Art_Nouveau_Tarot_Back.jpg',
+    });
+
+    await tester.tap(find.byKey(const Key('tarot-shuffle-button')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tarot-full-deck-stage')), findsOneWidget);
+    runtimeBackAssets = tester
+        .widgetList<Image>(find.byKey(const Key('tarot-card-back-image')))
+        .map((image) => (image.image as AssetImage).assetName)
+        .toSet();
+    expect(runtimeBackAssets, {
+      'assets/tarot/decks/golden_art_nouveau_tarot/back/Golden_Art_Nouveau_Tarot_Back.jpg',
+    });
+
+    await tester.tap(find.text(UserText.tarotAutoDraw));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('모두 펼치기'));
+    await tester.pumpAndSettle();
+    final revealedAssets = tester
+        .widgetList<Image>(find.byKey(const Key('tarot-rws-card-image')))
+        .map((image) => (image.image as AssetImage).assetName)
+        .toSet();
+    expect(revealedAssets, isNotEmpty);
+    expect(
+      revealedAssets.every(
+        (asset) =>
+            asset.startsWith('assets/tarot/decks/golden_art_nouveau_tarot/'),
+      ),
+      isTrue,
+    );
+    expect(
+      revealedAssets.any((asset) => asset.contains('rws_public_domain')),
+      isFalse,
+    );
+
+    await tester.tap(find.byKey(const Key('tarot-focusable-result-card-0')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tarot-focus-detail-overlay')), findsOneWidget);
+    final focusedCard = tester.widget<Image>(
+      find.byKey(const Key('tarot-focus-card-image')),
+    );
+    expect(
+      (focusedCard.image as AssetImage).assetName,
+      startsWith('assets/tarot/decks/golden_art_nouveau_tarot/'),
+    );
+    expect(find.byKey(const Key('tarot-focus-meaning-title')), findsOneWidget);
+    expect(
+      find.byKey(const Key('tarot-focus-meaning-orientation-text')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('tarot-focus-meaning-question-lens')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('tarot-focus-meaning-position-lens')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('tarot-focus-meaning-small-action')),
+      findsOneWidget,
     );
   });
 
@@ -192,6 +711,8 @@ void main() {
     expect(tarotShell.contains('focused card detail panel'), isTrue);
     expect(tarotShell.contains('selected card preview retained'), isTrue);
     expect(tarotShell.contains('tarot-card-focus-reading-prompt'), isTrue);
+    expect(tarotShell.contains('RWS 계열 ·'), isTrue);
+    expect(tarotShell.contains('RWS 이미지 ·'), isFalse);
     expect(tarotShell.contains('tarot-reading-context-ribbon'), isTrue);
     expect(tarotShell.contains('AppData'), isFalse);
     expect(tarotShell.contains('schema'), isFalse);
@@ -287,8 +808,15 @@ void main() {
       expect(tarotShell.contains('흐름 해석'), isTrue);
       expect(tarotShell.contains('핵심 메시지'), isTrue);
       expect(tarotShell.contains('오늘의 조언 / 작은 실천'), isTrue);
-      expect(tarotShell.contains('현재 화면 안에서만 유지됩니다'), isTrue);
-      expect(tarotShell.contains('카드별 상세 의미는 이후 DB 연결 뒤 팝업'), isTrue);
+      expect(tarotShell.contains('작성한 해석은 이 화면을 벗어나면 남지 않습니다'), isTrue);
+      expect(
+        tarotShell.contains('각 카드를 자세히 보려면 결과 보드에서 카드를 눌러 집중 보기를 여세요'),
+        isTrue,
+      );
+      expect(tarotShell.contains('카드별 상세 의미 보기는 다음 업데이트에서 열립니다'), isFalse);
+      expect(tarotShell.contains('카드별 상세 의미는 이후 DB 연결 뒤 팝업'), isFalse);
+      expect(tarotShell.contains('결과 보드 snapshot의 장면'), isFalse);
+      expect(tarotShell.contains('이후 DB 연결'), isFalse);
       expect(tarotShell.contains('AppData'), isFalse);
       expect(tarotShell.contains('schema'), isFalse);
       expect(tarotShell.contains('migration'), isFalse);
@@ -927,8 +1455,18 @@ void main() {
       findsOneWidget,
     );
     expect(
-      find.byKey(const Key('tarot-coverflow-far-card-oracle')),
+      find.byKey(
+        const Key('tarot-coverflow-near-card-golden_art_nouveau_tarot'),
+      ),
       findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('tarot-coverflow-side-card-universal_waite')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('tarot-coverflow-far-card-oracle')),
+      findsNothing,
     );
     expect(find.text(UserText.tarotSpreadSelect), findsNothing);
 
@@ -1140,6 +1678,8 @@ void main() {
     await tester.tap(find.byKey(const Key('tarot-reveal-all-button')));
     await tester.pump(const Duration(milliseconds: 1200));
     await tester.pumpAndSettle();
+    expect(find.text('해석 보기로 이어가세요'), findsOneWidget);
+    expect(find.text('카드를 펼쳐보세요'), findsNothing);
     final firstImage = tester.widget<Image>(
       find.byKey(const Key('tarot-rws-card-image')).first,
     );
@@ -1340,7 +1880,7 @@ void main() {
       expect(find.text('흐름 해석'), findsOneWidget);
       expect(find.text('핵심 메시지'), findsOneWidget);
       expect(find.text('오늘의 조언 / 작은 실천'), findsOneWidget);
-      expect(find.textContaining('현재 화면 안에서만 유지됩니다'), findsOneWidget);
+      expect(find.textContaining('작성한 해석은 이 화면을 벗어나면 남지 않습니다'), findsOneWidget);
       expect(find.textContaining('PDF', findRichText: true), findsNothing);
       expect(find.textContaining('AI', findRichText: true), findsNothing);
       expect(tester.takeException(), isNull);
@@ -1440,7 +1980,7 @@ void main() {
       find.byKey(const Key('tarot-interpretation-workspace-shell')),
       findsOneWidget,
     );
-    expect(find.textContaining('현재 화면 안에서만 유지됩니다'), findsOneWidget);
+    expect(find.textContaining('작성한 해석은 이 화면을 벗어나면 남지 않습니다'), findsOneWidget);
     expect(find.textContaining('export', findRichText: true), findsNothing);
     expect(find.textContaining('PDF', findRichText: true), findsNothing);
     expect(find.textContaining('AI', findRichText: true), findsNothing);
@@ -1655,8 +2195,18 @@ void main() {
         findsOneWidget,
       );
       expect(
-        find.byKey(const Key('tarot-coverflow-far-card-oracle')),
+        find.byKey(
+          const Key('tarot-coverflow-near-card-golden_art_nouveau_tarot'),
+        ),
         findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-coverflow-side-card-universal_waite')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-coverflow-far-card-oracle')),
+        findsNothing,
       );
       expect(
         find.byKey(const Key('tarot-immersive-deck-stage')),
@@ -3455,7 +4005,14 @@ void main() {
         find.byKey(const Key('tarot-card-focus-reading-prompt')),
         findsOneWidget,
       );
-      expect(find.text('이 카드가 먼저 말하는 장면'), findsOneWidget);
+      expect(
+        find.byKey(const Key('tarot-focus-meaning-title')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const Key('tarot-focus-meaning-orientation-text')),
+        findsOneWidget,
+      );
       expect(
         find.byKey(const Key('tarot-focus-panel-guidance')),
         findsOneWidget,
@@ -3469,7 +4026,7 @@ void main() {
         find.byKey(const Key('tarot-focus-card-orientation')),
         findsOneWidget,
       );
-      expect(find.text(UserText.tarotUpright), findsOneWidget);
+      expect(find.text(UserText.tarotUpright), findsWidgets);
       expect(find.text('과거'), findsWidgets);
       expect(find.text(UserText.tarotDeckUniversalWaite), findsOneWidget);
       expect(
