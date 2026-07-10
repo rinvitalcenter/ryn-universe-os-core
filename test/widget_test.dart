@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ryn_universe_os_core/core/text/user_text.dart';
 import 'package:ryn_universe_os_core/features/tarot/data/tarot_card_meaning_registry.dart';
 import 'package:ryn_universe_os_core/features/tarot/data/tarot_deck_registry.dart';
+import 'package:ryn_universe_os_core/features/tarot/models/tarot_reading_result_snapshot.dart';
 import 'package:ryn_universe_os_core/features/tarot/tarot_spread_shell.dart';
 import 'package:ryn_universe_os_core/main.dart';
 
@@ -134,9 +135,15 @@ void main() {
     );
     expect(
       tarotShell.contains(
-        '_selectedDeck.cards.isEmpty ? _rwsCards : _selectedDeck.cards',
+        '_remainingDeck = List<TarotCardDefinition>.of(_selectedDeck.cards)',
       ),
       isTrue,
+    );
+    expect(
+      tarotShell.contains(
+        '_selectedDeck.cards.isEmpty ? _rwsCards : _selectedDeck.cards',
+      ),
+      isFalse,
     );
     expect(tarotShell.contains('_selectedCardBackOverrideId ??'), isTrue);
     expect(tarotShell.contains('_selectedDeckCardBack?.id'), isTrue);
@@ -549,6 +556,362 @@ void main() {
       find.byKey(const Key('tarot-focus-meaning-small-action')),
       findsOneWidget,
     );
+  });
+
+  testWidgets(
+    'Tarot completed result freezes one validated snapshot per reading',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1440, 1100);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final delivered = <TarotReadingResultSnapshot>[];
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: TarotSpreadShell(
+              onBack: () {},
+              onResultCompleted: delivered.add,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      Future<void> completeOneCardReading({bool uprightOnly = false}) async {
+        await tester.tap(find.text('바로 덱 선택'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('다음'));
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.widgetWithText(ChoiceChip, UserText.tarotSpreadOne),
+        );
+        await tester.pumpAndSettle();
+        if (uprightOnly) {
+          final uprightChoice = find.text('정방향만');
+          await tester.ensureVisible(uprightChoice);
+          await tester.pumpAndSettle();
+          await tester.tap(uprightChoice);
+          await tester.pumpAndSettle();
+        }
+        final detailNext = find.text('다음');
+        await tester.ensureVisible(detailNext);
+        await tester.pumpAndSettle();
+        await tester.tap(detailNext);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(UserText.tarotAutoDraw));
+        await tester.pumpAndSettle();
+        expect(delivered, isEmpty);
+        await tester.tap(
+          find.byKey(const Key('tarot-result-card-back-slot')).first,
+        );
+        await tester.pumpAndSettle();
+        if (uprightOnly) {
+          expect(
+            find.byKey(const Key('tarot-result-direction-toggle-0')),
+            findsNothing,
+          );
+        }
+        await tester.tap(
+          find.byKey(const Key('tarot-open-interpretation-button')),
+        );
+        await tester.pumpAndSettle();
+      }
+
+      await completeOneCardReading();
+      expect(delivered, hasLength(1));
+      final first = delivered.single;
+      expect(first.readingInstanceId, isNotEmpty);
+      expect(first.readingQuestionText, '오늘 가장 먼저 비춰볼 질문');
+      expect(first.deckId, TarotDeckRegistry.rwsPublicDomainDeckId);
+      expect(first.spreadId, 'one_card');
+      expect(first.spreadNameSnapshot, UserText.tarotSpreadOne);
+      expect(first.placements, hasLength(1));
+      expect(first.placements.single.placementOrder, 1);
+      expect(first.placements.single.positionId, 'one_center');
+      expect(
+        TarotDeckRegistry.rwsPublicDomain.cards.map((card) => card.id),
+        contains(first.placements.single.cardId),
+      );
+      expect(
+        first.placements.single.orientation,
+        anyOf(TarotCardOrientation.upright, TarotCardOrientation.reversed),
+      );
+
+      await tester.tap(find.text('공개로 돌아가기'));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('tarot-open-interpretation-button')),
+      );
+      await tester.pumpAndSettle();
+      expect(delivered, hasLength(2));
+      expect(identical(delivered[0], delivered[1]), isTrue);
+      expect(delivered[1].readingInstanceId, first.readingInstanceId);
+      expect(delivered[1].readingAt, first.readingAt);
+
+      await tester.tap(find.text(UserText.tarotResetDraw));
+      await tester.pumpAndSettle();
+      delivered.clear();
+      await completeOneCardReading(uprightOnly: true);
+      expect(delivered, hasLength(1));
+      expect(delivered.single.readingInstanceId, isNot(first.readingInstanceId));
+      expect(
+        delivered.single.placements.single.orientation,
+        TarotCardOrientation.notUsed,
+      );
+    },
+  );
+
+  testWidgets(
+    'Tarot result orientation becomes read-only after snapshot freeze',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1440, 1100);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      final delivered = <TarotReadingResultSnapshot>[];
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: TarotSpreadShell(
+              onBack: () {},
+              onResultCompleted: delivered.add,
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      Future<void> openOneCardResult() async {
+        await tester.tap(find.text('바로 덱 선택'));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('다음'));
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.widgetWithText(ChoiceChip, UserText.tarotSpreadOne),
+        );
+        await tester.pumpAndSettle();
+        final detailNext = find.text('다음');
+        await tester.ensureVisible(detailNext);
+        await tester.pumpAndSettle();
+        await tester.tap(detailNext);
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(UserText.tarotAutoDraw));
+        await tester.pumpAndSettle();
+        await tester.tap(
+          find.byKey(const Key('tarot-result-card-back-slot')).first,
+        );
+        await tester.pumpAndSettle();
+      }
+
+      String visibleOrientation() {
+        final focusableCard = find.byKey(
+          const Key('tarot-focusable-result-card-0'),
+        );
+        final tooltip = find.ancestor(
+          of: focusableCard,
+          matching: find.byType(Tooltip),
+        );
+        return tester.widget<Tooltip>(tooltip).message ?? '';
+      }
+
+      await openOneCardResult();
+      final toggle = find.byKey(
+        const Key('tarot-result-direction-toggle-0'),
+      );
+      expect(toggle, findsOneWidget);
+      expect(tester.widget<IconButton>(toggle).onPressed, isNotNull);
+      final beforeToggle = visibleOrientation();
+      await tester.tap(toggle);
+      await tester.pumpAndSettle();
+      final frozenVisibleOrientation = visibleOrientation();
+      expect(frozenVisibleOrientation, isNot(beforeToggle));
+
+      await tester.tap(
+        find.byKey(const Key('tarot-open-interpretation-button')),
+      );
+      await tester.pumpAndSettle();
+      expect(delivered, hasLength(1));
+      final first = delivered.single;
+      final frozenOrientation = first.placements.single.orientation;
+      expect(
+        frozenVisibleOrientation,
+        contains(
+          frozenOrientation == TarotCardOrientation.reversed
+              ? UserText.tarotReversed
+              : UserText.tarotUpright,
+        ),
+      );
+
+      await tester.tap(find.text('공개로 돌아가기'));
+      await tester.pumpAndSettle();
+      expect(toggle, findsOneWidget);
+      expect(tester.widget<IconButton>(toggle).onPressed, isNull);
+      await tester.tap(toggle, warnIfMissed: false);
+      await tester.pumpAndSettle();
+      expect(visibleOrientation(), frozenVisibleOrientation);
+
+      await tester.tap(
+        find.byKey(const Key('tarot-open-interpretation-button')),
+      );
+      await tester.pumpAndSettle();
+      expect(delivered, hasLength(2));
+      expect(identical(delivered[0], delivered[1]), isTrue);
+      expect(delivered[1].readingInstanceId, first.readingInstanceId);
+      expect(
+        delivered[1].placements.single.orientation,
+        frozenOrientation,
+      );
+
+      await tester.tap(find.text(UserText.tarotResetDraw));
+      await tester.pumpAndSettle();
+      await openOneCardResult();
+      expect(toggle, findsOneWidget);
+      expect(tester.widget<IconButton>(toggle).onPressed, isNotNull);
+      await tester.tap(
+        find.byKey(const Key('tarot-open-interpretation-button')),
+      );
+      await tester.pumpAndSettle();
+      expect(delivered, hasLength(3));
+      expect(
+        delivered.last.readingInstanceId,
+        isNot(first.readingInstanceId),
+      );
+    },
+  );
+
+  testWidgets('unsupported Tarot deck cannot start a recordable draw', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 1100);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    final delivered = <TarotReadingResultSnapshot>[];
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: TarotSpreadShell(
+            onBack: () {},
+            onResultCompleted: delivered.add,
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('바로 덱 선택'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('tarot-deck-carousel-card-thoth')),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byKey(const Key('tarot-unsupported-deck-message')),
+      findsOneWidget,
+    );
+    expect(find.text(UserText.tarotDeckUnavailable), findsOneWidget);
+    expect(
+      tester
+          .widget<FilledButton>(find.byKey(const Key('tarot-shuffle-button')))
+          .onPressed,
+      isNull,
+    );
+    expect(delivered, isEmpty);
+    expect(find.byKey(const Key('tarot-full-deck-stage')), findsNothing);
+  });
+
+  testWidgets('actual Tarot result callback reaches Core Home summary', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1440, 1100);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(UserText.navReading).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(UserText.readingToolTarot).last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('바로 덱 선택'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.widgetWithText(ChoiceChip, UserText.tarotSpreadOne),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('다음'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(UserText.tarotAutoDraw));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('tarot-open-interpretation-button')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('tarot-back-button-strong')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(UserText.navHome).first);
+    await tester.pumpAndSettle();
+
+    final activeResultMarker = find.byWidgetPredicate((widget) {
+      final key = widget.key;
+      return key is ValueKey<String> &&
+          key.value.startsWith('core-active-tarot-result-');
+    });
+    expect(activeResultMarker, findsOneWidget);
+    expect(find.textContaining(UserText.tarotSpreadOne), findsAtLeastNWidgets(1));
+    expect(
+      find.textContaining('질문: 오늘 가장 먼저 비춰볼 질문'),
+      findsOneWidget,
+    );
+    expect(
+      TarotDeckRegistry.rwsPublicDomain.cards.any(
+        (card) => find.textContaining(card.displayName).evaluate().isNotEmpty,
+      ),
+      isTrue,
+    );
+  });
+
+  test('Tarot snapshot bridge uses stable spread and selected-deck facts', () {
+    final tarotSource = File(
+      'lib/features/tarot/tarot_spread_shell.dart',
+    ).readAsStringSync();
+    final mainSource = File('lib/main.dart').readAsStringSync();
+    final homeStart = mainSource.indexOf('class _NativeHomeEntrance');
+    final homeEnd = mainSource.indexOf('class _HomeEntranceCard');
+    final homeSource = mainSource.substring(homeStart, homeEnd);
+
+    expect(tarotSource.contains('String _selectedSpreadId'), isTrue);
+    expect(tarotSource.contains('spread.id == selected'), isTrue);
+    expect(tarotSource.contains('onSelected(spread.id)'), isTrue);
+    expect(tarotSource.contains('spread.label == selected'), isFalse);
+    expect(
+      tarotSource.contains('_selectedDeck.cards.isEmpty ? _rwsCards'),
+      isFalse,
+    );
+    expect(tarotSource.contains('selectedDeckCardIds:'), isTrue);
+    expect(mainSource.contains('TarotReadingResultSnapshot? _activeTarotResult'), isTrue);
+    expect(homeSource.contains('placement.cardNameSnapshot'), isFalse);
+    expect(homeSource.contains('_tarotResultCardSummary(activeTarotResult!)'), isTrue);
+    expect(homeSource.contains('The Hermit'), isFalse);
+    expect(homeSource.contains('Justice'), isFalse);
+    expect(homeSource.contains('The Star'), isFalse);
   });
 
   test('Tarot setup flow uses honest visible step keys only', () {

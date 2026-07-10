@@ -13,6 +13,7 @@ import 'package:ryn_universe_os_core/features/tarot/data/tarot_card_meaning_regi
 import 'package:ryn_universe_os_core/features/tarot/data/tarot_deck_registry.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_card_definition.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_deck_definition.dart';
+import 'package:ryn_universe_os_core/features/tarot/models/tarot_reading_result_snapshot.dart';
 import 'package:ryn_universe_os_core/core/theme/ryn_tokens.dart';
 
 class RynPalette {
@@ -437,9 +438,14 @@ class _TarotUiText {
 // FX foundation stabilizes; this task intentionally avoids layout micro-polish.
 
 class TarotSpreadShell extends StatefulWidget {
-  const TarotSpreadShell({super.key, required this.onBack});
+  const TarotSpreadShell({
+    super.key,
+    required this.onBack,
+    this.onResultCompleted,
+  });
 
   final VoidCallback onBack;
+  final ValueChanged<TarotReadingResultSnapshot>? onResultCompleted;
 
   @override
   State<TarotSpreadShell> createState() => _TarotSpreadShellState();
@@ -476,12 +482,10 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
 
   static final _spreadDefinitions = _buildTarotSpreadRegistry();
 
-  static const _rwsCards = TarotDeckRegistry.rwsCards;
-
   String _selectedDeckId = 'rws_public_domain';
   String? _selectedCardBackOverrideId;
   String _selectedTableClothId = 'deep_purple';
-  String _selectedSpread = UserText.tarotSpreadThree;
+  String _selectedSpreadId = 'three_card';
   String _selectedQuestionCategoryId = 'love';
   String _freeQuestion = '';
   String _questionTitle = '';
@@ -502,6 +506,9 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   final Set<int> _revealedResultIndexes = {};
   final Set<int> _revealFxIndexes = {};
   Uint8List? _interpretationSnapshotBytes;
+  String? _pendingReadingInstanceId;
+  DateTime? _pendingReadingAt;
+  TarotReadingResultSnapshot? _frozenResultSnapshot;
   late List<String> _positionLabels;
   _TarotDrawPhase _phase = _TarotDrawPhase.beforeShuffle;
   _TarotFlowStage _stage = _TarotFlowStage.setup;
@@ -510,7 +517,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   @override
   void initState() {
     super.initState();
-    _positionLabels = _defaultPositionLabelsFor(_selectedSpread);
+    _positionLabels = _defaultPositionLabelsFor(_selectedSpreadId);
     _prepareFreshDeck(clearDrawn: true);
   }
 
@@ -553,9 +560,11 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
 
   _TarotSpreadDefinition get _selectedSpreadDefinition =>
       _spreadDefinitions.firstWhere(
-        (spread) => spread.label == _selectedSpread,
+        (spread) => spread.id == _selectedSpreadId,
         orElse: () => _spreadDefinitions[1],
       );
+
+  String get _selectedSpreadLabel => _selectedSpreadDefinition.label;
 
   _TarotQuestionCategory get _selectedQuestionCategory =>
       _tarotQuestionCategories.firstWhere(
@@ -613,9 +622,9 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
       ),
   ];
 
-  List<String> _defaultPositionLabelsFor(String spreadLabel) {
+  List<String> _defaultPositionLabelsFor(String spreadId) {
     final definition = _spreadDefinitions.firstWhere(
-      (spread) => spread.label == spreadLabel,
+      (spread) => spread.id == spreadId,
       orElse: () => _spreadDefinitions[1],
     );
     final slots = definition.id == 'free_draw'
@@ -642,7 +651,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     setState(() {
       _selectedFreeDrawCount = next;
       if (_isFreeDrawSelected) {
-        _positionLabels = _defaultPositionLabelsFor(_selectedSpread);
+        _positionLabels = _defaultPositionLabelsFor(_selectedSpreadId);
         _prepareFreshDeck(clearDrawn: true);
         _phase = _TarotDrawPhase.beforeShuffle;
         _stage = _TarotFlowStage.setup;
@@ -660,7 +669,11 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   }
 
   void _toggleDrawnDirection(int index) {
-    if (index < 0 || index >= _drawnCards.length) return;
+    if (_frozenResultSnapshot != null ||
+        index < 0 ||
+        index >= _drawnCards.length) {
+      return;
+    }
     setState(() {
       final current = _drawnCards[index];
       _drawnCards[index] = _DrawnTarotCard(
@@ -670,9 +683,10 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     });
   }
 
+  bool get _selectedDeckSupportsReading => _selectedDeck.cards.isNotEmpty;
+
   void _prepareFreshDeck({required bool clearDrawn}) {
-    final cards = _selectedDeck.cards.isEmpty ? _rwsCards : _selectedDeck.cards;
-    _remainingDeck = List<TarotCardDefinition>.of(cards)
+    _remainingDeck = List<TarotCardDefinition>.of(_selectedDeck.cards)
       ..shuffle(math.Random());
     if (clearDrawn) {
       _drawnCards.clear();
@@ -680,11 +694,17 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
       _revealedResultIndexes.clear();
       _revealFxIndexes.clear();
       _interpretationSnapshotBytes = null;
+      _pendingReadingInstanceId = null;
+      _pendingReadingAt = null;
+      _frozenResultSnapshot = null;
     }
   }
 
   Future<void> _startShuffle() async {
-    if (_phase == _TarotDrawPhase.shuffling) return;
+    if (!_selectedDeckSupportsReading ||
+        _phase == _TarotDrawPhase.shuffling) {
+      return;
+    }
     setState(() {
       _prepareFreshDeck(clearDrawn: true);
       _phase = _TarotDrawPhase.shuffling;
@@ -707,7 +727,8 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   }
 
   void _drawOneFromFan(int deckIndex) {
-    if (_phase == _TarotDrawPhase.shuffling ||
+    if (!_selectedDeckSupportsReading ||
+        _phase == _TarotDrawPhase.shuffling ||
         _drawnCards.length >= _slots.length ||
         deckIndex < 0 ||
         deckIndex >= _remainingDeck.length ||
@@ -730,7 +751,10 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   }
 
   void _drawAll() {
-    if (_phase == _TarotDrawPhase.shuffling) return;
+    if (!_selectedDeckSupportsReading ||
+        _phase == _TarotDrawPhase.shuffling) {
+      return;
+    }
     setState(() {
       if (_phase == _TarotDrawPhase.beforeShuffle) {
         _prepareFreshDeck(clearDrawn: _drawnCards.isEmpty);
@@ -780,11 +804,74 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     }
   }
 
+  String _newReadingInstanceId(DateTime readingAt) {
+    final entropy = math.Random.secure().nextInt(0x7fffffff);
+    return 'tarot_${readingAt.microsecondsSinceEpoch}_${entropy.toRadixString(16)}';
+  }
+
   void _enterResultStage() {
+    if (!_isComplete) return;
+    if (_pendingReadingInstanceId == null || _pendingReadingAt == null) {
+      final readingAt = DateTime.now().toUtc();
+      _pendingReadingAt = readingAt;
+      _pendingReadingInstanceId = _newReadingInstanceId(readingAt);
+    }
     _revealedResultIndexes.clear();
     _revealFxIndexes.clear();
     _interpretationSnapshotBytes = null;
     _stage = _TarotFlowStage.result;
+  }
+
+  TarotReadingResultSnapshot _buildResultSnapshot() {
+    final readingInstanceId = _pendingReadingInstanceId;
+    final readingAt = _pendingReadingAt;
+    if (!_isComplete || readingInstanceId == null || readingAt == null) {
+      throw StateError('A completed reading identity is required.');
+    }
+
+    final slots = _slots;
+    if (slots.length != _drawnCards.length) {
+      throw StateError('Completed slots and cards must have the same count.');
+    }
+
+    final placements = <TarotCardPlacementSnapshot>[];
+    for (var index = 0; index < slots.length; index++) {
+      final slot = slots[index];
+      final positionId = slot.slotId?.trim();
+      if (positionId == null || positionId.isEmpty) {
+        throw StateError('Every completed position requires a stable ID.');
+      }
+      final drawnCard = _drawnCards[index];
+      final orientation = switch (_directionMode) {
+        _TarotDirectionMode.uprightOnly => TarotCardOrientation.notUsed,
+        _TarotDirectionMode.auto => drawnCard.reversed
+            ? TarotCardOrientation.reversed
+            : TarotCardOrientation.upright,
+      };
+      placements.add(
+        TarotCardPlacementSnapshot(
+          placementOrder: index + 1,
+          cardId: drawnCard.card.id,
+          cardNameSnapshot: drawnCard.card.label,
+          positionId: positionId,
+          positionNameSnapshot: slot.label,
+          orientation: orientation,
+        ),
+      );
+    }
+
+    return TarotReadingResultSnapshot.validated(
+      readingInstanceId: readingInstanceId,
+      readingQuestionText: _readingContext.question,
+      deckId: _selectedDeck.id,
+      deckNameSnapshot: _selectedDeck.label,
+      spreadId: _selectedSpreadDefinition.id,
+      spreadNameSnapshot: _selectedSpreadDefinition.label,
+      readingAt: readingAt,
+      placements: placements,
+      expectedPlacementCount: slots.length,
+      selectedDeckCardIds: _selectedDeck.cards.map((card) => card.id).toSet(),
+    );
   }
 
   void _showResult() {
@@ -794,6 +881,18 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
 
   void _showInterpretation(GlobalKey resultBoundaryKey) {
     if (!_isComplete) return;
+
+    late final TarotReadingResultSnapshot snapshot;
+    try {
+      snapshot = _frozenResultSnapshot ?? _buildResultSnapshot();
+      _frozenResultSnapshot = snapshot;
+    } on ArgumentError {
+      return;
+    } on StateError {
+      return;
+    }
+
+    widget.onResultCompleted?.call(snapshot);
     setState(() {
       _interpretationSnapshotBytes = null;
       _stage = _TarotFlowStage.interpretation;
@@ -809,10 +908,10 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         });
   }
 
-  void _selectSpread(String spread) {
+  void _selectSpread(String spreadId) {
     setState(() {
-      _selectedSpread = spread;
-      _positionLabels = _defaultPositionLabelsFor(spread);
+      _selectedSpreadId = spreadId;
+      _positionLabels = _defaultPositionLabelsFor(spreadId);
       _prepareFreshDeck(clearDrawn: true);
       _phase = _TarotDrawPhase.beforeShuffle;
       _stage = _TarotFlowStage.setup;
@@ -832,12 +931,9 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
       _selectSetupStep(index);
       return;
     }
-    if (!_isComplete) return;
+    if (!_isComplete || index == 9) return;
     setState(() {
-      if (index == 9) _interpretationSnapshotBytes = null;
-      _stage = index == 8
-          ? _TarotFlowStage.result
-          : _TarotFlowStage.interpretation;
+      _stage = _TarotFlowStage.result;
     });
   }
 
@@ -898,7 +994,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         onTableClothSelected: _selectTableCloth,
         freeSpreads: _freeSpreadDefinitions,
         fixedSpreads: _fixedSpreadDefinitions,
-        selectedSpread: _selectedSpread,
+        selectedSpread: _selectedSpreadId,
         onSpreadSelected: _selectSpread,
         selectedDeck: _selectedDeck,
         questionCategories: _tarotQuestionCategories,
@@ -932,7 +1028,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         directionMode: _directionMode,
         onDirectionModeSelected: _selectDirectionMode,
         positionLabels: _positionLabels,
-        defaultPositionLabels: _defaultPositionLabelsFor(_selectedSpread),
+        defaultPositionLabels: _defaultPositionLabelsFor(_selectedSpreadId),
         onPositionLabelChanged: _updatePositionLabel,
         selectedFreeDrawCount: _selectedFreeDrawCount,
         onFreeDrawCountChanged: _selectFreeDrawCount,
@@ -941,7 +1037,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
       ),
       _TarotFlowStage.draw => _TarotFullDeckDrawStage(
         deck: _selectedDeck,
-        spread: _selectedSpread,
+        spread: _selectedSpreadLabel,
         cards: _remainingDeck,
         selectedIndexes: _selectedDeckIndexes,
         selectedOrder: _selectedDeckOrder(),
@@ -958,7 +1054,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
       ),
       _TarotFlowStage.result => _TarotResultStage(
         spreadDefinition: _selectedSpreadDefinition,
-        spreadLabel: _selectedSpread,
+        spreadLabel: _selectedSpreadLabel,
         slots: _slots,
         drawnCards: _drawnCards,
         revealedIndexes: _revealedResultIndexes,
@@ -968,14 +1064,19 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         onInterpret: _showInterpretation,
         onReset: _resetDraw,
         onBack: widget.onBack,
-        onDirectionToggle: _toggleDrawnDirection,
+        showDirectionControls: _directionMode == _TarotDirectionMode.auto,
+        onDirectionToggle:
+            _directionMode == _TarotDirectionMode.auto &&
+                _frozenResultSnapshot == null
+            ? _toggleDrawnDirection
+            : null,
         cardBack: _selectedCardBack,
         deckLabel: _selectedDeck.label,
         tableCloth: _selectedTableCloth,
         readingContext: _readingContext,
       ),
       _TarotFlowStage.interpretation => _TarotInterpretationStage(
-        spreadLabel: _selectedSpread,
+        spreadLabel: _selectedSpreadLabel,
         drawnCards: _drawnCards,
         tableCloth: _selectedTableCloth,
         readingContext: _readingContext,
@@ -999,7 +1100,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
               if (immersive)
                 _TarotImmersiveTopBar(
                   stage: _stage,
-                  spreadLabel: _selectedSpread,
+                  spreadLabel: _selectedSpreadLabel,
                   onBack: widget.onBack,
                 )
               else
@@ -1459,6 +1560,13 @@ class _TarotSetupStageState extends State<_TarotSetupStage> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedSpreadLabel = [
+      ...widget.freeSpreads,
+      ...widget.fixedSpreads,
+    ].firstWhere(
+      (spread) => spread.id == widget.selectedSpread,
+      orElse: () => widget.freeSpreads.first,
+    ).label;
     final introStep = _TarotStepPanel(
       title: '1 질문과 목적',
       subtitle: '카드를 뽑기 전 질문의 결을 차분히 정리합니다.',
@@ -1568,7 +1676,7 @@ class _TarotSetupStageState extends State<_TarotSetupStage> {
       subtitle: '준비가 끝나면 카드를 섞거나 자동으로 펼칩니다.',
       child: _TarotPreparationPanel(
         selectedDeck: widget.selectedDeck,
-        selectedSpread: widget.selectedSpread,
+        selectedSpread: selectedSpreadLabel,
         isShuffling: widget.isShuffling,
         onShuffle: widget.onShuffle,
         onAutoDraw: widget.onAutoDraw,
@@ -2933,6 +3041,10 @@ class _TarotCardDetailSetupLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final selectedDefinition = [...freeSpreads, ...fixedSpreads].firstWhere(
+      (spread) => spread.id == selectedSpread,
+      orElse: () => freeSpreads.first,
+    );
     return LayoutBuilder(
       builder: (context, constraints) {
         final wide = constraints.maxWidth >= 1040;
@@ -2967,7 +3079,7 @@ class _TarotCardDetailSetupLayout extends StatelessWidget {
               selected: selectedSpread,
               onSelected: onSpreadSelected,
             ),
-            if (selectedSpread == '자유 드로우') ...[
+            if (selectedSpread == 'free_draw') ...[
               const SizedBox(height: 14),
               _TarotFreeDrawCountSelector(
                 selectedCount: selectedFreeDrawCount,
@@ -2976,7 +3088,7 @@ class _TarotCardDetailSetupLayout extends StatelessWidget {
             ],
             const SizedBox(height: 14),
             _TarotPositionSetupSection(
-              spreadLabel: selectedSpread,
+              spreadLabel: selectedDefinition.label,
               labels: positionLabels,
               defaultLabels: defaultPositionLabels,
               onChanged: onPositionLabelChanged,
@@ -3564,6 +3676,7 @@ class _TarotPreparationPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final canStartReading = selectedDeck.cards.isNotEmpty;
     return Container(
       key: const Key('tarot-ritual-shuffle-stage'),
       padding: const EdgeInsets.all(22),
@@ -3629,6 +3742,18 @@ class _TarotPreparationPanel extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   _TarotReadingContextRibbon(readingContext: readingContext),
+                  if (!canStartReading) ...[
+                    const SizedBox(height: 10),
+                    const Text(
+                      UserText.tarotDeckUnavailable,
+                      key: Key('tarot-unsupported-deck-message'),
+                      style: TextStyle(
+                        color: RynPalette.tarotLavender,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -3672,7 +3797,9 @@ class _TarotPreparationPanel extends StatelessWidget {
                     child: FilledButton.icon(
                       key: const Key('tarot-shuffle-button'),
                       style: _tarotFilledActionStyle(),
-                      onPressed: isShuffling ? null : onShuffle,
+                      onPressed: !canStartReading || isShuffling
+                          ? null
+                          : onShuffle,
                       icon: const Icon(Icons.shuffle_rounded, size: 18),
                       label: Text(
                         isShuffling
@@ -3685,7 +3812,9 @@ class _TarotPreparationPanel extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton.icon(
                       style: _tarotOutlinedActionStyle(),
-                      onPressed: isShuffling ? null : onAutoDraw,
+                      onPressed: !canStartReading || isShuffling
+                          ? null
+                          : onAutoDraw,
                       icon: const Icon(Icons.auto_awesome_rounded, size: 18),
                       label: const Text(UserText.tarotAutoDraw),
                     ),
@@ -4319,6 +4448,7 @@ class _TarotResultStage extends StatefulWidget {
     required this.onInterpret,
     required this.onReset,
     required this.onBack,
+    required this.showDirectionControls,
     required this.onDirectionToggle,
     required this.cardBack,
     required this.deckLabel,
@@ -4337,7 +4467,8 @@ class _TarotResultStage extends StatefulWidget {
   final ValueChanged<GlobalKey> onInterpret;
   final VoidCallback onReset;
   final VoidCallback onBack;
-  final ValueChanged<int> onDirectionToggle;
+  final bool showDirectionControls;
+  final ValueChanged<int>? onDirectionToggle;
   final _TarotCardBackDefinition cardBack;
   final String deckLabel;
   final _TarotTableClothDefinition tableCloth;
@@ -4429,6 +4560,7 @@ class _TarotResultStageState extends State<_TarotResultStage> {
                     revealedIndexes: widget.revealedIndexes,
                     revealFxIndexes: widget.revealFxIndexes,
                     onRevealCard: widget.onRevealCard,
+                    showDirectionControls: widget.showDirectionControls,
                     onDirectionToggle: widget.onDirectionToggle,
                     showEmptySlots: false,
                     fillAvailable: true,
@@ -6430,11 +6562,11 @@ class _TarotSpreadGroup extends StatelessWidget {
             for (final spread in spreads)
               ChoiceChip(
                 label: Text(spread.label),
-                selected: spread.label == selected,
-                onSelected: (_) => onSelected(spread.label),
+                selected: spread.id == selected,
+                onSelected: (_) => onSelected(spread.id),
                 showCheckmark: false,
                 labelStyle: TextStyle(
-                  color: spread.label == selected
+                  color: spread.id == selected
                       ? RynPalette.tarotMidnight
                       : RynPalette.tarotTextPrimary(context),
                   fontSize: 12,
@@ -6972,6 +7104,7 @@ class _TarotSpreadCanvas extends StatefulWidget {
     required this.revealedIndexes,
     required this.revealFxIndexes,
     required this.onRevealCard,
+    required this.showDirectionControls,
     required this.onDirectionToggle,
     required this.onEmptySlotTap,
     required this.cardBack,
@@ -6989,7 +7122,8 @@ class _TarotSpreadCanvas extends StatefulWidget {
   final Set<int> revealedIndexes;
   final Set<int> revealFxIndexes;
   final ValueChanged<int> onRevealCard;
-  final ValueChanged<int> onDirectionToggle;
+  final bool showDirectionControls;
+  final ValueChanged<int>? onDirectionToggle;
   final VoidCallback onEmptySlotTap;
   final _TarotCardBackDefinition cardBack;
   final String deckLabel;
@@ -7515,6 +7649,7 @@ class _TarotSpreadCanvasState extends State<_TarotSpreadCanvas> {
               showRevealFx: widget.revealFxIndexes.contains(index),
               onReveal: () => widget.onRevealCard(index),
               onFocus: () => _openFocusedCard(index),
+              showDirectionControl: widget.showDirectionControls,
               onDirectionToggle: widget.onDirectionToggle,
               cardBack: widget.cardBack,
             )
@@ -8100,6 +8235,7 @@ class _TarotDrawnCardView extends StatelessWidget {
     required this.showRevealFx,
     required this.onReveal,
     required this.onFocus,
+    required this.showDirectionControl,
     required this.onDirectionToggle,
     required this.cardBack,
   });
@@ -8110,7 +8246,8 @@ class _TarotDrawnCardView extends StatelessWidget {
   final bool showRevealFx;
   final VoidCallback onReveal;
   final VoidCallback onFocus;
-  final ValueChanged<int> onDirectionToggle;
+  final bool showDirectionControl;
+  final ValueChanged<int>? onDirectionToggle;
   final _TarotCardBackDefinition cardBack;
 
   @override
@@ -8154,6 +8291,26 @@ class _TarotDrawnCardView extends StatelessWidget {
             ),
             if (showRevealFx)
               const Positioned.fill(child: _TarotFxBurst(particleCount: 8)),
+            if (revealed && showDirectionControl)
+              Positioned(
+                right: 4,
+                bottom: 4,
+                child: IconButton.filledTonal(
+                  key: Key('tarot-result-direction-toggle-$index'),
+                  tooltip: onDirectionToggle == null
+                      ? '방향 고정됨'
+                      : '방향 바꾸기',
+                  onPressed: onDirectionToggle == null
+                      ? null
+                      : () => onDirectionToggle!(index),
+                  icon: const Icon(Icons.rotate_right_rounded, size: 16),
+                  constraints: const BoxConstraints.tightFor(
+                    width: 30,
+                    height: 30,
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+              ),
           ],
         ),
       ),

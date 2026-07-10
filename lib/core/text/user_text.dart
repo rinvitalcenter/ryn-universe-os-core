@@ -81,6 +81,7 @@ abstract final class UserText {
   static const recordsAreaTitle = '기록';
   static const recordsAreaBody = '보관함 · 히스토리 · 검색';
   static const quickStartUnsupportedLens = '이 시작 방식은 아직 준비 중입니다.';
+  static const tarotDeckUnavailable = '이 덱은 아직 리딩을 준비 중입니다.';
   static const quickStartGuidance = '질문과 리딩 방식을 선택해 주세요.';
   static const outputsAreaTitle = '산출';
   static const outputsAreaBody = '리포트 · 요약 · 공지';

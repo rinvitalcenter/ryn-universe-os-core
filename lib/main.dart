@@ -8,6 +8,7 @@ import 'core/theme/ryn_tokens.dart';
 import 'core/text/app_text.dart' hide UserText;
 import 'core/text/user_text.dart';
 import 'features/study_os/study_os_shell.dart';
+import 'features/tarot/models/tarot_reading_result_snapshot.dart';
 import 'features/tarot/tarot_spread_shell.dart';
 
 void main() {
@@ -247,6 +248,22 @@ class _TarotLoopPreview {
   bool get isSelf => targetType == 'self';
 }
 
+String _tarotOrientationLabel(TarotCardOrientation orientation) => switch (
+  orientation
+) {
+  TarotCardOrientation.notUsed => '방향 미사용',
+  TarotCardOrientation.upright => '정방향',
+  TarotCardOrientation.reversed => '역방향',
+};
+
+String _tarotResultCardSummary(TarotReadingResultSnapshot snapshot) => snapshot
+    .placements
+    .map(
+      (placement) =>
+          '${placement.positionNameSnapshot}: ${placement.cardNameSnapshot} (${_tarotOrientationLabel(placement.orientation)})',
+    )
+    .join(' · ');
+
 class CoreOsShell extends StatefulWidget {
   const CoreOsShell({super.key});
 
@@ -336,6 +353,7 @@ class _CoreOsShellState extends State<CoreOsShell> {
   String _selectedNav = UserText.navHome;
   bool _readingTarotFocus = false;
   _TarotLoopPreview? _tarotLoopPreview;
+  TarotReadingResultSnapshot? _activeTarotResult;
 
   void _selectNav(String label) {
     setState(() {
@@ -354,6 +372,11 @@ class _CoreOsShellState extends State<CoreOsShell> {
   void _reflectTarotLoop(_TarotLoopPreview preview) {
     if (!mounted) return;
     setState(() => _tarotLoopPreview = preview);
+  }
+
+  void _receiveTarotResult(TarotReadingResultSnapshot snapshot) {
+    if (!mounted) return;
+    setState(() => _activeTarotResult = snapshot);
   }
 
   @override
@@ -382,6 +405,8 @@ class _CoreOsShellState extends State<CoreOsShell> {
                             onReadingTarotFocusChanged: _setReadingTarotFocus,
                             tarotLoopPreview: _tarotLoopPreview,
                             onTarotLoopReflected: _reflectTarotLoop,
+                            activeTarotResult: _activeTarotResult,
+                            onTarotResultCompleted: _receiveTarotResult,
                           ),
                         ),
                       ],
@@ -393,6 +418,8 @@ class _CoreOsShellState extends State<CoreOsShell> {
                       onReadingTarotFocusChanged: _setReadingTarotFocus,
                       tarotLoopPreview: _tarotLoopPreview,
                       onTarotLoopReflected: _reflectTarotLoop,
+                      activeTarotResult: _activeTarotResult,
+                      onTarotResultCompleted: _receiveTarotResult,
                     ),
             );
           },
@@ -410,6 +437,8 @@ class _ScrollableShellCanvas extends StatelessWidget {
     required this.onReadingTarotFocusChanged,
     required this.tarotLoopPreview,
     required this.onTarotLoopReflected,
+    required this.activeTarotResult,
+    required this.onTarotResultCompleted,
   });
 
   final bool showCompactNav;
@@ -418,6 +447,8 @@ class _ScrollableShellCanvas extends StatelessWidget {
   final ValueChanged<bool> onReadingTarotFocusChanged;
   final _TarotLoopPreview? tarotLoopPreview;
   final ValueChanged<_TarotLoopPreview> onTarotLoopReflected;
+  final TarotReadingResultSnapshot? activeTarotResult;
+  final ValueChanged<TarotReadingResultSnapshot> onTarotResultCompleted;
 
   @override
   Widget build(BuildContext context) {
@@ -465,6 +496,8 @@ class _ScrollableShellCanvas extends StatelessWidget {
                   onReadingTarotFocusChanged: onReadingTarotFocusChanged,
                   tarotLoopPreview: tarotLoopPreview,
                   onTarotLoopReflected: onTarotLoopReflected,
+                  activeTarotResult: activeTarotResult,
+                  onTarotResultCompleted: onTarotResultCompleted,
                 ),
               ),
             ),
@@ -483,6 +516,8 @@ class _ShellPageContent extends StatelessWidget {
     required this.onReadingTarotFocusChanged,
     required this.tarotLoopPreview,
     required this.onTarotLoopReflected,
+    required this.activeTarotResult,
+    required this.onTarotResultCompleted,
   });
 
   final bool showCompactNav;
@@ -491,6 +526,8 @@ class _ShellPageContent extends StatelessWidget {
   final ValueChanged<bool> onReadingTarotFocusChanged;
   final _TarotLoopPreview? tarotLoopPreview;
   final ValueChanged<_TarotLoopPreview> onTarotLoopReflected;
+  final TarotReadingResultSnapshot? activeTarotResult;
+  final ValueChanged<TarotReadingResultSnapshot> onTarotResultCompleted;
 
   bool get _isHome => selectedLabel == UserText.navHome;
   bool get _isStudy => selectedLabel == UserText.navStudy;
@@ -522,6 +559,7 @@ class _ShellPageContent extends StatelessWidget {
               onOpenPeople: () => onNavSelected(UserText.navPeople),
               onOpenRecords: () => onNavSelected(UserText.navRecord),
               tarotLoopPreview: tarotLoopPreview,
+              activeTarotResult: activeTarotResult,
             ),
           ]
         : _isStudy
@@ -560,13 +598,17 @@ class _ShellPageContent extends StatelessWidget {
         ? <Widget>[
             const _TopSystemBar(showDailyHome: false),
             const SizedBox(height: 16),
-            _RecordsArchivePage(tarotLoopPreview: tarotLoopPreview),
+            _RecordsArchivePage(
+              tarotLoopPreview: tarotLoopPreview,
+              activeTarotResult: activeTarotResult,
+            ),
           ]
         : selectedLabel == UserText.navReading
         ? <Widget>[
             _BusinessAreaPage(
               label: selectedLabel,
               onReadingTarotFocusChanged: onReadingTarotFocusChanged,
+              onTarotResultCompleted: onTarotResultCompleted,
               onStartSession: () => _openQuickStartSheet(
                 context,
                 target: '나의 기록',
@@ -852,14 +894,23 @@ class _PreviewNote extends StatelessWidget {
 }
 
 class _RecordPreviewList extends StatelessWidget {
-  const _RecordPreviewList({required this.tarotLoopPreview});
+  const _RecordPreviewList({
+    required this.tarotLoopPreview,
+    required this.activeTarotResult,
+  });
 
   final _TarotLoopPreview? tarotLoopPreview;
+  final TarotReadingResultSnapshot? activeTarotResult;
 
   @override
   Widget build(BuildContext context) {
     final records = [
-      if (tarotLoopPreview != null)
+      if (activeTarotResult != null)
+        (
+          '타로 리딩',
+          '${activeTarotResult!.deckNameSnapshot} · ${activeTarotResult!.spreadNameSnapshot} · 질문: ${activeTarotResult!.readingQuestionText} · ${_tarotResultCardSummary(activeTarotResult!)} · ${activeTarotResult!.readingAt.toLocal().toIso8601String()} · 이번 실행에서만 표시',
+        )
+      else if (tarotLoopPreview != null)
         (
           '타로 리딩',
           '대상: ${tarotLoopPreview!.targetLabel} · 질문: ${tarotLoopPreview!.questionText} · 아직 저장하지 않음 / preview',
@@ -931,12 +982,14 @@ class _NativeHomeEntrance extends StatelessWidget {
     required this.onOpenPeople,
     required this.onOpenRecords,
     required this.tarotLoopPreview,
+    required this.activeTarotResult,
   });
 
   final VoidCallback onStartSession;
   final VoidCallback onOpenPeople;
   final VoidCallback onOpenRecords;
   final _TarotLoopPreview? tarotLoopPreview;
+  final TarotReadingResultSnapshot? activeTarotResult;
 
   @override
   Widget build(BuildContext context) {
@@ -1018,18 +1071,34 @@ class _NativeHomeEntrance extends StatelessWidget {
                   chips: const ['최근 흐름', '타로 리딩'],
                   onTap: onOpenPeople,
                 ),
-                _HomeEntranceCard(
-                  title: '이어보기',
-                  body: tarotLoopPreview == null
-                      ? '스터디 참여자와 3카드 리딩 복습을 이어갑니다.'
-                      : '${tarotLoopPreview!.targetLabel} · ${tarotLoopPreview!.lensLabel}\n질문: ${tarotLoopPreview!.questionText}',
-                  icon: Icons.play_circle_outline_rounded,
-                  chips: tarotLoopPreview == null
-                      ? const ['스터디', '다음에 볼 것']
-                      : ['다음에 볼 것', tarotLoopPreview!.nextPrompt],
-                  onTap: tarotLoopPreview?.isSelf == true
-                      ? onOpenRecords
-                      : onOpenPeople,
+                KeyedSubtree(
+                  key: activeTarotResult == null
+                      ? null
+                      : ValueKey(
+                          'core-active-tarot-result-${activeTarotResult!.readingInstanceId}',
+                        ),
+                  child: _HomeEntranceCard(
+                    title: '이어보기',
+                    body: activeTarotResult != null
+                        ? '${activeTarotResult!.spreadNameSnapshot} · ${activeTarotResult!.deckNameSnapshot}\n질문: ${activeTarotResult!.readingQuestionText}\n${_tarotResultCardSummary(activeTarotResult!)}'
+                        : tarotLoopPreview == null
+                        ? '스터디 참여자와 3카드 리딩 복습을 이어갑니다.'
+                        : '${tarotLoopPreview!.targetLabel} · ${tarotLoopPreview!.lensLabel}\n질문: ${tarotLoopPreview!.questionText}',
+                    icon: Icons.play_circle_outline_rounded,
+                    chips: activeTarotResult != null
+                        ? [
+                            activeTarotResult!.deckNameSnapshot,
+                            activeTarotResult!.spreadNameSnapshot,
+                          ]
+                        : tarotLoopPreview == null
+                        ? const ['스터디', '다음에 볼 것']
+                        : ['다음에 볼 것', tarotLoopPreview!.nextPrompt],
+                    onTap: activeTarotResult != null
+                        ? onOpenRecords
+                        : tarotLoopPreview?.isSelf == true
+                        ? onOpenRecords
+                        : onOpenPeople,
+                  ),
                 ),
                 _HomeEntranceCard(
                   title: '작은 메모',
@@ -2120,9 +2189,13 @@ class _FlowChoice extends StatelessWidget {
 }
 
 class _RecordsArchivePage extends StatelessWidget {
-  const _RecordsArchivePage({required this.tarotLoopPreview});
+  const _RecordsArchivePage({
+    required this.tarotLoopPreview,
+    required this.activeTarotResult,
+  });
 
   final _TarotLoopPreview? tarotLoopPreview;
+  final TarotReadingResultSnapshot? activeTarotResult;
 
   @override
   Widget build(BuildContext context) {
@@ -2186,7 +2259,10 @@ class _RecordsArchivePage extends StatelessWidget {
             caption: '찾아보기 전, 최근 흐름을 작은 샘플로 확인합니다.',
           ),
           const SizedBox(height: 12),
-          _RecordPreviewList(tarotLoopPreview: tarotLoopPreview),
+          _RecordPreviewList(
+            tarotLoopPreview: tarotLoopPreview,
+            activeTarotResult: activeTarotResult,
+          ),
         ],
       ),
     );
@@ -2478,11 +2554,13 @@ class _BusinessAreaPage extends StatelessWidget {
   const _BusinessAreaPage({
     required this.label,
     this.onReadingTarotFocusChanged,
+    this.onTarotResultCompleted,
     this.onStartSession,
   });
 
   final String label;
   final ValueChanged<bool>? onReadingTarotFocusChanged;
+  final ValueChanged<TarotReadingResultSnapshot>? onTarotResultCompleted;
   final VoidCallback? onStartSession;
 
   _BusinessActionSpec get _spec {
@@ -2576,6 +2654,7 @@ class _BusinessAreaPage extends StatelessWidget {
     if (label == UserText.navReading) {
       return _ReadingWorkspacePage(
         onTarotFocusChanged: onReadingTarotFocusChanged,
+        onTarotResultCompleted: onTarotResultCompleted,
         onStartSession: onStartSession,
       );
     }
@@ -2679,9 +2758,14 @@ class _BusinessModuleSummary extends StatelessWidget {
 }
 
 class _ReadingWorkspacePage extends StatefulWidget {
-  const _ReadingWorkspacePage({this.onTarotFocusChanged, this.onStartSession});
+  const _ReadingWorkspacePage({
+    this.onTarotFocusChanged,
+    this.onTarotResultCompleted,
+    this.onStartSession,
+  });
 
   final ValueChanged<bool>? onTarotFocusChanged;
+  final ValueChanged<TarotReadingResultSnapshot>? onTarotResultCompleted;
   final VoidCallback? onStartSession;
 
   @override
@@ -2700,7 +2784,10 @@ class _ReadingWorkspacePageState extends State<_ReadingWorkspacePage> {
   @override
   Widget build(BuildContext context) {
     if (_tarotOpen) {
-      return TarotSpreadShell(onBack: () => _setTarotOpen(false));
+      return TarotSpreadShell(
+        onBack: () => _setTarotOpen(false),
+        onResultCompleted: widget.onTarotResultCompleted,
+      );
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
