@@ -915,6 +915,7 @@ void main() {
     }
 
     expect(UserText.navHome, '홈');
+    expect(UserText.navPeople, '사람');
     expect(UserText.navReading, '리딩');
     expect(UserText.studyOsTitle, 'Ryn Study OS 2.0');
 
@@ -957,6 +958,7 @@ void main() {
     const menuLabels = <String>[
       UserText.navHome,
       UserText.navOperating,
+      UserText.navPeople,
       UserText.navStudy,
       UserText.navReading,
       UserText.navPractice,
@@ -971,19 +973,15 @@ void main() {
       expect(find.text(label), findsAtLeastNWidgets(1));
     }
 
-    expect(find.text(UserText.homeToday), findsOneWidget);
-    expect(find.text(UserText.homeThisWeek), findsOneWidget);
-    expect(find.text(UserText.homeContinue), findsOneWidget);
-    expect(find.text(UserText.homeTodayEmpty), findsAtLeastNWidgets(1));
-    expect(find.text(UserText.homeTodo), findsOneWidget);
-    expect(find.text(UserText.homeTodaySchedule), findsOneWidget);
-    expect(find.text(UserText.homeWeekSchedule), findsOneWidget);
-    expect(find.text(UserText.homeQuickMemo), findsOneWidget);
-    expect(find.text(UserText.homeContinueRecords), findsOneWidget);
-    expect(find.text(UserText.homeMaterialsReady), findsOneWidget);
-    expect(find.text(UserText.homeOutputsReview), findsOneWidget);
-    expect(find.text(UserText.homeAiAssist), findsOneWidget);
-    expect(find.text(UserText.homeQuickLinks), findsOneWidget);
+    expect(find.text('오늘의 입구'), findsOneWidget);
+    expect(find.text('오늘 누구를 보고, 무엇을 이어갈까요?'), findsOneWidget);
+    expect(find.text('새 만남 시작'), findsOneWidget);
+    expect(find.text('오늘 볼 사람'), findsOneWidget);
+    expect(find.text('이어보기'), findsOneWidget);
+    expect(find.text('작은 메모'), findsOneWidget);
+    expect(find.text(UserText.homeToday), findsNothing);
+    expect(find.text(UserText.homeThisWeek), findsNothing);
+    expect(find.text(UserText.homeQuickLinks), findsNothing);
     expect(find.text(UserText.homeStudyOps), findsNothing);
     expect(find.text(UserText.homeReadingPractice), findsNothing);
     expect(find.text('Ryn Business OS'), findsNothing);
@@ -1009,13 +1007,304 @@ void main() {
     expect(find.text(UserText.themeSystem), findsAtLeastNWidgets(1));
   });
 
+  testWidgets('native people session flow and records archive follow v0.2 IA', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(UserText.navPeople).first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('샘플 사람 A'), findsAtLeastNWidgets(1));
+    expect(find.text('이해 지도'), findsAtLeastNWidgets(1));
+    expect(find.text('타고난 기질'), findsOneWidget);
+    expect(find.text('현재의 흐름'), findsOneWidget);
+    expect(find.text('성장 여정'), findsOneWidget);
+
+    await tester.tap(find.text('새 만남 시작').first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('새 만남 빠른 시작'), findsOneWidget);
+    expect(find.text(UserText.quickStartGuidance), findsOneWidget);
+    expect(find.text('샘플 사람 A'), findsAtLeastNWidgets(1));
+    expect(find.text('타로 리딩'), findsAtLeastNWidgets(1));
+    expect(find.byKey(const Key('quick-start-question-field')), findsOneWidget);
+    expect(find.text('자세히 설정'), findsOneWidget);
+    expect(find.byKey(const Key('quick-start-begin-button')), findsOneWidget);
+    expect(find.text('오늘 어떤 만남을 시작할까요?'), findsNothing);
+    expect(find.text('누구와 만날까요?'), findsNothing);
+
+    await tester.tap(find.byKey(const Key('quick-start-begin-button')));
+    await tester.pumpAndSettle();
+    expect(find.text('타로 리딩 미리보기'), findsOneWidget);
+    expect(find.text('흐름에 반영'), findsOneWidget);
+    expect(find.textContaining('아직 저장하지 않음'), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.close_rounded));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text(UserText.navRecord).first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('보관함'), findsOneWidget);
+    expect(find.text('히스토리'), findsOneWidget);
+    expect(find.text('검색'), findsOneWidget);
+    expect(find.text('만남 기록'), findsAtLeastNWidgets(1));
+    expect(find.text('리딩 기록'), findsAtLeastNWidgets(1));
+    expect(find.text('수련 기록'), findsAtLeastNWidgets(1));
+    expect(find.text('스터디 기록'), findsAtLeastNWidgets(1));
+    expect(find.text('기록 홈'), findsNothing);
+    expect(find.text('Group Session'), findsNothing);
+  });
+
+  testWidgets(
+    'quick start sheet uses nav context defaults without 5 step wizard',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(const RynUniverseApp());
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('새 만남 시작').first);
+      await tester.pumpAndSettle();
+      expect(find.text(UserText.quickStartGuidance), findsOneWidget);
+      expect(find.text('오늘 어떤 만남을 시작할까요?'), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text(UserText.navReading).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('새 만남 시작').first);
+      await tester.pumpAndSettle();
+
+      expect(find.text(UserText.quickStartGuidance), findsOneWidget);
+      expect(find.text('나의 기록'), findsOneWidget);
+      expect(find.text('타로 리딩'), findsOneWidget);
+      expect(find.text('오늘 어떤 만남을 시작할까요?'), findsNothing);
+    },
+  );
+
+  testWidgets('in-memory tarot loop reflects into Home People and Records', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('새 만남 시작').first);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const Key('quick-start-question-field')),
+      '지금 선택의 기준은?',
+    );
+    await tester.tap(find.byKey(const Key('quick-start-begin-button')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('타로 리딩 미리보기'), findsOneWidget);
+    expect(find.textContaining('The Hermit'), findsOneWidget);
+    expect(find.textContaining('Justice'), findsOneWidget);
+    expect(find.textContaining('The Star'), findsOneWidget);
+    expect(find.byKey(const Key('tarot-loop-memo-field')), findsOneWidget);
+
+    await tester.enterText(
+      find.byKey(const Key('tarot-loop-memo-field')),
+      '오늘은 기준을 좁혀본다.',
+    );
+    await tester.tap(find.byKey(const Key('tarot-loop-reflect-button')));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('현재의 흐름에 표시했습니다'), findsOneWidget);
+    expect(find.textContaining('이번 실행에서만 이어집니다'), findsOneWidget);
+    expect(find.text('저장되었습니다'), findsNothing);
+    expect(find.textContaining('DB', findRichText: true), findsNothing);
+    expect(find.textContaining('schema', findRichText: true), findsNothing);
+    expect(find.textContaining('CRUD', findRichText: true), findsNothing);
+
+    await tester.tap(find.byIcon(Icons.close_rounded));
+    await tester.pumpAndSettle();
+
+    expect(find.text('이어보기'), findsOneWidget);
+    expect(find.textContaining('샘플 사람 A · 타로 리딩'), findsOneWidget);
+    expect(find.textContaining('질문: 지금 선택의 기준은?'), findsOneWidget);
+    expect(find.text('현재의 흐름 다시 보기'), findsAtLeastNWidgets(1));
+
+    await tester.tap(find.text(UserText.navPeople).first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('현재의 흐름'), findsOneWidget);
+    expect(find.text('타로 리딩 · 방금 이어본 질문 있음'), findsOneWidget);
+    expect(find.text('현재 질문 · 지금 선택의 기준은?'), findsOneWidget);
+    expect(find.text('다음에 볼 것 · 현재의 흐름 다시 보기'), findsOneWidget);
+
+    await tester.tap(find.text(UserText.navRecord).first);
+    await tester.pumpAndSettle();
+
+    expect(find.text('타로 리딩'), findsAtLeastNWidgets(1));
+    expect(
+      find.textContaining('대상: 샘플 사람 A · 질문: 지금 선택의 기준은?'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('아직 저장하지 않음 / preview'), findsOneWidget);
+    expect(find.text('오늘 어떤 만남을 시작할까요?'), findsNothing);
+  });
+
+  testWidgets('People Quick Start reflects each available selected target', (
+    WidgetTester tester,
+  ) async {
+    tester.view.physicalSize = const Size(1200, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    const targets = ['샘플 사람 A', '샘플 사람 B', '나의 기록', '스터디 참여자'];
+    for (final target in targets) {
+      await tester.pumpWidget(const RynUniverseApp());
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.navPeople).first);
+      await tester.pumpAndSettle();
+
+      final peopleList = find.byWidgetPredicate(
+        (widget) => widget.runtimeType.toString() == '_PeopleListPanel',
+      );
+      await tester.tap(
+        find.descendant(of: peopleList, matching: find.text(target)).first,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('새 만남 시작').first);
+      await tester.pumpAndSettle();
+
+      final dialog = find.byType(Dialog);
+      expect(
+        find.descendant(of: dialog, matching: find.text(target)),
+        findsOneWidget,
+        reason: target,
+      );
+      await tester.enterText(
+        find.byKey(const Key('quick-start-question-field')),
+        '$target 확인',
+      );
+      await tester.tap(find.byKey(const Key('quick-start-begin-button')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('tarot-loop-reflect-button')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pumpAndSettle();
+
+      expect(find.text('현재 질문 · $target 확인'), findsOneWidget);
+      await tester.tap(find.text(UserText.navHome).first);
+      await tester.pumpAndSettle();
+      final lens = target == '나의 기록' ? '셀프 리딩' : '타로 리딩';
+      expect(find.textContaining('$target · $lens'), findsOneWidget);
+      if (target != '샘플 사람 A') {
+        expect(find.textContaining('샘플 사람 A · $lens'), findsNothing);
+      }
+
+      await tester.tap(find.text(UserText.navRecord).first);
+      await tester.pumpAndSettle();
+      expect(
+        find.textContaining('대상: $target · 질문: $target 확인'),
+        findsOneWidget,
+      );
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    }
+  });
+
+  testWidgets(
+    'unsupported Quick Start lens stays disabled and preserves prior preview',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1200, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(const RynUniverseApp());
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('새 만남 시작').first);
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('quick-start-question-field')),
+        '기존 질문 유지',
+      );
+      await tester.tap(find.byKey(const Key('quick-start-begin-button')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('tarot-loop-reflect-button')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('질문: 기존 질문 유지'), findsOneWidget);
+
+      await tester.tap(find.text('새 만남 시작').first);
+      await tester.pumpAndSettle();
+      final dialog = find.byType(Dialog);
+      await tester.tap(
+        find.descendant(of: dialog, matching: find.text('샘플 사람 A')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('샘플 사람 B').last);
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.descendant(of: dialog, matching: find.text('타로 리딩')).first,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('상담 메모').last);
+      await tester.pumpAndSettle();
+
+      expect(find.text(UserText.quickStartUnsupportedLens), findsOneWidget);
+      final begin = tester.widget<FilledButton>(
+        find.byKey(const Key('quick-start-begin-button')),
+      );
+      expect(begin.onPressed, isNull);
+      expect(find.text('타로 리딩 미리보기'), findsNothing);
+      expect(find.text('흐름에 반영'), findsNothing);
+      expect(find.textContaining('현재의 흐름에 표시했습니다'), findsNothing);
+
+      await tester.tap(find.text('자세히 설정'));
+      await tester.pumpAndSettle();
+      expect(find.text(UserText.quickStartGuidance), findsOneWidget);
+      expect(find.textContaining('wizard'), findsNothing);
+      expect(find.textContaining('UX'), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.close_rounded));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('샘플 사람 A · 타로 리딩'), findsOneWidget);
+      expect(find.textContaining('질문: 기존 질문 유지'), findsOneWidget);
+      expect(find.textContaining('샘플 사람 B · 상담 메모'), findsNothing);
+    },
+  );
+
   testWidgets('keeps normal user surfaces free of developer wording', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const RynUniverseApp());
     await tester.pumpAndSettle();
 
-    expect(find.text(UserText.homeToday), findsAtLeastNWidgets(1));
+    expect(find.text('오늘의 입구'), findsAtLeastNWidgets(1));
     expect(find.text('AI Command Center'), findsNothing);
     expect(find.text('Chief / Governance Deck'), findsNothing);
     expect(find.text('Safety Status Strip'), findsNothing);
@@ -1076,7 +1365,7 @@ void main() {
         find
             .byWidgetPredicate(
               (widget) =>
-                  widget.runtimeType.toString() == '_BusinessHomeDashboard',
+                  widget.runtimeType.toString() == '_NativeHomeEntrance',
             )
             .first,
       );
@@ -1084,19 +1373,10 @@ void main() {
       expect(businessHomeRect.width, greaterThan(1100));
       expect(businessHomeRect.width, lessThanOrEqualTo(1700));
       expect(businessHomeRect.right, lessThanOrEqualTo(2400));
-      expect(find.text(UserText.homeToday), findsAtLeastNWidgets(1));
-
-      final homeGroups = find.byWidgetPredicate(
-        (widget) => widget.runtimeType.toString() == '_HomeDashboardGroup',
-      );
-      expect(homeGroups, findsNWidgets(3));
-      final firstHomeGroup = tester.getRect(homeGroups.at(0));
-      final secondHomeGroup = tester.getRect(homeGroups.at(1));
-      expect(
-        (firstHomeGroup.width - secondHomeGroup.width).abs(),
-        lessThan(0.1),
-      );
-      expect(firstHomeGroup.height, greaterThan(180));
+      expect(find.text('오늘의 입구'), findsAtLeastNWidgets(1));
+      expect(find.text('오늘 볼 사람'), findsOneWidget);
+      expect(find.text('이어보기'), findsOneWidget);
+      expect(find.text('작은 메모'), findsOneWidget);
 
       await tester.tap(find.text(UserText.navOperating).first);
       await tester.pumpAndSettle();
@@ -1112,7 +1392,7 @@ void main() {
     },
   );
 
-  testWidgets('Home secondary quick links navigate to workspace homes', (
+  testWidgets('primary navigation opens study and reading homes', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const RynUniverseApp());
@@ -1123,7 +1403,7 @@ void main() {
     await tester.tap(find.text(UserText.navStudy).last);
     await tester.pumpAndSettle();
     expect(find.text(UserText.studyWorkspaceTitle), findsAtLeastNWidgets(1));
-    expect(find.text(UserText.studyActionAttendance), findsOneWidget);
+    expect(find.text('새 만남 시작'), findsOneWidget);
 
     await tester.ensureVisible(find.text(UserText.navHome).first);
     await tester.pumpAndSettle();
@@ -1387,6 +1667,7 @@ void main() {
     const menuLabels = <String>[
       UserText.navHome,
       UserText.navOperating,
+      UserText.navPeople,
       UserText.navStudy,
       UserText.navReading,
       UserText.navPractice,
@@ -2609,26 +2890,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(UserText.navHome), findsAtLeastNWidgets(1));
 
-    final homeItemColors = tester
-        .widgetList<Container>(
-          find.byKey(const Key('home-dashboard-item-card')),
-        )
-        .map((container) => container.decoration)
-        .whereType<BoxDecoration>()
-        .map((decoration) => decoration.color)
-        .whereType<Color>()
-        .toList();
-    expect(homeItemColors, isNotEmpty);
-    expect(homeItemColors.contains(Colors.white), isFalse);
-    final homeQuickLinkColors = tester
-        .widgetList<Container>(find.byKey(const Key('home-quick-link-chip')))
-        .map((container) => container.decoration)
-        .whereType<BoxDecoration>()
-        .map((decoration) => decoration.color)
-        .whereType<Color>()
-        .toList();
-    expect(homeQuickLinkColors, isNotEmpty);
-    expect(homeQuickLinkColors.contains(Colors.white), isFalse);
+    final nativeHome = find.byWidgetPredicate(
+      (widget) => widget.runtimeType.toString() == '_NativeHomeEntrance',
+    );
+    expect(nativeHome, findsOneWidget);
+    expect(find.text('오늘의 입구'), findsAtLeastNWidgets(1));
 
     await tester.tap(find.text(UserText.navStudy).first);
     await tester.pumpAndSettle();
@@ -4210,4 +4476,67 @@ void main() {
       expect(tester.takeException(), isNull, reason: spread.id);
     }
   });
+
+  testWidgets(
+    'Records nav hides old ledger dashboard while people nav keeps insight map',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1500, 1100);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(const RynUniverseApp());
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.navRecord).first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('기록'), findsAtLeastNWidgets(1));
+      expect(find.text('보관함'), findsOneWidget);
+      expect(find.text('히스토리'), findsOneWidget);
+      expect(find.text('검색'), findsOneWidget);
+      expect(find.text('사람 이해 중심 기록 홈'), findsNothing);
+      expect(find.text('기록 홈'), findsNothing);
+      expect(find.text('새 만남 시작'), findsNothing);
+      expect(find.text('Group Session'), findsNothing);
+
+      await tester.tap(find.text(UserText.navPeople).first);
+      await tester.pumpAndSettle();
+
+      expect(find.text('샘플 사람 A'), findsAtLeastNWidgets(1));
+      expect(find.text('이해 지도'), findsAtLeastNWidgets(1));
+      expect(find.text('타고난 기질'), findsOneWidget);
+      expect(find.text('현재의 흐름'), findsOneWidget);
+      expect(find.text('성장 여정'), findsOneWidget);
+      expect(find.textContaining('사주 정보 · 아직 연결하지 않음'), findsOneWidget);
+      expect(find.textContaining('타로 리딩 · 최근 리딩 있음'), findsOneWidget);
+      expect(find.textContaining('타로 스터디 4회차 참여'), findsOneWidget);
+
+      final visibleText = tester
+          .widgetList<Text>(find.byType(Text))
+          .map((text) => text.data ?? '')
+          .join('\n');
+      for (final forbidden in [
+        'DB',
+        'schema',
+        'CRUD',
+        'migration',
+        'prediction engine',
+        'diagnosis',
+        'fortune guarantee',
+        'analysis engine',
+        'payload',
+        'entity',
+        'table',
+        'repository',
+        'internal ID',
+        'developer',
+        'governance',
+        '레저',
+      ]) {
+        expect(visibleText.contains(forbidden), isFalse, reason: forbidden);
+      }
+    },
+  );
 }

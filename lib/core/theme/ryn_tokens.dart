@@ -12,32 +12,32 @@ final class RynTokens {
   // Core color tokens
   // ---------------------------------------------------------------------------
 
-  static const Color coreInk = Color(0xFF070A12);
-  static const Color coreNight = Color(0xFF0C1120);
-  static const Color coreBlue = Color(0xFF5EA8FF);
+  static const Color coreInk = Color(0xFF1D2433);
+  static const Color coreNight = Color(0xFF111623);
+  static const Color coreBlue = Color(0xFF2D3854);
   static const Color coreViolet = Color(0xFF9D7CFF);
   static const Color coreCyan = Color(0xFF5FE7F0);
-  static const Color coreGold = Color(0xFFFFD27A);
+  static const Color coreGold = Color(0xFFA99058);
 
   // User OS visual baseline: clean light mode + OLED-first dark mode.
-  static const Color lightCanvas = Color(0xFFF6F7FA);
+  static const Color lightCanvas = Color(0xFFF7F7F5);
   static const Color lightSurface = Color(0xFFFFFFFF);
-  static const Color lightSurfaceSoft = Color(0xFFF2F4F8);
-  static const Color lightBorder = Color(0xFFE2E6EE);
-  static const Color lightTextPrimary = Color(0xFF111827);
-  static const Color lightTextSecondary = Color(0xFF667085);
-  static const Color lightAccent = Color(0xFF2F6FED);
-  static const Color lightAccentSoft = Color(0xFFEAF2FF);
+  static const Color lightSurfaceSoft = Color(0xFFEFEFEC);
+  static const Color lightBorder = Color(0xFFD8DADF);
+  static const Color lightTextPrimary = Color(0xFF1D2433);
+  static const Color lightTextSecondary = Color(0xFF687083);
+  static const Color lightAccent = Color(0xFF2D3854);
+  static const Color lightAccentSoft = Color(0x102D3854);
 
-  static const Color oledCanvas = Color(0xFF000000);
-  static const Color oledSurface = Color(0xFF07090D);
-  static const Color oledSurfaceSoft = Color(0xFF10141C);
-  static const Color oledCard = Color(0xFF171C26);
-  static const Color oledBorder = Color(0xFF2A3140);
-  static const Color oledTextPrimary = Color(0xFFF6F7FB);
-  static const Color oledTextSecondary = Color(0xFFA3AAB7);
-  static const Color oledAccent = Color(0xFF64A8FF);
-  static const Color oledAccentSoft = Color(0xFF102033);
+  static const Color oledCanvas = Color(0xFF111623);
+  static const Color oledSurface = Color(0xFF181E2D);
+  static const Color oledSurfaceSoft = Color(0xFF202737);
+  static const Color oledCard = Color(0xFF252D3F);
+  static const Color oledBorder = Color(0xFF323A4D);
+  static const Color oledTextPrimary = Color(0xFFF1F3F7);
+  static const Color oledTextSecondary = Color(0xFFA6ADBB);
+  static const Color oledAccent = Color(0xFF8EA0C8);
+  static const Color oledAccentSoft = Color(0x1A8EA0C8);
 
   // Neutral scale: dark-mode first, light-mode ready.
   static const Color neutral0 = Color(0xFF03050A);
@@ -103,11 +103,11 @@ final class RynTokens {
   // ---------------------------------------------------------------------------
 
   static const double radiusNone = 0;
-  static const double radiusXs = 6;
-  static const double radiusSm = 10;
-  static const double radiusMd = 14;
-  static const double radiusLg = 20;
-  static const double radiusXl = 28;
+  static const double radiusXs = 4;
+  static const double radiusSm = 8;
+  static const double radiusMd = 10;
+  static const double radiusLg = 12;
+  static const double radiusXl = 12;
   static const double radiusPill = 999;
 
   static const BorderRadius radiusCard = BorderRadius.all(
@@ -120,7 +120,7 @@ final class RynTokens {
     Radius.circular(radiusXl),
   );
   static const BorderRadius radiusChip = BorderRadius.all(
-    Radius.circular(radiusPill),
+    Radius.circular(radiusSm),
   );
 
   // ---------------------------------------------------------------------------
@@ -129,7 +129,7 @@ final class RynTokens {
 
   static const Color borderSubtle = Color(0x1FFFFFFF);
   static const Color borderFocused = coreCyan;
-  static const Color borderApproval = Color(0x80FFD27A);
+  static const Color borderApproval = Color(0x40A99058);
   static const Color borderRisk = Color(0x80FF7B7B);
   static const Color borderStatic = Color(0x665FE7F0);
 
@@ -177,7 +177,7 @@ final class RynTokens {
 
   static const Color interactionHoverOverlay = Color(0x0FFFFFFF);
   static const Color interactionPressedOverlay = Color(0x1AFFFFFF);
-  static const Color interactionSelectedOverlay = Color(0x245EA8FF);
+  static const Color interactionSelectedOverlay = Color(0x182D3854);
   static const Duration interactionFast = Duration(milliseconds: 120);
   static const Duration interactionRegular = Duration(milliseconds: 180);
 
@@ -186,7 +186,7 @@ final class RynTokens {
   // ---------------------------------------------------------------------------
 
   static const Color commandSurfaceAccent = coreBlue;
-  static const Color commandSurfaceQuietAccent = Color(0x995EA8FF);
+  static const Color commandSurfaceQuietAccent = Color(0x802D3854);
   static const Color commandApprovalAccent = approvalRequired;
   static const Color commandRiskAccent = riskHigh;
 

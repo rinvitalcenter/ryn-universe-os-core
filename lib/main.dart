@@ -39,7 +39,7 @@ class _RynUniverseAppState extends State<RynUniverseApp> {
         themeMode: _themeMode,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-            seedColor: RynPalette.accentBlue,
+            seedColor: RynPalette.navy,
             brightness: Brightness.light,
             surface: RynPalette.ivory,
           ),
@@ -50,8 +50,8 @@ class _RynUniverseAppState extends State<RynUniverseApp> {
         ),
         darkTheme: ThemeData(
           colorScheme: const ColorScheme.dark(
-            primary: RynPalette.accentBlueDark,
-            secondary: RynPalette.lavenderStrong,
+            primary: Color(0xFF8EA0C8),
+            secondary: Color(0xFFA99058),
             surface: RynPalette.oledSurface,
             onSurface: RynPalette.oledInk,
             onSurfaceVariant: RynPalette.oledMuted,
@@ -107,21 +107,21 @@ class RynPalette {
   static const oledInk = RynTokens.oledTextPrimary;
   static const oledMuted = RynTokens.oledTextSecondary;
 
-  static const navy = Color(0xFF07101F);
-  static const deepNavy = Color(0xFF101A2F);
-  static const graphite = Color(0xFF1B2638);
-  static const navyLine = Color(0xFF2D3B55);
-  static const gold = Color(0xFFD4AF5F);
+  static const navy = Color(0xFF1D2433);
+  static const deepNavy = Color(0xFF27324A);
+  static const graphite = Color(0xFF323A4D);
+  static const navyLine = Color(0xFFD8DADF);
+  static const gold = Color(0xFFA99058);
   static const goldSoft = RynTokens.lightAccentSoft;
-  static const lavender = Color(0xFFE9E5FF);
-  static const lavenderStrong = Color(0xFF8B7CF6);
+  static const lavender = Color(0xFFE8EBF2);
+  static const lavenderStrong = Color(0xFF53627F);
   static const accentBlue = RynTokens.lightAccent;
   static const accentBlueDark = RynTokens.oledAccent;
   static const accentSoftDark = RynTokens.oledAccentSoft;
-  static const success = Color(0xFF4F8A6B);
-  static const warning = Color(0xFFC08337);
-  static const shadow = Color(0x1A0F172A);
-  static const darkShadow = Color(0xA6000000);
+  static const success = Color(0xFF5A7C62);
+  static const warning = Color(0xFFA99058);
+  static const shadow = Color(0x0A1E2233);
+  static const darkShadow = Color(0x33000000);
 
   static bool isDark(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark;
@@ -143,30 +143,21 @@ class RynPalette {
   static Color accentSoft(BuildContext context) =>
       isDark(context) ? accentSoftDark : goldSoft;
   static Color navSelected(BuildContext context) =>
-      isDark(context) ? const Color(0xFF18243A) : navy;
+      isDark(context) ? const Color(0x33252D3F) : const Color(0x102D3854);
   static Color iconOnAccent(BuildContext context) =>
-      isDark(context) ? accentBlueDark : deepNavy;
-  static List<BoxShadow> panelShadow(BuildContext context) => isDark(context)
-      ? const <BoxShadow>[
-          BoxShadow(
-            color: Color(0xB0000000),
-            blurRadius: 28,
-            offset: Offset(0, 18),
-          ),
-        ]
-      : const <BoxShadow>[
-          BoxShadow(color: shadow, blurRadius: 24, offset: Offset(0, 14)),
-        ];
+      isDark(context) ? const Color(0xFF171A29) : deepNavy;
+  static List<BoxShadow> panelShadow(BuildContext context) =>
+      const <BoxShadow>[];
 }
 
 class RynMetrics {
   const RynMetrics._();
 
   static const maxWidth = 3200.0;
-  static const radiusShell = 32.0;
-  static const radiusCard = 24.0;
-  static const radiusSoft = 18.0;
-  static const radiusPill = 999.0;
+  static const radiusShell = 12.0;
+  static const radiusCard = 12.0;
+  static const radiusSoft = 10.0;
+  static const radiusPill = 8.0;
 }
 
 class RynFonts {
@@ -232,12 +223,37 @@ class StaticKanbanTask {
   final String boundary;
 }
 
+class _TarotLoopPreview {
+  const _TarotLoopPreview({
+    required this.targetLabel,
+    required this.targetType,
+    required this.lensLabel,
+    required this.questionText,
+    required this.selectedCards,
+    required this.memoText,
+    required this.createdAtLabel,
+    required this.nextPrompt,
+  });
+
+  final String targetLabel;
+  final String targetType;
+  final String lensLabel;
+  final String questionText;
+  final List<String> selectedCards;
+  final String memoText;
+  final String createdAtLabel;
+  final String nextPrompt;
+
+  bool get isSelf => targetType == 'self';
+}
+
 class CoreOsShell extends StatefulWidget {
   const CoreOsShell({super.key});
 
   static const navigationItems = [
     NavItem(UserText.navHome, Icons.home_rounded),
     NavItem(UserText.navOperating, Icons.dashboard_customize_rounded),
+    NavItem(UserText.navPeople, Icons.people_alt_rounded),
     NavItem(UserText.navStudy, Icons.school_rounded),
     NavItem(UserText.navReading, Icons.auto_stories_rounded),
     NavItem(UserText.navPractice, Icons.self_improvement_rounded),
@@ -254,6 +270,7 @@ class CoreOsShell extends StatefulWidget {
       '할 일 · 일정 · 메모',
       Icons.dashboard_customize_rounded,
     ),
+    ModuleItem(UserText.navPeople, '사람 · 이해 지도', Icons.people_alt_rounded),
     ModuleItem(UserText.navStudy, '세션 · 회원 · 출석', Icons.school_rounded),
     ModuleItem(
       UserText.navReading,
@@ -318,6 +335,7 @@ class CoreOsShell extends StatefulWidget {
 class _CoreOsShellState extends State<CoreOsShell> {
   String _selectedNav = UserText.navHome;
   bool _readingTarotFocus = false;
+  _TarotLoopPreview? _tarotLoopPreview;
 
   void _selectNav(String label) {
     setState(() {
@@ -331,6 +349,11 @@ class _CoreOsShellState extends State<CoreOsShell> {
   void _setReadingTarotFocus(bool focused) {
     if (!mounted || _readingTarotFocus == focused) return;
     setState(() => _readingTarotFocus = focused);
+  }
+
+  void _reflectTarotLoop(_TarotLoopPreview preview) {
+    if (!mounted) return;
+    setState(() => _tarotLoopPreview = preview);
   }
 
   @override
@@ -357,6 +380,8 @@ class _CoreOsShellState extends State<CoreOsShell> {
                             selectedLabel: _selectedNav,
                             onNavSelected: _selectNav,
                             onReadingTarotFocusChanged: _setReadingTarotFocus,
+                            tarotLoopPreview: _tarotLoopPreview,
+                            onTarotLoopReflected: _reflectTarotLoop,
                           ),
                         ),
                       ],
@@ -366,6 +391,8 @@ class _CoreOsShellState extends State<CoreOsShell> {
                       selectedLabel: _selectedNav,
                       onNavSelected: _selectNav,
                       onReadingTarotFocusChanged: _setReadingTarotFocus,
+                      tarotLoopPreview: _tarotLoopPreview,
+                      onTarotLoopReflected: _reflectTarotLoop,
                     ),
             );
           },
@@ -381,12 +408,16 @@ class _ScrollableShellCanvas extends StatelessWidget {
     required this.selectedLabel,
     required this.onNavSelected,
     required this.onReadingTarotFocusChanged,
+    required this.tarotLoopPreview,
+    required this.onTarotLoopReflected,
   });
 
   final bool showCompactNav;
   final String selectedLabel;
   final ValueChanged<String> onNavSelected;
   final ValueChanged<bool> onReadingTarotFocusChanged;
+  final _TarotLoopPreview? tarotLoopPreview;
+  final ValueChanged<_TarotLoopPreview> onTarotLoopReflected;
 
   @override
   Widget build(BuildContext context) {
@@ -432,6 +463,8 @@ class _ScrollableShellCanvas extends StatelessWidget {
                   selectedLabel: selectedLabel,
                   onNavSelected: onNavSelected,
                   onReadingTarotFocusChanged: onReadingTarotFocusChanged,
+                  tarotLoopPreview: tarotLoopPreview,
+                  onTarotLoopReflected: onTarotLoopReflected,
                 ),
               ),
             ),
@@ -448,15 +481,35 @@ class _ShellPageContent extends StatelessWidget {
     required this.selectedLabel,
     required this.onNavSelected,
     required this.onReadingTarotFocusChanged,
+    required this.tarotLoopPreview,
+    required this.onTarotLoopReflected,
   });
 
   final bool showCompactNav;
   final String selectedLabel;
   final ValueChanged<String> onNavSelected;
   final ValueChanged<bool> onReadingTarotFocusChanged;
+  final _TarotLoopPreview? tarotLoopPreview;
+  final ValueChanged<_TarotLoopPreview> onTarotLoopReflected;
 
   bool get _isHome => selectedLabel == UserText.navHome;
   bool get _isStudy => selectedLabel == UserText.navStudy;
+
+  void _openQuickStartSheet(
+    BuildContext context, {
+    String target = '샘플 사람 A',
+    String lens = '타로 리딩',
+  }) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => _QuickStartSheet(
+        initialTarget: target,
+        initialLens: lens,
+        onReflected: onTarotLoopReflected,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -464,19 +517,61 @@ class _ShellPageContent extends StatelessWidget {
         ? <Widget>[
             const _TopSystemBar(showDailyHome: false, compactHome: true),
             const SizedBox(height: 14),
-            _BusinessHomeDashboard(onOpenWorkspace: onNavSelected),
+            _NativeHomeEntrance(
+              onStartSession: () => _openQuickStartSheet(context),
+              onOpenPeople: () => onNavSelected(UserText.navPeople),
+              onOpenRecords: () => onNavSelected(UserText.navRecord),
+              tarotLoopPreview: tarotLoopPreview,
+            ),
           ]
         : _isStudy
-        ? const <Widget>[
-            _TopSystemBar(showDailyHome: false),
-            SizedBox(height: 16),
-            StudyOsShell(),
+        ? <Widget>[
+            const _TopSystemBar(showDailyHome: false),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: FilledButton.icon(
+                onPressed: () => _openQuickStartSheet(
+                  context,
+                  target: '스터디 참여자',
+                  lens: '스터디 기록',
+                ),
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('새 만남 시작'),
+              ),
+            ),
+            const SizedBox(height: 12),
+            const StudyOsShell(),
+          ]
+        : selectedLabel == UserText.navPeople
+        ? <Widget>[
+            const _TopSystemBar(showDailyHome: false),
+            const SizedBox(height: 16),
+            _PeopleWorkspacePage(
+              onStartSession: (person) => _openQuickStartSheet(
+                context,
+                target: person.name,
+                lens: '타로 리딩',
+              ),
+              tarotLoopPreview: tarotLoopPreview,
+            ),
+          ]
+        : selectedLabel == UserText.navRecord
+        ? <Widget>[
+            const _TopSystemBar(showDailyHome: false),
+            const SizedBox(height: 16),
+            _RecordsArchivePage(tarotLoopPreview: tarotLoopPreview),
           ]
         : selectedLabel == UserText.navReading
         ? <Widget>[
             _BusinessAreaPage(
               label: selectedLabel,
               onReadingTarotFocusChanged: onReadingTarotFocusChanged,
+              onStartSession: () => _openQuickStartSheet(
+                context,
+                target: '나의 기록',
+                lens: '타로 리딩',
+              ),
             ),
           ]
         : <Widget>[
@@ -513,14 +608,12 @@ class _NavigationRailPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 176,
-      margin: const EdgeInsets.all(12),
+      width: 168,
+      margin: const EdgeInsets.fromLTRB(0, 0, 12, 0),
       padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
       decoration: BoxDecoration(
-        color: RynPalette.surface(context),
-        borderRadius: BorderRadius.circular(RynMetrics.radiusShell),
-        border: Border.all(color: RynPalette.line(context)),
-        boxShadow: RynPalette.panelShadow(context),
+        color: RynPalette.surfaceSoft(context),
+        border: Border(right: BorderSide(color: RynPalette.line(context))),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -609,7 +702,7 @@ class _SidebarHint extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: RynPalette.surfaceSoft(context),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
         border: Border.all(color: RynPalette.line(context)),
       ),
       child: Text(
@@ -619,6 +712,1482 @@ class _SidebarHint extends StatelessWidget {
           fontSize: 12,
           fontWeight: FontWeight.w800,
         ),
+      ),
+    );
+  }
+}
+
+class _HomeEntranceSummary extends StatelessWidget {
+  const _HomeEntranceSummary({required this.onStartSession});
+
+  final VoidCallback onStartSession;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      decoration: BoxDecoration(
+        color: RynPalette.surfaceSoft(context),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
+        border: Border.all(color: RynPalette.line(context)),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.auto_awesome_rounded,
+            size: 18,
+            color: RynPalette.accent(context),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              '사람을 먼저 고르고, 질문과 렌즈로 오늘의 흐름을 엽니다.',
+              style: TextStyle(
+                color: RynPalette.subtext(context),
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                height: 1.35,
+              ),
+            ),
+          ),
+          TextButton(onPressed: onStartSession, child: const Text('바로 시작')),
+        ],
+      ),
+    );
+  }
+}
+
+class _SoftActionChip extends StatelessWidget {
+  const _SoftActionChip(this.label);
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: RynPalette.surfaceSoft(context).withValues(alpha: 0.72),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+        border: Border.all(color: RynPalette.line(context)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: RynPalette.subtext(context),
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+}
+
+class _SessionStepIndicator extends StatelessWidget {
+  const _SessionStepIndicator({required this.step});
+  final int step;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          '새 만남 시작',
+          style: TextStyle(
+            color: RynPalette.text(context),
+            fontSize: 13,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+        const SizedBox(width: 14),
+        for (var i = 0; i < 5; i++) ...[
+          Container(
+            width: i == step ? 30 : 9,
+            height: 9,
+            decoration: BoxDecoration(
+              color: i <= step
+                  ? RynPalette.accent(context)
+                  : RynPalette.line(context),
+              borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+            ),
+          ),
+          if (i != 4) const SizedBox(width: 6),
+        ],
+        const SizedBox(width: 10),
+        Text(
+          '${step + 1}/5',
+          style: TextStyle(
+            color: RynPalette.subtext(context),
+            fontSize: 12,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PreviewNote extends StatelessWidget {
+  const _PreviewNote();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+      decoration: BoxDecoration(
+        color: RynPalette.surfaceSoft(context),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+        border: Border.all(color: RynPalette.line(context)),
+      ),
+      child: Text(
+        '아직 저장하지 않음 · 미리보기',
+        style: TextStyle(
+          color: RynPalette.subtext(context),
+          fontWeight: FontWeight.w800,
+          fontSize: 12,
+        ),
+      ),
+    );
+  }
+}
+
+class _RecordPreviewList extends StatelessWidget {
+  const _RecordPreviewList({required this.tarotLoopPreview});
+
+  final _TarotLoopPreview? tarotLoopPreview;
+
+  @override
+  Widget build(BuildContext context) {
+    final records = [
+      if (tarotLoopPreview != null)
+        (
+          '타로 리딩',
+          '대상: ${tarotLoopPreview!.targetLabel} · 질문: ${tarotLoopPreview!.questionText} · 아직 저장하지 않음 / preview',
+        ),
+      ('만남 기록', '샘플 사람 A · 현재의 흐름 보기'),
+      ('리딩 기록', '3카드 리딩 복습 · 미리보기'),
+      ('수련 기록', '호흡 관찰 · 작은 메모'),
+    ];
+    return Column(
+      children: [
+        for (final record in records) ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(13),
+            decoration: BoxDecoration(
+              color: RynPalette.surfaceSoft(context),
+              borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+              border: Border.all(color: RynPalette.line(context)),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.history_rounded,
+                  size: 18,
+                  color: RynPalette.accent(context),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        record.$1,
+                        style: TextStyle(
+                          color: RynPalette.text(context),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        record.$2,
+                        style: TextStyle(
+                          color: RynPalette.subtext(context),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: RynPalette.subtext(context),
+                ),
+              ],
+            ),
+          ),
+          if (record != records.last) const SizedBox(height: 8),
+        ],
+      ],
+    );
+  }
+}
+
+class _NativeHomeEntrance extends StatelessWidget {
+  const _NativeHomeEntrance({
+    required this.onStartSession,
+    required this.onOpenPeople,
+    required this.onOpenRecords,
+    required this.tarotLoopPreview,
+  });
+
+  final VoidCallback onStartSession;
+  final VoidCallback onOpenPeople;
+  final VoidCallback onOpenRecords;
+  final _TarotLoopPreview? tarotLoopPreview;
+
+  @override
+  Widget build(BuildContext context) {
+    return _LightCard(
+      padding: const EdgeInsets.all(26),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final compact = constraints.maxWidth < 620;
+              final title = Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _BusinessIconBadge(icon: Icons.wb_sunny_rounded),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '오늘의 입구',
+                          style: TextStyle(
+                            color: RynPalette.text(context),
+                            fontSize: compact ? 24 : 30,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.8,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          '오늘 누구를 보고, 무엇을 이어갈까요?',
+                          style: TextStyle(
+                            color: RynPalette.subtext(context),
+                            fontSize: compact ? 14 : 16,
+                            fontWeight: FontWeight.w700,
+                            height: 1.45,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+              final button = FilledButton.icon(
+                key: const Key('home-start-new-session'),
+                onPressed: onStartSession,
+                icon: const Icon(Icons.add_rounded),
+                label: const Text('새 만남 시작'),
+              );
+              if (compact) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [title, const SizedBox(height: 14), button],
+                );
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: title),
+                  const SizedBox(width: 14),
+                  button,
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 18),
+          _HomeEntranceSummary(onStartSession: onStartSession),
+          const SizedBox(height: 16),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth >= 980;
+              final cards = [
+                _HomeEntranceCard(
+                  title: '오늘 볼 사람',
+                  body: '샘플 사람 A · 관계와 선택의 기준을 이어봅니다.',
+                  icon: Icons.person_search_rounded,
+                  emphasis: true,
+                  chips: const ['최근 흐름', '타로 리딩'],
+                  onTap: onOpenPeople,
+                ),
+                _HomeEntranceCard(
+                  title: '이어보기',
+                  body: tarotLoopPreview == null
+                      ? '스터디 참여자와 3카드 리딩 복습을 이어갑니다.'
+                      : '${tarotLoopPreview!.targetLabel} · ${tarotLoopPreview!.lensLabel}\n질문: ${tarotLoopPreview!.questionText}',
+                  icon: Icons.play_circle_outline_rounded,
+                  chips: tarotLoopPreview == null
+                      ? const ['스터디', '다음에 볼 것']
+                      : ['다음에 볼 것', tarotLoopPreview!.nextPrompt],
+                  onTap: tarotLoopPreview?.isSelf == true
+                      ? onOpenRecords
+                      : onOpenPeople,
+                ),
+                _HomeEntranceCard(
+                  title: '작은 메모',
+                  body: '오늘 떠오른 관찰을 짧게 남기는 자리입니다.',
+                  icon: Icons.sticky_note_2_rounded,
+                  chips: const ['나의 기록', '아직 저장하지 않음'],
+                  onTap: onOpenRecords,
+                ),
+              ];
+              if (!wide) {
+                return Column(
+                  children: [
+                    for (final card in cards) ...[
+                      card,
+                      const SizedBox(height: 12),
+                    ],
+                  ],
+                );
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final card in cards) ...[
+                    Expanded(child: card),
+                    if (card != cards.last) const SizedBox(width: 12),
+                  ],
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _HomeEntranceCard extends StatelessWidget {
+  const _HomeEntranceCard({
+    required this.title,
+    required this.body,
+    required this.icon,
+    required this.chips,
+    required this.onTap,
+    this.emphasis = false,
+  });
+
+  final String title;
+  final String body;
+  final IconData icon;
+  final List<String> chips;
+  final VoidCallback onTap;
+  final bool emphasis;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: emphasis
+                ? RynPalette.accentSoft(context).withValues(alpha: 0.56)
+                : RynPalette.surfaceSoft(context),
+            borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
+            border: Border.all(
+              color: emphasis
+                  ? RynPalette.accent(context).withValues(alpha: 0.28)
+                  : RynPalette.line(context),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  _BusinessIconBadge(icon: icon),
+                  const Spacer(),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 18,
+                    color: RynPalette.subtext(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Text(
+                title,
+                style: TextStyle(
+                  color: RynPalette.text(context),
+                  fontSize: 19,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              const SizedBox(height: 7),
+              Text(
+                body,
+                style: TextStyle(
+                  color: RynPalette.subtext(context),
+                  fontSize: 13.5,
+                  height: 1.48,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 14),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [for (final chip in chips) _BusinessChip(chip)],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PeopleWorkspacePage extends StatefulWidget {
+  const _PeopleWorkspacePage({
+    required this.onStartSession,
+    required this.tarotLoopPreview,
+  });
+
+  final ValueChanged<_PersonSample> onStartSession;
+  final _TarotLoopPreview? tarotLoopPreview;
+
+  @override
+  State<_PeopleWorkspacePage> createState() => _PeopleWorkspacePageState();
+}
+
+class _PeopleWorkspacePageState extends State<_PeopleWorkspacePage> {
+  int _selectedIndex = 0;
+  static const _people = [
+    _PersonSample('샘플 사람 A', '관계 · 선택', '최근 리딩 있음', '선택의 기준 반복 확인', [
+      '타로',
+      '상담 메모',
+    ]),
+    _PersonSample('샘플 사람 B', '수련 · 몸의 관찰', '호흡 변화 메모', '수련 후 변화 관찰', [
+      '기공명상',
+      '노트',
+    ]),
+    _PersonSample('나의 기록', '셀프 리딩 · 수련', '오늘의 관찰', '셀프 리딩 질문 정리', [
+      '셀프 리딩',
+      '수련 기록',
+    ]),
+    _PersonSample('스터디 참여자', '타로 스터디', '4회차 참여', '3카드 리딩 복습', ['스터디', '리딩']),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = _people[_selectedIndex];
+    return _LightCard(
+      padding: const EdgeInsets.all(20),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final split = constraints.maxWidth >= 980;
+          final list = _PeopleListPanel(
+            people: _people,
+            selectedIndex: _selectedIndex,
+            onSelected: (index) => setState(() => _selectedIndex = index),
+          );
+          final detail = _NativePersonDetail(
+            person: selected,
+            onStartSession: () => widget.onStartSession(selected),
+            tarotLoopPreview: widget.tarotLoopPreview,
+          );
+          if (!split) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [list, const SizedBox(height: 16), detail],
+            );
+          }
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(width: 360, child: list),
+              const SizedBox(width: 16),
+              Expanded(child: detail),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _PersonSample {
+  const _PersonSample(
+    this.name,
+    this.topic,
+    this.recentFlow,
+    this.nextLook,
+    this.lenses,
+  );
+  final String name;
+  final String topic;
+  final String recentFlow;
+  final String nextLook;
+  final List<String> lenses;
+}
+
+class _PeopleListPanel extends StatelessWidget {
+  const _PeopleListPanel({
+    required this.people,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  final List<_PersonSample> people;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return _InnerLightCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _SectionHeader(title: '사람', caption: '오늘 이어볼 사람을 먼저 고릅니다.'),
+          const SizedBox(height: 12),
+          for (var i = 0; i < people.length; i++) ...[
+            _PersonListTile(
+              person: people[i],
+              selected: i == selectedIndex,
+              onTap: () => onSelected(i),
+            ),
+            if (i != people.length - 1) const SizedBox(height: 8),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _PersonListTile extends StatelessWidget {
+  const _PersonListTile({
+    required this.person,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final _PersonSample person;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+        onTap: onTap,
+        child: Container(
+          padding: EdgeInsets.fromLTRB(
+            12,
+            selected ? 14 : 12,
+            12,
+            selected ? 14 : 12,
+          ),
+          decoration: BoxDecoration(
+            color: selected
+                ? RynPalette.accentSoft(context)
+                : RynPalette.surfaceElevated(context),
+            borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+            border: Border.all(
+              color: selected
+                  ? RynPalette.accent(context)
+                  : RynPalette.line(context),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      person.name,
+                      style: TextStyle(
+                        color: RynPalette.text(context),
+                        fontWeight: FontWeight.w900,
+                        fontSize: selected ? 16 : 15,
+                      ),
+                    ),
+                  ),
+                  if (selected)
+                    Icon(
+                      Icons.check_circle_rounded,
+                      color: RynPalette.accent(context),
+                      size: 18,
+                    ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                person.topic,
+                style: TextStyle(
+                  color: RynPalette.subtext(context),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12.5,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                '최근 흐름 · ${person.recentFlow}',
+                style: TextStyle(
+                  color: RynPalette.subtext(context),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                ),
+              ),
+              Text(
+                '다음에 볼 것 · ${person.nextLook}',
+                style: TextStyle(
+                  color: RynPalette.subtext(context),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  for (final lens in person.lenses.take(2)) _BusinessChip(lens),
+                  const _BusinessChip('샘플 기록'),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NativePersonDetail extends StatelessWidget {
+  const _NativePersonDetail({
+    required this.person,
+    required this.onStartSession,
+    required this.tarotLoopPreview,
+  });
+
+  final _PersonSample person;
+  final VoidCallback onStartSession;
+  final _TarotLoopPreview? tarotLoopPreview;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _InnerLightCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final compact = constraints.maxWidth < 720;
+                  final identity = Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const _BusinessIconBadge(icon: Icons.person_rounded),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              person.name,
+                              style: TextStyle(
+                                color: RynPalette.text(context),
+                                fontWeight: FontWeight.w900,
+                                fontSize: compact ? 24 : 29,
+                                letterSpacing: -0.7,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                _BusinessChip('관심 주제 · ${person.topic}'),
+                                _BusinessChip('최근 흐름 · ${person.recentFlow}'),
+                                _BusinessChip('다음에 볼 것 · ${person.nextLook}'),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                  final primary = FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 14,
+                      ),
+                    ),
+                    onPressed: onStartSession,
+                    icon: const Icon(Icons.add_rounded),
+                    label: const Text('새 만남 시작'),
+                  );
+                  if (compact) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [identity, const SizedBox(height: 14), primary],
+                    );
+                  }
+                  return Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: identity),
+                      const SizedBox(width: 14),
+                      primary,
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 14),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: const [
+                  _BusinessChip('개요'),
+                  _BusinessChip('이해 지도'),
+                  _BusinessChip('만남'),
+                  _BusinessChip('리딩'),
+                  _BusinessChip('수련'),
+                  _BusinessChip('스터디'),
+                  _BusinessChip('노트'),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: const [
+                  _SoftActionChip('현재의 흐름 보기'),
+                  _SoftActionChip('메모 남기기'),
+                  _SoftActionChip('전체 기록'),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
+        _InsightMapPanel(person: person, tarotLoopPreview: tarotLoopPreview),
+      ],
+    );
+  }
+}
+
+class _InsightMapPanel extends StatelessWidget {
+  const _InsightMapPanel({
+    required this.person,
+    required this.tarotLoopPreview,
+  });
+
+  final _PersonSample person;
+  final _TarotLoopPreview? tarotLoopPreview;
+
+  @override
+  Widget build(BuildContext context) {
+    final reflectedHere =
+        tarotLoopPreview != null &&
+        (tarotLoopPreview!.targetLabel == person.name ||
+            (tarotLoopPreview!.isSelf && person.name == '나의 기록'));
+    final currentFlowItems = reflectedHere
+        ? [
+            tarotLoopPreview!.isSelf
+                ? '셀프 리딩 질문 · ${tarotLoopPreview!.questionText}'
+                : '타로 리딩 · 방금 이어본 질문 있음',
+            '현재 질문 · ${tarotLoopPreview!.questionText}',
+            '다음에 볼 것 · ${tarotLoopPreview!.nextPrompt}',
+          ]
+        : const ['타로 리딩 · 최근 리딩 있음', '현재 질문 · 선택의 기준', '상담 메모 · 다음에 볼 것 있음'];
+    return _InnerLightCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _SectionHeader(
+            title: '이해 지도',
+            caption: '사람을 타고난 기질, 현재의 흐름, 성장 여정으로 나누어 봅니다.',
+          ),
+          const SizedBox(height: 12),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth >= 860;
+              final cards = [
+                const _InsightCard(
+                  title: '타고난 기질',
+                  items: [
+                    '사주 정보 · 아직 연결하지 않음',
+                    '점성학 · 향후 연결 예정',
+                    '휴먼디자인 · 향후 연결 예정',
+                  ],
+                  icon: Icons.auto_graph_rounded,
+                ),
+                _InsightCard(
+                  title: '현재의 흐름',
+                  items: currentFlowItems,
+                  icon: Icons.water_drop_rounded,
+                ),
+                const _InsightCard(
+                  title: '성장 여정',
+                  items: [
+                    '타로 스터디 4회차 참여',
+                    '기공명상 · 향후 연결 예정',
+                    '다음 과제 · 3카드 리딩 복습',
+                  ],
+                  icon: Icons.trending_up_rounded,
+                ),
+              ];
+              if (!wide) {
+                return Column(
+                  children: [
+                    for (final card in cards) ...[
+                      card,
+                      const SizedBox(height: 10),
+                    ],
+                  ],
+                );
+              }
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  for (final card in cards) ...[
+                    Expanded(child: card),
+                    if (card != cards.last) const SizedBox(width: 10),
+                  ],
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InsightCard extends StatelessWidget {
+  const _InsightCard({
+    required this.title,
+    required this.items,
+    required this.icon,
+  });
+  final String title;
+  final List<String> items;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(minHeight: 214),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: RynPalette.surfaceElevated(context),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
+        border: Border.all(color: RynPalette.line(context)),
+        boxShadow: RynPalette.panelShadow(context),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _BusinessIconBadge(icon: icon),
+              const Spacer(),
+              Icon(
+                Icons.more_horiz_rounded,
+                size: 18,
+                color: RynPalette.subtext(context),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: TextStyle(
+              color: RynPalette.text(context),
+              fontWeight: FontWeight.w900,
+              fontSize: 17,
+            ),
+          ),
+          const SizedBox(height: 8),
+          for (final item in items)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 7),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 5,
+                    height: 5,
+                    margin: const EdgeInsets.only(top: 7, right: 8),
+                    decoration: BoxDecoration(
+                      color: RynPalette.accent(context).withValues(alpha: 0.52),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      item,
+                      style: TextStyle(
+                        color: RynPalette.subtext(context),
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12.8,
+                        height: 1.38,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _QuickStartSheet extends StatefulWidget {
+  const _QuickStartSheet({
+    required this.initialTarget,
+    required this.initialLens,
+    required this.onReflected,
+  });
+
+  final String initialTarget;
+  final String initialLens;
+  final ValueChanged<_TarotLoopPreview> onReflected;
+
+  @override
+  State<_QuickStartSheet> createState() => _QuickStartSheetState();
+}
+
+class _QuickStartSheetState extends State<_QuickStartSheet> {
+  static const _targets = ['샘플 사람 A', '샘플 사람 B', '나의 기록', '스터디 참여자'];
+  static const _lenses = ['타로 리딩', '상담 메모', '수련 기록', '스터디 기록', '셀프 리딩'];
+
+  late String _target = widget.initialTarget;
+  late String _lens = widget.initialLens;
+  final TextEditingController _questionController = TextEditingController();
+  final TextEditingController _memoController = TextEditingController();
+  bool _advancedOpen = false;
+  bool _previewReady = false;
+  bool _reflected = false;
+
+  bool get _supportsTarotPreview =>
+      _lens == '타로 리딩' || _lens == '셀프 리딩';
+
+  @override
+  void dispose() {
+    _questionController.dispose();
+    _memoController.dispose();
+    super.dispose();
+  }
+
+  _TarotLoopPreview _buildPreview() {
+    final question = _questionController.text.trim().isEmpty
+        ? '오늘 내가 붙잡고 있는 흐름은?'
+        : _questionController.text.trim();
+    final memo = _memoController.text.trim().isEmpty
+        ? '짧은 메모는 아직 비워둔 미리보기입니다.'
+        : _memoController.text.trim();
+    final self = _target == '나의 기록' || _lens == '셀프 리딩';
+    return _TarotLoopPreview(
+      targetLabel: _target,
+      targetType: self ? 'self' : 'samplePerson',
+      lensLabel: self ? '셀프 리딩' : _lens,
+      questionText: question,
+      selectedCards: const ['The Hermit', 'Justice', 'The Star'],
+      memoText: memo,
+      createdAtLabel: '이번 실행',
+      nextPrompt: self ? '메모 이어보기' : '현재의 흐름 다시 보기',
+    );
+  }
+
+  void _reflectPreview() {
+    if (!_supportsTarotPreview) return;
+    final preview = _buildPreview();
+    widget.onReflected(preview);
+    setState(() => _reflected = true);
+  }
+
+  void _selectLens(String value) {
+    setState(() {
+      _lens = value;
+      if (!_supportsTarotPreview) {
+        _previewReady = false;
+        _reflected = false;
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 460),
+        child: _LightCard(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const _BusinessIconBadge(icon: Icons.bolt_rounded),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '새 만남 빠른 시작',
+                          style: TextStyle(
+                            color: RynPalette.text(context),
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.4,
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          UserText.quickStartGuidance,
+                          style: TextStyle(
+                            color: RynPalette.subtext(context),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: '닫기',
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close_rounded),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _QuickOptionMenu(
+                    value: _target,
+                    options: _targets,
+                    icon: Icons.person_rounded,
+                    onSelected: (value) => setState(() => _target = value),
+                  ),
+                  Text(
+                    '와',
+                    style: TextStyle(
+                      color: RynPalette.subtext(context),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  _QuickOptionMenu(
+                    value: _lens,
+                    options: _lenses,
+                    icon: Icons.auto_stories_rounded,
+                    onSelected: _selectLens,
+                  ),
+                ],
+              ),
+              if (!_supportsTarotPreview) ...[
+                const SizedBox(height: 10),
+                Text(
+                  UserText.quickStartUnsupportedLens,
+                  style: TextStyle(
+                    color: RynPalette.subtext(context),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 16),
+              TextField(
+                key: const Key('quick-start-question-field'),
+                controller: _questionController,
+                minLines: 1,
+                maxLines: 3,
+                decoration: InputDecoration(
+                  labelText: '오늘의 질문',
+                  hintText: '선택 사항입니다',
+                  filled: true,
+                  fillColor: RynPalette.surfaceSoft(context),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+                    borderSide: BorderSide(color: RynPalette.line(context)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+                    borderSide: BorderSide(color: RynPalette.line(context)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+                    borderSide: BorderSide(
+                      color: RynPalette.accent(context).withValues(alpha: 0.56),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              AnimatedSize(
+                duration: RynTokens.interactionRegular,
+                curve: Curves.easeOutCubic,
+                child: _advancedOpen
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _InnerLightCard(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '자세히 설정',
+                                style: TextStyle(
+                                  color: RynPalette.text(context),
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: const [
+                                  _BusinessChip('1:1 만남'),
+                                  _BusinessChip('여러 명과의 만남'),
+                                  _BusinessChip('셀프 기록'),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+              if (_previewReady) ...[
+                _TarotLoopPreviewPanel(
+                  preview: _buildPreview(),
+                  memoController: _memoController,
+                  reflected: _reflected,
+                  onReflect: _reflectPreview,
+                ),
+                const SizedBox(height: 12),
+              ],
+              Row(
+                children: [
+                  TextButton(
+                    onPressed: () =>
+                        setState(() => _advancedOpen = !_advancedOpen),
+                    child: Text(_advancedOpen ? '간단히 보기' : '자세히 설정'),
+                  ),
+                  const Spacer(),
+                  FilledButton.icon(
+                    key: const Key('quick-start-begin-button'),
+                    onPressed: _supportsTarotPreview
+                        ? () => setState(() => _previewReady = true)
+                        : null,
+                    icon: const Icon(Icons.keyboard_return_rounded),
+                    label: Text(_previewReady ? '미리보기 갱신' : '시작'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _QuickOptionMenu extends StatelessWidget {
+  const _QuickOptionMenu({
+    required this.value,
+    required this.options,
+    required this.icon,
+    required this.onSelected,
+  });
+
+  final String value;
+  final List<String> options;
+  final IconData icon;
+  final ValueChanged<String> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      tooltip: value,
+      onSelected: onSelected,
+      itemBuilder: (context) => [
+        for (final option in options)
+          PopupMenuItem<String>(value: option, child: Text(option)),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: RynPalette.accentSoft(context),
+          borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+          border: Border.all(
+            color: RynPalette.accent(context).withValues(alpha: 0.22),
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 16, color: RynPalette.accent(context)),
+            const SizedBox(width: 7),
+            Text(
+              value,
+              style: TextStyle(
+                color: RynPalette.text(context),
+                fontWeight: FontWeight.w900,
+                fontSize: 13,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Icon(
+              Icons.expand_more_rounded,
+              size: 16,
+              color: RynPalette.subtext(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TarotLoopPreviewPanel extends StatelessWidget {
+  const _TarotLoopPreviewPanel({
+    required this.preview,
+    required this.memoController,
+    required this.reflected,
+    required this.onReflect,
+  });
+
+  final _TarotLoopPreview preview;
+  final TextEditingController memoController;
+  final bool reflected;
+  final VoidCallback onReflect;
+
+  @override
+  Widget build(BuildContext context) {
+    return _InnerLightCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '타로 리딩 미리보기',
+            style: TextStyle(
+              color: RynPalette.text(context),
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '질문: ${preview.questionText}',
+            style: TextStyle(
+              color: RynPalette.text(context),
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final card in preview.selectedCards)
+                _BusinessChip('$card · preview'),
+            ],
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            key: const Key('tarot-loop-memo-field'),
+            controller: memoController,
+            minLines: 1,
+            maxLines: 3,
+            decoration: InputDecoration(
+              labelText: '짧은 메모',
+              hintText: '이번 실행에서만 보이는 미리보기 메모',
+              filled: true,
+              fillColor: RynPalette.surfaceSoft(context),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+                borderSide: BorderSide(color: RynPalette.line(context)),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+                borderSide: BorderSide(color: RynPalette.line(context)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            reflected
+                ? '현재의 흐름에 표시했습니다 · 이번 실행에서만 이어집니다'
+                : '아직 저장하지 않음 · 이번 실행에서만 보이는 미리보기입니다',
+            style: TextStyle(
+              color: RynPalette.subtext(context),
+              fontSize: 12,
+              fontWeight: FontWeight.w800,
+              height: 1.35,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: FilledButton.icon(
+              key: const Key('tarot-loop-reflect-button'),
+              onPressed: onReflect,
+              icon: const Icon(Icons.call_merge_rounded),
+              label: const Text('흐름에 반영'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FlowChoice extends StatelessWidget {
+  const _FlowChoice({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: selected
+                ? RynPalette.accentSoft(context)
+                : RynPalette.surfaceSoft(context),
+            borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+            border: Border.all(
+              color: selected
+                  ? RynPalette.accent(context)
+                  : RynPalette.line(context),
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                selected ? Icons.check_circle_rounded : Icons.circle_outlined,
+                size: 17,
+                color: selected
+                    ? RynPalette.accent(context)
+                    : RynPalette.subtext(context),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  color: RynPalette.text(context),
+                  fontWeight: FontWeight.w900,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RecordsArchivePage extends StatelessWidget {
+  const _RecordsArchivePage({required this.tarotLoopPreview});
+
+  final _TarotLoopPreview? tarotLoopPreview;
+
+  @override
+  Widget build(BuildContext context) {
+    return _LightCard(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const _BusinessIconBadge(icon: Icons.inventory_2_rounded),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '기록',
+                      style: TextStyle(
+                        color: RynPalette.text(context),
+                        fontWeight: FontWeight.w900,
+                        fontSize: 28,
+                        letterSpacing: -0.7,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '보관함, 히스토리, 검색으로 지난 흐름을 찾는 자리입니다.',
+                      style: TextStyle(
+                        color: RynPalette.subtext(context),
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                        height: 1.45,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: const [
+              _BusinessChip('보관함'),
+              _BusinessChip('히스토리'),
+              _BusinessChip('검색'),
+              _BusinessChip('최근 기록'),
+              _BusinessChip('만남 기록'),
+              _BusinessChip('리딩 기록'),
+              _BusinessChip('수련 기록'),
+              _BusinessChip('스터디 기록'),
+              _BusinessChip('노트'),
+            ],
+          ),
+          const SizedBox(height: 18),
+          const _SectionHeader(
+            title: '최근 기록',
+            caption: '찾아보기 전, 최근 흐름을 작은 샘플로 확인합니다.',
+          ),
+          const SizedBox(height: 12),
+          _RecordPreviewList(tarotLoopPreview: tarotLoopPreview),
+        ],
       ),
     );
   }
@@ -683,6 +2252,7 @@ class _BusinessHomeDashboard extends StatelessWidget {
       UserText.navOperating,
       Icons.dashboard_customize_rounded,
     ),
+    _HomeQuickLinkSpec(UserText.navPeople, Icons.people_alt_rounded),
     _HomeQuickLinkSpec(UserText.navStudy, Icons.school_rounded),
     _HomeQuickLinkSpec(UserText.navReading, Icons.auto_stories_rounded),
     _HomeQuickLinkSpec(UserText.navPractice, Icons.self_improvement_rounded),
@@ -873,14 +2443,14 @@ class _HomeQuickLinkChip extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
         onTap: onTap,
         child: Container(
           key: const Key('home-quick-link-chip'),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
           decoration: BoxDecoration(
             color: RynPalette.surfaceElevated(context),
-            borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+            borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
             border: Border.all(color: RynPalette.line(context)),
           ),
           child: Row(
@@ -908,10 +2478,12 @@ class _BusinessAreaPage extends StatelessWidget {
   const _BusinessAreaPage({
     required this.label,
     this.onReadingTarotFocusChanged,
+    this.onStartSession,
   });
 
   final String label;
   final ValueChanged<bool>? onReadingTarotFocusChanged;
+  final VoidCallback? onStartSession;
 
   _BusinessActionSpec get _spec {
     return switch (label) {
@@ -1004,6 +2576,7 @@ class _BusinessAreaPage extends StatelessWidget {
     if (label == UserText.navReading) {
       return _ReadingWorkspacePage(
         onTarotFocusChanged: onReadingTarotFocusChanged,
+        onStartSession: onStartSession,
       );
     }
     final spec = _spec;
@@ -1106,9 +2679,10 @@ class _BusinessModuleSummary extends StatelessWidget {
 }
 
 class _ReadingWorkspacePage extends StatefulWidget {
-  const _ReadingWorkspacePage({this.onTarotFocusChanged});
+  const _ReadingWorkspacePage({this.onTarotFocusChanged, this.onStartSession});
 
   final ValueChanged<bool>? onTarotFocusChanged;
+  final VoidCallback? onStartSession;
 
   @override
   State<_ReadingWorkspacePage> createState() => _ReadingWorkspacePageState();
@@ -1169,6 +2743,15 @@ class _ReadingWorkspacePageState extends State<_ReadingWorkspacePage> {
                       ],
                     ),
                   ),
+                  if (widget.onStartSession != null &&
+                      MediaQuery.sizeOf(context).width >= 720) ...[
+                    const SizedBox(width: 12),
+                    FilledButton.icon(
+                      onPressed: widget.onStartSession,
+                      icon: const Icon(Icons.add_rounded),
+                      label: const Text('새 만남 시작'),
+                    ),
+                  ],
                 ],
               ),
               const SizedBox(height: 20),
@@ -1241,7 +2824,7 @@ class _ReadingToolCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
               border: Border.all(
                 color: prominent
-                    ? RynPalette.accent(context).withValues(alpha: 0.35)
+                    ? RynPalette.accent(context).withValues(alpha: 0.24)
                     : RynPalette.line(context),
               ),
             ),
@@ -1307,7 +2890,7 @@ class _BusinessChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 8),
       decoration: BoxDecoration(
         color: RynPalette.surface(context),
-        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
         border: Border.all(color: RynPalette.line(context)),
       ),
       child: Text(
@@ -1535,7 +3118,7 @@ class _CommandHubScopeSurface extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: RynPalette.deepNavy.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
         border: Border.all(color: RynPalette.gold.withValues(alpha: 0.22)),
       ),
       child: Column(
@@ -2139,7 +3722,7 @@ class _MissionDomainNode extends StatelessWidget {
               label,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 11,
+                fontSize: 10.5,
                 fontWeight: FontWeight.w900,
               ),
             ),
@@ -2309,7 +3892,7 @@ class _MissionFocusPanel extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
               color: RynPalette.gold.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
               border: Border.all(
                 color: RynPalette.gold.withValues(alpha: 0.38),
               ),
@@ -2401,7 +3984,7 @@ class _ReadinessChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
       decoration: BoxDecoration(
         color: RynPalette.gold.withValues(alpha: 0.18),
-        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
         border: Border.all(color: RynPalette.gold.withValues(alpha: 0.44)),
       ),
       child: Text(
@@ -2494,7 +4077,7 @@ class _DailyHomeTile extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: RynPalette.deepNavy.withValues(alpha: 0.58),
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
           border: Border.all(color: Colors.white.withValues(alpha: 0.10)),
         ),
         child: Row(
@@ -2600,7 +4183,7 @@ class _ConstructionStageBanner extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
         border: Border.all(color: RynPalette.gold.withValues(alpha: 0.24)),
       ),
       child: Column(
@@ -2635,7 +4218,7 @@ class _NextPermitQueue extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: const Color(0xFF111A2B).withValues(alpha: 0.78),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
         border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
       ),
       child: Column(
@@ -2846,7 +4429,7 @@ class _StaticShellPanel extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
         border: Border.all(color: RynPalette.gold.withValues(alpha: 0.24)),
       ),
       child: Column(
@@ -2943,7 +4526,7 @@ class _StaticShellChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
       decoration: BoxDecoration(
         color: RynPalette.deepNavy.withValues(alpha: 0.70),
-        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
         border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
       ),
       child: Text(
@@ -3244,7 +4827,7 @@ class _CommandCta extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
         border: Border.all(color: RynPalette.gold.withValues(alpha: 0.50)),
       ),
       child: Text(
@@ -3412,7 +4995,7 @@ class _CommandStatusStrip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
         border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
       ),
       child: LayoutBuilder(
@@ -3438,7 +5021,7 @@ class _CommandStatusStrip extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Color(0xFFEDE7D9),
-                        fontSize: 11,
+                        fontSize: 10.5,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.2,
                       ),
@@ -4420,7 +6003,7 @@ class _KanbanSignalPill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
       decoration: BoxDecoration(
         color: RynPalette.goldSoft,
-        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
         border: Border.all(color: RynPalette.gold.withValues(alpha: 0.34)),
       ),
       child: Row(
@@ -4460,7 +6043,7 @@ class _KanbanDetailField extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
         decoration: BoxDecoration(
-          color: RynPalette.ivory,
+          color: RynPalette.surfaceSoft(context),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: RynPalette.line(context)),
         ),
@@ -4551,7 +6134,7 @@ class _KanbanEmptyState extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: RynPalette.ivory,
+        color: RynPalette.surfaceSoft(context),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: RynPalette.line(context)),
       ),
@@ -4593,7 +6176,7 @@ class _KanbanTaskCard extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
           onTap: onSelected,
           child: Container(
             padding: EdgeInsets.all(compact ? 12 : 10),
@@ -4601,7 +6184,7 @@ class _KanbanTaskCard extends StatelessWidget {
               color: selected
                   ? RynPalette.goldSoft.withValues(alpha: 0.58)
                   : RynPalette.ivory,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
               border: Border.all(
                 color: selected
                     ? RynPalette.gold
@@ -4710,7 +6293,7 @@ class _KanbanStatePill extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: RynPalette.navy,
-        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
       ),
       child: Text(
         label,
@@ -4737,7 +6320,7 @@ class _KanbanMetaPill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
       decoration: BoxDecoration(
         color: RynPalette.goldSoft,
-        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
       ),
       child: Text(
         label,
@@ -4916,7 +6499,7 @@ class _BrandBlock extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: RynPalette.subtext(context),
-                        fontSize: 11,
+                        fontSize: 10.5,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
@@ -4945,7 +6528,7 @@ class _CommandSearchPlaceholder extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: RynPalette.surfaceSoft(context),
-        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
         border: Border.all(color: RynPalette.line(context)),
       ),
       child: Row(
@@ -5035,7 +6618,7 @@ class _OwnerChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: RynPalette.ivorySoft,
-        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
         border: Border.all(color: RynPalette.line(context)),
       ),
       child: Row(
@@ -5071,16 +6654,16 @@ class _NavPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(17),
+      borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 11),
+        margin: const EdgeInsets.only(bottom: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         decoration: BoxDecoration(
           color: active ? RynPalette.navSelected(context) : Colors.transparent,
-          borderRadius: BorderRadius.circular(17),
+          borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
           border: Border.all(
             color: active
-                ? RynPalette.accent(context).withValues(alpha: 0.35)
+                ? RynPalette.accent(context).withValues(alpha: 0.24)
                 : Colors.transparent,
           ),
         ),
@@ -5097,7 +6680,7 @@ class _NavPill extends StatelessWidget {
             Text(
               item.label,
               style: TextStyle(
-                color: active ? RynPalette.oledInk : RynPalette.text(context),
+                color: RynPalette.text(context),
                 fontWeight: FontWeight.w900,
                 fontSize: 13,
               ),
@@ -5123,17 +6706,17 @@ class _CompactNavChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+      borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
         decoration: BoxDecoration(
           color: active
               ? RynPalette.navSelected(context)
               : RynPalette.surfaceSoft(context),
-          borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+          borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
           border: Border.all(
             color: active
-                ? RynPalette.accent(context).withValues(alpha: 0.35)
+                ? RynPalette.accent(context).withValues(alpha: 0.24)
                 : RynPalette.line(context),
           ),
         ),
@@ -5147,13 +6730,13 @@ class _CompactNavChip extends StatelessWidget {
                   ? RynPalette.accent(context)
                   : RynPalette.subtext(context),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 4),
             Text(
               item.label,
               style: TextStyle(
-                color: active ? RynPalette.oledInk : RynPalette.text(context),
+                color: RynPalette.text(context),
                 fontWeight: FontWeight.w900,
-                fontSize: 11,
+                fontSize: 10.5,
               ),
             ),
           ],
@@ -5179,7 +6762,6 @@ class _LightCard extends StatelessWidget {
         color: RynPalette.surface(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusShell),
         border: Border.all(color: RynPalette.line(context)),
-        boxShadow: RynPalette.panelShadow(context),
       ),
       child: child,
     );
@@ -5283,7 +6865,7 @@ class _MiniHeading extends StatelessWidget {
                 style: TextStyle(
                   color: onDark ? const Color(0xFFB9C2D5) : RynPalette.muted,
                   fontWeight: FontWeight.w700,
-                  fontSize: 11,
+                  fontSize: 10.5,
                   height: 1.3,
                 ),
               ),
@@ -5339,10 +6921,10 @@ class _TinyStep extends StatelessWidget {
         color: active
             ? RynPalette.navSelected(context)
             : RynPalette.surfaceElevated(context),
-        borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
         border: Border.all(
           color: active
-              ? RynPalette.accent(context).withValues(alpha: 0.35)
+              ? RynPalette.accent(context).withValues(alpha: 0.24)
               : RynPalette.line(context),
         ),
       ),
@@ -5370,9 +6952,9 @@ class _MetricWrap extends StatelessWidget {
       children: [
         for (final metric in metrics)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
             decoration: BoxDecoration(
-              color: RynPalette.ivory,
+              color: RynPalette.surfaceSoft(context),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: RynPalette.line(context)),
             ),
@@ -5457,8 +7039,8 @@ class _AgentChip extends StatelessWidget {
       constraints: const BoxConstraints(maxWidth: 176),
       padding: const EdgeInsets.all(9),
       decoration: BoxDecoration(
-        color: RynPalette.ivory,
-        borderRadius: BorderRadius.circular(18),
+        color: RynPalette.surfaceSoft(context),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
         border: Border.all(color: RynPalette.line(context)),
       ),
       child: Row(
@@ -5514,7 +7096,7 @@ class _ModuleChip extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: RynPalette.ivorySoft,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
         border: Border.all(
           color: RynTokens.borderApproval,
           width: RynTokens.borderWidthHairline,
@@ -5576,7 +7158,7 @@ class _PrincipleChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
         color: RynPalette.ivorySoft,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
         border: Border.all(color: RynPalette.line(context)),
       ),
       child: Row(
@@ -5655,7 +7237,7 @@ class _DarkStatusTile extends StatelessWidget {
       padding: const EdgeInsets.all(11),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.055),
-        borderRadius: BorderRadius.circular(17),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
         border: Border.all(
           color: RynTokens.borderSubtle,
           width: RynTokens.borderWidthHairline,
@@ -5778,7 +7360,7 @@ class _MarkerPill extends StatelessWidget {
                     softWrap: true,
                     style: TextStyle(
                       color: RynTokens.textStatic,
-                      fontSize: 11,
+                      fontSize: 10.5,
                       fontWeight: FontWeight.w900,
                       height: 1.18,
                     ),
@@ -5806,7 +7388,7 @@ class _DarkPill extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 8),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.055),
-          borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
+          borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
           border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         ),
         child: Row(
@@ -5822,7 +7404,7 @@ class _DarkPill extends StatelessWidget {
                 softWrap: true,
                 style: TextStyle(
                   color: Color(0xFFEDE7D9),
-                  fontSize: 11,
+                  fontSize: 10.5,
                   fontWeight: FontWeight.w900,
                   height: 1.16,
                 ),
