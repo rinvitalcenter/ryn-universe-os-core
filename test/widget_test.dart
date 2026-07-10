@@ -3950,7 +3950,7 @@ void main() {
   testWidgets(
     'Tarot revealed result card opens and closes focus detail overlay',
     (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(1920, 1080);
+      tester.view.physicalSize = const Size(1440, 1100);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
         tester.view.resetPhysicalSize();
@@ -3959,6 +3959,12 @@ void main() {
 
       await tester.pumpWidget(
         MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: const TextScaler.linear(1.2)),
+            child: child!,
+          ),
           home: Scaffold(
             body: TarotSpreadShell(key: UniqueKey(), onBack: () {}),
           ),
@@ -3992,8 +3998,13 @@ void main() {
       await tester.tap(find.byKey(const Key('tarot-focusable-result-card-0')));
       await tester.pumpAndSettle();
 
+      expect(tester.takeException(), isNull);
       expect(
         find.byKey(const Key('tarot-focus-detail-overlay')),
+        findsOneWidget,
+      );
+      expect(
+        find.byKey(const ValueKey<String>('tarot-focus-reading-scroll')),
         findsOneWidget,
       );
       expect(

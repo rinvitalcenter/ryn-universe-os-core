@@ -8414,7 +8414,7 @@ class _TarotFocusedCardOverlay extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 10),
                       Text(
                         drawnCard.card.label,
                         key: const Key('tarot-focus-card-name'),
@@ -8425,7 +8425,7 @@ class _TarotFocusedCardOverlay extends StatelessWidget {
                           letterSpacing: -0.5,
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 10),
                       _TarotFocusInfoChip(
                         icon: Icons.swap_vert_rounded,
                         label: orientation,
@@ -8443,12 +8443,18 @@ class _TarotFocusedCardOverlay extends StatelessWidget {
                         label: deckLabel,
                         valueKey: const Key('tarot-focus-deck-label'),
                       ),
-                      const SizedBox(height: 16),
-                      _TarotFocusReadingPrompt(
-                        meaning: meaning,
-                        reversed: drawnCard.reversed,
+                      const SizedBox(height: 12),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          key: const ValueKey<String>(
+                            'tarot-focus-reading-scroll',
+                          ),
+                          child: _TarotFocusReadingPrompt(
+                            meaning: meaning,
+                            reversed: drawnCard.reversed,
+                          ),
+                        ),
                       ),
-                      const Spacer(),
                       Text(
                         '해석 공간에서 이 카드를 먼저 살펴보세요. 현재 배열과 임시 조정은 그대로 유지됩니다.',
                         key: const Key('tarot-focus-panel-guidance'),
@@ -8607,8 +8613,6 @@ class _TarotMeaningLine extends StatelessWidget {
         Text(
           text,
           key: valueKey,
-          maxLines: 3,
-          overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: Colors.white.withValues(alpha: 0.73),
             fontSize: 11.3,
@@ -8635,7 +8639,7 @@ class _TarotFocusInfoChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.07),
         borderRadius: BorderRadius.circular(16),
