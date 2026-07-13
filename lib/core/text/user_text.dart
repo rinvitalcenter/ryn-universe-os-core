@@ -18,7 +18,18 @@ abstract final class UserText {
   // Product
   static const productName = 'Ryn Universe OS Core';
 
-  // Home operating dashboard
+  // Home cinematic scene
+  static const homeFlowEyebrow = '오늘의 성장 흐름';
+  static const homeFlowHeadline = '오늘의 흐름을 천천히 열어보세요';
+  static const homeFlowSupport = '첫 카드를 펼치기 전, 지금 마음에 머무는 질문을 바라봅니다.';
+  static const homeStartSelfTarot = '새 셀프 타로 시작';
+  static const homeCompletedTarotEyebrow = '방금 완료한 셀프 타로';
+  static const homeOpenResult = '결과 자세히 보기';
+  static const homeGrowthRecords = '나의 성장 기록';
+  static const homePeople = '사람과 만남';
+  static const homeNewSelfTarot = '새 셀프 타로';
+
+  // Legacy Home text contracts used outside the cinematic scene
   static const homeToday = '오늘';
   static const homeThisWeek = '이번 주';
   static const homeContinue = '이어가기';

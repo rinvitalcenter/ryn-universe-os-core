@@ -2,14 +2,56 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ryn_universe_os_core/core/text/user_text.dart';
+import 'package:ryn_universe_os_core/features/home/presentation/home_cinematic_scene.dart';
 import 'package:ryn_universe_os_core/features/tarot/data/tarot_card_meaning_registry.dart';
 import 'package:ryn_universe_os_core/features/tarot/data/tarot_deck_registry.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_reading_result_snapshot.dart';
 import 'package:ryn_universe_os_core/features/tarot/tarot_spread_shell.dart';
 import 'package:ryn_universe_os_core/main.dart';
+
+TarotReadingResultSnapshot _homeSnapshot({
+  int cardCount = 3,
+  String? question,
+  String deckId = TarotDeckRegistry.rwsPublicDomainDeckId,
+  bool missingRegistryCard = false,
+}) {
+  final registryCards = TarotDeckRegistry.rwsPublicDomain.cards;
+  final placements = List.generate(cardCount, (index) {
+    final registryCard = registryCards[index];
+    return TarotCardPlacementSnapshot(
+      placementOrder: index + 1,
+      cardId: missingRegistryCard && index == 0
+          ? 'missing-card'
+          : registryCard.semanticId,
+      cardNameSnapshot: missingRegistryCard && index == 0
+          ? 'Missing Snapshot Card'
+          : registryCard.displayName,
+      positionId: 'position-${index + 1}',
+      positionNameSnapshot: '자리 ${index + 1}',
+      orientation: index == 1
+          ? TarotCardOrientation.reversed
+          : TarotCardOrientation.upright,
+    );
+  });
+  return TarotReadingResultSnapshot.validated(
+    readingInstanceId: 'home-scene-$cardCount-$deckId',
+    readingQuestionText: question ?? '지금 내 성장에서 가장 먼저 바라볼 것은?',
+    deckId: deckId,
+    deckNameSnapshot: '테스트 덱',
+    spreadId: 'test-spread-$cardCount',
+    spreadNameSnapshot: '$cardCount장 흐름',
+    readingAt: DateTime(2026, 7, 11, 10, 20),
+    placements: placements,
+    expectedPlacementCount: placements.length,
+    selectedDeckCardIds: placements
+        .map((placement) => placement.cardId)
+        .toSet(),
+  );
+}
 
 void main() {
   test('tarot deck registry preserves existing RWS asset baseline', () {
@@ -582,6 +624,7 @@ void main() {
       await tester.pumpAndSettle();
 
       Future<void> completeOneCardReading({bool uprightOnly = false}) async {
+        final deliveriesBefore = delivered.length;
         await tester.tap(find.text('바로 덱 선택'));
         await tester.pumpAndSettle();
         await tester.tap(find.text('다음'));
@@ -604,7 +647,7 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.text(UserText.tarotAutoDraw));
         await tester.pumpAndSettle();
-        expect(delivered, isEmpty);
+        expect(delivered, hasLength(deliveriesBefore));
         await tester.tap(
           find.byKey(const Key('tarot-result-card-back-slot')).first,
         );
@@ -647,19 +690,21 @@ void main() {
         find.byKey(const Key('tarot-open-interpretation-button')),
       );
       await tester.pumpAndSettle();
-      expect(delivered, hasLength(2));
-      expect(identical(delivered[0], delivered[1]), isTrue);
-      expect(delivered[1].readingInstanceId, first.readingInstanceId);
-      expect(delivered[1].readingAt, first.readingAt);
+      expect(delivered, hasLength(1));
+      expect(identical(delivered.single, first), isTrue);
+      expect(delivered.single.readingInstanceId, first.readingInstanceId);
+      expect(delivered.single.readingAt, first.readingAt);
 
       await tester.tap(find.text(UserText.tarotResetDraw));
       await tester.pumpAndSettle();
-      delivered.clear();
       await completeOneCardReading(uprightOnly: true);
-      expect(delivered, hasLength(1));
-      expect(delivered.single.readingInstanceId, isNot(first.readingInstanceId));
+      expect(delivered, hasLength(2));
       expect(
-        delivered.single.placements.single.orientation,
+        delivered.last.readingInstanceId,
+        isNot(first.readingInstanceId),
+      );
+      expect(
+        delivered.last.placements.single.orientation,
         TarotCardOrientation.notUsed,
       );
     },
@@ -722,9 +767,7 @@ void main() {
       }
 
       await openOneCardResult();
-      final toggle = find.byKey(
-        const Key('tarot-result-direction-toggle-0'),
-      );
+      final toggle = find.byKey(const Key('tarot-result-direction-toggle-0'));
       expect(toggle, findsOneWidget);
       expect(tester.widget<IconButton>(toggle).onPressed, isNotNull);
       final beforeToggle = visibleOrientation();
@@ -761,13 +804,10 @@ void main() {
         find.byKey(const Key('tarot-open-interpretation-button')),
       );
       await tester.pumpAndSettle();
-      expect(delivered, hasLength(2));
-      expect(identical(delivered[0], delivered[1]), isTrue);
-      expect(delivered[1].readingInstanceId, first.readingInstanceId);
-      expect(
-        delivered[1].placements.single.orientation,
-        frozenOrientation,
-      );
+      expect(delivered, hasLength(1));
+      expect(identical(delivered.single, first), isTrue);
+      expect(delivered.single.readingInstanceId, first.readingInstanceId);
+      expect(delivered.single.placements.single.orientation, frozenOrientation);
 
       await tester.tap(find.text(UserText.tarotResetDraw));
       await tester.pumpAndSettle();
@@ -778,11 +818,8 @@ void main() {
         find.byKey(const Key('tarot-open-interpretation-button')),
       );
       await tester.pumpAndSettle();
-      expect(delivered, hasLength(3));
-      expect(
-        delivered.last.readingInstanceId,
-        isNot(first.readingInstanceId),
-      );
+      expect(delivered, hasLength(2));
+      expect(delivered.last.readingInstanceId, isNot(first.readingInstanceId));
     },
   );
 
@@ -854,9 +891,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('다음'));
     await tester.pumpAndSettle();
-    await tester.tap(
-      find.widgetWithText(ChoiceChip, UserText.tarotSpreadOne),
-    );
+    await tester.tap(find.widgetWithText(ChoiceChip, UserText.tarotSpreadOne));
     await tester.pumpAndSettle();
     await tester.tap(find.text('다음'));
     await tester.pumpAndSettle();
@@ -869,23 +904,43 @@ void main() {
     await tester.tap(find.text(UserText.navHome).first);
     await tester.pumpAndSettle();
 
-    final activeResultMarker = find.byWidgetPredicate((widget) {
-      final key = widget.key;
-      return key is ValueKey<String> &&
-          key.value.startsWith('core-active-tarot-result-');
-    });
-    expect(activeResultMarker, findsOneWidget);
-    expect(find.textContaining(UserText.tarotSpreadOne), findsAtLeastNWidgets(1));
+    expect(find.byKey(const Key('home-actual-result-hero')), findsOneWidget);
     expect(
-      find.textContaining('질문: 오늘 가장 먼저 비춰볼 질문'),
-      findsOneWidget,
+      find.textContaining(UserText.tarotSpreadOne),
+      findsAtLeastNWidgets(1),
     );
-    expect(
-      TarotDeckRegistry.rwsPublicDomain.cards.any(
-        (card) => find.textContaining(card.displayName).evaluate().isNotEmpty,
-      ),
-      isTrue,
-    );
+    expect(find.text('오늘 가장 먼저 비춰볼 질문'), findsOneWidget);
+    expect(find.byKey(const Key('home-card-layout-one')), findsOneWidget);
+    expect(find.textContaining('월'), findsWidgets);
+
+    await tester.tap(find.byKey(const Key('home-primary-cta')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tarot-result-detail-page')), findsOneWidget);
+    expect(find.byKey(const Key('records-session-page')), findsNothing);
+
+    await tester.tap(find.byKey(const Key('tarot-result-detail-back')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('records-session-page')), findsOneWidget);
+    expect(find.text('현재 홈에 표시 중'), findsOneWidget);
+
+    await tester.tap(find.text(UserText.navHome).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('home-hide-result')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('home-empty-scene')), findsOneWidget);
+
+    await tester.tap(find.text(UserText.navRecord).first);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('records-session-page')), findsOneWidget);
+    expect(find.text('오늘 가장 먼저 비춰볼 질문'), findsOneWidget);
+    expect(find.text('홈에 표시'), findsOneWidget);
+
+    await tester.tap(find.text('상세 보기'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tarot-result-detail-page')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('detail-show-on-home')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('home-actual-result-hero')), findsOneWidget);
   });
 
   test('Tarot snapshot bridge uses stable spread and selected-deck facts', () {
@@ -893,9 +948,9 @@ void main() {
       'lib/features/tarot/tarot_spread_shell.dart',
     ).readAsStringSync();
     final mainSource = File('lib/main.dart').readAsStringSync();
-    final homeStart = mainSource.indexOf('class _NativeHomeEntrance');
-    final homeEnd = mainSource.indexOf('class _HomeEntranceCard');
-    final homeSource = mainSource.substring(homeStart, homeEnd);
+    final homeSource = File(
+      'lib/features/home/presentation/home_tarot_hero.dart',
+    ).readAsStringSync();
 
     expect(tarotSource.contains('String _selectedSpreadId'), isTrue);
     expect(tarotSource.contains('spread.id == selected'), isTrue);
@@ -906,9 +961,15 @@ void main() {
       isFalse,
     );
     expect(tarotSource.contains('selectedDeckCardIds:'), isTrue);
-    expect(mainSource.contains('TarotReadingResultSnapshot? _activeTarotResult'), isTrue);
-    expect(homeSource.contains('placement.cardNameSnapshot'), isFalse);
-    expect(homeSource.contains('_tarotResultCardSummary(activeTarotResult!)'), isTrue);
+    expect(
+      mainSource.contains('SessionTarotResults _sessionTarotResults'),
+      isTrue,
+    );
+    expect(homeSource.contains('placement.cardNameSnapshot'), isTrue);
+    expect(
+      homeSource.contains('_resolveCard(deckId, placement.cardId)'),
+      isTrue,
+    );
     expect(homeSource.contains('The Hermit'), isFalse);
     expect(homeSource.contains('Justice'), isFalse);
     expect(homeSource.contains('The Star'), isFalse);
@@ -1034,7 +1095,13 @@ void main() {
     expect(tarotShell.contains('AppData'), isFalse);
     expect(tarotShell.contains('schema'), isFalse);
     expect(tarotShell.contains('migration'), isFalse);
-    expect(tarotShell.contains('export'), isFalse);
+    expect(
+      RegExp(
+        r'''(?:Text\(|message:\s*|tooltip:\s*|semanticLabel:\s*)['"][^'"]*export''',
+        caseSensitive: false,
+      ).hasMatch(tarotShell),
+      isFalse,
+    );
     expect(tarotShell.contains('PDF'), isFalse);
     expect(tarotShell.contains('http'), isFalse);
   });
@@ -1059,7 +1126,13 @@ void main() {
     expect(tarotShell.contains('AppData'), isFalse);
     expect(tarotShell.contains('schema'), isFalse);
     expect(tarotShell.contains('migration'), isFalse);
-    expect(tarotShell.contains('export'), isFalse);
+    expect(
+      RegExp(
+        r'''(?:Text\(|message:\s*|tooltip:\s*|semanticLabel:\s*)['"][^'"]*export''',
+        caseSensitive: false,
+      ).hasMatch(tarotShell),
+      isFalse,
+    );
     expect(tarotShell.contains('PDF'), isFalse);
     expect(tarotShell.contains('http'), isFalse);
   });
@@ -1080,7 +1153,13 @@ void main() {
     expect(tarotShell.contains('AppData'), isFalse);
     expect(tarotShell.contains('schema'), isFalse);
     expect(tarotShell.contains('migration'), isFalse);
-    expect(tarotShell.contains('export'), isFalse);
+    expect(
+      RegExp(
+        r'''(?:Text\(|message:\s*|tooltip:\s*|semanticLabel:\s*)['"][^'"]*export''',
+        caseSensitive: false,
+      ).hasMatch(tarotShell),
+      isFalse,
+    );
     expect(tarotShell.contains('PDF'), isFalse);
     expect(tarotShell.contains('http'), isFalse);
   });
@@ -1129,11 +1208,10 @@ void main() {
       );
       expect(tarotShell.contains('height: 660'), isTrue);
       expect(
-        tarotShell.contains(
-          'constraints: const BoxConstraints(minHeight: 660)',
-        ),
+        tarotShell.contains('const BoxConstraints(minHeight: 660)'),
         isTrue,
       );
+      expect(tarotShell.contains('this.bounded = false'), isTrue);
       expect(
         tarotShell.contains('tarot-interpretation-story-notes-panel'),
         isTrue,
@@ -1171,7 +1249,10 @@ void main() {
       expect(tarotShell.contains('흐름 해석'), isTrue);
       expect(tarotShell.contains('핵심 메시지'), isTrue);
       expect(tarotShell.contains('오늘의 조언 / 작은 실천'), isTrue);
-      expect(tarotShell.contains('작성한 해석은 이 화면을 벗어나면 남지 않습니다'), isTrue);
+      expect(
+        tarotShell.contains('결과와 해석 화면을 오가는 동안 유지되며, 앱을 닫으면 비워집니다'),
+        isTrue,
+      );
       expect(
         tarotShell.contains('각 카드를 자세히 보려면 결과 보드에서 카드를 눌러 집중 보기를 여세요'),
         isTrue,
@@ -1196,7 +1277,7 @@ void main() {
     expect(tarotShell.contains('TAROT-READING-IMAGE-EXPORT1'), isTrue);
     expect(tarotShell.contains('tarot-save-result-image-button'), isTrue);
     expect(tarotShell.contains('이미지 저장'), isTrue);
-    expect(tarotShell.contains('tarot-result-image-capture-boundary'), isTrue);
+    expect(tarotShell.contains('tarot-result-export-boundary'), isTrue);
     expect(tarotShell.contains('RenderRepaintBoundary'), isTrue);
     expect(tarotShell.contains('ui.ImageByteFormat.png'), isTrue);
     expect(tarotShell.contains('tarot_result_'), isTrue);
@@ -1216,7 +1297,7 @@ void main() {
     expect(tarotShell.contains('boundaryKey: _imageBoundaryKey'), isTrue);
     expect(tarotShell.contains('final imageBoundaryKey = GlobalKey'), isFalse);
     final captureMarker = tarotShell.indexOf(
-      "key: const Key('tarot-result-image-capture-boundary')",
+      "key: const Key('tarot-result-export-boundary')",
     );
     final adjustmentToolbar = tarotShell.indexOf(
       'child: _TarotFloatingAdjustmentControls(',
@@ -1227,10 +1308,107 @@ void main() {
     expect(tarotShell.contains('AppData'), isFalse);
     expect(tarotShell.contains('schema'), isFalse);
     expect(tarotShell.contains('migration'), isFalse);
-    expect(tarotShell.contains('export'), isFalse);
     expect(tarotShell.contains('PDF'), isFalse);
     expect(tarotShell.contains('http'), isFalse);
   });
+
+  testWidgets(
+    'Tarot result export boundary contains artwork but excludes interactive UI',
+    (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(1440, 1100);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(body: TarotSpreadShell(onBack: () {})),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('바로 덱 선택'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.widgetWithText(ChoiceChip, UserText.tarotSpreadOne),
+      );
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('다음'));
+      await tester.tap(find.text('다음'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.tarotAutoDraw));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('tarot-result-card-back-slot')).first,
+      );
+      await tester.pumpAndSettle();
+
+      final boundary = find.byKey(const Key('tarot-result-export-boundary'));
+      final overlay = find.byKey(const Key('tarot-result-interactive-overlay'));
+      final directionControl = find.byKey(
+        const Key('tarot-result-direction-toggle-0'),
+      );
+      final artwork = find.byKey(const Key('tarot-export-card-artwork-0'));
+      final positionLabel = find.byKey(
+        const Key('tarot-export-position-label-one_center'),
+      );
+
+      expect(boundary, findsOneWidget);
+      expect(overlay, findsOneWidget);
+      expect(directionControl, findsOneWidget);
+      expect(artwork, findsOneWidget);
+      expect(positionLabel, findsOneWidget);
+      expect(
+        find.descendant(of: boundary, matching: directionControl),
+        findsNothing,
+      );
+      expect(find.descendant(of: boundary, matching: overlay), findsNothing);
+      expect(find.descendant(of: boundary, matching: artwork), findsOneWidget);
+      expect(
+        find.descendant(of: boundary, matching: positionLabel),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: boundary,
+          matching: find.byKey(const Key('tarot-layout-adjustment-toolbar')),
+        ),
+        findsNothing,
+      );
+      expect(
+        find.descendant(
+          of: boundary,
+          matching: find.byKey(const Key('tarot-save-result-image-button')),
+        ),
+        findsNothing,
+      );
+      expect(
+        find.descendant(of: boundary, matching: find.byType(Tooltip)),
+        findsNothing,
+      );
+
+      final repaintBoundary = find
+          .ancestor(of: boundary, matching: find.byType(RepaintBoundary))
+          .first;
+      expect(repaintBoundary, findsOneWidget);
+      final renderBoundary = tester.renderObject<RenderRepaintBoundary>(
+        repaintBoundary,
+      );
+      final image = await renderBoundary.toImage(pixelRatio: 1);
+      expect(image.width, greaterThan(0));
+      expect(image.height, greaterThan(0));
+      image.dispose();
+
+      final beforeToggleRect = tester.getRect(artwork);
+      await tester.tap(directionControl);
+      await tester.pumpAndSettle();
+      expect(directionControl, findsOneWidget);
+      expect(tester.getRect(artwork), beforeToggleRect);
+    },
+  );
 
   test('text registries keep user copy separated from developer copy', () {
     final userTextFile = File('lib/core/text/user_text.dart');
@@ -1305,6 +1483,146 @@ void main() {
     );
   });
 
+  group('Cinematic Home scene', () {
+    Future<void> pumpScene(
+      WidgetTester tester, {
+      TarotReadingResultSnapshot? result,
+      Brightness brightness = Brightness.light,
+      Size size = const Size(1440, 900),
+      VoidCallback? onOpenRecords,
+      VoidCallback? onStartSelfTarot,
+      VoidCallback? onOpenPeople,
+    }) async {
+      tester.view.physicalSize = size;
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(brightness: brightness, useMaterial3: true),
+          home: Scaffold(
+            body: HomeCinematicScene(
+              activeTarotResult: result,
+              onOpenRecords: onOpenRecords ?? () {},
+              onStartSelfTarot: onStartSelfTarot ?? () {},
+              onOpenPeople: onOpenPeople ?? () {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('renders actual result as the dominant ordered Tarot Hero', (
+      tester,
+    ) async {
+      final snapshot = _homeSnapshot();
+      var recordsOpened = false;
+      await pumpScene(
+        tester,
+        result: snapshot,
+        onOpenRecords: () => recordsOpened = true,
+      );
+
+      expect(find.byKey(const Key('home-actual-result-hero')), findsOneWidget);
+      expect(find.text('방금 완료한 셀프 타로'), findsOneWidget);
+      expect(find.text(snapshot.readingQuestionText), findsOneWidget);
+      expect(find.text(snapshot.deckNameSnapshot), findsOneWidget);
+      expect(find.text(snapshot.spreadNameSnapshot), findsOneWidget);
+      expect(find.byKey(const Key('home-card-layout-three')), findsOneWidget);
+      for (final placement in snapshot.placements) {
+        expect(
+          find.byKey(Key('home-card-placement-${placement.placementOrder}')),
+          findsOneWidget,
+        );
+        expect(find.text(placement.positionNameSnapshot), findsOneWidget);
+      }
+      expect(find.text('역방향'), findsOneWidget);
+      expect(find.byKey(const Key('home-primary-cta')), findsOneWidget);
+      expect(find.text('결과 자세히 보기'), findsOneWidget);
+      await tester.tap(find.byKey(const Key('home-primary-cta')));
+      expect(recordsOpened, isTrue);
+    });
+
+    testWidgets('renders one and multi-card policies without a dashboard row', (
+      tester,
+    ) async {
+      await pumpScene(tester, result: _homeSnapshot(cardCount: 1));
+      expect(find.byKey(const Key('home-card-layout-one')), findsOneWidget);
+      expect(find.text('오늘 볼 사람'), findsNothing);
+      expect(find.text('이어보기'), findsNothing);
+      expect(find.text('작은 메모'), findsNothing);
+      expect(find.text('사람을 먼저 고르고, 질문과 렌즈로 오늘의 흐름을 엽니다.'), findsNothing);
+
+      await pumpScene(tester, result: _homeSnapshot(cardCount: 8));
+      expect(find.byKey(const Key('home-card-layout-multi')), findsOneWidget);
+      expect(find.text('전체 배열 보기'), findsOneWidget);
+      expect(find.byKey(const Key('home-card-placement-8')), findsOneWidget);
+    });
+
+    testWidgets('uses neutral snapshot fallback when Registry lookup fails', (
+      tester,
+    ) async {
+      await pumpScene(tester, result: _homeSnapshot(missingRegistryCard: true));
+      expect(
+        find.byKey(const Key('home-card-neutral-fallback')),
+        findsOneWidget,
+      );
+      expect(find.text('Missing Snapshot Card'), findsOneWidget);
+    });
+
+    testWidgets('renders one coherent no-result scene and opens self Tarot', (
+      tester,
+    ) async {
+      var selfTarotOpened = false;
+      var peopleOpened = false;
+      await pumpScene(
+        tester,
+        onStartSelfTarot: () => selfTarotOpened = true,
+        onOpenPeople: () => peopleOpened = true,
+      );
+
+      expect(find.byKey(const Key('home-empty-scene')), findsOneWidget);
+      expect(find.text('오늘의 성장 흐름'), findsOneWidget);
+      expect(find.text('오늘의 흐름을 천천히 열어보세요'), findsOneWidget);
+      expect(find.text('새 셀프 타로 시작'), findsOneWidget);
+      expect(find.byKey(const Key('home-primary-cta')), findsOneWidget);
+      expect(find.textContaining('%'), findsNothing);
+      expect(find.textContaining('통계'), findsNothing);
+      expect(find.textContaining('이전 리딩'), findsNothing);
+      await tester.tap(find.byKey(const Key('home-primary-cta')));
+      expect(selfTarotOpened, isTrue);
+      await tester.tap(find.text('사람과 만남'));
+      expect(peopleOpened, isTrue);
+    });
+
+    testWidgets('handles long questions, compact desktop, Light and Dark', (
+      tester,
+    ) async {
+      const longQuestion =
+          '지금 내가 오랫동안 놓치고 있던 마음의 방향을 다시 바라보고 앞으로의 작은 선택을 어떻게 이어가면 좋을까?';
+      await pumpScene(
+        tester,
+        result: _homeSnapshot(question: longQuestion),
+        size: const Size(1280, 720),
+      );
+      expect(find.text(longQuestion), findsOneWidget);
+      expect(find.text('질문 전체 보기'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+
+      await pumpScene(
+        tester,
+        result: _homeSnapshot(),
+        brightness: Brightness.dark,
+        size: const Size(1280, 720),
+      );
+      expect(find.byKey(const Key('home-cinematic-scene')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+  });
+
   testWidgets('renders clean action Home, practical menu, and theme control', (
     WidgetTester tester,
   ) async {
@@ -1336,12 +1654,13 @@ void main() {
       expect(find.text(label), findsAtLeastNWidgets(1));
     }
 
-    expect(find.text('오늘의 입구'), findsOneWidget);
-    expect(find.text('오늘 누구를 보고, 무엇을 이어갈까요?'), findsOneWidget);
-    expect(find.text('새 만남 시작'), findsOneWidget);
-    expect(find.text('오늘 볼 사람'), findsOneWidget);
-    expect(find.text('이어보기'), findsOneWidget);
-    expect(find.text('작은 메모'), findsOneWidget);
+    expect(find.byKey(const Key('home-cinematic-scene')), findsOneWidget);
+    expect(find.text('오늘의 성장 흐름'), findsOneWidget);
+    expect(find.text('오늘의 흐름을 천천히 열어보세요'), findsOneWidget);
+    expect(find.text('새 셀프 타로 시작'), findsOneWidget);
+    expect(find.text('오늘 볼 사람'), findsNothing);
+    expect(find.text('이어보기'), findsNothing);
+    expect(find.text('작은 메모'), findsNothing);
     expect(find.text(UserText.homeToday), findsNothing);
     expect(find.text(UserText.homeThisWeek), findsNothing);
     expect(find.text(UserText.homeQuickLinks), findsNothing);
@@ -1417,13 +1736,13 @@ void main() {
     await tester.tap(find.text(UserText.navRecord).first);
     await tester.pumpAndSettle();
 
-    expect(find.text('보관함'), findsOneWidget);
-    expect(find.text('히스토리'), findsOneWidget);
-    expect(find.text('검색'), findsOneWidget);
-    expect(find.text('만남 기록'), findsAtLeastNWidgets(1));
-    expect(find.text('리딩 기록'), findsAtLeastNWidgets(1));
-    expect(find.text('수련 기록'), findsAtLeastNWidgets(1));
-    expect(find.text('스터디 기록'), findsAtLeastNWidgets(1));
+    expect(find.text('나의 성장 기록'), findsOneWidget);
+    expect(find.text('이번 실행에서 완료한 리딩을 살펴봅니다.'), findsOneWidget);
+    expect(find.text('아직 완료한 리딩이 없습니다'), findsOneWidget);
+    expect(find.text('새 셀프 타로 시작'), findsOneWidget);
+    expect(find.text('샘플 사람 A'), findsNothing);
+    expect(find.text('만남 기록'), findsNothing);
+    expect(find.text('리딩 기록'), findsNothing);
     expect(find.text('기록 홈'), findsNothing);
     expect(find.text('Group Session'), findsNothing);
   });
@@ -1441,6 +1760,8 @@ void main() {
       await tester.pumpWidget(const RynUniverseApp());
       await tester.pumpAndSettle();
 
+      await tester.tap(find.text(UserText.navPeople).first);
+      await tester.pumpAndSettle();
       await tester.tap(find.text('새 만남 시작').first);
       await tester.pumpAndSettle();
       expect(find.text(UserText.quickStartGuidance), findsOneWidget);
@@ -1474,6 +1795,8 @@ void main() {
     await tester.pumpWidget(const RynUniverseApp());
     await tester.pumpAndSettle();
 
+    await tester.tap(find.text(UserText.navPeople).first);
+    await tester.pumpAndSettle();
     await tester.tap(find.text('새 만남 시작').first);
     await tester.pumpAndSettle();
     await tester.enterText(
@@ -1506,10 +1829,8 @@ void main() {
     await tester.tap(find.byIcon(Icons.close_rounded));
     await tester.pumpAndSettle();
 
-    expect(find.text('이어보기'), findsOneWidget);
-    expect(find.textContaining('샘플 사람 A · 타로 리딩'), findsOneWidget);
-    expect(find.textContaining('질문: 지금 선택의 기준은?'), findsOneWidget);
-    expect(find.text('현재의 흐름 다시 보기'), findsAtLeastNWidgets(1));
+    expect(find.text('현재의 흐름'), findsOneWidget);
+    expect(find.text('현재 질문 · 지금 선택의 기준은?'), findsOneWidget);
 
     await tester.tap(find.text(UserText.navPeople).first);
     await tester.pumpAndSettle();
@@ -1522,12 +1843,9 @@ void main() {
     await tester.tap(find.text(UserText.navRecord).first);
     await tester.pumpAndSettle();
 
-    expect(find.text('타로 리딩'), findsAtLeastNWidgets(1));
-    expect(
-      find.textContaining('대상: 샘플 사람 A · 질문: 지금 선택의 기준은?'),
-      findsOneWidget,
-    );
-    expect(find.textContaining('아직 저장하지 않음 / preview'), findsOneWidget);
+    expect(find.text('아직 완료한 리딩이 없습니다'), findsOneWidget);
+    expect(find.textContaining('대상: 샘플 사람 A'), findsNothing);
+    expect(find.textContaining('아직 저장하지 않음 / preview'), findsNothing);
     expect(find.text('오늘 어떤 만남을 시작할까요?'), findsNothing);
   });
 
@@ -1578,18 +1896,13 @@ void main() {
       expect(find.text('현재 질문 · $target 확인'), findsOneWidget);
       await tester.tap(find.text(UserText.navHome).first);
       await tester.pumpAndSettle();
-      final lens = target == '나의 기록' ? '셀프 리딩' : '타로 리딩';
-      expect(find.textContaining('$target · $lens'), findsOneWidget);
-      if (target != '샘플 사람 A') {
-        expect(find.textContaining('샘플 사람 A · $lens'), findsNothing);
-      }
+      expect(find.byKey(const Key('home-empty-scene')), findsOneWidget);
+      expect(find.textContaining('$target · 타로 리딩'), findsNothing);
 
       await tester.tap(find.text(UserText.navRecord).first);
       await tester.pumpAndSettle();
-      expect(
-        find.textContaining('대상: $target · 질문: $target 확인'),
-        findsOneWidget,
-      );
+      expect(find.text('아직 완료한 리딩이 없습니다'), findsOneWidget);
+      expect(find.textContaining('대상: $target'), findsNothing);
 
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pumpAndSettle();
@@ -1608,6 +1921,8 @@ void main() {
 
       await tester.pumpWidget(const RynUniverseApp());
       await tester.pumpAndSettle();
+      await tester.tap(find.text(UserText.navPeople).first);
+      await tester.pumpAndSettle();
       await tester.tap(find.text('새 만남 시작').first);
       await tester.pumpAndSettle();
       await tester.enterText(
@@ -1620,7 +1935,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.close_rounded));
       await tester.pumpAndSettle();
-      expect(find.textContaining('질문: 기존 질문 유지'), findsOneWidget);
+      expect(find.text('현재 질문 · 기존 질문 유지'), findsOneWidget);
 
       await tester.tap(find.text('새 만남 시작').first);
       await tester.pumpAndSettle();
@@ -1655,8 +1970,8 @@ void main() {
 
       await tester.tap(find.byIcon(Icons.close_rounded));
       await tester.pumpAndSettle();
-      expect(find.textContaining('샘플 사람 A · 타로 리딩'), findsOneWidget);
-      expect(find.textContaining('질문: 기존 질문 유지'), findsOneWidget);
+      expect(find.text('타로 리딩 · 방금 이어본 질문 있음'), findsOneWidget);
+      expect(find.text('현재 질문 · 기존 질문 유지'), findsOneWidget);
       expect(find.textContaining('샘플 사람 B · 상담 메모'), findsNothing);
     },
   );
@@ -1667,7 +1982,7 @@ void main() {
     await tester.pumpWidget(const RynUniverseApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('오늘의 입구'), findsAtLeastNWidgets(1));
+    expect(find.text('오늘의 성장 흐름'), findsAtLeastNWidgets(1));
     expect(find.text('AI Command Center'), findsNothing);
     expect(find.text('Chief / Governance Deck'), findsNothing);
     expect(find.text('Safety Status Strip'), findsNothing);
@@ -1725,21 +2040,16 @@ void main() {
       await tester.pumpAndSettle();
 
       final businessHomeRect = tester.getRect(
-        find
-            .byWidgetPredicate(
-              (widget) =>
-                  widget.runtimeType.toString() == '_NativeHomeEntrance',
-            )
-            .first,
+        find.byKey(const Key('home-cinematic-scene')),
       );
 
       expect(businessHomeRect.width, greaterThan(1100));
       expect(businessHomeRect.width, lessThanOrEqualTo(1700));
       expect(businessHomeRect.right, lessThanOrEqualTo(2400));
-      expect(find.text('오늘의 입구'), findsAtLeastNWidgets(1));
-      expect(find.text('오늘 볼 사람'), findsOneWidget);
-      expect(find.text('이어보기'), findsOneWidget);
-      expect(find.text('작은 메모'), findsOneWidget);
+      expect(find.text('오늘의 성장 흐름'), findsAtLeastNWidgets(1));
+      expect(find.text('오늘 볼 사람'), findsNothing);
+      expect(find.text('이어보기'), findsNothing);
+      expect(find.text('작은 메모'), findsNothing);
 
       await tester.tap(find.text(UserText.navOperating).first);
       await tester.pumpAndSettle();
@@ -2524,7 +2834,10 @@ void main() {
       expect(find.text('흐름 해석'), findsOneWidget);
       expect(find.text('핵심 메시지'), findsOneWidget);
       expect(find.text('오늘의 조언 / 작은 실천'), findsOneWidget);
-      expect(find.textContaining('작성한 해석은 이 화면을 벗어나면 남지 않습니다'), findsOneWidget);
+      expect(
+        find.textContaining('결과와 해석 화면을 오가는 동안 유지되며, 앱을 닫으면 비워집니다'),
+        findsOneWidget,
+      );
       expect(find.textContaining('PDF', findRichText: true), findsNothing);
       expect(find.textContaining('AI', findRichText: true), findsNothing);
       expect(tester.takeException(), isNull);
@@ -2624,7 +2937,10 @@ void main() {
       find.byKey(const Key('tarot-interpretation-workspace-shell')),
       findsOneWidget,
     );
-    expect(find.textContaining('작성한 해석은 이 화면을 벗어나면 남지 않습니다'), findsOneWidget);
+    expect(
+      find.textContaining('결과와 해석 화면을 오가는 동안 유지되며, 앱을 닫으면 비워집니다'),
+      findsOneWidget,
+    );
     expect(find.textContaining('export', findRichText: true), findsNothing);
     expect(find.textContaining('PDF', findRichText: true), findsNothing);
     expect(find.textContaining('AI', findRichText: true), findsNothing);
@@ -3253,11 +3569,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text(UserText.navHome), findsAtLeastNWidgets(1));
 
-    final nativeHome = find.byWidgetPredicate(
-      (widget) => widget.runtimeType.toString() == '_NativeHomeEntrance',
-    );
-    expect(nativeHome, findsOneWidget);
-    expect(find.text('오늘의 입구'), findsAtLeastNWidgets(1));
+    expect(find.byKey(const Key('home-cinematic-scene')), findsOneWidget);
+    expect(find.text('오늘의 성장 흐름'), findsAtLeastNWidgets(1));
 
     await tester.tap(find.text(UserText.navStudy).first);
     await tester.pumpAndSettle();
@@ -4855,10 +5168,10 @@ void main() {
       await tester.tap(find.text(UserText.navRecord).first);
       await tester.pumpAndSettle();
 
-      expect(find.text('기록'), findsAtLeastNWidgets(1));
-      expect(find.text('보관함'), findsOneWidget);
-      expect(find.text('히스토리'), findsOneWidget);
-      expect(find.text('검색'), findsOneWidget);
+      expect(find.text('나의 성장 기록'), findsOneWidget);
+      expect(find.text('이번 실행에서 완료한 리딩을 살펴봅니다.'), findsOneWidget);
+      expect(find.text('아직 완료한 리딩이 없습니다'), findsOneWidget);
+      expect(find.text('새 셀프 타로 시작'), findsOneWidget);
       expect(find.text('사람 이해 중심 기록 홈'), findsNothing);
       expect(find.text('기록 홈'), findsNothing);
       expect(find.text('새 만남 시작'), findsNothing);

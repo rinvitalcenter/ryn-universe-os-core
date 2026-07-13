@@ -7,7 +7,12 @@ import 'package:flutter/material.dart';
 import 'core/theme/ryn_tokens.dart';
 import 'core/text/app_text.dart' hide UserText;
 import 'core/text/user_text.dart';
+import 'features/home/presentation/home_cinematic_scene.dart';
+import 'features/records/models/session_tarot_results.dart';
+import 'features/records/presentation/records_session_page.dart';
+import 'features/records/presentation/tarot_result_detail_page.dart';
 import 'features/study_os/study_os_shell.dart';
+import 'features/tarot/models/tarot_interpretation_session_draft.dart';
 import 'features/tarot/models/tarot_reading_result_snapshot.dart';
 import 'features/tarot/tarot_spread_shell.dart';
 
@@ -248,13 +253,12 @@ class _TarotLoopPreview {
   bool get isSelf => targetType == 'self';
 }
 
-String _tarotOrientationLabel(TarotCardOrientation orientation) => switch (
-  orientation
-) {
-  TarotCardOrientation.notUsed => '방향 미사용',
-  TarotCardOrientation.upright => '정방향',
-  TarotCardOrientation.reversed => '역방향',
-};
+String _tarotOrientationLabel(TarotCardOrientation orientation) =>
+    switch (orientation) {
+      TarotCardOrientation.notUsed => '방향 미사용',
+      TarotCardOrientation.upright => '정방향',
+      TarotCardOrientation.reversed => '역방향',
+    };
 
 String _tarotResultCardSummary(TarotReadingResultSnapshot snapshot) => snapshot
     .placements
@@ -353,7 +357,22 @@ class _CoreOsShellState extends State<CoreOsShell> {
   String _selectedNav = UserText.navHome;
   bool _readingTarotFocus = false;
   _TarotLoopPreview? _tarotLoopPreview;
-  TarotReadingResultSnapshot? _activeTarotResult;
+  final SessionTarotResults _sessionTarotResults = SessionTarotResults();
+  final Map<String, TarotInterpretationSessionDraft>
+  _tarotInterpretationDrafts = {};
+  String? _selectedTarotDetailId;
+
+  TarotReadingResultSnapshot? get _activeTarotResult =>
+      _sessionTarotResults.activeResult;
+
+  TarotReadingResultSnapshot? get _selectedTarotDetail {
+    final id = _selectedTarotDetailId;
+    if (id == null) return null;
+    for (final result in _sessionTarotResults.results) {
+      if (result.readingInstanceId == id) return result;
+    }
+    return null;
+  }
 
   void _selectNav(String label) {
     setState(() {
@@ -376,7 +395,39 @@ class _CoreOsShellState extends State<CoreOsShell> {
 
   void _receiveTarotResult(TarotReadingResultSnapshot snapshot) {
     if (!mounted) return;
-    setState(() => _activeTarotResult = snapshot);
+    setState(() => _sessionTarotResults.complete(snapshot));
+  }
+
+  void _retainTarotDraft(TarotInterpretationSessionDraft draft) {
+    _tarotInterpretationDrafts[draft.readingInstanceId] = draft;
+  }
+
+  TarotInterpretationSessionDraft? _lookupTarotDraft(
+    String readingInstanceId,
+  ) => _tarotInterpretationDrafts[readingInstanceId];
+
+  void _openTarotResultDetail(TarotReadingResultSnapshot snapshot) {
+    setState(() {
+      _selectedTarotDetailId = snapshot.readingInstanceId;
+      _selectedNav = UserText.navRecord;
+      _readingTarotFocus = false;
+    });
+  }
+
+  void _closeTarotResultDetail() {
+    setState(() => _selectedTarotDetailId = null);
+  }
+
+  void _hideTarotResultFromHome() {
+    setState(_sessionTarotResults.hideFromHome);
+  }
+
+  void _showTarotResultOnHome(TarotReadingResultSnapshot snapshot) {
+    setState(() {
+      _sessionTarotResults.showOnHome(snapshot.readingInstanceId);
+      _selectedTarotDetailId = null;
+      _selectedNav = UserText.navHome;
+    });
   }
 
   @override
@@ -406,7 +457,17 @@ class _CoreOsShellState extends State<CoreOsShell> {
                             tarotLoopPreview: _tarotLoopPreview,
                             onTarotLoopReflected: _reflectTarotLoop,
                             activeTarotResult: _activeTarotResult,
+                            sessionTarotResults: _sessionTarotResults.results,
+                            activeTarotResultId:
+                                _sessionTarotResults.activeReadingInstanceId,
+                            selectedTarotDetail: _selectedTarotDetail,
                             onTarotResultCompleted: _receiveTarotResult,
+                            onTarotDraftChanged: _retainTarotDraft,
+                            tarotDraftLookup: _lookupTarotDraft,
+                            onOpenTarotResultDetail: _openTarotResultDetail,
+                            onCloseTarotResultDetail: _closeTarotResultDetail,
+                            onHideTarotResultFromHome: _hideTarotResultFromHome,
+                            onShowTarotResultOnHome: _showTarotResultOnHome,
                           ),
                         ),
                       ],
@@ -419,7 +480,17 @@ class _CoreOsShellState extends State<CoreOsShell> {
                       tarotLoopPreview: _tarotLoopPreview,
                       onTarotLoopReflected: _reflectTarotLoop,
                       activeTarotResult: _activeTarotResult,
+                      sessionTarotResults: _sessionTarotResults.results,
+                      activeTarotResultId:
+                          _sessionTarotResults.activeReadingInstanceId,
+                      selectedTarotDetail: _selectedTarotDetail,
                       onTarotResultCompleted: _receiveTarotResult,
+                      onTarotDraftChanged: _retainTarotDraft,
+                      tarotDraftLookup: _lookupTarotDraft,
+                      onOpenTarotResultDetail: _openTarotResultDetail,
+                      onCloseTarotResultDetail: _closeTarotResultDetail,
+                      onHideTarotResultFromHome: _hideTarotResultFromHome,
+                      onShowTarotResultOnHome: _showTarotResultOnHome,
                     ),
             );
           },
@@ -438,7 +509,16 @@ class _ScrollableShellCanvas extends StatelessWidget {
     required this.tarotLoopPreview,
     required this.onTarotLoopReflected,
     required this.activeTarotResult,
+    required this.sessionTarotResults,
+    required this.activeTarotResultId,
+    required this.selectedTarotDetail,
     required this.onTarotResultCompleted,
+    required this.onTarotDraftChanged,
+    required this.tarotDraftLookup,
+    required this.onOpenTarotResultDetail,
+    required this.onCloseTarotResultDetail,
+    required this.onHideTarotResultFromHome,
+    required this.onShowTarotResultOnHome,
   });
 
   final bool showCompactNav;
@@ -448,7 +528,16 @@ class _ScrollableShellCanvas extends StatelessWidget {
   final _TarotLoopPreview? tarotLoopPreview;
   final ValueChanged<_TarotLoopPreview> onTarotLoopReflected;
   final TarotReadingResultSnapshot? activeTarotResult;
+  final List<TarotReadingResultSnapshot> sessionTarotResults;
+  final String? activeTarotResultId;
+  final TarotReadingResultSnapshot? selectedTarotDetail;
   final ValueChanged<TarotReadingResultSnapshot> onTarotResultCompleted;
+  final ValueChanged<TarotInterpretationSessionDraft> onTarotDraftChanged;
+  final TarotInterpretationSessionDraft? Function(String) tarotDraftLookup;
+  final ValueChanged<TarotReadingResultSnapshot> onOpenTarotResultDetail;
+  final VoidCallback onCloseTarotResultDetail;
+  final VoidCallback onHideTarotResultFromHome;
+  final ValueChanged<TarotReadingResultSnapshot> onShowTarotResultOnHome;
 
   @override
   Widget build(BuildContext context) {
@@ -497,7 +586,16 @@ class _ScrollableShellCanvas extends StatelessWidget {
                   tarotLoopPreview: tarotLoopPreview,
                   onTarotLoopReflected: onTarotLoopReflected,
                   activeTarotResult: activeTarotResult,
+                  sessionTarotResults: sessionTarotResults,
+                  activeTarotResultId: activeTarotResultId,
+                  selectedTarotDetail: selectedTarotDetail,
                   onTarotResultCompleted: onTarotResultCompleted,
+                  onTarotDraftChanged: onTarotDraftChanged,
+                  tarotDraftLookup: tarotDraftLookup,
+                  onOpenTarotResultDetail: onOpenTarotResultDetail,
+                  onCloseTarotResultDetail: onCloseTarotResultDetail,
+                  onHideTarotResultFromHome: onHideTarotResultFromHome,
+                  onShowTarotResultOnHome: onShowTarotResultOnHome,
                 ),
               ),
             ),
@@ -517,7 +615,16 @@ class _ShellPageContent extends StatelessWidget {
     required this.tarotLoopPreview,
     required this.onTarotLoopReflected,
     required this.activeTarotResult,
+    required this.sessionTarotResults,
+    required this.activeTarotResultId,
+    required this.selectedTarotDetail,
     required this.onTarotResultCompleted,
+    required this.onTarotDraftChanged,
+    required this.tarotDraftLookup,
+    required this.onOpenTarotResultDetail,
+    required this.onCloseTarotResultDetail,
+    required this.onHideTarotResultFromHome,
+    required this.onShowTarotResultOnHome,
   });
 
   final bool showCompactNav;
@@ -527,7 +634,16 @@ class _ShellPageContent extends StatelessWidget {
   final _TarotLoopPreview? tarotLoopPreview;
   final ValueChanged<_TarotLoopPreview> onTarotLoopReflected;
   final TarotReadingResultSnapshot? activeTarotResult;
+  final List<TarotReadingResultSnapshot> sessionTarotResults;
+  final String? activeTarotResultId;
+  final TarotReadingResultSnapshot? selectedTarotDetail;
   final ValueChanged<TarotReadingResultSnapshot> onTarotResultCompleted;
+  final ValueChanged<TarotInterpretationSessionDraft> onTarotDraftChanged;
+  final TarotInterpretationSessionDraft? Function(String) tarotDraftLookup;
+  final ValueChanged<TarotReadingResultSnapshot> onOpenTarotResultDetail;
+  final VoidCallback onCloseTarotResultDetail;
+  final VoidCallback onHideTarotResultFromHome;
+  final ValueChanged<TarotReadingResultSnapshot> onShowTarotResultOnHome;
 
   bool get _isHome => selectedLabel == UserText.navHome;
   bool get _isStudy => selectedLabel == UserText.navStudy;
@@ -548,18 +664,36 @@ class _ShellPageContent extends StatelessWidget {
     );
   }
 
+  void _hideFromHome(BuildContext context) {
+    onHideTarotResultFromHome();
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(content: Text('이번 리딩은 현재 실행의 성장 기록에서 다시 볼 수 있습니다.')),
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
     final body = _isHome
         ? <Widget>[
             const _TopSystemBar(showDailyHome: false, compactHome: true),
             const SizedBox(height: 14),
-            _NativeHomeEntrance(
-              onStartSession: () => _openQuickStartSheet(context),
+            HomeCinematicScene(
+              minSceneHeight: math.max(
+                520,
+                MediaQuery.sizeOf(context).height - 110,
+              ),
+              activeTarotResult: activeTarotResult,
+              onStartSelfTarot: () => onNavSelected(UserText.navReading),
               onOpenPeople: () => onNavSelected(UserText.navPeople),
               onOpenRecords: () => onNavSelected(UserText.navRecord),
-              tarotLoopPreview: tarotLoopPreview,
-              activeTarotResult: activeTarotResult,
+              onOpenResult: activeTarotResult == null
+                  ? null
+                  : () => onOpenTarotResultDetail(activeTarotResult!),
+              onHideResult: activeTarotResult == null
+                  ? null
+                  : () => _hideFromHome(context),
             ),
           ]
         : _isStudy
@@ -598,10 +732,28 @@ class _ShellPageContent extends StatelessWidget {
         ? <Widget>[
             const _TopSystemBar(showDailyHome: false),
             const SizedBox(height: 16),
-            _RecordsArchivePage(
-              tarotLoopPreview: tarotLoopPreview,
-              activeTarotResult: activeTarotResult,
-            ),
+            if (selectedTarotDetail != null)
+              TarotResultDetailPage(
+                snapshot: selectedTarotDetail!,
+                interpretationDraft: tarotDraftLookup(
+                  selectedTarotDetail!.readingInstanceId,
+                ),
+                isActiveOnHome:
+                    selectedTarotDetail!.readingInstanceId ==
+                    activeTarotResultId,
+                onBack: onCloseTarotResultDetail,
+                onShowOnHome: () =>
+                    onShowTarotResultOnHome(selectedTarotDetail!),
+                onHideFromHome: () => _hideFromHome(context),
+              )
+            else
+              RecordsSessionPage(
+                results: sessionTarotResults,
+                activeReadingInstanceId: activeTarotResultId,
+                onOpenDetail: onOpenTarotResultDetail,
+                onShowOnHome: onShowTarotResultOnHome,
+                onStartSelfTarot: () => onNavSelected(UserText.navReading),
+              ),
           ]
         : selectedLabel == UserText.navReading
         ? <Widget>[
@@ -609,11 +761,12 @@ class _ShellPageContent extends StatelessWidget {
               label: selectedLabel,
               onReadingTarotFocusChanged: onReadingTarotFocusChanged,
               onTarotResultCompleted: onTarotResultCompleted,
-              onStartSession: () => _openQuickStartSheet(
-                context,
-                target: '나의 기록',
-                lens: '타로 리딩',
-              ),
+              onTarotDraftChanged: onTarotDraftChanged,
+              tarotDraftLookup: tarotDraftLookup,
+              onNavigateHome: () => onNavSelected(UserText.navHome),
+              onOpenTarotResultDetail: onOpenTarotResultDetail,
+              onStartSession: () =>
+                  _openQuickStartSheet(context, target: '나의 기록', lens: '타로 리딩'),
             ),
           ]
         : <Widget>[
@@ -1751,8 +1904,7 @@ class _QuickStartSheetState extends State<_QuickStartSheet> {
   bool _previewReady = false;
   bool _reflected = false;
 
-  bool get _supportsTarotPreview =>
-      _lens == '타로 리딩' || _lens == '셀프 리딩';
+  bool get _supportsTarotPreview => _lens == '타로 리딩' || _lens == '셀프 리딩';
 
   @override
   void dispose() {
@@ -2555,12 +2707,20 @@ class _BusinessAreaPage extends StatelessWidget {
     required this.label,
     this.onReadingTarotFocusChanged,
     this.onTarotResultCompleted,
+    this.onTarotDraftChanged,
+    this.tarotDraftLookup,
+    this.onNavigateHome,
+    this.onOpenTarotResultDetail,
     this.onStartSession,
   });
 
   final String label;
   final ValueChanged<bool>? onReadingTarotFocusChanged;
   final ValueChanged<TarotReadingResultSnapshot>? onTarotResultCompleted;
+  final ValueChanged<TarotInterpretationSessionDraft>? onTarotDraftChanged;
+  final TarotInterpretationSessionDraft? Function(String)? tarotDraftLookup;
+  final VoidCallback? onNavigateHome;
+  final ValueChanged<TarotReadingResultSnapshot>? onOpenTarotResultDetail;
   final VoidCallback? onStartSession;
 
   _BusinessActionSpec get _spec {
@@ -2655,6 +2815,10 @@ class _BusinessAreaPage extends StatelessWidget {
       return _ReadingWorkspacePage(
         onTarotFocusChanged: onReadingTarotFocusChanged,
         onTarotResultCompleted: onTarotResultCompleted,
+        onTarotDraftChanged: onTarotDraftChanged,
+        tarotDraftLookup: tarotDraftLookup,
+        onNavigateHome: onNavigateHome,
+        onOpenTarotResultDetail: onOpenTarotResultDetail,
         onStartSession: onStartSession,
       );
     }
@@ -2761,11 +2925,19 @@ class _ReadingWorkspacePage extends StatefulWidget {
   const _ReadingWorkspacePage({
     this.onTarotFocusChanged,
     this.onTarotResultCompleted,
+    this.onTarotDraftChanged,
+    this.tarotDraftLookup,
+    this.onNavigateHome,
+    this.onOpenTarotResultDetail,
     this.onStartSession,
   });
 
   final ValueChanged<bool>? onTarotFocusChanged;
   final ValueChanged<TarotReadingResultSnapshot>? onTarotResultCompleted;
+  final ValueChanged<TarotInterpretationSessionDraft>? onTarotDraftChanged;
+  final TarotInterpretationSessionDraft? Function(String)? tarotDraftLookup;
+  final VoidCallback? onNavigateHome;
+  final ValueChanged<TarotReadingResultSnapshot>? onOpenTarotResultDetail;
   final VoidCallback? onStartSession;
 
   @override
@@ -2781,12 +2953,26 @@ class _ReadingWorkspacePageState extends State<_ReadingWorkspacePage> {
     setState(() => _tarotOpen = open);
   }
 
+  void _finishTarotToHome(TarotReadingResultSnapshot snapshot) {
+    widget.onTarotResultCompleted?.call(snapshot);
+    widget.onNavigateHome?.call();
+  }
+
+  void _openTarotInRecords(TarotReadingResultSnapshot snapshot) {
+    widget.onTarotResultCompleted?.call(snapshot);
+    widget.onOpenTarotResultDetail?.call(snapshot);
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_tarotOpen) {
       return TarotSpreadShell(
         onBack: () => _setTarotOpen(false),
         onResultCompleted: widget.onTarotResultCompleted,
+        onFinishToHome: _finishTarotToHome,
+        onOpenInRecords: _openTarotInRecords,
+        onInterpretationDraftChanged: widget.onTarotDraftChanged,
+        initialInterpretationDraft: widget.tarotDraftLookup,
       );
     }
     return Column(
@@ -3011,6 +3197,35 @@ class _TopSystemBar extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, outerConstraints) {
         final ultraCompact = outerConstraints.maxWidth < 360;
+        if (compactHome) {
+          return Align(
+            alignment: Alignment.centerRight,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              decoration: BoxDecoration(
+                color: RynPalette.surfaceSoft(context),
+                borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+                border: Border.all(color: RynPalette.line(context)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    tooltip: '검색 열기',
+                    onPressed: () {},
+                    icon: const Icon(Icons.search_rounded),
+                  ),
+                  const SizedBox(width: 6),
+                  if (outerConstraints.maxWidth >= 600) ...const [
+                    _HeaderThemeToggle(),
+                    SizedBox(width: 6),
+                  ],
+                  const _OwnerChip(),
+                ],
+              ),
+            ),
+          );
+        }
         return _LightCard(
           padding: compactHome
               ? const EdgeInsets.fromLTRB(12, 8, 12, 8)
@@ -3021,6 +3236,24 @@ class _TopSystemBar extends StatelessWidget {
             builder: (context, constraints) {
               final tight = constraints.maxWidth < 1240;
               final veryTight = constraints.maxWidth < 360;
+              if (compactHome) {
+                return Row(
+                  children: [
+                    const Spacer(),
+                    IconButton(
+                      tooltip: '검색 열기',
+                      onPressed: () {},
+                      icon: const Icon(Icons.search_rounded),
+                    ),
+                    const SizedBox(width: 8),
+                    if (constraints.maxWidth >= 600) ...const [
+                      _HeaderThemeToggle(),
+                      SizedBox(width: 8),
+                    ],
+                    const _OwnerChip(),
+                  ],
+                );
+              }
               final content = [
                 Expanded(
                   child: _CommandSearchPlaceholder(compact: compactHome),
