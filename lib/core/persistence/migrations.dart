@@ -1,16 +1,12 @@
-/// Migration policy placeholder for the early Drift/SQLite schema slices.
-///
-/// No table migration, data migration, backup, restore, export, or destructive
-/// operation is implemented in SCHEMA-DRAFT4.
-///
-/// Future schema tasks must define migration behavior together with tests before
-/// introducing runtime data or destructive changes.
+/// First global Drift schema marker retained for migration history.
 const int plannedInitialSchemaVersion = 1;
 
-/// Current planned schema version after adding the minimal agent_runs and
-/// approval_records schema slice. This is a version marker only; migration code
-/// is not implemented in this task.
-const int plannedCurrentSchemaVersion = 4;
+/// Current global schema version.
+///
+/// Version 5 adds only the approved Tarot aggregate tables and typed Home
+/// singleton state to the existing version 4 governance schema.
+const int plannedCurrentSchemaVersion = 5;
 
-/// Documentation marker for the current implementation boundary.
-const String migrationImplementationStatus = 'schema_migrations_not_implemented';
+/// The only supported upgrade in this phase is the truthful add-only 4 -> 5
+/// migration implemented by [RynAppDatabase.migration].
+const String migrationImplementationStatus = 'add_only_4_to_5_implemented';

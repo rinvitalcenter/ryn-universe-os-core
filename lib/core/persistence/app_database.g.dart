@@ -4882,6 +4882,2278 @@ class ApprovalRecordsCompanion extends UpdateCompanion<ApprovalRecord> {
   }
 }
 
+class $TarotReadingsTable extends TarotReadings
+    with TableInfo<$TarotReadingsTable, TarotReading> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TarotReadingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _readingInstanceIdMeta = const VerificationMeta(
+    'readingInstanceId',
+  );
+  @override
+  late final GeneratedColumn<String> readingInstanceId =
+      GeneratedColumn<String>(
+        'reading_instance_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _sourceTypeMeta = const VerificationMeta(
+    'sourceType',
+  );
+  @override
+  late final GeneratedColumn<String> sourceType = GeneratedColumn<String>(
+    'source_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _questionOriginalSnapshotMeta =
+      const VerificationMeta('questionOriginalSnapshot');
+  @override
+  late final GeneratedColumn<String> questionOriginalSnapshot =
+      GeneratedColumn<String>(
+        'question_original_snapshot',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _questionDisplayTextMeta =
+      const VerificationMeta('questionDisplayText');
+  @override
+  late final GeneratedColumn<String> questionDisplayText =
+      GeneratedColumn<String>(
+        'question_display_text',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _deckIdMeta = const VerificationMeta('deckId');
+  @override
+  late final GeneratedColumn<String> deckId = GeneratedColumn<String>(
+    'deck_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deckNameSnapshotMeta = const VerificationMeta(
+    'deckNameSnapshot',
+  );
+  @override
+  late final GeneratedColumn<String> deckNameSnapshot = GeneratedColumn<String>(
+    'deck_name_snapshot',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _spreadIdMeta = const VerificationMeta(
+    'spreadId',
+  );
+  @override
+  late final GeneratedColumn<String> spreadId = GeneratedColumn<String>(
+    'spread_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _spreadNameSnapshotMeta =
+      const VerificationMeta('spreadNameSnapshot');
+  @override
+  late final GeneratedColumn<String> spreadNameSnapshot =
+      GeneratedColumn<String>(
+        'spread_name_snapshot',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _expectedPlacementCountMeta =
+      const VerificationMeta('expectedPlacementCount');
+  @override
+  late final GeneratedColumn<int> expectedPlacementCount = GeneratedColumn<int>(
+    'expected_placement_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _readingAtUtcUsMeta = const VerificationMeta(
+    'readingAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> readingAtUtcUs = GeneratedColumn<int>(
+    'reading_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _readingTimezoneOffsetMinMeta =
+      const VerificationMeta('readingTimezoneOffsetMin');
+  @override
+  late final GeneratedColumn<int> readingTimezoneOffsetMin =
+      GeneratedColumn<int>(
+        'reading_timezone_offset_min',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _createdAtUtcUsMeta = const VerificationMeta(
+    'createdAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> createdAtUtcUs = GeneratedColumn<int>(
+    'created_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtUtcUsMeta = const VerificationMeta(
+    'updatedAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAtUtcUs = GeneratedColumn<int>(
+    'updated_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lifecycleStatusMeta = const VerificationMeta(
+    'lifecycleStatus',
+  );
+  @override
+  late final GeneratedColumn<String> lifecycleStatus = GeneratedColumn<String>(
+    'lifecycle_status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _finishedAtUtcUsMeta = const VerificationMeta(
+    'finishedAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> finishedAtUtcUs = GeneratedColumn<int>(
+    'finished_at_utc_us',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    readingInstanceId,
+    sourceType,
+    questionOriginalSnapshot,
+    questionDisplayText,
+    deckId,
+    deckNameSnapshot,
+    spreadId,
+    spreadNameSnapshot,
+    expectedPlacementCount,
+    readingAtUtcUs,
+    readingTimezoneOffsetMin,
+    createdAtUtcUs,
+    updatedAtUtcUs,
+    lifecycleStatus,
+    finishedAtUtcUs,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'tarot_readings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TarotReading> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('reading_instance_id')) {
+      context.handle(
+        _readingInstanceIdMeta,
+        readingInstanceId.isAcceptableOrUnknown(
+          data['reading_instance_id']!,
+          _readingInstanceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_readingInstanceIdMeta);
+    }
+    if (data.containsKey('source_type')) {
+      context.handle(
+        _sourceTypeMeta,
+        sourceType.isAcceptableOrUnknown(data['source_type']!, _sourceTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceTypeMeta);
+    }
+    if (data.containsKey('question_original_snapshot')) {
+      context.handle(
+        _questionOriginalSnapshotMeta,
+        questionOriginalSnapshot.isAcceptableOrUnknown(
+          data['question_original_snapshot']!,
+          _questionOriginalSnapshotMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_questionOriginalSnapshotMeta);
+    }
+    if (data.containsKey('question_display_text')) {
+      context.handle(
+        _questionDisplayTextMeta,
+        questionDisplayText.isAcceptableOrUnknown(
+          data['question_display_text']!,
+          _questionDisplayTextMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_questionDisplayTextMeta);
+    }
+    if (data.containsKey('deck_id')) {
+      context.handle(
+        _deckIdMeta,
+        deckId.isAcceptableOrUnknown(data['deck_id']!, _deckIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deckIdMeta);
+    }
+    if (data.containsKey('deck_name_snapshot')) {
+      context.handle(
+        _deckNameSnapshotMeta,
+        deckNameSnapshot.isAcceptableOrUnknown(
+          data['deck_name_snapshot']!,
+          _deckNameSnapshotMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_deckNameSnapshotMeta);
+    }
+    if (data.containsKey('spread_id')) {
+      context.handle(
+        _spreadIdMeta,
+        spreadId.isAcceptableOrUnknown(data['spread_id']!, _spreadIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_spreadIdMeta);
+    }
+    if (data.containsKey('spread_name_snapshot')) {
+      context.handle(
+        _spreadNameSnapshotMeta,
+        spreadNameSnapshot.isAcceptableOrUnknown(
+          data['spread_name_snapshot']!,
+          _spreadNameSnapshotMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_spreadNameSnapshotMeta);
+    }
+    if (data.containsKey('expected_placement_count')) {
+      context.handle(
+        _expectedPlacementCountMeta,
+        expectedPlacementCount.isAcceptableOrUnknown(
+          data['expected_placement_count']!,
+          _expectedPlacementCountMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_expectedPlacementCountMeta);
+    }
+    if (data.containsKey('reading_at_utc_us')) {
+      context.handle(
+        _readingAtUtcUsMeta,
+        readingAtUtcUs.isAcceptableOrUnknown(
+          data['reading_at_utc_us']!,
+          _readingAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_readingAtUtcUsMeta);
+    }
+    if (data.containsKey('reading_timezone_offset_min')) {
+      context.handle(
+        _readingTimezoneOffsetMinMeta,
+        readingTimezoneOffsetMin.isAcceptableOrUnknown(
+          data['reading_timezone_offset_min']!,
+          _readingTimezoneOffsetMinMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_readingTimezoneOffsetMinMeta);
+    }
+    if (data.containsKey('created_at_utc_us')) {
+      context.handle(
+        _createdAtUtcUsMeta,
+        createdAtUtcUs.isAcceptableOrUnknown(
+          data['created_at_utc_us']!,
+          _createdAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtUtcUsMeta);
+    }
+    if (data.containsKey('updated_at_utc_us')) {
+      context.handle(
+        _updatedAtUtcUsMeta,
+        updatedAtUtcUs.isAcceptableOrUnknown(
+          data['updated_at_utc_us']!,
+          _updatedAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtUtcUsMeta);
+    }
+    if (data.containsKey('lifecycle_status')) {
+      context.handle(
+        _lifecycleStatusMeta,
+        lifecycleStatus.isAcceptableOrUnknown(
+          data['lifecycle_status']!,
+          _lifecycleStatusMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lifecycleStatusMeta);
+    }
+    if (data.containsKey('finished_at_utc_us')) {
+      context.handle(
+        _finishedAtUtcUsMeta,
+        finishedAtUtcUs.isAcceptableOrUnknown(
+          data['finished_at_utc_us']!,
+          _finishedAtUtcUsMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {readingInstanceId};
+  @override
+  TarotReading map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TarotReading(
+      readingInstanceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reading_instance_id'],
+      )!,
+      sourceType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_type'],
+      )!,
+      questionOriginalSnapshot: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}question_original_snapshot'],
+      )!,
+      questionDisplayText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}question_display_text'],
+      )!,
+      deckId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}deck_id'],
+      )!,
+      deckNameSnapshot: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}deck_name_snapshot'],
+      )!,
+      spreadId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}spread_id'],
+      )!,
+      spreadNameSnapshot: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}spread_name_snapshot'],
+      )!,
+      expectedPlacementCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}expected_placement_count'],
+      )!,
+      readingAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reading_at_utc_us'],
+      )!,
+      readingTimezoneOffsetMin: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reading_timezone_offset_min'],
+      )!,
+      createdAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at_utc_us'],
+      )!,
+      updatedAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at_utc_us'],
+      )!,
+      lifecycleStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}lifecycle_status'],
+      )!,
+      finishedAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}finished_at_utc_us'],
+      ),
+    );
+  }
+
+  @override
+  $TarotReadingsTable createAlias(String alias) {
+    return $TarotReadingsTable(attachedDatabase, alias);
+  }
+}
+
+class TarotReading extends DataClass implements Insertable<TarotReading> {
+  final String readingInstanceId;
+  final String sourceType;
+  final String questionOriginalSnapshot;
+  final String questionDisplayText;
+  final String deckId;
+  final String deckNameSnapshot;
+  final String spreadId;
+  final String spreadNameSnapshot;
+  final int expectedPlacementCount;
+  final int readingAtUtcUs;
+  final int readingTimezoneOffsetMin;
+  final int createdAtUtcUs;
+  final int updatedAtUtcUs;
+  final String lifecycleStatus;
+  final int? finishedAtUtcUs;
+  const TarotReading({
+    required this.readingInstanceId,
+    required this.sourceType,
+    required this.questionOriginalSnapshot,
+    required this.questionDisplayText,
+    required this.deckId,
+    required this.deckNameSnapshot,
+    required this.spreadId,
+    required this.spreadNameSnapshot,
+    required this.expectedPlacementCount,
+    required this.readingAtUtcUs,
+    required this.readingTimezoneOffsetMin,
+    required this.createdAtUtcUs,
+    required this.updatedAtUtcUs,
+    required this.lifecycleStatus,
+    this.finishedAtUtcUs,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['reading_instance_id'] = Variable<String>(readingInstanceId);
+    map['source_type'] = Variable<String>(sourceType);
+    map['question_original_snapshot'] = Variable<String>(
+      questionOriginalSnapshot,
+    );
+    map['question_display_text'] = Variable<String>(questionDisplayText);
+    map['deck_id'] = Variable<String>(deckId);
+    map['deck_name_snapshot'] = Variable<String>(deckNameSnapshot);
+    map['spread_id'] = Variable<String>(spreadId);
+    map['spread_name_snapshot'] = Variable<String>(spreadNameSnapshot);
+    map['expected_placement_count'] = Variable<int>(expectedPlacementCount);
+    map['reading_at_utc_us'] = Variable<int>(readingAtUtcUs);
+    map['reading_timezone_offset_min'] = Variable<int>(
+      readingTimezoneOffsetMin,
+    );
+    map['created_at_utc_us'] = Variable<int>(createdAtUtcUs);
+    map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs);
+    map['lifecycle_status'] = Variable<String>(lifecycleStatus);
+    if (!nullToAbsent || finishedAtUtcUs != null) {
+      map['finished_at_utc_us'] = Variable<int>(finishedAtUtcUs);
+    }
+    return map;
+  }
+
+  TarotReadingsCompanion toCompanion(bool nullToAbsent) {
+    return TarotReadingsCompanion(
+      readingInstanceId: Value(readingInstanceId),
+      sourceType: Value(sourceType),
+      questionOriginalSnapshot: Value(questionOriginalSnapshot),
+      questionDisplayText: Value(questionDisplayText),
+      deckId: Value(deckId),
+      deckNameSnapshot: Value(deckNameSnapshot),
+      spreadId: Value(spreadId),
+      spreadNameSnapshot: Value(spreadNameSnapshot),
+      expectedPlacementCount: Value(expectedPlacementCount),
+      readingAtUtcUs: Value(readingAtUtcUs),
+      readingTimezoneOffsetMin: Value(readingTimezoneOffsetMin),
+      createdAtUtcUs: Value(createdAtUtcUs),
+      updatedAtUtcUs: Value(updatedAtUtcUs),
+      lifecycleStatus: Value(lifecycleStatus),
+      finishedAtUtcUs: finishedAtUtcUs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(finishedAtUtcUs),
+    );
+  }
+
+  factory TarotReading.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TarotReading(
+      readingInstanceId: serializer.fromJson<String>(json['readingInstanceId']),
+      sourceType: serializer.fromJson<String>(json['sourceType']),
+      questionOriginalSnapshot: serializer.fromJson<String>(
+        json['questionOriginalSnapshot'],
+      ),
+      questionDisplayText: serializer.fromJson<String>(
+        json['questionDisplayText'],
+      ),
+      deckId: serializer.fromJson<String>(json['deckId']),
+      deckNameSnapshot: serializer.fromJson<String>(json['deckNameSnapshot']),
+      spreadId: serializer.fromJson<String>(json['spreadId']),
+      spreadNameSnapshot: serializer.fromJson<String>(
+        json['spreadNameSnapshot'],
+      ),
+      expectedPlacementCount: serializer.fromJson<int>(
+        json['expectedPlacementCount'],
+      ),
+      readingAtUtcUs: serializer.fromJson<int>(json['readingAtUtcUs']),
+      readingTimezoneOffsetMin: serializer.fromJson<int>(
+        json['readingTimezoneOffsetMin'],
+      ),
+      createdAtUtcUs: serializer.fromJson<int>(json['createdAtUtcUs']),
+      updatedAtUtcUs: serializer.fromJson<int>(json['updatedAtUtcUs']),
+      lifecycleStatus: serializer.fromJson<String>(json['lifecycleStatus']),
+      finishedAtUtcUs: serializer.fromJson<int?>(json['finishedAtUtcUs']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'readingInstanceId': serializer.toJson<String>(readingInstanceId),
+      'sourceType': serializer.toJson<String>(sourceType),
+      'questionOriginalSnapshot': serializer.toJson<String>(
+        questionOriginalSnapshot,
+      ),
+      'questionDisplayText': serializer.toJson<String>(questionDisplayText),
+      'deckId': serializer.toJson<String>(deckId),
+      'deckNameSnapshot': serializer.toJson<String>(deckNameSnapshot),
+      'spreadId': serializer.toJson<String>(spreadId),
+      'spreadNameSnapshot': serializer.toJson<String>(spreadNameSnapshot),
+      'expectedPlacementCount': serializer.toJson<int>(expectedPlacementCount),
+      'readingAtUtcUs': serializer.toJson<int>(readingAtUtcUs),
+      'readingTimezoneOffsetMin': serializer.toJson<int>(
+        readingTimezoneOffsetMin,
+      ),
+      'createdAtUtcUs': serializer.toJson<int>(createdAtUtcUs),
+      'updatedAtUtcUs': serializer.toJson<int>(updatedAtUtcUs),
+      'lifecycleStatus': serializer.toJson<String>(lifecycleStatus),
+      'finishedAtUtcUs': serializer.toJson<int?>(finishedAtUtcUs),
+    };
+  }
+
+  TarotReading copyWith({
+    String? readingInstanceId,
+    String? sourceType,
+    String? questionOriginalSnapshot,
+    String? questionDisplayText,
+    String? deckId,
+    String? deckNameSnapshot,
+    String? spreadId,
+    String? spreadNameSnapshot,
+    int? expectedPlacementCount,
+    int? readingAtUtcUs,
+    int? readingTimezoneOffsetMin,
+    int? createdAtUtcUs,
+    int? updatedAtUtcUs,
+    String? lifecycleStatus,
+    Value<int?> finishedAtUtcUs = const Value.absent(),
+  }) => TarotReading(
+    readingInstanceId: readingInstanceId ?? this.readingInstanceId,
+    sourceType: sourceType ?? this.sourceType,
+    questionOriginalSnapshot:
+        questionOriginalSnapshot ?? this.questionOriginalSnapshot,
+    questionDisplayText: questionDisplayText ?? this.questionDisplayText,
+    deckId: deckId ?? this.deckId,
+    deckNameSnapshot: deckNameSnapshot ?? this.deckNameSnapshot,
+    spreadId: spreadId ?? this.spreadId,
+    spreadNameSnapshot: spreadNameSnapshot ?? this.spreadNameSnapshot,
+    expectedPlacementCount:
+        expectedPlacementCount ?? this.expectedPlacementCount,
+    readingAtUtcUs: readingAtUtcUs ?? this.readingAtUtcUs,
+    readingTimezoneOffsetMin:
+        readingTimezoneOffsetMin ?? this.readingTimezoneOffsetMin,
+    createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+    updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+    lifecycleStatus: lifecycleStatus ?? this.lifecycleStatus,
+    finishedAtUtcUs: finishedAtUtcUs.present
+        ? finishedAtUtcUs.value
+        : this.finishedAtUtcUs,
+  );
+  TarotReading copyWithCompanion(TarotReadingsCompanion data) {
+    return TarotReading(
+      readingInstanceId: data.readingInstanceId.present
+          ? data.readingInstanceId.value
+          : this.readingInstanceId,
+      sourceType: data.sourceType.present
+          ? data.sourceType.value
+          : this.sourceType,
+      questionOriginalSnapshot: data.questionOriginalSnapshot.present
+          ? data.questionOriginalSnapshot.value
+          : this.questionOriginalSnapshot,
+      questionDisplayText: data.questionDisplayText.present
+          ? data.questionDisplayText.value
+          : this.questionDisplayText,
+      deckId: data.deckId.present ? data.deckId.value : this.deckId,
+      deckNameSnapshot: data.deckNameSnapshot.present
+          ? data.deckNameSnapshot.value
+          : this.deckNameSnapshot,
+      spreadId: data.spreadId.present ? data.spreadId.value : this.spreadId,
+      spreadNameSnapshot: data.spreadNameSnapshot.present
+          ? data.spreadNameSnapshot.value
+          : this.spreadNameSnapshot,
+      expectedPlacementCount: data.expectedPlacementCount.present
+          ? data.expectedPlacementCount.value
+          : this.expectedPlacementCount,
+      readingAtUtcUs: data.readingAtUtcUs.present
+          ? data.readingAtUtcUs.value
+          : this.readingAtUtcUs,
+      readingTimezoneOffsetMin: data.readingTimezoneOffsetMin.present
+          ? data.readingTimezoneOffsetMin.value
+          : this.readingTimezoneOffsetMin,
+      createdAtUtcUs: data.createdAtUtcUs.present
+          ? data.createdAtUtcUs.value
+          : this.createdAtUtcUs,
+      updatedAtUtcUs: data.updatedAtUtcUs.present
+          ? data.updatedAtUtcUs.value
+          : this.updatedAtUtcUs,
+      lifecycleStatus: data.lifecycleStatus.present
+          ? data.lifecycleStatus.value
+          : this.lifecycleStatus,
+      finishedAtUtcUs: data.finishedAtUtcUs.present
+          ? data.finishedAtUtcUs.value
+          : this.finishedAtUtcUs,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TarotReading(')
+          ..write('readingInstanceId: $readingInstanceId, ')
+          ..write('sourceType: $sourceType, ')
+          ..write('questionOriginalSnapshot: $questionOriginalSnapshot, ')
+          ..write('questionDisplayText: $questionDisplayText, ')
+          ..write('deckId: $deckId, ')
+          ..write('deckNameSnapshot: $deckNameSnapshot, ')
+          ..write('spreadId: $spreadId, ')
+          ..write('spreadNameSnapshot: $spreadNameSnapshot, ')
+          ..write('expectedPlacementCount: $expectedPlacementCount, ')
+          ..write('readingAtUtcUs: $readingAtUtcUs, ')
+          ..write('readingTimezoneOffsetMin: $readingTimezoneOffsetMin, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs, ')
+          ..write('lifecycleStatus: $lifecycleStatus, ')
+          ..write('finishedAtUtcUs: $finishedAtUtcUs')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    readingInstanceId,
+    sourceType,
+    questionOriginalSnapshot,
+    questionDisplayText,
+    deckId,
+    deckNameSnapshot,
+    spreadId,
+    spreadNameSnapshot,
+    expectedPlacementCount,
+    readingAtUtcUs,
+    readingTimezoneOffsetMin,
+    createdAtUtcUs,
+    updatedAtUtcUs,
+    lifecycleStatus,
+    finishedAtUtcUs,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TarotReading &&
+          other.readingInstanceId == this.readingInstanceId &&
+          other.sourceType == this.sourceType &&
+          other.questionOriginalSnapshot == this.questionOriginalSnapshot &&
+          other.questionDisplayText == this.questionDisplayText &&
+          other.deckId == this.deckId &&
+          other.deckNameSnapshot == this.deckNameSnapshot &&
+          other.spreadId == this.spreadId &&
+          other.spreadNameSnapshot == this.spreadNameSnapshot &&
+          other.expectedPlacementCount == this.expectedPlacementCount &&
+          other.readingAtUtcUs == this.readingAtUtcUs &&
+          other.readingTimezoneOffsetMin == this.readingTimezoneOffsetMin &&
+          other.createdAtUtcUs == this.createdAtUtcUs &&
+          other.updatedAtUtcUs == this.updatedAtUtcUs &&
+          other.lifecycleStatus == this.lifecycleStatus &&
+          other.finishedAtUtcUs == this.finishedAtUtcUs);
+}
+
+class TarotReadingsCompanion extends UpdateCompanion<TarotReading> {
+  final Value<String> readingInstanceId;
+  final Value<String> sourceType;
+  final Value<String> questionOriginalSnapshot;
+  final Value<String> questionDisplayText;
+  final Value<String> deckId;
+  final Value<String> deckNameSnapshot;
+  final Value<String> spreadId;
+  final Value<String> spreadNameSnapshot;
+  final Value<int> expectedPlacementCount;
+  final Value<int> readingAtUtcUs;
+  final Value<int> readingTimezoneOffsetMin;
+  final Value<int> createdAtUtcUs;
+  final Value<int> updatedAtUtcUs;
+  final Value<String> lifecycleStatus;
+  final Value<int?> finishedAtUtcUs;
+  final Value<int> rowid;
+  const TarotReadingsCompanion({
+    this.readingInstanceId = const Value.absent(),
+    this.sourceType = const Value.absent(),
+    this.questionOriginalSnapshot = const Value.absent(),
+    this.questionDisplayText = const Value.absent(),
+    this.deckId = const Value.absent(),
+    this.deckNameSnapshot = const Value.absent(),
+    this.spreadId = const Value.absent(),
+    this.spreadNameSnapshot = const Value.absent(),
+    this.expectedPlacementCount = const Value.absent(),
+    this.readingAtUtcUs = const Value.absent(),
+    this.readingTimezoneOffsetMin = const Value.absent(),
+    this.createdAtUtcUs = const Value.absent(),
+    this.updatedAtUtcUs = const Value.absent(),
+    this.lifecycleStatus = const Value.absent(),
+    this.finishedAtUtcUs = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TarotReadingsCompanion.insert({
+    required String readingInstanceId,
+    required String sourceType,
+    required String questionOriginalSnapshot,
+    required String questionDisplayText,
+    required String deckId,
+    required String deckNameSnapshot,
+    required String spreadId,
+    required String spreadNameSnapshot,
+    required int expectedPlacementCount,
+    required int readingAtUtcUs,
+    required int readingTimezoneOffsetMin,
+    required int createdAtUtcUs,
+    required int updatedAtUtcUs,
+    required String lifecycleStatus,
+    this.finishedAtUtcUs = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : readingInstanceId = Value(readingInstanceId),
+       sourceType = Value(sourceType),
+       questionOriginalSnapshot = Value(questionOriginalSnapshot),
+       questionDisplayText = Value(questionDisplayText),
+       deckId = Value(deckId),
+       deckNameSnapshot = Value(deckNameSnapshot),
+       spreadId = Value(spreadId),
+       spreadNameSnapshot = Value(spreadNameSnapshot),
+       expectedPlacementCount = Value(expectedPlacementCount),
+       readingAtUtcUs = Value(readingAtUtcUs),
+       readingTimezoneOffsetMin = Value(readingTimezoneOffsetMin),
+       createdAtUtcUs = Value(createdAtUtcUs),
+       updatedAtUtcUs = Value(updatedAtUtcUs),
+       lifecycleStatus = Value(lifecycleStatus);
+  static Insertable<TarotReading> custom({
+    Expression<String>? readingInstanceId,
+    Expression<String>? sourceType,
+    Expression<String>? questionOriginalSnapshot,
+    Expression<String>? questionDisplayText,
+    Expression<String>? deckId,
+    Expression<String>? deckNameSnapshot,
+    Expression<String>? spreadId,
+    Expression<String>? spreadNameSnapshot,
+    Expression<int>? expectedPlacementCount,
+    Expression<int>? readingAtUtcUs,
+    Expression<int>? readingTimezoneOffsetMin,
+    Expression<int>? createdAtUtcUs,
+    Expression<int>? updatedAtUtcUs,
+    Expression<String>? lifecycleStatus,
+    Expression<int>? finishedAtUtcUs,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (readingInstanceId != null) 'reading_instance_id': readingInstanceId,
+      if (sourceType != null) 'source_type': sourceType,
+      if (questionOriginalSnapshot != null)
+        'question_original_snapshot': questionOriginalSnapshot,
+      if (questionDisplayText != null)
+        'question_display_text': questionDisplayText,
+      if (deckId != null) 'deck_id': deckId,
+      if (deckNameSnapshot != null) 'deck_name_snapshot': deckNameSnapshot,
+      if (spreadId != null) 'spread_id': spreadId,
+      if (spreadNameSnapshot != null)
+        'spread_name_snapshot': spreadNameSnapshot,
+      if (expectedPlacementCount != null)
+        'expected_placement_count': expectedPlacementCount,
+      if (readingAtUtcUs != null) 'reading_at_utc_us': readingAtUtcUs,
+      if (readingTimezoneOffsetMin != null)
+        'reading_timezone_offset_min': readingTimezoneOffsetMin,
+      if (createdAtUtcUs != null) 'created_at_utc_us': createdAtUtcUs,
+      if (updatedAtUtcUs != null) 'updated_at_utc_us': updatedAtUtcUs,
+      if (lifecycleStatus != null) 'lifecycle_status': lifecycleStatus,
+      if (finishedAtUtcUs != null) 'finished_at_utc_us': finishedAtUtcUs,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TarotReadingsCompanion copyWith({
+    Value<String>? readingInstanceId,
+    Value<String>? sourceType,
+    Value<String>? questionOriginalSnapshot,
+    Value<String>? questionDisplayText,
+    Value<String>? deckId,
+    Value<String>? deckNameSnapshot,
+    Value<String>? spreadId,
+    Value<String>? spreadNameSnapshot,
+    Value<int>? expectedPlacementCount,
+    Value<int>? readingAtUtcUs,
+    Value<int>? readingTimezoneOffsetMin,
+    Value<int>? createdAtUtcUs,
+    Value<int>? updatedAtUtcUs,
+    Value<String>? lifecycleStatus,
+    Value<int?>? finishedAtUtcUs,
+    Value<int>? rowid,
+  }) {
+    return TarotReadingsCompanion(
+      readingInstanceId: readingInstanceId ?? this.readingInstanceId,
+      sourceType: sourceType ?? this.sourceType,
+      questionOriginalSnapshot:
+          questionOriginalSnapshot ?? this.questionOriginalSnapshot,
+      questionDisplayText: questionDisplayText ?? this.questionDisplayText,
+      deckId: deckId ?? this.deckId,
+      deckNameSnapshot: deckNameSnapshot ?? this.deckNameSnapshot,
+      spreadId: spreadId ?? this.spreadId,
+      spreadNameSnapshot: spreadNameSnapshot ?? this.spreadNameSnapshot,
+      expectedPlacementCount:
+          expectedPlacementCount ?? this.expectedPlacementCount,
+      readingAtUtcUs: readingAtUtcUs ?? this.readingAtUtcUs,
+      readingTimezoneOffsetMin:
+          readingTimezoneOffsetMin ?? this.readingTimezoneOffsetMin,
+      createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+      updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+      lifecycleStatus: lifecycleStatus ?? this.lifecycleStatus,
+      finishedAtUtcUs: finishedAtUtcUs ?? this.finishedAtUtcUs,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (readingInstanceId.present) {
+      map['reading_instance_id'] = Variable<String>(readingInstanceId.value);
+    }
+    if (sourceType.present) {
+      map['source_type'] = Variable<String>(sourceType.value);
+    }
+    if (questionOriginalSnapshot.present) {
+      map['question_original_snapshot'] = Variable<String>(
+        questionOriginalSnapshot.value,
+      );
+    }
+    if (questionDisplayText.present) {
+      map['question_display_text'] = Variable<String>(
+        questionDisplayText.value,
+      );
+    }
+    if (deckId.present) {
+      map['deck_id'] = Variable<String>(deckId.value);
+    }
+    if (deckNameSnapshot.present) {
+      map['deck_name_snapshot'] = Variable<String>(deckNameSnapshot.value);
+    }
+    if (spreadId.present) {
+      map['spread_id'] = Variable<String>(spreadId.value);
+    }
+    if (spreadNameSnapshot.present) {
+      map['spread_name_snapshot'] = Variable<String>(spreadNameSnapshot.value);
+    }
+    if (expectedPlacementCount.present) {
+      map['expected_placement_count'] = Variable<int>(
+        expectedPlacementCount.value,
+      );
+    }
+    if (readingAtUtcUs.present) {
+      map['reading_at_utc_us'] = Variable<int>(readingAtUtcUs.value);
+    }
+    if (readingTimezoneOffsetMin.present) {
+      map['reading_timezone_offset_min'] = Variable<int>(
+        readingTimezoneOffsetMin.value,
+      );
+    }
+    if (createdAtUtcUs.present) {
+      map['created_at_utc_us'] = Variable<int>(createdAtUtcUs.value);
+    }
+    if (updatedAtUtcUs.present) {
+      map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs.value);
+    }
+    if (lifecycleStatus.present) {
+      map['lifecycle_status'] = Variable<String>(lifecycleStatus.value);
+    }
+    if (finishedAtUtcUs.present) {
+      map['finished_at_utc_us'] = Variable<int>(finishedAtUtcUs.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TarotReadingsCompanion(')
+          ..write('readingInstanceId: $readingInstanceId, ')
+          ..write('sourceType: $sourceType, ')
+          ..write('questionOriginalSnapshot: $questionOriginalSnapshot, ')
+          ..write('questionDisplayText: $questionDisplayText, ')
+          ..write('deckId: $deckId, ')
+          ..write('deckNameSnapshot: $deckNameSnapshot, ')
+          ..write('spreadId: $spreadId, ')
+          ..write('spreadNameSnapshot: $spreadNameSnapshot, ')
+          ..write('expectedPlacementCount: $expectedPlacementCount, ')
+          ..write('readingAtUtcUs: $readingAtUtcUs, ')
+          ..write('readingTimezoneOffsetMin: $readingTimezoneOffsetMin, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs, ')
+          ..write('lifecycleStatus: $lifecycleStatus, ')
+          ..write('finishedAtUtcUs: $finishedAtUtcUs, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TarotCardPlacementsTable extends TarotCardPlacements
+    with TableInfo<$TarotCardPlacementsTable, TarotCardPlacement> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TarotCardPlacementsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _readingInstanceIdMeta = const VerificationMeta(
+    'readingInstanceId',
+  );
+  @override
+  late final GeneratedColumn<String> readingInstanceId =
+      GeneratedColumn<String>(
+        'reading_instance_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES tarot_readings (reading_instance_id) ON DELETE RESTRICT',
+        ),
+      );
+  static const VerificationMeta _placementOrderMeta = const VerificationMeta(
+    'placementOrder',
+  );
+  @override
+  late final GeneratedColumn<int> placementOrder = GeneratedColumn<int>(
+    'placement_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionIdMeta = const VerificationMeta(
+    'positionId',
+  );
+  @override
+  late final GeneratedColumn<String> positionId = GeneratedColumn<String>(
+    'position_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionNameSnapshotMeta =
+      const VerificationMeta('positionNameSnapshot');
+  @override
+  late final GeneratedColumn<String> positionNameSnapshot =
+      GeneratedColumn<String>(
+        'position_name_snapshot',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _cardIdMeta = const VerificationMeta('cardId');
+  @override
+  late final GeneratedColumn<String> cardId = GeneratedColumn<String>(
+    'card_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _cardNameSnapshotMeta = const VerificationMeta(
+    'cardNameSnapshot',
+  );
+  @override
+  late final GeneratedColumn<String> cardNameSnapshot = GeneratedColumn<String>(
+    'card_name_snapshot',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _orientationMeta = const VerificationMeta(
+    'orientation',
+  );
+  @override
+  late final GeneratedColumn<String> orientation = GeneratedColumn<String>(
+    'orientation',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    readingInstanceId,
+    placementOrder,
+    positionId,
+    positionNameSnapshot,
+    cardId,
+    cardNameSnapshot,
+    orientation,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'tarot_card_placements';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TarotCardPlacement> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('reading_instance_id')) {
+      context.handle(
+        _readingInstanceIdMeta,
+        readingInstanceId.isAcceptableOrUnknown(
+          data['reading_instance_id']!,
+          _readingInstanceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_readingInstanceIdMeta);
+    }
+    if (data.containsKey('placement_order')) {
+      context.handle(
+        _placementOrderMeta,
+        placementOrder.isAcceptableOrUnknown(
+          data['placement_order']!,
+          _placementOrderMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_placementOrderMeta);
+    }
+    if (data.containsKey('position_id')) {
+      context.handle(
+        _positionIdMeta,
+        positionId.isAcceptableOrUnknown(data['position_id']!, _positionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionIdMeta);
+    }
+    if (data.containsKey('position_name_snapshot')) {
+      context.handle(
+        _positionNameSnapshotMeta,
+        positionNameSnapshot.isAcceptableOrUnknown(
+          data['position_name_snapshot']!,
+          _positionNameSnapshotMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_positionNameSnapshotMeta);
+    }
+    if (data.containsKey('card_id')) {
+      context.handle(
+        _cardIdMeta,
+        cardId.isAcceptableOrUnknown(data['card_id']!, _cardIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_cardIdMeta);
+    }
+    if (data.containsKey('card_name_snapshot')) {
+      context.handle(
+        _cardNameSnapshotMeta,
+        cardNameSnapshot.isAcceptableOrUnknown(
+          data['card_name_snapshot']!,
+          _cardNameSnapshotMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_cardNameSnapshotMeta);
+    }
+    if (data.containsKey('orientation')) {
+      context.handle(
+        _orientationMeta,
+        orientation.isAcceptableOrUnknown(
+          data['orientation']!,
+          _orientationMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_orientationMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {readingInstanceId, placementOrder};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {readingInstanceId, positionId},
+  ];
+  @override
+  TarotCardPlacement map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TarotCardPlacement(
+      readingInstanceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reading_instance_id'],
+      )!,
+      placementOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}placement_order'],
+      )!,
+      positionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}position_id'],
+      )!,
+      positionNameSnapshot: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}position_name_snapshot'],
+      )!,
+      cardId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}card_id'],
+      )!,
+      cardNameSnapshot: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}card_name_snapshot'],
+      )!,
+      orientation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}orientation'],
+      )!,
+    );
+  }
+
+  @override
+  $TarotCardPlacementsTable createAlias(String alias) {
+    return $TarotCardPlacementsTable(attachedDatabase, alias);
+  }
+}
+
+class TarotCardPlacement extends DataClass
+    implements Insertable<TarotCardPlacement> {
+  final String readingInstanceId;
+  final int placementOrder;
+  final String positionId;
+  final String positionNameSnapshot;
+  final String cardId;
+  final String cardNameSnapshot;
+  final String orientation;
+  const TarotCardPlacement({
+    required this.readingInstanceId,
+    required this.placementOrder,
+    required this.positionId,
+    required this.positionNameSnapshot,
+    required this.cardId,
+    required this.cardNameSnapshot,
+    required this.orientation,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['reading_instance_id'] = Variable<String>(readingInstanceId);
+    map['placement_order'] = Variable<int>(placementOrder);
+    map['position_id'] = Variable<String>(positionId);
+    map['position_name_snapshot'] = Variable<String>(positionNameSnapshot);
+    map['card_id'] = Variable<String>(cardId);
+    map['card_name_snapshot'] = Variable<String>(cardNameSnapshot);
+    map['orientation'] = Variable<String>(orientation);
+    return map;
+  }
+
+  TarotCardPlacementsCompanion toCompanion(bool nullToAbsent) {
+    return TarotCardPlacementsCompanion(
+      readingInstanceId: Value(readingInstanceId),
+      placementOrder: Value(placementOrder),
+      positionId: Value(positionId),
+      positionNameSnapshot: Value(positionNameSnapshot),
+      cardId: Value(cardId),
+      cardNameSnapshot: Value(cardNameSnapshot),
+      orientation: Value(orientation),
+    );
+  }
+
+  factory TarotCardPlacement.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TarotCardPlacement(
+      readingInstanceId: serializer.fromJson<String>(json['readingInstanceId']),
+      placementOrder: serializer.fromJson<int>(json['placementOrder']),
+      positionId: serializer.fromJson<String>(json['positionId']),
+      positionNameSnapshot: serializer.fromJson<String>(
+        json['positionNameSnapshot'],
+      ),
+      cardId: serializer.fromJson<String>(json['cardId']),
+      cardNameSnapshot: serializer.fromJson<String>(json['cardNameSnapshot']),
+      orientation: serializer.fromJson<String>(json['orientation']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'readingInstanceId': serializer.toJson<String>(readingInstanceId),
+      'placementOrder': serializer.toJson<int>(placementOrder),
+      'positionId': serializer.toJson<String>(positionId),
+      'positionNameSnapshot': serializer.toJson<String>(positionNameSnapshot),
+      'cardId': serializer.toJson<String>(cardId),
+      'cardNameSnapshot': serializer.toJson<String>(cardNameSnapshot),
+      'orientation': serializer.toJson<String>(orientation),
+    };
+  }
+
+  TarotCardPlacement copyWith({
+    String? readingInstanceId,
+    int? placementOrder,
+    String? positionId,
+    String? positionNameSnapshot,
+    String? cardId,
+    String? cardNameSnapshot,
+    String? orientation,
+  }) => TarotCardPlacement(
+    readingInstanceId: readingInstanceId ?? this.readingInstanceId,
+    placementOrder: placementOrder ?? this.placementOrder,
+    positionId: positionId ?? this.positionId,
+    positionNameSnapshot: positionNameSnapshot ?? this.positionNameSnapshot,
+    cardId: cardId ?? this.cardId,
+    cardNameSnapshot: cardNameSnapshot ?? this.cardNameSnapshot,
+    orientation: orientation ?? this.orientation,
+  );
+  TarotCardPlacement copyWithCompanion(TarotCardPlacementsCompanion data) {
+    return TarotCardPlacement(
+      readingInstanceId: data.readingInstanceId.present
+          ? data.readingInstanceId.value
+          : this.readingInstanceId,
+      placementOrder: data.placementOrder.present
+          ? data.placementOrder.value
+          : this.placementOrder,
+      positionId: data.positionId.present
+          ? data.positionId.value
+          : this.positionId,
+      positionNameSnapshot: data.positionNameSnapshot.present
+          ? data.positionNameSnapshot.value
+          : this.positionNameSnapshot,
+      cardId: data.cardId.present ? data.cardId.value : this.cardId,
+      cardNameSnapshot: data.cardNameSnapshot.present
+          ? data.cardNameSnapshot.value
+          : this.cardNameSnapshot,
+      orientation: data.orientation.present
+          ? data.orientation.value
+          : this.orientation,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TarotCardPlacement(')
+          ..write('readingInstanceId: $readingInstanceId, ')
+          ..write('placementOrder: $placementOrder, ')
+          ..write('positionId: $positionId, ')
+          ..write('positionNameSnapshot: $positionNameSnapshot, ')
+          ..write('cardId: $cardId, ')
+          ..write('cardNameSnapshot: $cardNameSnapshot, ')
+          ..write('orientation: $orientation')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    readingInstanceId,
+    placementOrder,
+    positionId,
+    positionNameSnapshot,
+    cardId,
+    cardNameSnapshot,
+    orientation,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TarotCardPlacement &&
+          other.readingInstanceId == this.readingInstanceId &&
+          other.placementOrder == this.placementOrder &&
+          other.positionId == this.positionId &&
+          other.positionNameSnapshot == this.positionNameSnapshot &&
+          other.cardId == this.cardId &&
+          other.cardNameSnapshot == this.cardNameSnapshot &&
+          other.orientation == this.orientation);
+}
+
+class TarotCardPlacementsCompanion extends UpdateCompanion<TarotCardPlacement> {
+  final Value<String> readingInstanceId;
+  final Value<int> placementOrder;
+  final Value<String> positionId;
+  final Value<String> positionNameSnapshot;
+  final Value<String> cardId;
+  final Value<String> cardNameSnapshot;
+  final Value<String> orientation;
+  final Value<int> rowid;
+  const TarotCardPlacementsCompanion({
+    this.readingInstanceId = const Value.absent(),
+    this.placementOrder = const Value.absent(),
+    this.positionId = const Value.absent(),
+    this.positionNameSnapshot = const Value.absent(),
+    this.cardId = const Value.absent(),
+    this.cardNameSnapshot = const Value.absent(),
+    this.orientation = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TarotCardPlacementsCompanion.insert({
+    required String readingInstanceId,
+    required int placementOrder,
+    required String positionId,
+    required String positionNameSnapshot,
+    required String cardId,
+    required String cardNameSnapshot,
+    required String orientation,
+    this.rowid = const Value.absent(),
+  }) : readingInstanceId = Value(readingInstanceId),
+       placementOrder = Value(placementOrder),
+       positionId = Value(positionId),
+       positionNameSnapshot = Value(positionNameSnapshot),
+       cardId = Value(cardId),
+       cardNameSnapshot = Value(cardNameSnapshot),
+       orientation = Value(orientation);
+  static Insertable<TarotCardPlacement> custom({
+    Expression<String>? readingInstanceId,
+    Expression<int>? placementOrder,
+    Expression<String>? positionId,
+    Expression<String>? positionNameSnapshot,
+    Expression<String>? cardId,
+    Expression<String>? cardNameSnapshot,
+    Expression<String>? orientation,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (readingInstanceId != null) 'reading_instance_id': readingInstanceId,
+      if (placementOrder != null) 'placement_order': placementOrder,
+      if (positionId != null) 'position_id': positionId,
+      if (positionNameSnapshot != null)
+        'position_name_snapshot': positionNameSnapshot,
+      if (cardId != null) 'card_id': cardId,
+      if (cardNameSnapshot != null) 'card_name_snapshot': cardNameSnapshot,
+      if (orientation != null) 'orientation': orientation,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TarotCardPlacementsCompanion copyWith({
+    Value<String>? readingInstanceId,
+    Value<int>? placementOrder,
+    Value<String>? positionId,
+    Value<String>? positionNameSnapshot,
+    Value<String>? cardId,
+    Value<String>? cardNameSnapshot,
+    Value<String>? orientation,
+    Value<int>? rowid,
+  }) {
+    return TarotCardPlacementsCompanion(
+      readingInstanceId: readingInstanceId ?? this.readingInstanceId,
+      placementOrder: placementOrder ?? this.placementOrder,
+      positionId: positionId ?? this.positionId,
+      positionNameSnapshot: positionNameSnapshot ?? this.positionNameSnapshot,
+      cardId: cardId ?? this.cardId,
+      cardNameSnapshot: cardNameSnapshot ?? this.cardNameSnapshot,
+      orientation: orientation ?? this.orientation,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (readingInstanceId.present) {
+      map['reading_instance_id'] = Variable<String>(readingInstanceId.value);
+    }
+    if (placementOrder.present) {
+      map['placement_order'] = Variable<int>(placementOrder.value);
+    }
+    if (positionId.present) {
+      map['position_id'] = Variable<String>(positionId.value);
+    }
+    if (positionNameSnapshot.present) {
+      map['position_name_snapshot'] = Variable<String>(
+        positionNameSnapshot.value,
+      );
+    }
+    if (cardId.present) {
+      map['card_id'] = Variable<String>(cardId.value);
+    }
+    if (cardNameSnapshot.present) {
+      map['card_name_snapshot'] = Variable<String>(cardNameSnapshot.value);
+    }
+    if (orientation.present) {
+      map['orientation'] = Variable<String>(orientation.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TarotCardPlacementsCompanion(')
+          ..write('readingInstanceId: $readingInstanceId, ')
+          ..write('placementOrder: $placementOrder, ')
+          ..write('positionId: $positionId, ')
+          ..write('positionNameSnapshot: $positionNameSnapshot, ')
+          ..write('cardId: $cardId, ')
+          ..write('cardNameSnapshot: $cardNameSnapshot, ')
+          ..write('orientation: $orientation, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $TarotInterpretationsTable extends TarotInterpretations
+    with TableInfo<$TarotInterpretationsTable, TarotInterpretation> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TarotInterpretationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _readingInstanceIdMeta = const VerificationMeta(
+    'readingInstanceId',
+  );
+  @override
+  late final GeneratedColumn<String> readingInstanceId =
+      GeneratedColumn<String>(
+        'reading_instance_id',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES tarot_readings (reading_instance_id) ON DELETE RESTRICT',
+        ),
+      );
+  static const VerificationMeta _wholeImageObservationMeta =
+      const VerificationMeta('wholeImageObservation');
+  @override
+  late final GeneratedColumn<String> wholeImageObservation =
+      GeneratedColumn<String>(
+        'whole_image_observation',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(''),
+      );
+  static const VerificationMeta _flowInterpretationMeta =
+      const VerificationMeta('flowInterpretation');
+  @override
+  late final GeneratedColumn<String> flowInterpretation =
+      GeneratedColumn<String>(
+        'flow_interpretation',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(''),
+      );
+  static const VerificationMeta _coreMessageMeta = const VerificationMeta(
+    'coreMessage',
+  );
+  @override
+  late final GeneratedColumn<String> coreMessage = GeneratedColumn<String>(
+    'core_message',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _smallActionMeta = const VerificationMeta(
+    'smallAction',
+  );
+  @override
+  late final GeneratedColumn<String> smallAction = GeneratedColumn<String>(
+    'small_action',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _createdAtUtcUsMeta = const VerificationMeta(
+    'createdAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> createdAtUtcUs = GeneratedColumn<int>(
+    'created_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtUtcUsMeta = const VerificationMeta(
+    'updatedAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAtUtcUs = GeneratedColumn<int>(
+    'updated_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    readingInstanceId,
+    wholeImageObservation,
+    flowInterpretation,
+    coreMessage,
+    smallAction,
+    createdAtUtcUs,
+    updatedAtUtcUs,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'tarot_interpretations';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TarotInterpretation> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('reading_instance_id')) {
+      context.handle(
+        _readingInstanceIdMeta,
+        readingInstanceId.isAcceptableOrUnknown(
+          data['reading_instance_id']!,
+          _readingInstanceIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_readingInstanceIdMeta);
+    }
+    if (data.containsKey('whole_image_observation')) {
+      context.handle(
+        _wholeImageObservationMeta,
+        wholeImageObservation.isAcceptableOrUnknown(
+          data['whole_image_observation']!,
+          _wholeImageObservationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('flow_interpretation')) {
+      context.handle(
+        _flowInterpretationMeta,
+        flowInterpretation.isAcceptableOrUnknown(
+          data['flow_interpretation']!,
+          _flowInterpretationMeta,
+        ),
+      );
+    }
+    if (data.containsKey('core_message')) {
+      context.handle(
+        _coreMessageMeta,
+        coreMessage.isAcceptableOrUnknown(
+          data['core_message']!,
+          _coreMessageMeta,
+        ),
+      );
+    }
+    if (data.containsKey('small_action')) {
+      context.handle(
+        _smallActionMeta,
+        smallAction.isAcceptableOrUnknown(
+          data['small_action']!,
+          _smallActionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at_utc_us')) {
+      context.handle(
+        _createdAtUtcUsMeta,
+        createdAtUtcUs.isAcceptableOrUnknown(
+          data['created_at_utc_us']!,
+          _createdAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtUtcUsMeta);
+    }
+    if (data.containsKey('updated_at_utc_us')) {
+      context.handle(
+        _updatedAtUtcUsMeta,
+        updatedAtUtcUs.isAcceptableOrUnknown(
+          data['updated_at_utc_us']!,
+          _updatedAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtUtcUsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {readingInstanceId};
+  @override
+  TarotInterpretation map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TarotInterpretation(
+      readingInstanceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reading_instance_id'],
+      )!,
+      wholeImageObservation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}whole_image_observation'],
+      )!,
+      flowInterpretation: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}flow_interpretation'],
+      )!,
+      coreMessage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}core_message'],
+      )!,
+      smallAction: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}small_action'],
+      )!,
+      createdAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at_utc_us'],
+      )!,
+      updatedAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at_utc_us'],
+      )!,
+    );
+  }
+
+  @override
+  $TarotInterpretationsTable createAlias(String alias) {
+    return $TarotInterpretationsTable(attachedDatabase, alias);
+  }
+}
+
+class TarotInterpretation extends DataClass
+    implements Insertable<TarotInterpretation> {
+  final String readingInstanceId;
+  final String wholeImageObservation;
+  final String flowInterpretation;
+  final String coreMessage;
+  final String smallAction;
+  final int createdAtUtcUs;
+  final int updatedAtUtcUs;
+  const TarotInterpretation({
+    required this.readingInstanceId,
+    required this.wholeImageObservation,
+    required this.flowInterpretation,
+    required this.coreMessage,
+    required this.smallAction,
+    required this.createdAtUtcUs,
+    required this.updatedAtUtcUs,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['reading_instance_id'] = Variable<String>(readingInstanceId);
+    map['whole_image_observation'] = Variable<String>(wholeImageObservation);
+    map['flow_interpretation'] = Variable<String>(flowInterpretation);
+    map['core_message'] = Variable<String>(coreMessage);
+    map['small_action'] = Variable<String>(smallAction);
+    map['created_at_utc_us'] = Variable<int>(createdAtUtcUs);
+    map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs);
+    return map;
+  }
+
+  TarotInterpretationsCompanion toCompanion(bool nullToAbsent) {
+    return TarotInterpretationsCompanion(
+      readingInstanceId: Value(readingInstanceId),
+      wholeImageObservation: Value(wholeImageObservation),
+      flowInterpretation: Value(flowInterpretation),
+      coreMessage: Value(coreMessage),
+      smallAction: Value(smallAction),
+      createdAtUtcUs: Value(createdAtUtcUs),
+      updatedAtUtcUs: Value(updatedAtUtcUs),
+    );
+  }
+
+  factory TarotInterpretation.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TarotInterpretation(
+      readingInstanceId: serializer.fromJson<String>(json['readingInstanceId']),
+      wholeImageObservation: serializer.fromJson<String>(
+        json['wholeImageObservation'],
+      ),
+      flowInterpretation: serializer.fromJson<String>(
+        json['flowInterpretation'],
+      ),
+      coreMessage: serializer.fromJson<String>(json['coreMessage']),
+      smallAction: serializer.fromJson<String>(json['smallAction']),
+      createdAtUtcUs: serializer.fromJson<int>(json['createdAtUtcUs']),
+      updatedAtUtcUs: serializer.fromJson<int>(json['updatedAtUtcUs']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'readingInstanceId': serializer.toJson<String>(readingInstanceId),
+      'wholeImageObservation': serializer.toJson<String>(wholeImageObservation),
+      'flowInterpretation': serializer.toJson<String>(flowInterpretation),
+      'coreMessage': serializer.toJson<String>(coreMessage),
+      'smallAction': serializer.toJson<String>(smallAction),
+      'createdAtUtcUs': serializer.toJson<int>(createdAtUtcUs),
+      'updatedAtUtcUs': serializer.toJson<int>(updatedAtUtcUs),
+    };
+  }
+
+  TarotInterpretation copyWith({
+    String? readingInstanceId,
+    String? wholeImageObservation,
+    String? flowInterpretation,
+    String? coreMessage,
+    String? smallAction,
+    int? createdAtUtcUs,
+    int? updatedAtUtcUs,
+  }) => TarotInterpretation(
+    readingInstanceId: readingInstanceId ?? this.readingInstanceId,
+    wholeImageObservation: wholeImageObservation ?? this.wholeImageObservation,
+    flowInterpretation: flowInterpretation ?? this.flowInterpretation,
+    coreMessage: coreMessage ?? this.coreMessage,
+    smallAction: smallAction ?? this.smallAction,
+    createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+    updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+  );
+  TarotInterpretation copyWithCompanion(TarotInterpretationsCompanion data) {
+    return TarotInterpretation(
+      readingInstanceId: data.readingInstanceId.present
+          ? data.readingInstanceId.value
+          : this.readingInstanceId,
+      wholeImageObservation: data.wholeImageObservation.present
+          ? data.wholeImageObservation.value
+          : this.wholeImageObservation,
+      flowInterpretation: data.flowInterpretation.present
+          ? data.flowInterpretation.value
+          : this.flowInterpretation,
+      coreMessage: data.coreMessage.present
+          ? data.coreMessage.value
+          : this.coreMessage,
+      smallAction: data.smallAction.present
+          ? data.smallAction.value
+          : this.smallAction,
+      createdAtUtcUs: data.createdAtUtcUs.present
+          ? data.createdAtUtcUs.value
+          : this.createdAtUtcUs,
+      updatedAtUtcUs: data.updatedAtUtcUs.present
+          ? data.updatedAtUtcUs.value
+          : this.updatedAtUtcUs,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TarotInterpretation(')
+          ..write('readingInstanceId: $readingInstanceId, ')
+          ..write('wholeImageObservation: $wholeImageObservation, ')
+          ..write('flowInterpretation: $flowInterpretation, ')
+          ..write('coreMessage: $coreMessage, ')
+          ..write('smallAction: $smallAction, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    readingInstanceId,
+    wholeImageObservation,
+    flowInterpretation,
+    coreMessage,
+    smallAction,
+    createdAtUtcUs,
+    updatedAtUtcUs,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TarotInterpretation &&
+          other.readingInstanceId == this.readingInstanceId &&
+          other.wholeImageObservation == this.wholeImageObservation &&
+          other.flowInterpretation == this.flowInterpretation &&
+          other.coreMessage == this.coreMessage &&
+          other.smallAction == this.smallAction &&
+          other.createdAtUtcUs == this.createdAtUtcUs &&
+          other.updatedAtUtcUs == this.updatedAtUtcUs);
+}
+
+class TarotInterpretationsCompanion
+    extends UpdateCompanion<TarotInterpretation> {
+  final Value<String> readingInstanceId;
+  final Value<String> wholeImageObservation;
+  final Value<String> flowInterpretation;
+  final Value<String> coreMessage;
+  final Value<String> smallAction;
+  final Value<int> createdAtUtcUs;
+  final Value<int> updatedAtUtcUs;
+  final Value<int> rowid;
+  const TarotInterpretationsCompanion({
+    this.readingInstanceId = const Value.absent(),
+    this.wholeImageObservation = const Value.absent(),
+    this.flowInterpretation = const Value.absent(),
+    this.coreMessage = const Value.absent(),
+    this.smallAction = const Value.absent(),
+    this.createdAtUtcUs = const Value.absent(),
+    this.updatedAtUtcUs = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TarotInterpretationsCompanion.insert({
+    required String readingInstanceId,
+    this.wholeImageObservation = const Value.absent(),
+    this.flowInterpretation = const Value.absent(),
+    this.coreMessage = const Value.absent(),
+    this.smallAction = const Value.absent(),
+    required int createdAtUtcUs,
+    required int updatedAtUtcUs,
+    this.rowid = const Value.absent(),
+  }) : readingInstanceId = Value(readingInstanceId),
+       createdAtUtcUs = Value(createdAtUtcUs),
+       updatedAtUtcUs = Value(updatedAtUtcUs);
+  static Insertable<TarotInterpretation> custom({
+    Expression<String>? readingInstanceId,
+    Expression<String>? wholeImageObservation,
+    Expression<String>? flowInterpretation,
+    Expression<String>? coreMessage,
+    Expression<String>? smallAction,
+    Expression<int>? createdAtUtcUs,
+    Expression<int>? updatedAtUtcUs,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (readingInstanceId != null) 'reading_instance_id': readingInstanceId,
+      if (wholeImageObservation != null)
+        'whole_image_observation': wholeImageObservation,
+      if (flowInterpretation != null) 'flow_interpretation': flowInterpretation,
+      if (coreMessage != null) 'core_message': coreMessage,
+      if (smallAction != null) 'small_action': smallAction,
+      if (createdAtUtcUs != null) 'created_at_utc_us': createdAtUtcUs,
+      if (updatedAtUtcUs != null) 'updated_at_utc_us': updatedAtUtcUs,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TarotInterpretationsCompanion copyWith({
+    Value<String>? readingInstanceId,
+    Value<String>? wholeImageObservation,
+    Value<String>? flowInterpretation,
+    Value<String>? coreMessage,
+    Value<String>? smallAction,
+    Value<int>? createdAtUtcUs,
+    Value<int>? updatedAtUtcUs,
+    Value<int>? rowid,
+  }) {
+    return TarotInterpretationsCompanion(
+      readingInstanceId: readingInstanceId ?? this.readingInstanceId,
+      wholeImageObservation:
+          wholeImageObservation ?? this.wholeImageObservation,
+      flowInterpretation: flowInterpretation ?? this.flowInterpretation,
+      coreMessage: coreMessage ?? this.coreMessage,
+      smallAction: smallAction ?? this.smallAction,
+      createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+      updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (readingInstanceId.present) {
+      map['reading_instance_id'] = Variable<String>(readingInstanceId.value);
+    }
+    if (wholeImageObservation.present) {
+      map['whole_image_observation'] = Variable<String>(
+        wholeImageObservation.value,
+      );
+    }
+    if (flowInterpretation.present) {
+      map['flow_interpretation'] = Variable<String>(flowInterpretation.value);
+    }
+    if (coreMessage.present) {
+      map['core_message'] = Variable<String>(coreMessage.value);
+    }
+    if (smallAction.present) {
+      map['small_action'] = Variable<String>(smallAction.value);
+    }
+    if (createdAtUtcUs.present) {
+      map['created_at_utc_us'] = Variable<int>(createdAtUtcUs.value);
+    }
+    if (updatedAtUtcUs.present) {
+      map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TarotInterpretationsCompanion(')
+          ..write('readingInstanceId: $readingInstanceId, ')
+          ..write('wholeImageObservation: $wholeImageObservation, ')
+          ..write('flowInterpretation: $flowInterpretation, ')
+          ..write('coreMessage: $coreMessage, ')
+          ..write('smallAction: $smallAction, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AppRuntimeStateTable extends AppRuntimeState
+    with TableInfo<$AppRuntimeStateTable, AppRuntimeStateData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AppRuntimeStateTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _stateKeyMeta = const VerificationMeta(
+    'stateKey',
+  );
+  @override
+  late final GeneratedColumn<String> stateKey = GeneratedColumn<String>(
+    'state_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _activeHomeTarotReadingIdMeta =
+      const VerificationMeta('activeHomeTarotReadingId');
+  @override
+  late final GeneratedColumn<String> activeHomeTarotReadingId =
+      GeneratedColumn<String>(
+        'active_home_tarot_reading_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES tarot_readings (reading_instance_id) ON DELETE RESTRICT',
+        ),
+      );
+  static const VerificationMeta _updatedAtUtcUsMeta = const VerificationMeta(
+    'updatedAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAtUtcUs = GeneratedColumn<int>(
+    'updated_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    stateKey,
+    activeHomeTarotReadingId,
+    updatedAtUtcUs,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'app_runtime_state';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AppRuntimeStateData> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('state_key')) {
+      context.handle(
+        _stateKeyMeta,
+        stateKey.isAcceptableOrUnknown(data['state_key']!, _stateKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_stateKeyMeta);
+    }
+    if (data.containsKey('active_home_tarot_reading_id')) {
+      context.handle(
+        _activeHomeTarotReadingIdMeta,
+        activeHomeTarotReadingId.isAcceptableOrUnknown(
+          data['active_home_tarot_reading_id']!,
+          _activeHomeTarotReadingIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at_utc_us')) {
+      context.handle(
+        _updatedAtUtcUsMeta,
+        updatedAtUtcUs.isAcceptableOrUnknown(
+          data['updated_at_utc_us']!,
+          _updatedAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtUtcUsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {stateKey};
+  @override
+  AppRuntimeStateData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AppRuntimeStateData(
+      stateKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}state_key'],
+      )!,
+      activeHomeTarotReadingId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}active_home_tarot_reading_id'],
+      ),
+      updatedAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at_utc_us'],
+      )!,
+    );
+  }
+
+  @override
+  $AppRuntimeStateTable createAlias(String alias) {
+    return $AppRuntimeStateTable(attachedDatabase, alias);
+  }
+}
+
+class AppRuntimeStateData extends DataClass
+    implements Insertable<AppRuntimeStateData> {
+  final String stateKey;
+  final String? activeHomeTarotReadingId;
+  final int updatedAtUtcUs;
+  const AppRuntimeStateData({
+    required this.stateKey,
+    this.activeHomeTarotReadingId,
+    required this.updatedAtUtcUs,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['state_key'] = Variable<String>(stateKey);
+    if (!nullToAbsent || activeHomeTarotReadingId != null) {
+      map['active_home_tarot_reading_id'] = Variable<String>(
+        activeHomeTarotReadingId,
+      );
+    }
+    map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs);
+    return map;
+  }
+
+  AppRuntimeStateCompanion toCompanion(bool nullToAbsent) {
+    return AppRuntimeStateCompanion(
+      stateKey: Value(stateKey),
+      activeHomeTarotReadingId: activeHomeTarotReadingId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(activeHomeTarotReadingId),
+      updatedAtUtcUs: Value(updatedAtUtcUs),
+    );
+  }
+
+  factory AppRuntimeStateData.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AppRuntimeStateData(
+      stateKey: serializer.fromJson<String>(json['stateKey']),
+      activeHomeTarotReadingId: serializer.fromJson<String?>(
+        json['activeHomeTarotReadingId'],
+      ),
+      updatedAtUtcUs: serializer.fromJson<int>(json['updatedAtUtcUs']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'stateKey': serializer.toJson<String>(stateKey),
+      'activeHomeTarotReadingId': serializer.toJson<String?>(
+        activeHomeTarotReadingId,
+      ),
+      'updatedAtUtcUs': serializer.toJson<int>(updatedAtUtcUs),
+    };
+  }
+
+  AppRuntimeStateData copyWith({
+    String? stateKey,
+    Value<String?> activeHomeTarotReadingId = const Value.absent(),
+    int? updatedAtUtcUs,
+  }) => AppRuntimeStateData(
+    stateKey: stateKey ?? this.stateKey,
+    activeHomeTarotReadingId: activeHomeTarotReadingId.present
+        ? activeHomeTarotReadingId.value
+        : this.activeHomeTarotReadingId,
+    updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+  );
+  AppRuntimeStateData copyWithCompanion(AppRuntimeStateCompanion data) {
+    return AppRuntimeStateData(
+      stateKey: data.stateKey.present ? data.stateKey.value : this.stateKey,
+      activeHomeTarotReadingId: data.activeHomeTarotReadingId.present
+          ? data.activeHomeTarotReadingId.value
+          : this.activeHomeTarotReadingId,
+      updatedAtUtcUs: data.updatedAtUtcUs.present
+          ? data.updatedAtUtcUs.value
+          : this.updatedAtUtcUs,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppRuntimeStateData(')
+          ..write('stateKey: $stateKey, ')
+          ..write('activeHomeTarotReadingId: $activeHomeTarotReadingId, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(stateKey, activeHomeTarotReadingId, updatedAtUtcUs);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AppRuntimeStateData &&
+          other.stateKey == this.stateKey &&
+          other.activeHomeTarotReadingId == this.activeHomeTarotReadingId &&
+          other.updatedAtUtcUs == this.updatedAtUtcUs);
+}
+
+class AppRuntimeStateCompanion extends UpdateCompanion<AppRuntimeStateData> {
+  final Value<String> stateKey;
+  final Value<String?> activeHomeTarotReadingId;
+  final Value<int> updatedAtUtcUs;
+  final Value<int> rowid;
+  const AppRuntimeStateCompanion({
+    this.stateKey = const Value.absent(),
+    this.activeHomeTarotReadingId = const Value.absent(),
+    this.updatedAtUtcUs = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AppRuntimeStateCompanion.insert({
+    required String stateKey,
+    this.activeHomeTarotReadingId = const Value.absent(),
+    required int updatedAtUtcUs,
+    this.rowid = const Value.absent(),
+  }) : stateKey = Value(stateKey),
+       updatedAtUtcUs = Value(updatedAtUtcUs);
+  static Insertable<AppRuntimeStateData> custom({
+    Expression<String>? stateKey,
+    Expression<String>? activeHomeTarotReadingId,
+    Expression<int>? updatedAtUtcUs,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (stateKey != null) 'state_key': stateKey,
+      if (activeHomeTarotReadingId != null)
+        'active_home_tarot_reading_id': activeHomeTarotReadingId,
+      if (updatedAtUtcUs != null) 'updated_at_utc_us': updatedAtUtcUs,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AppRuntimeStateCompanion copyWith({
+    Value<String>? stateKey,
+    Value<String?>? activeHomeTarotReadingId,
+    Value<int>? updatedAtUtcUs,
+    Value<int>? rowid,
+  }) {
+    return AppRuntimeStateCompanion(
+      stateKey: stateKey ?? this.stateKey,
+      activeHomeTarotReadingId:
+          activeHomeTarotReadingId ?? this.activeHomeTarotReadingId,
+      updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (stateKey.present) {
+      map['state_key'] = Variable<String>(stateKey.value);
+    }
+    if (activeHomeTarotReadingId.present) {
+      map['active_home_tarot_reading_id'] = Variable<String>(
+        activeHomeTarotReadingId.value,
+      );
+    }
+    if (updatedAtUtcUs.present) {
+      map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppRuntimeStateCompanion(')
+          ..write('stateKey: $stateKey, ')
+          ..write('activeHomeTarotReadingId: $activeHomeTarotReadingId, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RynAppDatabase extends GeneratedDatabase {
   _$RynAppDatabase(QueryExecutor e) : super(e);
   $RynAppDatabaseManager get managers => $RynAppDatabaseManager(this);
@@ -4893,6 +7165,14 @@ abstract class _$RynAppDatabase extends GeneratedDatabase {
   late final $TaskCardsTable taskCards = $TaskCardsTable(this);
   late final $AgentRunsTable agentRuns = $AgentRunsTable(this);
   late final $ApprovalRecordsTable approvalRecords = $ApprovalRecordsTable(
+    this,
+  );
+  late final $TarotReadingsTable tarotReadings = $TarotReadingsTable(this);
+  late final $TarotCardPlacementsTable tarotCardPlacements =
+      $TarotCardPlacementsTable(this);
+  late final $TarotInterpretationsTable tarotInterpretations =
+      $TarotInterpretationsTable(this);
+  late final $AppRuntimeStateTable appRuntimeState = $AppRuntimeStateTable(
     this,
   );
   @override
@@ -4907,6 +7187,10 @@ abstract class _$RynAppDatabase extends GeneratedDatabase {
     taskCards,
     agentRuns,
     approvalRecords,
+    tarotReadings,
+    tarotCardPlacements,
+    tarotInterpretations,
+    appRuntimeState,
   ];
 }
 
@@ -7159,6 +9443,1854 @@ typedef $$ApprovalRecordsTableProcessedTableManager =
       ApprovalRecord,
       PrefetchHooks Function()
     >;
+typedef $$TarotReadingsTableCreateCompanionBuilder =
+    TarotReadingsCompanion Function({
+      required String readingInstanceId,
+      required String sourceType,
+      required String questionOriginalSnapshot,
+      required String questionDisplayText,
+      required String deckId,
+      required String deckNameSnapshot,
+      required String spreadId,
+      required String spreadNameSnapshot,
+      required int expectedPlacementCount,
+      required int readingAtUtcUs,
+      required int readingTimezoneOffsetMin,
+      required int createdAtUtcUs,
+      required int updatedAtUtcUs,
+      required String lifecycleStatus,
+      Value<int?> finishedAtUtcUs,
+      Value<int> rowid,
+    });
+typedef $$TarotReadingsTableUpdateCompanionBuilder =
+    TarotReadingsCompanion Function({
+      Value<String> readingInstanceId,
+      Value<String> sourceType,
+      Value<String> questionOriginalSnapshot,
+      Value<String> questionDisplayText,
+      Value<String> deckId,
+      Value<String> deckNameSnapshot,
+      Value<String> spreadId,
+      Value<String> spreadNameSnapshot,
+      Value<int> expectedPlacementCount,
+      Value<int> readingAtUtcUs,
+      Value<int> readingTimezoneOffsetMin,
+      Value<int> createdAtUtcUs,
+      Value<int> updatedAtUtcUs,
+      Value<String> lifecycleStatus,
+      Value<int?> finishedAtUtcUs,
+      Value<int> rowid,
+    });
+
+final class $$TarotReadingsTableReferences
+    extends
+        BaseReferences<_$RynAppDatabase, $TarotReadingsTable, TarotReading> {
+  $$TarotReadingsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<
+    $TarotCardPlacementsTable,
+    List<TarotCardPlacement>
+  >
+  _tarotCardPlacementsRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.tarotCardPlacements,
+        aliasName: $_aliasNameGenerator(
+          db.tarotReadings.readingInstanceId,
+          db.tarotCardPlacements.readingInstanceId,
+        ),
+      );
+
+  $$TarotCardPlacementsTableProcessedTableManager get tarotCardPlacementsRefs {
+    final manager =
+        $$TarotCardPlacementsTableTableManager(
+          $_db,
+          $_db.tarotCardPlacements,
+        ).filter(
+          (f) => f.readingInstanceId.readingInstanceId.sqlEquals(
+            $_itemColumn<String>('reading_instance_id')!,
+          ),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _tarotCardPlacementsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $TarotInterpretationsTable,
+    List<TarotInterpretation>
+  >
+  _tarotInterpretationsRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.tarotInterpretations,
+        aliasName: $_aliasNameGenerator(
+          db.tarotReadings.readingInstanceId,
+          db.tarotInterpretations.readingInstanceId,
+        ),
+      );
+
+  $$TarotInterpretationsTableProcessedTableManager
+  get tarotInterpretationsRefs {
+    final manager =
+        $$TarotInterpretationsTableTableManager(
+          $_db,
+          $_db.tarotInterpretations,
+        ).filter(
+          (f) => f.readingInstanceId.readingInstanceId.sqlEquals(
+            $_itemColumn<String>('reading_instance_id')!,
+          ),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _tarotInterpretationsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$AppRuntimeStateTable, List<AppRuntimeStateData>>
+  _appRuntimeStateRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.appRuntimeState,
+        aliasName: $_aliasNameGenerator(
+          db.tarotReadings.readingInstanceId,
+          db.appRuntimeState.activeHomeTarotReadingId,
+        ),
+      );
+
+  $$AppRuntimeStateTableProcessedTableManager get appRuntimeStateRefs {
+    final manager =
+        $$AppRuntimeStateTableTableManager($_db, $_db.appRuntimeState).filter(
+          (f) => f.activeHomeTarotReadingId.readingInstanceId.sqlEquals(
+            $_itemColumn<String>('reading_instance_id')!,
+          ),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _appRuntimeStateRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$TarotReadingsTableFilterComposer
+    extends Composer<_$RynAppDatabase, $TarotReadingsTable> {
+  $$TarotReadingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get readingInstanceId => $composableBuilder(
+    column: $table.readingInstanceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sourceType => $composableBuilder(
+    column: $table.sourceType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get questionOriginalSnapshot => $composableBuilder(
+    column: $table.questionOriginalSnapshot,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get questionDisplayText => $composableBuilder(
+    column: $table.questionDisplayText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deckId => $composableBuilder(
+    column: $table.deckId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deckNameSnapshot => $composableBuilder(
+    column: $table.deckNameSnapshot,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get spreadId => $composableBuilder(
+    column: $table.spreadId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get spreadNameSnapshot => $composableBuilder(
+    column: $table.spreadNameSnapshot,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get expectedPlacementCount => $composableBuilder(
+    column: $table.expectedPlacementCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get readingAtUtcUs => $composableBuilder(
+    column: $table.readingAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get readingTimezoneOffsetMin => $composableBuilder(
+    column: $table.readingTimezoneOffsetMin,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lifecycleStatus => $composableBuilder(
+    column: $table.lifecycleStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get finishedAtUtcUs => $composableBuilder(
+    column: $table.finishedAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> tarotCardPlacementsRefs(
+    Expression<bool> Function($$TarotCardPlacementsTableFilterComposer f) f,
+  ) {
+    final $$TarotCardPlacementsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.readingInstanceId,
+      referencedTable: $db.tarotCardPlacements,
+      getReferencedColumn: (t) => t.readingInstanceId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TarotCardPlacementsTableFilterComposer(
+            $db: $db,
+            $table: $db.tarotCardPlacements,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> tarotInterpretationsRefs(
+    Expression<bool> Function($$TarotInterpretationsTableFilterComposer f) f,
+  ) {
+    final $$TarotInterpretationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.readingInstanceId,
+      referencedTable: $db.tarotInterpretations,
+      getReferencedColumn: (t) => t.readingInstanceId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TarotInterpretationsTableFilterComposer(
+            $db: $db,
+            $table: $db.tarotInterpretations,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> appRuntimeStateRefs(
+    Expression<bool> Function($$AppRuntimeStateTableFilterComposer f) f,
+  ) {
+    final $$AppRuntimeStateTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.readingInstanceId,
+      referencedTable: $db.appRuntimeState,
+      getReferencedColumn: (t) => t.activeHomeTarotReadingId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AppRuntimeStateTableFilterComposer(
+            $db: $db,
+            $table: $db.appRuntimeState,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TarotReadingsTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $TarotReadingsTable> {
+  $$TarotReadingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get readingInstanceId => $composableBuilder(
+    column: $table.readingInstanceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sourceType => $composableBuilder(
+    column: $table.sourceType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get questionOriginalSnapshot => $composableBuilder(
+    column: $table.questionOriginalSnapshot,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get questionDisplayText => $composableBuilder(
+    column: $table.questionDisplayText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deckId => $composableBuilder(
+    column: $table.deckId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deckNameSnapshot => $composableBuilder(
+    column: $table.deckNameSnapshot,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get spreadId => $composableBuilder(
+    column: $table.spreadId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get spreadNameSnapshot => $composableBuilder(
+    column: $table.spreadNameSnapshot,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get expectedPlacementCount => $composableBuilder(
+    column: $table.expectedPlacementCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get readingAtUtcUs => $composableBuilder(
+    column: $table.readingAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get readingTimezoneOffsetMin => $composableBuilder(
+    column: $table.readingTimezoneOffsetMin,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lifecycleStatus => $composableBuilder(
+    column: $table.lifecycleStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get finishedAtUtcUs => $composableBuilder(
+    column: $table.finishedAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TarotReadingsTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $TarotReadingsTable> {
+  $$TarotReadingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get readingInstanceId => $composableBuilder(
+    column: $table.readingInstanceId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get sourceType => $composableBuilder(
+    column: $table.sourceType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get questionOriginalSnapshot => $composableBuilder(
+    column: $table.questionOriginalSnapshot,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get questionDisplayText => $composableBuilder(
+    column: $table.questionDisplayText,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get deckId =>
+      $composableBuilder(column: $table.deckId, builder: (column) => column);
+
+  GeneratedColumn<String> get deckNameSnapshot => $composableBuilder(
+    column: $table.deckNameSnapshot,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get spreadId =>
+      $composableBuilder(column: $table.spreadId, builder: (column) => column);
+
+  GeneratedColumn<String> get spreadNameSnapshot => $composableBuilder(
+    column: $table.spreadNameSnapshot,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get expectedPlacementCount => $composableBuilder(
+    column: $table.expectedPlacementCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get readingAtUtcUs => $composableBuilder(
+    column: $table.readingAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get readingTimezoneOffsetMin => $composableBuilder(
+    column: $table.readingTimezoneOffsetMin,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lifecycleStatus => $composableBuilder(
+    column: $table.lifecycleStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get finishedAtUtcUs => $composableBuilder(
+    column: $table.finishedAtUtcUs,
+    builder: (column) => column,
+  );
+
+  Expression<T> tarotCardPlacementsRefs<T extends Object>(
+    Expression<T> Function($$TarotCardPlacementsTableAnnotationComposer a) f,
+  ) {
+    final $$TarotCardPlacementsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.readingInstanceId,
+          referencedTable: $db.tarotCardPlacements,
+          getReferencedColumn: (t) => t.readingInstanceId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$TarotCardPlacementsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.tarotCardPlacements,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> tarotInterpretationsRefs<T extends Object>(
+    Expression<T> Function($$TarotInterpretationsTableAnnotationComposer a) f,
+  ) {
+    final $$TarotInterpretationsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.readingInstanceId,
+          referencedTable: $db.tarotInterpretations,
+          getReferencedColumn: (t) => t.readingInstanceId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$TarotInterpretationsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.tarotInterpretations,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> appRuntimeStateRefs<T extends Object>(
+    Expression<T> Function($$AppRuntimeStateTableAnnotationComposer a) f,
+  ) {
+    final $$AppRuntimeStateTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.readingInstanceId,
+      referencedTable: $db.appRuntimeState,
+      getReferencedColumn: (t) => t.activeHomeTarotReadingId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AppRuntimeStateTableAnnotationComposer(
+            $db: $db,
+            $table: $db.appRuntimeState,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$TarotReadingsTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $TarotReadingsTable,
+          TarotReading,
+          $$TarotReadingsTableFilterComposer,
+          $$TarotReadingsTableOrderingComposer,
+          $$TarotReadingsTableAnnotationComposer,
+          $$TarotReadingsTableCreateCompanionBuilder,
+          $$TarotReadingsTableUpdateCompanionBuilder,
+          (TarotReading, $$TarotReadingsTableReferences),
+          TarotReading,
+          PrefetchHooks Function({
+            bool tarotCardPlacementsRefs,
+            bool tarotInterpretationsRefs,
+            bool appRuntimeStateRefs,
+          })
+        > {
+  $$TarotReadingsTableTableManager(
+    _$RynAppDatabase db,
+    $TarotReadingsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TarotReadingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TarotReadingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TarotReadingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> readingInstanceId = const Value.absent(),
+                Value<String> sourceType = const Value.absent(),
+                Value<String> questionOriginalSnapshot = const Value.absent(),
+                Value<String> questionDisplayText = const Value.absent(),
+                Value<String> deckId = const Value.absent(),
+                Value<String> deckNameSnapshot = const Value.absent(),
+                Value<String> spreadId = const Value.absent(),
+                Value<String> spreadNameSnapshot = const Value.absent(),
+                Value<int> expectedPlacementCount = const Value.absent(),
+                Value<int> readingAtUtcUs = const Value.absent(),
+                Value<int> readingTimezoneOffsetMin = const Value.absent(),
+                Value<int> createdAtUtcUs = const Value.absent(),
+                Value<int> updatedAtUtcUs = const Value.absent(),
+                Value<String> lifecycleStatus = const Value.absent(),
+                Value<int?> finishedAtUtcUs = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TarotReadingsCompanion(
+                readingInstanceId: readingInstanceId,
+                sourceType: sourceType,
+                questionOriginalSnapshot: questionOriginalSnapshot,
+                questionDisplayText: questionDisplayText,
+                deckId: deckId,
+                deckNameSnapshot: deckNameSnapshot,
+                spreadId: spreadId,
+                spreadNameSnapshot: spreadNameSnapshot,
+                expectedPlacementCount: expectedPlacementCount,
+                readingAtUtcUs: readingAtUtcUs,
+                readingTimezoneOffsetMin: readingTimezoneOffsetMin,
+                createdAtUtcUs: createdAtUtcUs,
+                updatedAtUtcUs: updatedAtUtcUs,
+                lifecycleStatus: lifecycleStatus,
+                finishedAtUtcUs: finishedAtUtcUs,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String readingInstanceId,
+                required String sourceType,
+                required String questionOriginalSnapshot,
+                required String questionDisplayText,
+                required String deckId,
+                required String deckNameSnapshot,
+                required String spreadId,
+                required String spreadNameSnapshot,
+                required int expectedPlacementCount,
+                required int readingAtUtcUs,
+                required int readingTimezoneOffsetMin,
+                required int createdAtUtcUs,
+                required int updatedAtUtcUs,
+                required String lifecycleStatus,
+                Value<int?> finishedAtUtcUs = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TarotReadingsCompanion.insert(
+                readingInstanceId: readingInstanceId,
+                sourceType: sourceType,
+                questionOriginalSnapshot: questionOriginalSnapshot,
+                questionDisplayText: questionDisplayText,
+                deckId: deckId,
+                deckNameSnapshot: deckNameSnapshot,
+                spreadId: spreadId,
+                spreadNameSnapshot: spreadNameSnapshot,
+                expectedPlacementCount: expectedPlacementCount,
+                readingAtUtcUs: readingAtUtcUs,
+                readingTimezoneOffsetMin: readingTimezoneOffsetMin,
+                createdAtUtcUs: createdAtUtcUs,
+                updatedAtUtcUs: updatedAtUtcUs,
+                lifecycleStatus: lifecycleStatus,
+                finishedAtUtcUs: finishedAtUtcUs,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$TarotReadingsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                tarotCardPlacementsRefs = false,
+                tarotInterpretationsRefs = false,
+                appRuntimeStateRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (tarotCardPlacementsRefs) db.tarotCardPlacements,
+                    if (tarotInterpretationsRefs) db.tarotInterpretations,
+                    if (appRuntimeStateRefs) db.appRuntimeState,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (tarotCardPlacementsRefs)
+                        await $_getPrefetchedData<
+                          TarotReading,
+                          $TarotReadingsTable,
+                          TarotCardPlacement
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TarotReadingsTableReferences
+                              ._tarotCardPlacementsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TarotReadingsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).tarotCardPlacementsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) =>
+                                    e.readingInstanceId ==
+                                    item.readingInstanceId,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (tarotInterpretationsRefs)
+                        await $_getPrefetchedData<
+                          TarotReading,
+                          $TarotReadingsTable,
+                          TarotInterpretation
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TarotReadingsTableReferences
+                              ._tarotInterpretationsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TarotReadingsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).tarotInterpretationsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) =>
+                                    e.readingInstanceId ==
+                                    item.readingInstanceId,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (appRuntimeStateRefs)
+                        await $_getPrefetchedData<
+                          TarotReading,
+                          $TarotReadingsTable,
+                          AppRuntimeStateData
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TarotReadingsTableReferences
+                              ._appRuntimeStateRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TarotReadingsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).appRuntimeStateRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) =>
+                                    e.activeHomeTarotReadingId ==
+                                    item.readingInstanceId,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$TarotReadingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $TarotReadingsTable,
+      TarotReading,
+      $$TarotReadingsTableFilterComposer,
+      $$TarotReadingsTableOrderingComposer,
+      $$TarotReadingsTableAnnotationComposer,
+      $$TarotReadingsTableCreateCompanionBuilder,
+      $$TarotReadingsTableUpdateCompanionBuilder,
+      (TarotReading, $$TarotReadingsTableReferences),
+      TarotReading,
+      PrefetchHooks Function({
+        bool tarotCardPlacementsRefs,
+        bool tarotInterpretationsRefs,
+        bool appRuntimeStateRefs,
+      })
+    >;
+typedef $$TarotCardPlacementsTableCreateCompanionBuilder =
+    TarotCardPlacementsCompanion Function({
+      required String readingInstanceId,
+      required int placementOrder,
+      required String positionId,
+      required String positionNameSnapshot,
+      required String cardId,
+      required String cardNameSnapshot,
+      required String orientation,
+      Value<int> rowid,
+    });
+typedef $$TarotCardPlacementsTableUpdateCompanionBuilder =
+    TarotCardPlacementsCompanion Function({
+      Value<String> readingInstanceId,
+      Value<int> placementOrder,
+      Value<String> positionId,
+      Value<String> positionNameSnapshot,
+      Value<String> cardId,
+      Value<String> cardNameSnapshot,
+      Value<String> orientation,
+      Value<int> rowid,
+    });
+
+final class $$TarotCardPlacementsTableReferences
+    extends
+        BaseReferences<
+          _$RynAppDatabase,
+          $TarotCardPlacementsTable,
+          TarotCardPlacement
+        > {
+  $$TarotCardPlacementsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $TarotReadingsTable _readingInstanceIdTable(_$RynAppDatabase db) =>
+      db.tarotReadings.createAlias(
+        $_aliasNameGenerator(
+          db.tarotCardPlacements.readingInstanceId,
+          db.tarotReadings.readingInstanceId,
+        ),
+      );
+
+  $$TarotReadingsTableProcessedTableManager get readingInstanceId {
+    final $_column = $_itemColumn<String>('reading_instance_id')!;
+
+    final manager = $$TarotReadingsTableTableManager(
+      $_db,
+      $_db.tarotReadings,
+    ).filter((f) => f.readingInstanceId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_readingInstanceIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$TarotCardPlacementsTableFilterComposer
+    extends Composer<_$RynAppDatabase, $TarotCardPlacementsTable> {
+  $$TarotCardPlacementsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get placementOrder => $composableBuilder(
+    column: $table.placementOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get positionId => $composableBuilder(
+    column: $table.positionId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get positionNameSnapshot => $composableBuilder(
+    column: $table.positionNameSnapshot,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cardId => $composableBuilder(
+    column: $table.cardId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cardNameSnapshot => $composableBuilder(
+    column: $table.cardNameSnapshot,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get orientation => $composableBuilder(
+    column: $table.orientation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$TarotReadingsTableFilterComposer get readingInstanceId {
+    final $$TarotReadingsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.readingInstanceId,
+      referencedTable: $db.tarotReadings,
+      getReferencedColumn: (t) => t.readingInstanceId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TarotReadingsTableFilterComposer(
+            $db: $db,
+            $table: $db.tarotReadings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TarotCardPlacementsTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $TarotCardPlacementsTable> {
+  $$TarotCardPlacementsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get placementOrder => $composableBuilder(
+    column: $table.placementOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get positionId => $composableBuilder(
+    column: $table.positionId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get positionNameSnapshot => $composableBuilder(
+    column: $table.positionNameSnapshot,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get cardId => $composableBuilder(
+    column: $table.cardId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get cardNameSnapshot => $composableBuilder(
+    column: $table.cardNameSnapshot,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get orientation => $composableBuilder(
+    column: $table.orientation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$TarotReadingsTableOrderingComposer get readingInstanceId {
+    final $$TarotReadingsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.readingInstanceId,
+      referencedTable: $db.tarotReadings,
+      getReferencedColumn: (t) => t.readingInstanceId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TarotReadingsTableOrderingComposer(
+            $db: $db,
+            $table: $db.tarotReadings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TarotCardPlacementsTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $TarotCardPlacementsTable> {
+  $$TarotCardPlacementsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get placementOrder => $composableBuilder(
+    column: $table.placementOrder,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get positionId => $composableBuilder(
+    column: $table.positionId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get positionNameSnapshot => $composableBuilder(
+    column: $table.positionNameSnapshot,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get cardId =>
+      $composableBuilder(column: $table.cardId, builder: (column) => column);
+
+  GeneratedColumn<String> get cardNameSnapshot => $composableBuilder(
+    column: $table.cardNameSnapshot,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get orientation => $composableBuilder(
+    column: $table.orientation,
+    builder: (column) => column,
+  );
+
+  $$TarotReadingsTableAnnotationComposer get readingInstanceId {
+    final $$TarotReadingsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.readingInstanceId,
+      referencedTable: $db.tarotReadings,
+      getReferencedColumn: (t) => t.readingInstanceId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TarotReadingsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.tarotReadings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TarotCardPlacementsTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $TarotCardPlacementsTable,
+          TarotCardPlacement,
+          $$TarotCardPlacementsTableFilterComposer,
+          $$TarotCardPlacementsTableOrderingComposer,
+          $$TarotCardPlacementsTableAnnotationComposer,
+          $$TarotCardPlacementsTableCreateCompanionBuilder,
+          $$TarotCardPlacementsTableUpdateCompanionBuilder,
+          (TarotCardPlacement, $$TarotCardPlacementsTableReferences),
+          TarotCardPlacement,
+          PrefetchHooks Function({bool readingInstanceId})
+        > {
+  $$TarotCardPlacementsTableTableManager(
+    _$RynAppDatabase db,
+    $TarotCardPlacementsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TarotCardPlacementsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TarotCardPlacementsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$TarotCardPlacementsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> readingInstanceId = const Value.absent(),
+                Value<int> placementOrder = const Value.absent(),
+                Value<String> positionId = const Value.absent(),
+                Value<String> positionNameSnapshot = const Value.absent(),
+                Value<String> cardId = const Value.absent(),
+                Value<String> cardNameSnapshot = const Value.absent(),
+                Value<String> orientation = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TarotCardPlacementsCompanion(
+                readingInstanceId: readingInstanceId,
+                placementOrder: placementOrder,
+                positionId: positionId,
+                positionNameSnapshot: positionNameSnapshot,
+                cardId: cardId,
+                cardNameSnapshot: cardNameSnapshot,
+                orientation: orientation,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String readingInstanceId,
+                required int placementOrder,
+                required String positionId,
+                required String positionNameSnapshot,
+                required String cardId,
+                required String cardNameSnapshot,
+                required String orientation,
+                Value<int> rowid = const Value.absent(),
+              }) => TarotCardPlacementsCompanion.insert(
+                readingInstanceId: readingInstanceId,
+                placementOrder: placementOrder,
+                positionId: positionId,
+                positionNameSnapshot: positionNameSnapshot,
+                cardId: cardId,
+                cardNameSnapshot: cardNameSnapshot,
+                orientation: orientation,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$TarotCardPlacementsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({readingInstanceId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (readingInstanceId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.readingInstanceId,
+                                referencedTable:
+                                    $$TarotCardPlacementsTableReferences
+                                        ._readingInstanceIdTable(db),
+                                referencedColumn:
+                                    $$TarotCardPlacementsTableReferences
+                                        ._readingInstanceIdTable(db)
+                                        .readingInstanceId,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$TarotCardPlacementsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $TarotCardPlacementsTable,
+      TarotCardPlacement,
+      $$TarotCardPlacementsTableFilterComposer,
+      $$TarotCardPlacementsTableOrderingComposer,
+      $$TarotCardPlacementsTableAnnotationComposer,
+      $$TarotCardPlacementsTableCreateCompanionBuilder,
+      $$TarotCardPlacementsTableUpdateCompanionBuilder,
+      (TarotCardPlacement, $$TarotCardPlacementsTableReferences),
+      TarotCardPlacement,
+      PrefetchHooks Function({bool readingInstanceId})
+    >;
+typedef $$TarotInterpretationsTableCreateCompanionBuilder =
+    TarotInterpretationsCompanion Function({
+      required String readingInstanceId,
+      Value<String> wholeImageObservation,
+      Value<String> flowInterpretation,
+      Value<String> coreMessage,
+      Value<String> smallAction,
+      required int createdAtUtcUs,
+      required int updatedAtUtcUs,
+      Value<int> rowid,
+    });
+typedef $$TarotInterpretationsTableUpdateCompanionBuilder =
+    TarotInterpretationsCompanion Function({
+      Value<String> readingInstanceId,
+      Value<String> wholeImageObservation,
+      Value<String> flowInterpretation,
+      Value<String> coreMessage,
+      Value<String> smallAction,
+      Value<int> createdAtUtcUs,
+      Value<int> updatedAtUtcUs,
+      Value<int> rowid,
+    });
+
+final class $$TarotInterpretationsTableReferences
+    extends
+        BaseReferences<
+          _$RynAppDatabase,
+          $TarotInterpretationsTable,
+          TarotInterpretation
+        > {
+  $$TarotInterpretationsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $TarotReadingsTable _readingInstanceIdTable(_$RynAppDatabase db) =>
+      db.tarotReadings.createAlias(
+        $_aliasNameGenerator(
+          db.tarotInterpretations.readingInstanceId,
+          db.tarotReadings.readingInstanceId,
+        ),
+      );
+
+  $$TarotReadingsTableProcessedTableManager get readingInstanceId {
+    final $_column = $_itemColumn<String>('reading_instance_id')!;
+
+    final manager = $$TarotReadingsTableTableManager(
+      $_db,
+      $_db.tarotReadings,
+    ).filter((f) => f.readingInstanceId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_readingInstanceIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$TarotInterpretationsTableFilterComposer
+    extends Composer<_$RynAppDatabase, $TarotInterpretationsTable> {
+  $$TarotInterpretationsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get wholeImageObservation => $composableBuilder(
+    column: $table.wholeImageObservation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get flowInterpretation => $composableBuilder(
+    column: $table.flowInterpretation,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get coreMessage => $composableBuilder(
+    column: $table.coreMessage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get smallAction => $composableBuilder(
+    column: $table.smallAction,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$TarotReadingsTableFilterComposer get readingInstanceId {
+    final $$TarotReadingsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.readingInstanceId,
+      referencedTable: $db.tarotReadings,
+      getReferencedColumn: (t) => t.readingInstanceId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TarotReadingsTableFilterComposer(
+            $db: $db,
+            $table: $db.tarotReadings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TarotInterpretationsTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $TarotInterpretationsTable> {
+  $$TarotInterpretationsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get wholeImageObservation => $composableBuilder(
+    column: $table.wholeImageObservation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get flowInterpretation => $composableBuilder(
+    column: $table.flowInterpretation,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get coreMessage => $composableBuilder(
+    column: $table.coreMessage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get smallAction => $composableBuilder(
+    column: $table.smallAction,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$TarotReadingsTableOrderingComposer get readingInstanceId {
+    final $$TarotReadingsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.readingInstanceId,
+      referencedTable: $db.tarotReadings,
+      getReferencedColumn: (t) => t.readingInstanceId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TarotReadingsTableOrderingComposer(
+            $db: $db,
+            $table: $db.tarotReadings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TarotInterpretationsTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $TarotInterpretationsTable> {
+  $$TarotInterpretationsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get wholeImageObservation => $composableBuilder(
+    column: $table.wholeImageObservation,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get flowInterpretation => $composableBuilder(
+    column: $table.flowInterpretation,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get coreMessage => $composableBuilder(
+    column: $table.coreMessage,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get smallAction => $composableBuilder(
+    column: $table.smallAction,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => column,
+  );
+
+  $$TarotReadingsTableAnnotationComposer get readingInstanceId {
+    final $$TarotReadingsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.readingInstanceId,
+      referencedTable: $db.tarotReadings,
+      getReferencedColumn: (t) => t.readingInstanceId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TarotReadingsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.tarotReadings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$TarotInterpretationsTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $TarotInterpretationsTable,
+          TarotInterpretation,
+          $$TarotInterpretationsTableFilterComposer,
+          $$TarotInterpretationsTableOrderingComposer,
+          $$TarotInterpretationsTableAnnotationComposer,
+          $$TarotInterpretationsTableCreateCompanionBuilder,
+          $$TarotInterpretationsTableUpdateCompanionBuilder,
+          (TarotInterpretation, $$TarotInterpretationsTableReferences),
+          TarotInterpretation,
+          PrefetchHooks Function({bool readingInstanceId})
+        > {
+  $$TarotInterpretationsTableTableManager(
+    _$RynAppDatabase db,
+    $TarotInterpretationsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TarotInterpretationsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TarotInterpretationsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$TarotInterpretationsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> readingInstanceId = const Value.absent(),
+                Value<String> wholeImageObservation = const Value.absent(),
+                Value<String> flowInterpretation = const Value.absent(),
+                Value<String> coreMessage = const Value.absent(),
+                Value<String> smallAction = const Value.absent(),
+                Value<int> createdAtUtcUs = const Value.absent(),
+                Value<int> updatedAtUtcUs = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TarotInterpretationsCompanion(
+                readingInstanceId: readingInstanceId,
+                wholeImageObservation: wholeImageObservation,
+                flowInterpretation: flowInterpretation,
+                coreMessage: coreMessage,
+                smallAction: smallAction,
+                createdAtUtcUs: createdAtUtcUs,
+                updatedAtUtcUs: updatedAtUtcUs,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String readingInstanceId,
+                Value<String> wholeImageObservation = const Value.absent(),
+                Value<String> flowInterpretation = const Value.absent(),
+                Value<String> coreMessage = const Value.absent(),
+                Value<String> smallAction = const Value.absent(),
+                required int createdAtUtcUs,
+                required int updatedAtUtcUs,
+                Value<int> rowid = const Value.absent(),
+              }) => TarotInterpretationsCompanion.insert(
+                readingInstanceId: readingInstanceId,
+                wholeImageObservation: wholeImageObservation,
+                flowInterpretation: flowInterpretation,
+                coreMessage: coreMessage,
+                smallAction: smallAction,
+                createdAtUtcUs: createdAtUtcUs,
+                updatedAtUtcUs: updatedAtUtcUs,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$TarotInterpretationsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({readingInstanceId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (readingInstanceId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.readingInstanceId,
+                                referencedTable:
+                                    $$TarotInterpretationsTableReferences
+                                        ._readingInstanceIdTable(db),
+                                referencedColumn:
+                                    $$TarotInterpretationsTableReferences
+                                        ._readingInstanceIdTable(db)
+                                        .readingInstanceId,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$TarotInterpretationsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $TarotInterpretationsTable,
+      TarotInterpretation,
+      $$TarotInterpretationsTableFilterComposer,
+      $$TarotInterpretationsTableOrderingComposer,
+      $$TarotInterpretationsTableAnnotationComposer,
+      $$TarotInterpretationsTableCreateCompanionBuilder,
+      $$TarotInterpretationsTableUpdateCompanionBuilder,
+      (TarotInterpretation, $$TarotInterpretationsTableReferences),
+      TarotInterpretation,
+      PrefetchHooks Function({bool readingInstanceId})
+    >;
+typedef $$AppRuntimeStateTableCreateCompanionBuilder =
+    AppRuntimeStateCompanion Function({
+      required String stateKey,
+      Value<String?> activeHomeTarotReadingId,
+      required int updatedAtUtcUs,
+      Value<int> rowid,
+    });
+typedef $$AppRuntimeStateTableUpdateCompanionBuilder =
+    AppRuntimeStateCompanion Function({
+      Value<String> stateKey,
+      Value<String?> activeHomeTarotReadingId,
+      Value<int> updatedAtUtcUs,
+      Value<int> rowid,
+    });
+
+final class $$AppRuntimeStateTableReferences
+    extends
+        BaseReferences<
+          _$RynAppDatabase,
+          $AppRuntimeStateTable,
+          AppRuntimeStateData
+        > {
+  $$AppRuntimeStateTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $TarotReadingsTable _activeHomeTarotReadingIdTable(
+    _$RynAppDatabase db,
+  ) => db.tarotReadings.createAlias(
+    $_aliasNameGenerator(
+      db.appRuntimeState.activeHomeTarotReadingId,
+      db.tarotReadings.readingInstanceId,
+    ),
+  );
+
+  $$TarotReadingsTableProcessedTableManager? get activeHomeTarotReadingId {
+    final $_column = $_itemColumn<String>('active_home_tarot_reading_id');
+    if ($_column == null) return null;
+    final manager = $$TarotReadingsTableTableManager(
+      $_db,
+      $_db.tarotReadings,
+    ).filter((f) => f.readingInstanceId.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _activeHomeTarotReadingIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AppRuntimeStateTableFilterComposer
+    extends Composer<_$RynAppDatabase, $AppRuntimeStateTable> {
+  $$AppRuntimeStateTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get stateKey => $composableBuilder(
+    column: $table.stateKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$TarotReadingsTableFilterComposer get activeHomeTarotReadingId {
+    final $$TarotReadingsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.activeHomeTarotReadingId,
+      referencedTable: $db.tarotReadings,
+      getReferencedColumn: (t) => t.readingInstanceId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TarotReadingsTableFilterComposer(
+            $db: $db,
+            $table: $db.tarotReadings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AppRuntimeStateTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $AppRuntimeStateTable> {
+  $$AppRuntimeStateTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get stateKey => $composableBuilder(
+    column: $table.stateKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$TarotReadingsTableOrderingComposer get activeHomeTarotReadingId {
+    final $$TarotReadingsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.activeHomeTarotReadingId,
+      referencedTable: $db.tarotReadings,
+      getReferencedColumn: (t) => t.readingInstanceId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TarotReadingsTableOrderingComposer(
+            $db: $db,
+            $table: $db.tarotReadings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AppRuntimeStateTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $AppRuntimeStateTable> {
+  $$AppRuntimeStateTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get stateKey =>
+      $composableBuilder(column: $table.stateKey, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => column,
+  );
+
+  $$TarotReadingsTableAnnotationComposer get activeHomeTarotReadingId {
+    final $$TarotReadingsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.activeHomeTarotReadingId,
+      referencedTable: $db.tarotReadings,
+      getReferencedColumn: (t) => t.readingInstanceId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TarotReadingsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.tarotReadings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AppRuntimeStateTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $AppRuntimeStateTable,
+          AppRuntimeStateData,
+          $$AppRuntimeStateTableFilterComposer,
+          $$AppRuntimeStateTableOrderingComposer,
+          $$AppRuntimeStateTableAnnotationComposer,
+          $$AppRuntimeStateTableCreateCompanionBuilder,
+          $$AppRuntimeStateTableUpdateCompanionBuilder,
+          (AppRuntimeStateData, $$AppRuntimeStateTableReferences),
+          AppRuntimeStateData,
+          PrefetchHooks Function({bool activeHomeTarotReadingId})
+        > {
+  $$AppRuntimeStateTableTableManager(
+    _$RynAppDatabase db,
+    $AppRuntimeStateTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AppRuntimeStateTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AppRuntimeStateTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AppRuntimeStateTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> stateKey = const Value.absent(),
+                Value<String?> activeHomeTarotReadingId = const Value.absent(),
+                Value<int> updatedAtUtcUs = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AppRuntimeStateCompanion(
+                stateKey: stateKey,
+                activeHomeTarotReadingId: activeHomeTarotReadingId,
+                updatedAtUtcUs: updatedAtUtcUs,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String stateKey,
+                Value<String?> activeHomeTarotReadingId = const Value.absent(),
+                required int updatedAtUtcUs,
+                Value<int> rowid = const Value.absent(),
+              }) => AppRuntimeStateCompanion.insert(
+                stateKey: stateKey,
+                activeHomeTarotReadingId: activeHomeTarotReadingId,
+                updatedAtUtcUs: updatedAtUtcUs,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$AppRuntimeStateTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({activeHomeTarotReadingId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (activeHomeTarotReadingId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.activeHomeTarotReadingId,
+                                referencedTable:
+                                    $$AppRuntimeStateTableReferences
+                                        ._activeHomeTarotReadingIdTable(db),
+                                referencedColumn:
+                                    $$AppRuntimeStateTableReferences
+                                        ._activeHomeTarotReadingIdTable(db)
+                                        .readingInstanceId,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AppRuntimeStateTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $AppRuntimeStateTable,
+      AppRuntimeStateData,
+      $$AppRuntimeStateTableFilterComposer,
+      $$AppRuntimeStateTableOrderingComposer,
+      $$AppRuntimeStateTableAnnotationComposer,
+      $$AppRuntimeStateTableCreateCompanionBuilder,
+      $$AppRuntimeStateTableUpdateCompanionBuilder,
+      (AppRuntimeStateData, $$AppRuntimeStateTableReferences),
+      AppRuntimeStateData,
+      PrefetchHooks Function({bool activeHomeTarotReadingId})
+    >;
 
 class $RynAppDatabaseManager {
   final _$RynAppDatabase _db;
@@ -7177,4 +11309,12 @@ class $RynAppDatabaseManager {
       $$AgentRunsTableTableManager(_db, _db.agentRuns);
   $$ApprovalRecordsTableTableManager get approvalRecords =>
       $$ApprovalRecordsTableTableManager(_db, _db.approvalRecords);
+  $$TarotReadingsTableTableManager get tarotReadings =>
+      $$TarotReadingsTableTableManager(_db, _db.tarotReadings);
+  $$TarotCardPlacementsTableTableManager get tarotCardPlacements =>
+      $$TarotCardPlacementsTableTableManager(_db, _db.tarotCardPlacements);
+  $$TarotInterpretationsTableTableManager get tarotInterpretations =>
+      $$TarotInterpretationsTableTableManager(_db, _db.tarotInterpretations);
+  $$AppRuntimeStateTableTableManager get appRuntimeState =>
+      $$AppRuntimeStateTableTableManager(_db, _db.appRuntimeState);
 }
