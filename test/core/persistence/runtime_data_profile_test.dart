@@ -120,6 +120,88 @@ void main() {
       expect(qa.databasePath, isNot(standard.databasePath));
     });
 
+    test('backup recovery QA mode resolves to its synthetic-only profile', () {
+      final mode = RynRuntimeDataModeContract.parseSelector(
+        'tarot_backup_recovery_qa',
+      );
+      final standard = paths.resolveMode(
+        RynRuntimeDataMode.standardDevelopment,
+      );
+      final persistenceQa = paths.resolveMode(
+        RynRuntimeDataMode.tarotPersistenceQa,
+      );
+      final backupQa = paths.resolveMode(mode);
+      final expectedProfileRoot = p.join(
+        temporaryRoot.path,
+        'RinVitalCenter',
+        'RynUniverseOS',
+        'development',
+        'qa',
+        'core_tarot_backup_recovery_v0_2',
+      );
+
+      expect(mode, RynRuntimeDataMode.tarotBackupRecoveryQa);
+      expect(backupQa.profile, RynDataProfile.development);
+      expect(backupQa.isStandardDevelopment, isFalse);
+      expect(backupQa.isTaskSpecificQa, isTrue);
+      expect(backupQa.isBackupRecoveryQa, isTrue);
+      expect(backupQa.isSyntheticOnly, isTrue);
+      expect(backupQa.environment, 'development');
+      expect(backupQa.purpose, 'core_tarot_backup_recovery_v0_2');
+      expect(backupQa.profileRootPath, expectedProfileRoot);
+      expect(
+        backupQa.databasePath,
+        p.join(
+          expectedProfileRoot,
+          'runtime',
+          'ryn_universe_os_core_backup_recovery_qa.sqlite',
+        ),
+      );
+      expect(
+        p.basename(backupQa.databasePath),
+        'ryn_universe_os_core_backup_recovery_qa.sqlite',
+      );
+      expect(
+        backupQa.backupOutputDirectoryPath,
+        p.join(expectedProfileRoot, 'backup_output'),
+      );
+      expect(
+        backupQa.recoverySafetyDirectoryPath,
+        p.join(expectedProfileRoot, 'recovery_safety'),
+      );
+      expect(
+        backupQa.recoveryWorkDirectoryPath,
+        p.join(expectedProfileRoot, 'recovery_work'),
+      );
+      expect(<String>{
+        backupQa.backupOutputDirectoryPath,
+        backupQa.recoverySafetyDirectoryPath,
+        backupQa.recoveryWorkDirectoryPath,
+      }, hasLength(3));
+      expect(p.split(backupQa.databasePath), isNot(contains('production')));
+      expect(backupQa.databasePath, isNot(standard.databasePath));
+      expect(backupQa.databasePath, isNot(persistenceQa.databasePath));
+    });
+
+    test('backup recovery QA is headless-only and rejected by environment', () {
+      expect(
+        () => RynRuntimeDataModeContract.parseEnvironmentSelector(
+          'tarot_backup_recovery_qa',
+        ),
+        throwsA(isA<RynDataProfileException>()),
+      );
+      expect(
+        RynRuntimeDataModeContract.parseHeadlessSelector(
+          'tarot_backup_recovery_qa',
+        ),
+        RynRuntimeDataMode.tarotBackupRecoveryQa,
+      );
+      expect(
+        () => RynRuntimeDataModeContract.parseHeadlessSelector('../x.sqlite'),
+        throwsA(isA<RynDataProfileException>()),
+      );
+    });
+
     test('unknown, production, and arbitrary path selectors fail closed', () {
       for (final selector in <String>[
         'unexpected',
@@ -127,6 +209,7 @@ void main() {
         'productionReserved',
         r'C:\temp\injected.sqlite',
         '../injected.sqlite',
+        r'C:\absolute\tarot_backup_recovery_qa.sqlite',
       ]) {
         expect(
           () => RynRuntimeDataModeContract.parseSelector(selector),
@@ -144,14 +227,32 @@ void main() {
       expect(cmake, contains('set(BINARY_NAME "ryn_universe_os_core")'));
     });
 
-    test('resolving either profile creates no directory or database', () {
+    test('resolving profiles and task paths creates no filesystem entries', () {
       final development = paths.resolve(RynDataProfile.development);
       final production = paths.resolve(RynDataProfile.productionReserved);
+      final backupQa = paths.resolveMode(
+        RynRuntimeDataMode.tarotBackupRecoveryQa,
+      );
 
       expect(Directory(development.runtimeDirectoryPath).existsSync(), isFalse);
       expect(File(development.databasePath).existsSync(), isFalse);
       expect(Directory(production.runtimeDirectoryPath).existsSync(), isFalse);
       expect(File(production.databasePath).existsSync(), isFalse);
+      expect(Directory(backupQa.profileRootPath).existsSync(), isFalse);
+      expect(Directory(backupQa.runtimeDirectoryPath).existsSync(), isFalse);
+      expect(File(backupQa.databasePath).existsSync(), isFalse);
+      expect(
+        Directory(backupQa.backupOutputDirectoryPath).existsSync(),
+        isFalse,
+      );
+      expect(
+        Directory(backupQa.recoverySafetyDirectoryPath).existsSync(),
+        isFalse,
+      );
+      expect(
+        Directory(backupQa.recoveryWorkDirectoryPath).existsSync(),
+        isFalse,
+      );
     });
 
     test('only development profile can be opened', () {
@@ -162,6 +263,12 @@ void main() {
       expect(
         paths.requireOpenable(RynDataProfile.development).profile,
         RynDataProfile.development,
+      );
+      expect(
+        paths
+            .requireOpenableMode(RynRuntimeDataMode.tarotBackupRecoveryQa)
+            .isSyntheticOnly,
+        isTrue,
       );
     });
 

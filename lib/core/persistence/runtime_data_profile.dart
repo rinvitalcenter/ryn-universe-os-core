@@ -5,19 +5,40 @@ import 'package:path_provider/path_provider.dart';
 
 enum RynDataProfile { development, productionReserved }
 
-enum RynRuntimeDataMode { standardDevelopment, tarotPersistenceQa }
+enum RynRuntimeDataMode {
+  standardDevelopment,
+  tarotPersistenceQa,
+  tarotBackupRecoveryQa,
+}
 
 abstract final class RynRuntimeDataModeContract {
   static const defineName = 'RYN_RUNTIME_DATA_MODE';
   static const approvedQaSelector = 'tarot_persistence_qa';
+  static const backupRecoveryQaSelector = 'tarot_backup_recovery_qa';
 
   static RynRuntimeDataMode fromEnvironment() =>
-      parseSelector(const String.fromEnvironment(defineName));
+      parseEnvironmentSelector(const String.fromEnvironment(defineName));
+
+  static RynRuntimeDataMode parseEnvironmentSelector(String value) =>
+      switch (value.trim()) {
+        '' => RynRuntimeDataMode.standardDevelopment,
+        approvedQaSelector => RynRuntimeDataMode.tarotPersistenceQa,
+        _ => throw const RynDataProfileException(
+          'Unsupported runtime data mode.',
+        ),
+      };
+
+  static RynRuntimeDataMode parseHeadlessSelector(String value) => switch (value
+      .trim()) {
+    backupRecoveryQaSelector => RynRuntimeDataMode.tarotBackupRecoveryQa,
+    _ => throw const RynDataProfileException('Unsupported headless data mode.'),
+  };
 
   static RynRuntimeDataMode parseSelector(String value) => switch (value
       .trim()) {
     '' => RynRuntimeDataMode.standardDevelopment,
     approvedQaSelector => RynRuntimeDataMode.tarotPersistenceQa,
+    backupRecoveryQaSelector => RynRuntimeDataMode.tarotBackupRecoveryQa,
     _ => throw const RynDataProfileException('Unsupported runtime data mode.'),
   };
 }
@@ -27,8 +48,15 @@ abstract final class RynDataProfileContract {
   static const productDirectoryName = 'RynUniverseOS';
   static const developmentDatabaseFileName = 'ryn_universe_os_core_dev.sqlite';
   static const qaDatabaseFileName = 'ryn_universe_os_core_qa.sqlite';
+  static const backupRecoveryQaDatabaseFileName =
+      'ryn_universe_os_core_backup_recovery_qa.sqlite';
   static const productionDatabaseFileName = 'ryn_universe_os_core.sqlite';
   static const qaPurposeDirectoryName = 'core_tarot_self_reading_persistence1';
+  static const backupRecoveryQaPurposeDirectoryName =
+      'core_tarot_backup_recovery_v0_2';
+  static const backupOutputDirectoryName = 'backup_output';
+  static const recoverySafetyDirectoryName = 'recovery_safety';
+  static const recoveryWorkDirectoryName = 'recovery_work';
 
   static RynDataProfile parse(String value) => switch (value.trim()) {
     'development' => RynDataProfile.development,
@@ -53,6 +81,7 @@ final class RynResolvedDatabasePath {
     required this.environment,
     required this.purpose,
     required this.relativeDatabasePath,
+    required this.profileRootPath,
     required this.runtimeDirectoryPath,
     required this.databasePath,
   });
@@ -62,13 +91,27 @@ final class RynResolvedDatabasePath {
   final String environment;
   final String purpose;
   final String relativeDatabasePath;
+  final String profileRootPath;
   final String runtimeDirectoryPath;
   final String databasePath;
 
   bool get isStandardDevelopment =>
       runtimeMode == RynRuntimeDataMode.standardDevelopment;
   bool get isTaskSpecificQa =>
-      runtimeMode == RynRuntimeDataMode.tarotPersistenceQa;
+      runtimeMode == RynRuntimeDataMode.tarotPersistenceQa ||
+      runtimeMode == RynRuntimeDataMode.tarotBackupRecoveryQa;
+  bool get isBackupRecoveryQa =>
+      runtimeMode == RynRuntimeDataMode.tarotBackupRecoveryQa;
+  bool get isSyntheticOnly => isBackupRecoveryQa;
+
+  String get backupOutputDirectoryPath =>
+      p.join(profileRootPath, RynDataProfileContract.backupOutputDirectoryName);
+  String get recoverySafetyDirectoryPath => p.join(
+    profileRootPath,
+    RynDataProfileContract.recoverySafetyDirectoryName,
+  );
+  String get recoveryWorkDirectoryPath =>
+      p.join(profileRootPath, RynDataProfileContract.recoveryWorkDirectoryName);
 }
 
 typedef RynApplicationSupportRootProvider = Future<Directory> Function();
@@ -184,6 +227,7 @@ final class RynRuntimeDataPathContract {
       environment: profileDirectory,
       purpose: 'reserved',
       relativeDatabasePath: relativeDatabasePath,
+      profileRootPath: p.dirname(runtimeDirectoryPath),
       runtimeDirectoryPath: runtimeDirectoryPath,
       databasePath: p.join(runtimeDirectoryPath, fileName),
     );
@@ -204,12 +248,20 @@ final class RynRuntimeDataPathContract {
         RynDataProfileContract.qaPurposeDirectoryName,
         'runtime',
       ),
+      RynRuntimeDataMode.tarotBackupRecoveryQa => p.join(
+        'development',
+        'qa',
+        RynDataProfileContract.backupRecoveryQaPurposeDirectoryName,
+        'runtime',
+      ),
     };
     final fileName = switch (mode) {
       RynRuntimeDataMode.standardDevelopment =>
         RynDataProfileContract.developmentDatabaseFileName,
       RynRuntimeDataMode.tarotPersistenceQa =>
         RynDataProfileContract.qaDatabaseFileName,
+      RynRuntimeDataMode.tarotBackupRecoveryQa =>
+        RynDataProfileContract.backupRecoveryQaDatabaseFileName,
     };
     final runtimeDirectoryPath = p.join(
       applicationSupportRoot.path,
@@ -225,8 +277,11 @@ final class RynRuntimeDataPathContract {
         RynRuntimeDataMode.standardDevelopment => 'standard',
         RynRuntimeDataMode.tarotPersistenceQa =>
           RynDataProfileContract.qaPurposeDirectoryName,
+        RynRuntimeDataMode.tarotBackupRecoveryQa =>
+          RynDataProfileContract.backupRecoveryQaPurposeDirectoryName,
       },
       relativeDatabasePath: p.join(relativeRuntimeDirectory, fileName),
+      profileRootPath: p.dirname(runtimeDirectoryPath),
       runtimeDirectoryPath: runtimeDirectoryPath,
       databasePath: p.join(runtimeDirectoryPath, fileName),
     );
