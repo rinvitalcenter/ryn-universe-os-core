@@ -438,6 +438,17 @@ class _TarotUiText {
 // Future TAROT-SPREAD-LAYOUT2: revisit Celtic Cross overlap/spacing after the
 // FX foundation stabilizes; this task intentionally avoids layout micro-polish.
 
+typedef PersistCompletedTarotReading =
+    Future<bool> Function(
+      TarotReadingResultSnapshot snapshot,
+      int readingTimezoneOffsetMinutes,
+    );
+
+typedef SaveTarotInterpretation =
+    Future<bool> Function(TarotInterpretationSessionDraft draft);
+
+enum _TarotDraftPersistenceState { clean, dirty, saving, saved, failed }
+
 class TarotSpreadShell extends StatefulWidget {
   const TarotSpreadShell({
     super.key,
@@ -447,6 +458,8 @@ class TarotSpreadShell extends StatefulWidget {
     this.onOpenInRecords,
     this.onInterpretationDraftChanged,
     this.initialInterpretationDraft,
+    this.onPersistCompletedReading,
+    this.onSaveInterpretation,
   });
 
   final VoidCallback onBack;
@@ -457,6 +470,8 @@ class TarotSpreadShell extends StatefulWidget {
   onInterpretationDraftChanged;
   final TarotInterpretationSessionDraft? Function(String readingInstanceId)?
   initialInterpretationDraft;
+  final PersistCompletedTarotReading? onPersistCompletedReading;
+  final SaveTarotInterpretation? onSaveInterpretation;
 
   @override
   State<TarotSpreadShell> createState() => _TarotSpreadShellState();
@@ -519,11 +534,15 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   Uint8List? _interpretationSnapshotBytes;
   String? _pendingReadingInstanceId;
   DateTime? _pendingReadingAt;
+  int? _pendingReadingTimezoneOffsetMinutes;
   TarotReadingResultSnapshot? _frozenResultSnapshot;
   TarotInterpretationSessionDraft? _interpretationDraft;
   TarotInterpretationSessionDraft? _lastRetainedInterpretationDraft;
   bool _hasAppliedInterpretationDraft = false;
   String? _completionEmittedReadingInstanceId;
+  String? _persistedReadingInstanceId;
+  _TarotDraftPersistenceState _draftPersistenceState =
+      _TarotDraftPersistenceState.clean;
   late List<String> _positionLabels;
   _TarotDrawPhase _phase = _TarotDrawPhase.beforeShuffle;
   _TarotFlowStage _stage = _TarotFlowStage.setup;
@@ -705,6 +724,8 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     _lastRetainedInterpretationDraft = null;
     _hasAppliedInterpretationDraft = false;
     _completionEmittedReadingInstanceId = null;
+    _persistedReadingInstanceId = null;
+    _draftPersistenceState = _TarotDraftPersistenceState.clean;
   }
 
   void _prepareFreshDeck({required bool clearDrawn}) {
@@ -718,6 +739,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
       _interpretationSnapshotBytes = null;
       _pendingReadingInstanceId = null;
       _pendingReadingAt = null;
+      _pendingReadingTimezoneOffsetMinutes = null;
       _frozenResultSnapshot = null;
       _resetInterpretationLifecycleState();
     }
@@ -833,8 +855,11 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   void _enterResultStage() {
     if (!_isComplete) return;
     if (_pendingReadingInstanceId == null || _pendingReadingAt == null) {
-      final readingAt = DateTime.now().toUtc();
+      final completionContext = DateTime.now();
+      final readingAt = completionContext.toUtc();
       _pendingReadingAt = readingAt;
+      _pendingReadingTimezoneOffsetMinutes =
+          completionContext.timeZoneOffset.inMinutes;
       _pendingReadingInstanceId = _newReadingInstanceId(readingAt);
     }
     _revealedResultIndexes.clear();
@@ -901,7 +926,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     setState(_enterResultStage);
   }
 
-  void _showInterpretation(GlobalKey resultBoundaryKey) {
+  Future<void> _showInterpretation(GlobalKey resultBoundaryKey) async {
     if (!_isComplete) return;
 
     late final TarotReadingResultSnapshot snapshot;
@@ -914,6 +939,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
       return;
     }
 
+    if (!await _persistCompletedReading(snapshot)) return;
     _emitCompletedResultOnce(snapshot);
     final restoredDraft = widget.initialInterpretationDraft?.call(
       snapshot.readingInstanceId,
@@ -925,6 +951,9 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         );
     _lastRetainedInterpretationDraft ??= restoredDraft ?? _interpretationDraft;
     _hasAppliedInterpretationDraft = restoredDraft != null;
+    _draftPersistenceState = restoredDraft == null
+        ? _TarotDraftPersistenceState.clean
+        : _TarotDraftPersistenceState.saved;
     setState(() {
       _interpretationSnapshotBytes = null;
       _stage = _TarotFlowStage.interpretation;
@@ -938,6 +967,29 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
           if (!mounted || _stage != _TarotFlowStage.interpretation) return;
           setState(() => _interpretationSnapshotBytes = null);
         });
+  }
+
+  Future<bool> _persistCompletedReading(
+    TarotReadingResultSnapshot snapshot,
+  ) async {
+    if (_persistedReadingInstanceId == snapshot.readingInstanceId) return true;
+    final callback = widget.onPersistCompletedReading;
+    if (callback == null) {
+      _persistedReadingInstanceId = snapshot.readingInstanceId;
+      return true;
+    }
+    final offset = _pendingReadingTimezoneOffsetMinutes;
+    if (offset == null) return false;
+    final saved = await callback(snapshot, offset);
+    if (!mounted) return false;
+    if (!saved) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(content: Text('저장하지 못했어요. 다시 시도해 주세요.')));
+      return false;
+    }
+    _persistedReadingInstanceId = snapshot.readingInstanceId;
+    return true;
   }
 
   TarotReadingResultSnapshot? _completedSnapshot() {
@@ -966,7 +1018,10 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     if (draft.readingInstanceId != _interpretationDraft?.readingInstanceId) {
       return;
     }
-    setState(() => _interpretationDraft = draft);
+    setState(() {
+      _interpretationDraft = draft;
+      _draftPersistenceState = _TarotDraftPersistenceState.dirty;
+    });
   }
 
   bool get _interpretationDraftIsDirty {
@@ -976,30 +1031,50 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         (retained == null || !draft.hasSameContentAs(retained));
   }
 
-  void _applyInterpretationDraft() {
+  Future<bool> _applyInterpretationDraft() async {
     final draft = _interpretationDraft;
-    if (draft == null) return;
+    if (draft == null) return true;
+    if (!_interpretationDraftIsDirty &&
+        _draftPersistenceState == _TarotDraftPersistenceState.saved) {
+      return true;
+    }
+    final save = widget.onSaveInterpretation;
+    if (save != null) {
+      setState(
+        () => _draftPersistenceState = _TarotDraftPersistenceState.saving,
+      );
+      final succeeded = await save(draft);
+      if (!mounted) return false;
+      if (!succeeded) {
+        setState(
+          () => _draftPersistenceState = _TarotDraftPersistenceState.failed,
+        );
+        return false;
+      }
+    }
     widget.onInterpretationDraftChanged?.call(draft);
     setState(() {
       _lastRetainedInterpretationDraft = draft;
       _hasAppliedInterpretationDraft = true;
+      _draftPersistenceState = _TarotDraftPersistenceState.saved;
     });
+    return true;
   }
 
-  void _finishToHome() {
-    _applyInterpretationDraft();
+  Future<void> _finishToHome() async {
+    if (!await _applyInterpretationDraft()) return;
     final snapshot = _completedSnapshot();
     if (snapshot != null) widget.onFinishToHome?.call(snapshot);
   }
 
-  void _openInRecords() {
-    _applyInterpretationDraft();
+  Future<void> _openInRecords() async {
+    if (!await _applyInterpretationDraft()) return;
     final snapshot = _completedSnapshot();
     if (snapshot != null) widget.onOpenInRecords?.call(snapshot);
   }
 
-  void _startNewReadingFromInterpretation() {
-    _applyInterpretationDraft();
+  Future<void> _startNewReadingFromInterpretation() async {
+    if (!await _applyInterpretationDraft()) return;
     _resetDraw();
   }
 
@@ -1013,7 +1088,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('작성 중인 해석을 두고 나갈까요?'),
-        content: const Text('현재 앱 실행 동안 초안은 유지되지만, 앱을 닫으면 비워집니다.'),
+        content: const Text('저장한 뒤 리딩 화면으로 돌아갑니다.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -1027,7 +1102,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
       ),
     );
     if (leave == true && mounted) {
-      _applyInterpretationDraft();
+      if (!await _applyInterpretationDraft()) return;
       widget.onBack();
     }
   }
@@ -1209,6 +1284,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         onDraftChanged: _updateInterpretationDraft,
         draftIsDirty: _interpretationDraftIsDirty,
         draftIsApplied: _hasAppliedInterpretationDraft,
+        persistenceState: _draftPersistenceState,
         onApplyDraft: _applyInterpretationDraft,
         onBackToResult: () => setState(() => _stage = _TarotFlowStage.result),
         onReset: _startNewReadingFromInterpretation,
@@ -4906,6 +4982,7 @@ class _TarotInterpretationStage extends StatelessWidget {
     required this.onDraftChanged,
     required this.draftIsDirty,
     required this.draftIsApplied,
+    required this.persistenceState,
     required this.onApplyDraft,
     required this.onBackToResult,
     required this.onReset,
@@ -4922,6 +4999,7 @@ class _TarotInterpretationStage extends StatelessWidget {
   final ValueChanged<TarotInterpretationSessionDraft> onDraftChanged;
   final bool draftIsDirty;
   final bool draftIsApplied;
+  final _TarotDraftPersistenceState persistenceState;
   final VoidCallback onApplyDraft;
   final VoidCallback onBackToResult;
   final VoidCallback onReset;
@@ -5022,6 +5100,7 @@ class _TarotInterpretationStage extends StatelessWidget {
                   onDraftChanged: onDraftChanged,
                   draftIsDirty: draftIsDirty,
                   draftIsApplied: draftIsApplied,
+                  persistenceState: persistenceState,
                   onApplyDraft: onApplyDraft,
                   onFinishToHome: onFinishToHome,
                   onOpenInRecords: onOpenInRecords,
@@ -5047,6 +5126,7 @@ class _TarotInterpretationShell extends StatelessWidget {
     required this.onDraftChanged,
     required this.draftIsDirty,
     required this.draftIsApplied,
+    required this.persistenceState,
     required this.onApplyDraft,
     required this.onFinishToHome,
     required this.onOpenInRecords,
@@ -5062,6 +5142,7 @@ class _TarotInterpretationShell extends StatelessWidget {
   final ValueChanged<TarotInterpretationSessionDraft> onDraftChanged;
   final bool draftIsDirty;
   final bool draftIsApplied;
+  final _TarotDraftPersistenceState persistenceState;
   final VoidCallback onApplyDraft;
   final VoidCallback onFinishToHome;
   final VoidCallback onOpenInRecords;
@@ -5182,6 +5263,7 @@ class _TarotInterpretationShell extends StatelessWidget {
                     onDraftChanged: onDraftChanged,
                     draftIsDirty: draftIsDirty,
                     draftIsApplied: draftIsApplied,
+                    persistenceState: persistenceState,
                     onApplyDraft: onApplyDraft,
                   ),
                   const SizedBox(height: 14),
@@ -5213,6 +5295,7 @@ class _TarotInterpretationShell extends StatelessWidget {
                         onDraftChanged: onDraftChanged,
                         draftIsDirty: draftIsDirty,
                         draftIsApplied: draftIsApplied,
+                        persistenceState: persistenceState,
                         onApplyDraft: onApplyDraft,
                         bounded: true,
                         completionDock: completionDock,
@@ -5339,6 +5422,7 @@ class _TarotInterpretationStoryNotesPanel extends StatelessWidget {
     required this.onDraftChanged,
     required this.draftIsDirty,
     required this.draftIsApplied,
+    required this.persistenceState,
     required this.onApplyDraft,
     this.completionDock,
     this.bounded = false,
@@ -5351,12 +5435,28 @@ class _TarotInterpretationStoryNotesPanel extends StatelessWidget {
   final ValueChanged<TarotInterpretationSessionDraft> onDraftChanged;
   final bool draftIsDirty;
   final bool draftIsApplied;
+  final _TarotDraftPersistenceState persistenceState;
   final VoidCallback onApplyDraft;
   final Widget? completionDock;
   final bool bounded;
 
   @override
   Widget build(BuildContext context) {
+    final saveStatusLabel = switch (persistenceState) {
+      _TarotDraftPersistenceState.dirty => '저장하지 않은 변경 사항이 있어요',
+      _TarotDraftPersistenceState.saving => '저장 중',
+      _TarotDraftPersistenceState.saved => '저장됨',
+      _TarotDraftPersistenceState.failed =>
+        '저장하지 못했어요. 작성한 내용은 화면에 그대로 남아 있어요.',
+      _TarotDraftPersistenceState.clean => '저장할 변경 사항이 없어요',
+    };
+    final saveStatusKey = switch (persistenceState) {
+      _TarotDraftPersistenceState.dirty => 'tarot-interpretation-dirty-state',
+      _TarotDraftPersistenceState.saving => 'tarot-interpretation-saving-state',
+      _TarotDraftPersistenceState.saved => 'tarot-interpretation-applied-state',
+      _TarotDraftPersistenceState.failed => 'tarot-interpretation-failed-state',
+      _TarotDraftPersistenceState.clean => 'tarot-interpretation-clean-state',
+    };
     final fields = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -5403,29 +5503,18 @@ class _TarotInterpretationStoryNotesPanel extends StatelessWidget {
         const SizedBox(height: 12),
         Semantics(
           liveRegion: true,
-          label: draftIsDirty
-              ? '변경 사항 있음'
-              : draftIsApplied
-              ? '현재 실행에 반영됨'
-              : '반영할 변경 없음',
+          label: saveStatusLabel,
           child: Row(
             children: [
               Expanded(
                 child: Text(
-                  draftIsDirty
-                      ? '변경 사항 있음'
-                      : draftIsApplied
-                      ? '현재 실행에 반영됨'
-                      : '반영할 변경 없음',
-                  key: Key(
-                    draftIsDirty
-                        ? 'tarot-interpretation-dirty-state'
-                        : draftIsApplied
-                        ? 'tarot-interpretation-applied-state'
-                        : 'tarot-interpretation-clean-state',
-                  ),
+                  saveStatusLabel,
+                  key: Key(saveStatusKey),
                   style: TextStyle(
-                    color: draftIsDirty
+                    color:
+                        persistenceState == _TarotDraftPersistenceState.dirty ||
+                            persistenceState ==
+                                _TarotDraftPersistenceState.failed
                         ? RynPalette.tarotGoldAccent(context)
                         : RynPalette.tarotPurpleAccent(context),
                     fontSize: 12,
@@ -5433,18 +5522,25 @@ class _TarotInterpretationStoryNotesPanel extends StatelessWidget {
                   ),
                 ),
               ),
-              OutlinedButton.icon(
+              KeyedSubtree(
                 key: const Key('tarot-interpretation-apply-action'),
-                onPressed: draftIsDirty ? onApplyDraft : null,
-                icon: const Icon(Icons.check_rounded, size: 16),
-                label: const Text('해석 반영'),
+                child: OutlinedButton.icon(
+                  key: const Key('tarot-interpretation-save-action'),
+                  onPressed:
+                      persistenceState == _TarotDraftPersistenceState.saving ||
+                          !draftIsDirty
+                      ? null
+                      : onApplyDraft,
+                  icon: const Icon(Icons.save_rounded, size: 16),
+                  label: const Text('저장'),
+                ),
               ),
             ],
           ),
         ),
         const SizedBox(height: 8),
         const Text(
-          '앱을 닫으면 작성한 해석은 비워집니다.',
+          '저장된 해석은 앱을 다시 열어도 이어집니다.',
           style: TextStyle(
             color: Colors.white54,
             fontSize: 11,
@@ -5626,7 +5722,7 @@ class _TarotReadingCompletionArea extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '결과와 작성 중인 해석은 앱을 닫기 전까지 이어집니다.',
+            '저장하지 않은 해석은 앱을 닫기 전까지 이어집니다.',
             style: TextStyle(
               color: RynPalette.tarotPurpleAccent(context),
               fontSize: 11.5,

@@ -2,8 +2,8 @@ import 'package:drift/drift.dart';
 
 import '../../features/tarot/data/persistence/tarot_tables.dart';
 import 'database_connection.dart';
-import 'database_paths.dart';
 import 'migrations.dart';
+import 'runtime_data_profile.dart';
 
 part 'app_database.g.dart';
 
@@ -323,14 +323,12 @@ class ApprovalRecords extends Table {
 final class RynAppDatabase extends _$RynAppDatabase {
   RynAppDatabase(super.executor);
 
-  /// Opens the future runtime SQLite database using the approved path strategy.
-  ///
-  /// No production caller is introduced by the Tarot schema/repository phase.
-  static Future<RynAppDatabase> open({
-    String databaseFileName = defaultRynDatabaseFileName,
+  /// Opens only the explicitly resolved development SQLite database.
+  static Future<RynAppDatabase> openDevelopment({
+    required RynResolvedDatabasePath resolvedPath,
   }) async {
     final executor = await openRynRuntimeDatabaseConnection(
-      databaseFileName: databaseFileName,
+      resolvedPath: resolvedPath,
     );
     return RynAppDatabase(executor);
   }

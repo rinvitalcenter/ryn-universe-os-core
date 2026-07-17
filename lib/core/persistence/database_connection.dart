@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 
-import 'database_paths.dart';
+import 'runtime_data_profile.dart';
 
 /// Creates the low-level Drift query executor for the future local runtime DB.
 ///
@@ -11,12 +11,18 @@ import 'database_paths.dart';
 /// It does not define tables, DAOs, repositories, CRUD operations, migrations,
 /// backup/export/restore behavior, secure storage, or UI/Riverpod wiring.
 Future<QueryExecutor> openRynRuntimeDatabaseConnection({
-  String databaseFileName = defaultRynDatabaseFileName,
+  required RynResolvedDatabasePath resolvedPath,
 }) async {
-  final runtimeDirectory = await ensureRuntimeDatabaseDirectory();
-  final databaseFile = File(
-    '${runtimeDirectory.path}${Platform.pathSeparator}$databaseFileName',
-  );
+  if (resolvedPath.profile != RynDataProfile.development) {
+    throw const RynDataProfileException(
+      'Only the development data profile may open a runtime database.',
+    );
+  }
+  final runtimeDirectory = Directory(resolvedPath.runtimeDirectoryPath);
+  if (!runtimeDirectory.existsSync()) {
+    await runtimeDirectory.create(recursive: true);
+  }
+  final databaseFile = File(resolvedPath.databasePath);
 
   return NativeDatabase.createInBackground(databaseFile);
 }

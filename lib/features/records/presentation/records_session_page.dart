@@ -11,6 +11,7 @@ class RecordsSessionPage extends StatelessWidget {
     required this.onOpenDetail,
     required this.onShowOnHome,
     required this.onStartSelfTarot,
+    this.questionDisplayTextFor,
     super.key,
   });
 
@@ -19,6 +20,7 @@ class RecordsSessionPage extends StatelessWidget {
   final ValueChanged<TarotReadingResultSnapshot> onOpenDetail;
   final ValueChanged<TarotReadingResultSnapshot> onShowOnHome;
   final VoidCallback onStartSelfTarot;
+  final String Function(String readingInstanceId)? questionDisplayTextFor;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +54,11 @@ class RecordsSessionPage extends StatelessWidget {
               for (var index = 0; index < results.length; index++) ...[
                 _ResultRow(
                   snapshot: results[index],
+                  questionDisplayText:
+                      questionDisplayTextFor?.call(
+                        results[index].readingInstanceId,
+                      ) ??
+                      results[index].readingQuestionText,
                   isActive:
                       results[index].readingInstanceId ==
                       activeReadingInstanceId,
@@ -82,7 +89,7 @@ class _SessionNote extends StatelessWidget {
         const SizedBox(width: 7),
         Flexible(
           child: Text(
-            '앱을 닫으면 이 목록은 비워집니다.',
+            '저장된 리딩은 앱을 다시 열어도 이어집니다.',
             style: TextStyle(color: colors.onSurfaceVariant, fontSize: 12.5),
           ),
         ),
@@ -140,12 +147,14 @@ class _EmptyRecords extends StatelessWidget {
 class _ResultRow extends StatelessWidget {
   const _ResultRow({
     required this.snapshot,
+    required this.questionDisplayText,
     required this.isActive,
     required this.onOpenDetail,
     required this.onShowOnHome,
   });
 
   final TarotReadingResultSnapshot snapshot;
+  final String questionDisplayText;
   final bool isActive;
   final VoidCallback onOpenDetail;
   final VoidCallback onShowOnHome;
@@ -189,7 +198,7 @@ class _ResultRow extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                snapshot.readingQuestionText,
+                questionDisplayText,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(

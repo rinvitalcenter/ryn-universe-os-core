@@ -14,11 +14,13 @@ class HomeTarotHero extends StatefulWidget {
     required this.onOpenRecords,
     required this.onOpenResult,
     required this.onHideResult,
+    this.questionDisplayText,
     this.minHeight = 520,
     super.key,
   });
 
   final TarotReadingResultSnapshot snapshot;
+  final String? questionDisplayText;
   final VoidCallback onOpenRecords;
   final VoidCallback onOpenResult;
   final VoidCallback onHideResult;
@@ -60,6 +62,8 @@ class _HomeTarotHeroState extends State<HomeTarotHero> {
           final compact = constraints.maxWidth < 860;
           final narrative = _ResultNarrative(
             snapshot: snapshot,
+            questionDisplayText:
+                widget.questionDisplayText ?? snapshot.readingQuestionText,
             showFullQuestion: _showFullQuestion,
             onToggleQuestion: () =>
                 setState(() => _showFullQuestion = !_showFullQuestion),
@@ -99,6 +103,7 @@ class _HomeTarotHeroState extends State<HomeTarotHero> {
 class _ResultNarrative extends StatelessWidget {
   const _ResultNarrative({
     required this.snapshot,
+    required this.questionDisplayText,
     required this.showFullQuestion,
     required this.onToggleQuestion,
     required this.onOpenRecords,
@@ -107,6 +112,7 @@ class _ResultNarrative extends StatelessWidget {
   });
 
   final TarotReadingResultSnapshot snapshot;
+  final String questionDisplayText;
   final bool showFullQuestion;
   final VoidCallback onToggleQuestion;
   final VoidCallback onOpenRecords;
@@ -118,7 +124,7 @@ class _ResultNarrative extends StatelessWidget {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final foreground = dark ? const Color(0xFFF7F1E8) : const Color(0xFF20283A);
     final muted = dark ? const Color(0xFFADB3C2) : const Color(0xFF697085);
-    final longQuestion = snapshot.readingQuestionText.characters.length > 48;
+    final longQuestion = questionDisplayText.characters.length > 48;
     final time = KoreanDateTimeFormatter.compact(snapshot.readingAt);
 
     return Column(
@@ -136,7 +142,7 @@ class _ResultNarrative extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text(
-          snapshot.readingQuestionText,
+          questionDisplayText,
           maxLines: showFullQuestion ? null : 3,
           overflow: showFullQuestion ? TextOverflow.visible : TextOverflow.fade,
           style: TextStyle(

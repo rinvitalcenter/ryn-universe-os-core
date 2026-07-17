@@ -18,6 +18,34 @@ final class SessionTarotResults {
     return null;
   }
 
+  void hydrate(
+    List<TarotReadingResultSnapshot> snapshots, {
+    required String? activeReadingInstanceId,
+  }) {
+    final ids = <String>{};
+    for (final snapshot in snapshots) {
+      if (!ids.add(snapshot.readingInstanceId)) {
+        throw ArgumentError.value(
+          snapshot.readingInstanceId,
+          'snapshots',
+          'must not contain duplicate reading IDs',
+        );
+      }
+    }
+    if (activeReadingInstanceId != null &&
+        !ids.contains(activeReadingInstanceId)) {
+      throw ArgumentError.value(
+        activeReadingInstanceId,
+        'activeReadingInstanceId',
+        'must identify a hydrated reading',
+      );
+    }
+    _results
+      ..clear()
+      ..addAll(snapshots);
+    _activeReadingInstanceId = activeReadingInstanceId;
+  }
+
   void complete(TarotReadingResultSnapshot snapshot) {
     final index = _results.indexWhere(
       (item) => item.readingInstanceId == snapshot.readingInstanceId,

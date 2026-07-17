@@ -446,12 +446,12 @@ void main() {
     );
   }
 
-  test('return-loop copy does not claim restart persistence', () {
+  test('return-loop copy distinguishes saved and unsaved interpretation', () {
     final source = File(
       'lib/features/tarot/tarot_spread_shell.dart',
     ).readAsStringSync();
-    expect(source.contains('결과와 작성 중인 해석은 앱을 닫기 전까지 이어집니다.'), isTrue);
-    expect(source.contains('앱을 다시 열어도'), isFalse);
+    expect(source.contains('저장된 해석은 앱을 다시 열어도 이어집니다.'), isTrue);
+    expect(source.contains('저장하지 않은 해석은 앱을 닫기 전까지 이어집니다.'), isTrue);
     expect(source.contains('영구 저장'), isFalse);
   });
 }

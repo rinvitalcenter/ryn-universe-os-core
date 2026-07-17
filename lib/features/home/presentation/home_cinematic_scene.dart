@@ -14,6 +14,7 @@ class HomeCinematicScene extends StatelessWidget {
     required this.onOpenPeople,
     this.onOpenResult,
     this.onHideResult,
+    this.questionDisplayText,
     super.key,
   });
 
@@ -24,6 +25,7 @@ class HomeCinematicScene extends StatelessWidget {
   final VoidCallback onOpenPeople;
   final VoidCallback? onOpenResult;
   final VoidCallback? onHideResult;
+  final String? questionDisplayText;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +53,7 @@ class HomeCinematicScene extends StatelessWidget {
                 )
               : HomeTarotHero(
                   snapshot: activeTarotResult!,
+                  questionDisplayText: questionDisplayText,
                   onOpenRecords: onOpenRecords,
                   onOpenResult: onOpenResult ?? onOpenRecords,
                   onHideResult: onHideResult ?? () {},

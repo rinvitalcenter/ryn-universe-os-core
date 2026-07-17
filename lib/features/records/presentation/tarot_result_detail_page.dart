@@ -16,11 +16,13 @@ class TarotResultDetailPage extends StatelessWidget {
     required this.onShowOnHome,
     required this.onHideFromHome,
     this.interpretationDraft,
+    this.questionDisplayText,
     super.key,
   });
 
   final TarotReadingResultSnapshot snapshot;
   final TarotInterpretationSessionDraft? interpretationDraft;
+  final String? questionDisplayText;
   final bool isActiveOnHome;
   final VoidCallback onBack;
   final VoidCallback onShowOnHome;
@@ -81,7 +83,7 @@ class TarotResultDetailPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  snapshot.readingQuestionText,
+                  questionDisplayText ?? snapshot.readingQuestionText,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w800,
                     height: 1.25,

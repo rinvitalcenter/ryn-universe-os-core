@@ -699,10 +699,7 @@ void main() {
       await tester.pumpAndSettle();
       await completeOneCardReading(uprightOnly: true);
       expect(delivered, hasLength(2));
-      expect(
-        delivered.last.readingInstanceId,
-        isNot(first.readingInstanceId),
-      );
+      expect(delivered.last.readingInstanceId, isNot(first.readingInstanceId));
       expect(
         delivered.last.placements.single.orientation,
         TarotCardOrientation.notUsed,
@@ -962,7 +959,13 @@ void main() {
     );
     expect(tarotSource.contains('selectedDeckCardIds:'), isTrue);
     expect(
-      mainSource.contains('SessionTarotResults _sessionTarotResults'),
+      mainSource.contains('SessionTarotResults _sessionOnlyTarotResults'),
+      isTrue,
+    );
+    expect(
+      mainSource.contains(
+        'widget.runtimeController?.sessionResults ?? _sessionOnlyTarotResults',
+      ),
       isTrue,
     );
     expect(homeSource.contains('placement.cardNameSnapshot'), isTrue);
