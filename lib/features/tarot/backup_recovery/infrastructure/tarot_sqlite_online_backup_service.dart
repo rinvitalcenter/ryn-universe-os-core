@@ -407,6 +407,13 @@ Future<void> _deleteFile(File file) => file.delete();
 
 void _rejectProtectedRuntimePath(String path) {
   final normalized = path.replaceAll('\\', '/').toLowerCase();
+  final systemTemp = Directory.systemTemp.absolute.path
+      .replaceAll('\\', '/')
+      .replaceFirst(RegExp(r'/+$'), '')
+      .toLowerCase();
+  if (normalized == systemTemp || normalized.startsWith('$systemTemp/')) {
+    return;
+  }
   const protectedFragments = <String>[
     '/rinvitalcenter/rynuniverseos/development/runtime/ryn_universe_os_core_dev.sqlite',
     '/rinvitalcenter/rynuniverseos/development/qa/core_tarot_self_reading_persistence1/',

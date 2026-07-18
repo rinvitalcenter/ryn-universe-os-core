@@ -8,6 +8,9 @@ import '../../../core/persistence/migrations.dart';
 import '../../../core/persistence/runtime_data_profile.dart';
 import '../../../core/repositories/repository_result.dart';
 import '../../records/models/session_tarot_results.dart';
+import '../backup_recovery/application/tarot_restore_coordinator.dart';
+import '../backup_recovery/application/tarot_restore_startup_recovery_coordinator.dart';
+import '../backup_recovery/infrastructure/tarot_backup_path_contract.dart';
 import '../data/persistence/drift_tarot_reading_repository.dart';
 import '../data/persistence/tarot_reading_repository.dart';
 import '../domain/tarot_persistence_models.dart';
@@ -57,6 +60,7 @@ final class TarotRuntimeController extends ChangeNotifier {
   TarotRuntimeController.development({
     RynRuntimeDataPathContract? pathContract,
     RynRuntimeDataMode? runtimeDataMode,
+    this.startupRecoveryCoordinator,
   }) : _pathContract = pathContract ?? RynRuntimeDataPathContract(),
        _runtimeDataMode =
            runtimeDataMode ?? RynRuntimeDataModeContract.fromEnvironment();
@@ -71,7 +75,8 @@ final class TarotRuntimeController extends ChangeNotifier {
        _pathContract = RynRuntimeDataPathContract.forApplicationSupportRoot(
          Directory.systemTemp,
        ),
-       _runtimeDataMode = RynRuntimeDataMode.standardDevelopment {
+       _runtimeDataMode = RynRuntimeDataMode.standardDevelopment,
+       startupRecoveryCoordinator = null {
     _startupStatus = status;
     if (status == TarotRuntimeStartupStatus.recoveryRequired) {
       _failure = const TarotRuntimeFailure(
@@ -90,6 +95,7 @@ final class TarotRuntimeController extends ChangeNotifier {
 
   final RynRuntimeDataPathContract _pathContract;
   final RynRuntimeDataMode _runtimeDataMode;
+  final TarotRestoreStartupRecoveryCoordinator? startupRecoveryCoordinator;
   final SessionTarotResults _sessionResults = SessionTarotResults();
   final Map<String, TarotInterpretationSessionDraft> _drafts = {};
   final Map<String, TarotInterpretationSessionDraft> _lastSavedDrafts = {};
@@ -102,11 +108,15 @@ final class TarotRuntimeController extends ChangeNotifier {
       TarotRuntimeStartupStatus.initializing;
   TarotRuntimeFailure? _failure;
   String? _databasePath;
+  TarotRestoreStartupRecoveryResult? _startupRecoveryResult;
   bool _closed = false;
 
   TarotRuntimeStartupStatus get startupStatus => _startupStatus;
   TarotRuntimeFailure? get failure => _failure;
   String? get databasePath => _databasePath;
+  RynRuntimeDataMode get runtimeDataMode => _runtimeDataMode;
+  TarotRestoreStartupRecoveryResult? get startupRecoveryResult =>
+      _startupRecoveryResult;
   bool get isClosed => _closed;
   SessionTarotResults get sessionResults => _sessionResults;
   List<TarotReadingResultSnapshot> get snapshots => _sessionResults.results;
@@ -136,6 +146,7 @@ final class TarotRuntimeController extends ChangeNotifier {
     _closed = false;
     _startupStatus = TarotRuntimeStartupStatus.initializing;
     _failure = null;
+    _startupRecoveryResult = null;
     _records = const [];
     _drafts.clear();
     _lastSavedDrafts.clear();
@@ -149,10 +160,19 @@ final class TarotRuntimeController extends ChangeNotifier {
         _runtimeDataMode,
       );
       _databasePath = resolvedPath.databasePath;
+      await _recoverInterruptedRestore(resolvedPath);
+      if (_startupRecoveryResult?.requiresManualRecovery ?? false) {
+        _setStartupFailure(
+          TarotRuntimeFailureCategory.loadFailed,
+          _startupRecoveryResult!.failureCode ??
+              'startup_restore_recovery_required',
+        );
+        return;
+      }
       _verifyExistingSchemaBeforeOpen(resolvedPath.databasePath);
-      final database = await RynAppDatabase.openDevelopment(
-        resolvedPath: resolvedPath,
-      );
+      final database =
+          _database ??
+          await RynAppDatabase.openDevelopment(resolvedPath: resolvedPath);
       _database = database;
       _repository = DriftTarotReadingRepository(database);
       await database.customSelect('PRAGMA user_version').getSingle();
@@ -268,9 +288,54 @@ final class TarotRuntimeController extends ChangeNotifier {
     return true;
   }
 
+  TarotRestoreRuntimeLifecycle syntheticRestoreLifecycle(
+    RynResolvedDatabasePath resolvedPath,
+  ) {
+    if (_runtimeDataMode != RynRuntimeDataMode.tarotBackupRecoveryQa ||
+        !resolvedPath.isSyntheticOnly ||
+        resolvedPath.databasePath != _databasePath) {
+      throw StateError('restore lifecycle is unavailable outside synthetic QA');
+    }
+    return _RuntimeRestoreLifecycle(this, resolvedPath);
+  }
+
   Future<void> close() async {
     await _closeDatabase();
     _closed = true;
+  }
+
+  Future<void> _recoverInterruptedRestore(
+    RynResolvedDatabasePath resolvedPath,
+  ) async {
+    final coordinator = startupRecoveryCoordinator;
+    if (coordinator == null ||
+        _runtimeDataMode != RynRuntimeDataMode.tarotBackupRecoveryQa ||
+        !Directory(resolvedPath.runtimeDirectoryPath).existsSync()) {
+      return;
+    }
+    final recoveryPaths = TarotBackupPathContract(
+      sourceRootPath: resolvedPath.runtimeDirectoryPath,
+      backupRootPath: resolvedPath.backupOutputDirectoryPath,
+      protectedRootPaths: const <String>[],
+    ).resolve();
+    _startupRecoveryResult = await coordinator.recoverIfNeeded(
+      liveDatabasePath: resolvedPath.databasePath,
+      resolvedPaths: recoveryPaths,
+      lifecycle: _RuntimeRestoreLifecycle(this, resolvedPath),
+    );
+  }
+
+  Future<void> _reopenForRestore(RynResolvedDatabasePath resolvedPath) async {
+    await _closeDatabase();
+    _database = await RynAppDatabase.openDevelopment(
+      resolvedPath: resolvedPath,
+    );
+  }
+
+  Future<void> _validateBasicRestoreRead() async {
+    final database = _database;
+    if (database == null) throw StateError('restore runtime is closed');
+    await database.customSelect('PRAGMA user_version').getSingle();
   }
 
   void _verifyExistingSchemaBeforeOpen(String path) {
@@ -416,4 +481,20 @@ final class TarotRuntimeController extends ChangeNotifier {
       }
     }
   }
+}
+
+final class _RuntimeRestoreLifecycle implements TarotRestoreRuntimeLifecycle {
+  const _RuntimeRestoreLifecycle(this.controller, this.resolvedPath);
+
+  final TarotRuntimeController controller;
+  final RynResolvedDatabasePath resolvedPath;
+
+  @override
+  Future<void> close() => controller._closeDatabase();
+
+  @override
+  Future<void> reopen() => controller._reopenForRestore(resolvedPath);
+
+  @override
+  Future<void> validateBasicRead() => controller._validateBasicRestoreRead();
 }

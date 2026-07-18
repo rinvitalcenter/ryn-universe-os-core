@@ -1,7 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:drift/native.dart';
+import 'package:ryn_universe_os_core/core/backup_recovery/sha256_digest_service.dart';
 import 'package:ryn_universe_os_core/core/persistence/app_database.dart';
+import 'package:ryn_universe_os_core/features/tarot/backup_recovery/domain/tarot_backup_manifest.dart';
+import 'package:ryn_universe_os_core/features/tarot/backup_recovery/infrastructure/tarot_backup_database_inspector.dart';
+import 'package:ryn_universe_os_core/features/tarot/backup_recovery/infrastructure/tarot_backup_manifest_codec.dart';
 import 'package:ryn_universe_os_core/features/tarot/backup_recovery/infrastructure/tarot_backup_path_contract.dart';
 import 'package:sqlite3/sqlite3.dart';
 
@@ -147,6 +152,109 @@ final class TarotBackupRecoveryFixture {
       'SELECT count(*) FROM app_runtime_state',
     ),
   };
+
+  Future<Directory> createRestoreCandidate({
+    DateTime? createdAtUtc,
+    String operationId = 'a1b2c3d4',
+  }) async {
+    final createdAt = createdAtUtc ?? DateTime.utc(2026, 7, 17, 1, 2, 3);
+    final package = resolvedPaths()
+        .packagePaths(createdAtUtc: createdAt, operationId: operationId)
+        .finalDirectory;
+    final data = Directory('${package.path}${Platform.pathSeparator}data');
+    final checksums = Directory(
+      '${package.path}${Platform.pathSeparator}checksums',
+    );
+    await data.create(recursive: true);
+    await checksums.create();
+    final snapshot = File(
+      '${package.path}${Platform.pathSeparator}'
+      '${TarotBackupManifest.databasePayloadFilename.replaceAll('/', Platform.pathSeparator)}',
+    );
+    await sourceFile.copy(snapshot.path);
+    final evidence = const TarotBackupDatabaseInspector().inspectVerified(
+      snapshot.path,
+      policy: TarotDatabaseInspectionPolicy.immutableReadOnlyFrozenTarget,
+      requireAcceptableSidecars: true,
+    );
+    const digest = DartSha256DigestService();
+    final payloadHash = await digest.digestFile(snapshot);
+    final manifest = TarotBackupManifest(
+      applicationVersion: '1.0.0+1',
+      sourceRuntimeMode: 'tarot_backup_recovery_qa',
+      sourceEnvironment: 'development',
+      sourcePurpose: 'core_tarot_backup_recovery_v0_2',
+      createdAtUtc: createdAt,
+      databasePayloadSizeBytes: await snapshot.length(),
+      databasePayloadSha256: payloadHash,
+      requiredTables: TarotBackupManifest.requiredTablesV1,
+      requiredColumnsByTable: TarotBackupManifest.requiredColumnsByTableV1,
+      tableRowCounts: evidence.tableRowCounts,
+      readingIdCount: evidence.distinctReadingIdCount,
+      placementCount: evidence.placementCount,
+      interpretationCount: evidence.interpretationCount,
+      runtimeStateRowCount: evidence.runtimeStateRowCount,
+      activeHomeReadingIdPresent: evidence.activeHomeReadingIdPresent,
+      lifecycleStateCounts: evidence.lifecycleStateCounts,
+      unsupportedTableRowsZero: evidence.unsupportedTableRowsZero,
+      verifiedAtUtc: createdAt,
+    );
+    await _writeRestoreCandidateIntegrity(package, manifest);
+    return package;
+  }
+
+  Future<void> refreshRestoreCandidateIntegrity(Directory package) async {
+    final manifestFile = File('${package.path}/manifest.json');
+    final previous = const TarotBackupManifestCodec().decode(
+      await manifestFile.readAsBytes(),
+    );
+    const digest = DartSha256DigestService();
+    final snapshot = File(
+      '${package.path}/${TarotBackupManifest.databasePayloadFilename}',
+    );
+    final refreshed = TarotBackupManifest(
+      applicationVersion: previous.applicationVersion,
+      sourceRuntimeMode: previous.sourceRuntimeMode,
+      sourceEnvironment: previous.sourceEnvironment,
+      sourcePurpose: previous.sourcePurpose,
+      createdAtUtc: previous.createdAtUtc,
+      databasePayloadSizeBytes: await snapshot.length(),
+      databasePayloadSha256: await digest.digestFile(snapshot),
+      requiredTables: previous.requiredTables,
+      requiredColumnsByTable: previous.requiredColumnsByTable,
+      tableRowCounts: previous.tableRowCounts,
+      readingIdCount: previous.readingIdCount,
+      placementCount: previous.placementCount,
+      interpretationCount: previous.interpretationCount,
+      runtimeStateRowCount: previous.runtimeStateRowCount,
+      activeHomeReadingIdPresent: previous.activeHomeReadingIdPresent,
+      lifecycleStateCounts: previous.lifecycleStateCounts,
+      unsupportedTableRowsZero: previous.unsupportedTableRowsZero,
+      verifiedAtUtc: previous.verifiedAtUtc,
+    );
+    await _writeRestoreCandidateIntegrity(package, refreshed);
+  }
+
+  Future<void> _writeRestoreCandidateIntegrity(
+    Directory package,
+    TarotBackupManifest manifest,
+  ) async {
+    const codec = TarotBackupManifestCodec();
+    const digest = DartSha256DigestService();
+    final manifestFile = File('${package.path}/manifest.json');
+    await manifestFile.writeAsBytes(codec.encode(manifest), flush: true);
+    final manifestHash = await digest.digestFile(manifestFile);
+    final checksum = File(
+      '${package.path}/${TarotBackupManifest.checksumFilename}',
+    );
+    await checksum.writeAsString(
+      '$manifestHash  manifest.json\n'
+      '${manifest.databasePayloadSha256}  '
+      '${TarotBackupManifest.databasePayloadFilename}',
+      encoding: utf8,
+      flush: true,
+    );
+  }
 
   Future<void> dispose() async {
     for (final database in List<Database>.from(_openDatabases)) {

@@ -1,9 +1,13 @@
 // ignore_for_file: unused_element
 
 import 'dart:async';
+import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
+
+import 'core/persistence/runtime_data_profile.dart';
 
 import 'core/theme/ryn_tokens.dart';
 import 'core/text/app_text.dart' hide UserText;
@@ -14,14 +18,72 @@ import 'features/records/presentation/records_session_page.dart';
 import 'features/records/presentation/tarot_result_detail_page.dart';
 import 'features/study_os/study_os_shell.dart';
 import 'features/tarot/application/tarot_runtime_controller.dart';
+import 'features/tarot/backup_recovery/application/tarot_backup_restore_action_controller.dart';
+import 'features/tarot/backup_recovery/application/tarot_restore_startup_recovery_coordinator.dart';
+import 'features/tarot/backup_recovery/infrastructure/tarot_restore_candidate_validator.dart';
 import 'features/tarot/models/tarot_interpretation_session_draft.dart';
 import 'features/tarot/models/tarot_reading_result_snapshot.dart';
 import 'features/tarot/tarot_spread_shell.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  final composition = _createRuntimeComposition();
   runApp(
-    RynUniverseApp(runtimeController: TarotRuntimeController.development()),
+    RynUniverseApp(
+      runtimeController: composition.runtime,
+      backupRestoreController: composition.backupRestore,
+    ),
+  );
+}
+
+final class _RuntimeComposition {
+  const _RuntimeComposition({required this.runtime, this.backupRestore});
+
+  final TarotRuntimeController runtime;
+  final TarotBackupRestoreActionController? backupRestore;
+}
+
+_RuntimeComposition _createRuntimeComposition() {
+  const selector = String.fromEnvironment(
+    RynRuntimeDataModeContract.defineName,
+  );
+  if (selector != RynRuntimeDataModeContract.backupRecoveryQaSelector) {
+    return _RuntimeComposition(
+      runtime: TarotRuntimeController.development(
+        runtimeDataMode: RynRuntimeDataModeContract.parseEnvironmentSelector(
+          selector,
+        ),
+      ),
+    );
+  }
+
+  const rootSelector = String.fromEnvironment('RYN_SYNTHETIC_ROOT');
+  final root = Directory(rootSelector).absolute;
+  final temp = Directory.systemTemp.absolute;
+  if (rootSelector.trim().isEmpty ||
+      (!p.equals(root.path, temp.path) && !p.isWithin(temp.path, root.path)) ||
+      !p.basename(root.path).startsWith('ryn-backup-ui-')) {
+    throw StateError(
+      'A task-owned synthetic root under systemTemp is required.',
+    );
+  }
+  final pathContract = RynRuntimeDataPathContract.forApplicationSupportRoot(
+    root,
+  );
+  final validator = TarotRestoreCandidateValidator();
+  final runtime = TarotRuntimeController.development(
+    pathContract: pathContract,
+    runtimeDataMode: RynRuntimeDataMode.tarotBackupRecoveryQa,
+    startupRecoveryCoordinator: TarotRestoreStartupRecoveryCoordinator(
+      candidateValidator: validator,
+    ),
+  );
+  return _RuntimeComposition(
+    runtime: runtime,
+    backupRestore: TarotBackupRestoreActionController.synthetic(
+      runtimeController: runtime,
+      pathContract: pathContract,
+    ),
   );
 }
 
@@ -29,10 +91,12 @@ class RynUniverseApp extends StatefulWidget {
   const RynUniverseApp({
     super.key,
     this.runtimeController,
+    this.backupRestoreController,
     this.bootstrapOnStart = true,
   });
 
   final TarotRuntimeController? runtimeController;
+  final TarotBackupRestoreActionController? backupRestoreController;
   final bool bootstrapOnStart;
 
   @override
@@ -68,39 +132,42 @@ class _RynUniverseAppState extends State<RynUniverseApp> {
 
   @override
   Widget build(BuildContext context) {
-    return _ThemeModeScope(
-      mode: _themeMode,
-      onChanged: _setThemeMode,
-      child: MaterialApp(
-        title: UserText.productName,
-        debugShowCheckedModeBanner: false,
-        themeMode: _themeMode,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: RynPalette.navy,
-            brightness: Brightness.light,
-            surface: RynPalette.ivory,
+    return _BackupRestoreScope(
+      controller: widget.backupRestoreController,
+      child: _ThemeModeScope(
+        mode: _themeMode,
+        onChanged: _setThemeMode,
+        child: MaterialApp(
+          title: UserText.productName,
+          debugShowCheckedModeBanner: false,
+          themeMode: _themeMode,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: RynPalette.navy,
+              brightness: Brightness.light,
+              surface: RynPalette.ivory,
+            ),
+            scaffoldBackgroundColor: RynPalette.ivoryCanvas,
+            fontFamily: RynFonts.text,
+            fontFamilyFallback: RynFonts.textFallback,
+            useMaterial3: true,
           ),
-          scaffoldBackgroundColor: RynPalette.ivoryCanvas,
-          fontFamily: RynFonts.text,
-          fontFamilyFallback: RynFonts.textFallback,
-          useMaterial3: true,
-        ),
-        darkTheme: ThemeData(
-          colorScheme: const ColorScheme.dark(
-            primary: Color(0xFF8EA0C8),
-            secondary: Color(0xFFA99058),
-            surface: RynPalette.oledSurface,
-            onSurface: RynPalette.oledInk,
-            onSurfaceVariant: RynPalette.oledMuted,
-            outlineVariant: RynPalette.oledLine,
+          darkTheme: ThemeData(
+            colorScheme: const ColorScheme.dark(
+              primary: Color(0xFF8EA0C8),
+              secondary: Color(0xFFA99058),
+              surface: RynPalette.oledSurface,
+              onSurface: RynPalette.oledInk,
+              onSurfaceVariant: RynPalette.oledMuted,
+              outlineVariant: RynPalette.oledLine,
+            ),
+            scaffoldBackgroundColor: RynPalette.oledCanvas,
+            fontFamily: RynFonts.text,
+            fontFamilyFallback: RynFonts.textFallback,
+            useMaterial3: true,
           ),
-          scaffoldBackgroundColor: RynPalette.oledCanvas,
-          fontFamily: RynFonts.text,
-          fontFamilyFallback: RynFonts.textFallback,
-          useMaterial3: true,
+          home: _runtimeHome(),
         ),
-        home: _runtimeHome(),
       ),
     );
   }
@@ -187,6 +254,21 @@ class _RuntimeRecoveryRequiredSurface extends StatelessWidget {
       ),
     );
   }
+}
+
+class _BackupRestoreScope extends InheritedWidget {
+  const _BackupRestoreScope({required this.controller, required super.child});
+
+  final TarotBackupRestoreActionController? controller;
+
+  static TarotBackupRestoreActionController? maybeOf(BuildContext context) =>
+      context
+          .dependOnInheritedWidgetOfExactType<_BackupRestoreScope>()
+          ?.controller;
+
+  @override
+  bool updateShouldNotify(_BackupRestoreScope oldWidget) =>
+      controller != oldWidget.controller;
 }
 
 class _ThemeModeScope extends InheritedWidget {
@@ -3131,6 +3213,201 @@ class _BusinessAreaPage extends StatelessWidget {
                 ? const [_HeaderThemeToggle()]
                 : _workspaceChips,
           ),
+          if (settingsMode) ...[
+            const SizedBox(height: 24),
+            _DataSafetySection(
+              controller: _BackupRestoreScope.maybeOf(context),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _DataSafetySection extends StatelessWidget {
+  const _DataSafetySection({required this.controller});
+
+  final TarotBackupRestoreActionController? controller;
+
+  Future<void> _selectAndConfirmRestore(BuildContext context) async {
+    final actions = controller;
+    if (actions == null || !await actions.selectRestoreCandidate()) return;
+    if (!context.mounted) return;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('백업에서 복원'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('현재 데이터는 자동 안전 백업된 후 선택한 백업으로 교체됩니다.'),
+            SizedBox(height: 10),
+            Text('복원 중에는 앱을 종료하지 마세요.'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('취소'),
+          ),
+          FilledButton(
+            key: const Key('restore-confirm'),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('복원'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      await actions.restoreSelected();
+    } else {
+      actions.clearResult();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final actions = controller;
+    if (actions == null) return _content(context, null);
+    return AnimatedBuilder(
+      animation: actions,
+      builder: (context, _) => _content(context, actions),
+    );
+  }
+
+  Widget _content(
+    BuildContext context,
+    TarotBackupRestoreActionController? actions,
+  ) {
+    final busy = actions?.isBusy ?? false;
+    final enabled = actions != null && !busy;
+    final fatal =
+        actions?.status == TarotBackupRestoreActionStatus.fatalRecoveryRequired;
+    final path = fatal ? actions?.evidencePath : actions?.outputPath;
+    return Container(
+      key: const Key('data-safety-section'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: RynPalette.surfaceSoft(context),
+        borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
+        border: Border.all(color: RynPalette.line(context)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.shield_outlined,
+                size: 20,
+                color: RynPalette.accent(context),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '데이터 안전',
+                style: TextStyle(
+                  color: RynPalette.text(context),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              if (busy) ...[
+                const Spacer(),
+                const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
+              ],
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            actions == null
+                ? '현재 데이터 환경에서는 백업과 복원을 실행하지 않습니다.'
+                : '현재 기록을 백업하거나, 확인된 백업에서 안전하게 복원합니다.',
+            style: TextStyle(
+              color: RynPalette.subtext(context),
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              FilledButton.icon(
+                key: const Key('data-safety-backup'),
+                onPressed: enabled ? actions.createBackup : null,
+                icon: const Icon(Icons.save_alt_rounded),
+                label: const Text('백업 만들기'),
+              ),
+              OutlinedButton.icon(
+                key: const Key('data-safety-restore'),
+                onPressed: enabled
+                    ? () => _selectAndConfirmRestore(context)
+                    : null,
+                icon: const Icon(Icons.restore_rounded),
+                label: const Text('백업에서 복원'),
+              ),
+            ],
+          ),
+          if (actions?.message != null) ...[
+            const SizedBox(height: 14),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: fatal
+                    ? Theme.of(context).colorScheme.errorContainer
+                    : RynPalette.surfaceElevated(context),
+                borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
+                border: Border.all(color: RynPalette.line(context)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (fatal) ...[
+                    Text(
+                      '복구 필요',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onErrorContainer,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                  ],
+                  Text(
+                    actions!.message!,
+                    style: TextStyle(
+                      color: fatal
+                          ? Theme.of(context).colorScheme.onErrorContainer
+                          : RynPalette.text(context),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  if (path != null) ...[
+                    const SizedBox(height: 8),
+                    SelectableText(
+                      path,
+                      style: TextStyle(
+                        color: fatal
+                            ? Theme.of(context).colorScheme.onErrorContainer
+                            : RynPalette.subtext(context),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
