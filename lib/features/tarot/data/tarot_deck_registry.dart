@@ -3,6 +3,7 @@ import 'package:ryn_universe_os_core/core/text/user_text.dart';
 import '../models/tarot_card_definition.dart';
 import '../models/tarot_deck_definition.dart';
 import 'tarot_card_ids.dart';
+import 'tarot_local_deck_cards.dart';
 
 class TarotDeckRegistry {
   const TarotDeckRegistry._();
@@ -10,6 +11,12 @@ class TarotDeckRegistry {
   static const String rwsPublicDomainDeckId = 'rws_public_domain';
   static const String universalWaiteDeckId = 'universal_waite';
   static const String goldenArtNouveauDeckId = 'golden_art_nouveau_tarot';
+  static const String chubbyBunVer2DeckId = 'chubby_bun_ver_2_tarot';
+  static const String heavenEarthDeckId = 'heaven_earth_tarot';
+  static const String lightSeersDeckId = 'light_seers_tarot';
+  static const String samramansangDeckId = 'samramansang_tarot';
+  static const String tarotOfMysticalMomentsDeckId =
+      'tarot_of_mystical_moments';
 
   static const List<TarotCardDefinition> rwsCards = [
     TarotCardDefinition(
@@ -1242,6 +1249,96 @@ class TarotDeckRegistry {
         'Local personal study tarot_78 asset copied from C:/Pictures/tarot/golden_art_nouveau_tarot; review rights again before distribution.',
   );
 
+  static const TarotDeckDefinition chubbyBunVer2 = TarotDeckDefinition(
+    deckId: chubbyBunVer2DeckId,
+    displayName: UserText.tarotDeckChubbyBunVer2,
+    shortName: UserText.tarotDeckChubbyBunVer2,
+    prefix: 'Chubby Bun Ver. 2',
+    family: 'rws',
+    cards: chubbyBunVer2Cards,
+    representativeAssetPath:
+        'assets/tarot/decks/chubby_bun_ver_2_tarot/major/Chubby_Bun_Ver_2_Tarot_00_Fool.jpg',
+    coverAssetPath:
+        'assets/tarot/decks/chubby_bun_ver_2_tarot/cover/Chubby_Bun_Ver_2_Tarot_Cover.jpg',
+    cardBackAssetPath:
+        'assets/tarot/decks/chubby_bun_ver_2_tarot/back/Chubby_Bun_Ver_2_Tarot_Back.jpg',
+    availabilityStatus: 'front_cards_ready',
+    notes:
+        'Local personal study tarot_78 asset copied from C:/Pictures/tarot/chubby_bun_ver.2_tarot; noncanonical Happy Squirrel card excluded; review rights again before distribution.',
+  );
+
+  static const TarotDeckDefinition heavenEarth = TarotDeckDefinition(
+    deckId: heavenEarthDeckId,
+    displayName: UserText.tarotDeckHeavenEarth,
+    shortName: UserText.tarotDeckHeavenEarth,
+    prefix: 'Heaven & Earth',
+    family: 'rws',
+    cards: heavenEarthCards,
+    representativeAssetPath:
+        'assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_00_Fool.jpg',
+    coverAssetPath:
+        'assets/tarot/decks/heaven_earth_tarot/cover/Heaven_Earth_Tarot_Cover.jpg',
+    cardBackAssetPath:
+        'assets/tarot/decks/heaven_earth_tarot/back/Heaven_Earth_Tarot_Back.jpg',
+    availabilityStatus: 'front_cards_ready',
+    notes:
+        'Local personal study tarot_78 asset copied from C:/Pictures/tarot/heaven&earth_tarot; review rights again before distribution.',
+  );
+
+  static const TarotDeckDefinition lightSeers = TarotDeckDefinition(
+    deckId: lightSeersDeckId,
+    displayName: UserText.tarotDeckLightSeers,
+    shortName: UserText.tarotDeckLightSeers,
+    prefix: "Light Seer's",
+    family: 'rws',
+    cards: lightSeersCards,
+    representativeAssetPath:
+        'assets/tarot/decks/light_seers_tarot/major/Light_Seers_Tarot_00_Fool.jpg',
+    coverAssetPath:
+        'assets/tarot/decks/light_seers_tarot/cover/Light_Seers_Tarot_Cover.jpg',
+    cardBackAssetPath:
+        'assets/tarot/decks/light_seers_tarot/back/Light_Seers_Tarot_Back.png',
+    availabilityStatus: 'front_cards_ready',
+    notes:
+        'Local personal study tarot_78 asset copied from C:/Pictures/tarot/light_seers_tarot; review rights again before distribution.',
+  );
+
+  static const TarotDeckDefinition samramansang = TarotDeckDefinition(
+    deckId: samramansangDeckId,
+    displayName: UserText.tarotDeckSamramansang,
+    shortName: UserText.tarotDeckSamramansang,
+    prefix: 'Samramansang',
+    family: 'rws',
+    cards: samramansangCards,
+    representativeAssetPath:
+        'assets/tarot/decks/samramansang_tarot/major/Samramansang_Tarot_00_Fool.jpg',
+    coverAssetPath:
+        'assets/tarot/decks/samramansang_tarot/cover/Samramansang_Tarot_Cover.jpg',
+    cardBackAssetPath:
+        'assets/tarot/decks/samramansang_tarot/back/Samramansang_Tarot_Back.jpg',
+    availabilityStatus: 'front_cards_ready',
+    notes:
+        'Local personal study tarot_78 asset copied from C:/Pictures/tarot/samramansang_tarot; guide PDF excluded; review rights again before distribution.',
+  );
+
+  static const TarotDeckDefinition tarotOfMysticalMoments = TarotDeckDefinition(
+    deckId: tarotOfMysticalMomentsDeckId,
+    displayName: UserText.tarotDeckMysticalMoments,
+    shortName: UserText.tarotDeckMysticalMoments,
+    prefix: 'Tarot of Mystical Moments',
+    family: 'rws',
+    cards: tarotOfMysticalMomentsCards,
+    representativeAssetPath:
+        'assets/tarot/decks/tarot_of_mystical_moments/major/Tarot_of_Mystical_Moments_Tarot_00_Fool.jpg',
+    coverAssetPath:
+        'assets/tarot/decks/tarot_of_mystical_moments/cover/Tarot_of_Mystical_Moments_Tarot_Cover.jpg',
+    cardBackAssetPath:
+        'assets/tarot/decks/tarot_of_mystical_moments/back/Tarot_of_Mystical_Moments_Tarot_Back.png',
+    availabilityStatus: 'front_cards_ready',
+    notes:
+        'Local personal study tarot_78 asset copied from C:/Pictures/tarot/tarot_of_mystical_moments; review rights again before distribution.',
+  );
+
   static const List<TarotDeckDefinition> decks = [
     rwsPublicDomain,
     TarotDeckDefinition(
@@ -1281,6 +1378,11 @@ class TarotDeckRegistry {
     ),
     universalWaite,
     goldenArtNouveau,
+    chubbyBunVer2,
+    heavenEarth,
+    lightSeers,
+    samramansang,
+    tarotOfMysticalMoments,
   ];
 
   static TarotCardDefinition? cardBySemanticId(

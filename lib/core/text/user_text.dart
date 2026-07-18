@@ -199,6 +199,11 @@ abstract final class UserText {
   static const tarotDeckUniversalWaite = 'RWS Public Domain';
   static const tarotDeckUniversalWaiteStudy = 'Universal Waite';
   static const tarotDeckGoldenArtNouveau = 'Golden Art Nouveau';
+  static const tarotDeckChubbyBunVer2 = 'Chubby Bun Ver. 2';
+  static const tarotDeckHeavenEarth = 'Heaven & Earth Tarot';
+  static const tarotDeckLightSeers = "Light Seer's Tarot";
+  static const tarotDeckSamramansang = '삼라만상 타로';
+  static const tarotDeckMysticalMoments = 'Tarot of Mystical Moments';
   static const tarotDeckThoth = '토트 타로';
   static const tarotDeckMarseille = '마르세유 타로';
   static const tarotDeckManshin1 = '만신타로 1';

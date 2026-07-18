@@ -84,6 +84,31 @@ flutter:
     - assets/tarot/decks/golden_art_nouveau_tarot/minor/
     - assets/tarot/decks/golden_art_nouveau_tarot/back/
     - assets/tarot/decks/golden_art_nouveau_tarot/cover/
+    - assets/tarot/decks/chubby_bun_ver_2_tarot/
+    - assets/tarot/decks/chubby_bun_ver_2_tarot/major/
+    - assets/tarot/decks/chubby_bun_ver_2_tarot/minor/
+    - assets/tarot/decks/chubby_bun_ver_2_tarot/back/
+    - assets/tarot/decks/chubby_bun_ver_2_tarot/cover/
+    - assets/tarot/decks/heaven_earth_tarot/
+    - assets/tarot/decks/heaven_earth_tarot/major/
+    - assets/tarot/decks/heaven_earth_tarot/minor/
+    - assets/tarot/decks/heaven_earth_tarot/back/
+    - assets/tarot/decks/heaven_earth_tarot/cover/
+    - assets/tarot/decks/light_seers_tarot/
+    - assets/tarot/decks/light_seers_tarot/major/
+    - assets/tarot/decks/light_seers_tarot/minor/
+    - assets/tarot/decks/light_seers_tarot/back/
+    - assets/tarot/decks/light_seers_tarot/cover/
+    - assets/tarot/decks/samramansang_tarot/
+    - assets/tarot/decks/samramansang_tarot/major/
+    - assets/tarot/decks/samramansang_tarot/minor/
+    - assets/tarot/decks/samramansang_tarot/back/
+    - assets/tarot/decks/samramansang_tarot/cover/
+    - assets/tarot/decks/tarot_of_mystical_moments/
+    - assets/tarot/decks/tarot_of_mystical_moments/major/
+    - assets/tarot/decks/tarot_of_mystical_moments/minor/
+    - assets/tarot/decks/tarot_of_mystical_moments/back/
+    - assets/tarot/decks/tarot_of_mystical_moments/cover/
 
   fonts:
     - family: Pretendard

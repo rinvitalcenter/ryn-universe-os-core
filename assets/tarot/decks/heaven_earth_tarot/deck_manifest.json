@@ -1,0 +1,480 @@
+{
+  "deckId": "heaven_earth_tarot",
+  "deckName": "Heaven & Earth Tarot",
+  "deckType": "tarot_78",
+  "cardCount": 78,
+  "sourceFolder": "C:/Pictures/tarot/heaven&earth_tarot",
+  "sourceNote": "local personal study asset copied for Ryn Tarot OS; review rights again before distribution or external sharing",
+  "cardBackAssetPath": "assets/tarot/decks/heaven_earth_tarot/back/Heaven_Earth_Tarot_Back.jpg",
+  "coverAssetPath": "assets/tarot/decks/heaven_earth_tarot/cover/Heaven_Earth_Tarot_Cover.jpg",
+  "cards": [
+    {
+      "id": "cups_01",
+      "label": "Ace of Cups",
+      "source": "heaven&earth_tarot_Cups01.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Cups01.jpg"
+    },
+    {
+      "id": "cups_02",
+      "label": "2 of Cups",
+      "source": "heaven&earth_tarot_Cups02.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Cups02.jpg"
+    },
+    {
+      "id": "cups_03",
+      "label": "3 of Cups",
+      "source": "heaven&earth_tarot_Cups03.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Cups03.jpg"
+    },
+    {
+      "id": "cups_04",
+      "label": "4 of Cups",
+      "source": "heaven&earth_tarot_Cups04.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Cups04.jpg"
+    },
+    {
+      "id": "cups_05",
+      "label": "5 of Cups",
+      "source": "heaven&earth_tarot_Cups05.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Cups05.jpg"
+    },
+    {
+      "id": "cups_06",
+      "label": "6 of Cups",
+      "source": "heaven&earth_tarot_Cups06.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Cups06.jpg"
+    },
+    {
+      "id": "cups_07",
+      "label": "7 of Cups",
+      "source": "heaven&earth_tarot_Cups07.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Cups07.jpg"
+    },
+    {
+      "id": "cups_08",
+      "label": "8 of Cups",
+      "source": "heaven&earth_tarot_Cups08.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Cups08.jpg"
+    },
+    {
+      "id": "cups_09",
+      "label": "9 of Cups",
+      "source": "heaven&earth_tarot_Cups09.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Cups09.jpg"
+    },
+    {
+      "id": "cups_10",
+      "label": "10 of Cups",
+      "source": "heaven&earth_tarot_Cups10.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Cups10.jpg"
+    },
+    {
+      "id": "cups_11",
+      "label": "Page of Cups",
+      "source": "heaven&earth_tarot_Cups11.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Cups11.jpg"
+    },
+    {
+      "id": "cups_12",
+      "label": "Knight of Cups",
+      "source": "heaven&earth_tarot_Cups12.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Cups12.jpg"
+    },
+    {
+      "id": "cups_13",
+      "label": "Queen of Cups",
+      "source": "heaven&earth_tarot_Cups13.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Cups13.jpg"
+    },
+    {
+      "id": "cups_14",
+      "label": "King of Cups",
+      "source": "heaven&earth_tarot_Cups14.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Cups14.jpg"
+    },
+    {
+      "id": "major_00",
+      "label": "The Fool",
+      "source": "heaven&earth_tarot_00_Fool.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_00_Fool.jpg"
+    },
+    {
+      "id": "major_01",
+      "label": "The Magician",
+      "source": "heaven&earth_tarot_01_Magician.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_01_Magician.jpg"
+    },
+    {
+      "id": "major_02",
+      "label": "The High Priestess",
+      "source": "heaven&earth_tarot_02_High_Priestess.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_02_High_Priestess.jpg"
+    },
+    {
+      "id": "major_03",
+      "label": "The Empress",
+      "source": "heaven&earth_tarot_03_Empress.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_03_Empress.jpg"
+    },
+    {
+      "id": "major_04",
+      "label": "The Emperor",
+      "source": "heaven&earth_tarot_04_Emperor.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_04_Emperor.jpg"
+    },
+    {
+      "id": "major_05",
+      "label": "The Hierophant",
+      "source": "heaven&earth_tarot_05_Hierophant.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_05_Hierophant.jpg"
+    },
+    {
+      "id": "major_06",
+      "label": "The Lovers",
+      "source": "heaven&earth_tarot_06_Lovers.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_06_Lovers.jpg"
+    },
+    {
+      "id": "major_07",
+      "label": "The Chariot",
+      "source": "heaven&earth_tarot_07_Chariot.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_07_Chariot.jpg"
+    },
+    {
+      "id": "major_08",
+      "label": "Strength",
+      "source": "heaven&earth_tarot_08_Strength.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_08_Strength.jpg"
+    },
+    {
+      "id": "major_09",
+      "label": "The Hermit",
+      "source": "heaven&earth_tarot_09_Hermit.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_09_Hermit.jpg"
+    },
+    {
+      "id": "major_10",
+      "label": "Wheel of Fortune",
+      "source": "heaven&earth_tarot_10_Wheel_of_Fortune.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_10_Wheel_of_Fortune.jpg"
+    },
+    {
+      "id": "major_11",
+      "label": "Justice",
+      "source": "heaven&earth_tarot_11_Justice.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_11_Justice.jpg"
+    },
+    {
+      "id": "major_12",
+      "label": "The Hanged Man",
+      "source": "heaven&earth_tarot_12_Hanged_Man.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_12_Hanged_Man.jpg"
+    },
+    {
+      "id": "major_13",
+      "label": "Death",
+      "source": "heaven&earth_tarot_13_Death.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_13_Death.jpg"
+    },
+    {
+      "id": "major_14",
+      "label": "Temperance",
+      "source": "heaven&earth_tarot_14_Temperance.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_14_Temperance.jpg"
+    },
+    {
+      "id": "major_15",
+      "label": "The Devil",
+      "source": "heaven&earth_tarot_15_Devil.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_15_Devil.jpg"
+    },
+    {
+      "id": "major_16",
+      "label": "The Tower",
+      "source": "heaven&earth_tarot_16_Tower.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_16_Tower.jpg"
+    },
+    {
+      "id": "major_17",
+      "label": "The Star",
+      "source": "heaven&earth_tarot_17_Star.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_17_Star.jpg"
+    },
+    {
+      "id": "major_18",
+      "label": "The Moon",
+      "source": "heaven&earth_tarot_18_Moon.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_18_Moon.jpg"
+    },
+    {
+      "id": "major_19",
+      "label": "The Sun",
+      "source": "heaven&earth_tarot_19_Sun.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_19_Sun.jpg"
+    },
+    {
+      "id": "major_20",
+      "label": "Judgement",
+      "source": "heaven&earth_tarot_20_Judgement.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_20_Judgement.jpg"
+    },
+    {
+      "id": "major_21",
+      "label": "The World",
+      "source": "heaven&earth_tarot_21_World.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/major/Heaven_Earth_Tarot_21_World.jpg"
+    },
+    {
+      "id": "pents_01",
+      "label": "Ace of Pentacles",
+      "source": "heaven&earth_tarot_Pentacles01.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Pentacles01.jpg"
+    },
+    {
+      "id": "pents_02",
+      "label": "2 of Pentacles",
+      "source": "heaven&earth_tarot_Pentacles02.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Pentacles02.jpg"
+    },
+    {
+      "id": "pents_03",
+      "label": "3 of Pentacles",
+      "source": "heaven&earth_tarot_Pentacles03.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Pentacles03.jpg"
+    },
+    {
+      "id": "pents_04",
+      "label": "4 of Pentacles",
+      "source": "heaven&earth_tarot_Pentacles04.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Pentacles04.jpg"
+    },
+    {
+      "id": "pents_05",
+      "label": "5 of Pentacles",
+      "source": "heaven&earth_tarot_Pentacles05.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Pentacles05.jpg"
+    },
+    {
+      "id": "pents_06",
+      "label": "6 of Pentacles",
+      "source": "heaven&earth_tarot_Pentacles06.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Pentacles06.jpg"
+    },
+    {
+      "id": "pents_07",
+      "label": "7 of Pentacles",
+      "source": "heaven&earth_tarot_Pentacles07.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Pentacles07.jpg"
+    },
+    {
+      "id": "pents_08",
+      "label": "8 of Pentacles",
+      "source": "heaven&earth_tarot_Pentacles08.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Pentacles08.jpg"
+    },
+    {
+      "id": "pents_09",
+      "label": "9 of Pentacles",
+      "source": "heaven&earth_tarot_Pentacles09.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Pentacles09.jpg"
+    },
+    {
+      "id": "pents_10",
+      "label": "10 of Pentacles",
+      "source": "heaven&earth_tarot_Pentacles10.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Pentacles10.jpg"
+    },
+    {
+      "id": "pents_11",
+      "label": "Page of Pentacles",
+      "source": "heaven&earth_tarot_Pentacles11.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Pentacles11.jpg"
+    },
+    {
+      "id": "pents_12",
+      "label": "Knight of Pentacles",
+      "source": "heaven&earth_tarot_Pentacles12.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Pentacles12.jpg"
+    },
+    {
+      "id": "pents_13",
+      "label": "Queen of Pentacles",
+      "source": "heaven&earth_tarot_Pentacles13.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Pentacles13.jpg"
+    },
+    {
+      "id": "pents_14",
+      "label": "King of Pentacles",
+      "source": "heaven&earth_tarot_Pentacles14.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Pentacles14.jpg"
+    },
+    {
+      "id": "swords_01",
+      "label": "Ace of Swords",
+      "source": "heaven&earth_tarot_Swords01.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Swords01.jpg"
+    },
+    {
+      "id": "swords_02",
+      "label": "2 of Swords",
+      "source": "heaven&earth_tarot_Swords02.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Swords02.jpg"
+    },
+    {
+      "id": "swords_03",
+      "label": "3 of Swords",
+      "source": "heaven&earth_tarot_Swords03.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Swords03.jpg"
+    },
+    {
+      "id": "swords_04",
+      "label": "4 of Swords",
+      "source": "heaven&earth_tarot_Swords04.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Swords04.jpg"
+    },
+    {
+      "id": "swords_05",
+      "label": "5 of Swords",
+      "source": "heaven&earth_tarot_Swords05.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Swords05.jpg"
+    },
+    {
+      "id": "swords_06",
+      "label": "6 of Swords",
+      "source": "heaven&earth_tarot_Swords06.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Swords06.jpg"
+    },
+    {
+      "id": "swords_07",
+      "label": "7 of Swords",
+      "source": "heaven&earth_tarot_Swords07.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Swords07.jpg"
+    },
+    {
+      "id": "swords_08",
+      "label": "8 of Swords",
+      "source": "heaven&earth_tarot_Swords08.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Swords08.jpg"
+    },
+    {
+      "id": "swords_09",
+      "label": "9 of Swords",
+      "source": "heaven&earth_tarot_Swords09.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Swords09.jpg"
+    },
+    {
+      "id": "swords_10",
+      "label": "10 of Swords",
+      "source": "heaven&earth_tarot_Swords10.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Swords10.jpg"
+    },
+    {
+      "id": "swords_11",
+      "label": "Page of Swords",
+      "source": "heaven&earth_tarot_Swords11.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Swords11.jpg"
+    },
+    {
+      "id": "swords_12",
+      "label": "Knight of Swords",
+      "source": "heaven&earth_tarot_Swords12.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Swords12.jpg"
+    },
+    {
+      "id": "swords_13",
+      "label": "Queen of Swords",
+      "source": "heaven&earth_tarot_Swords13.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Swords13.jpg"
+    },
+    {
+      "id": "swords_14",
+      "label": "King of Swords",
+      "source": "heaven&earth_tarot_Swords14.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Swords14.jpg"
+    },
+    {
+      "id": "wands_01",
+      "label": "Ace of Wands",
+      "source": "heaven&earth_tarot_Wands01.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Wands01.jpg"
+    },
+    {
+      "id": "wands_02",
+      "label": "2 of Wands",
+      "source": "heaven&earth_tarot_Wands02.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Wands02.jpg"
+    },
+    {
+      "id": "wands_03",
+      "label": "3 of Wands",
+      "source": "heaven&earth_tarot_Wands03.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Wands03.jpg"
+    },
+    {
+      "id": "wands_04",
+      "label": "4 of Wands",
+      "source": "heaven&earth_tarot_Wands04.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Wands04.jpg"
+    },
+    {
+      "id": "wands_05",
+      "label": "5 of Wands",
+      "source": "heaven&earth_tarot_Wands05.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Wands05.jpg"
+    },
+    {
+      "id": "wands_06",
+      "label": "6 of Wands",
+      "source": "heaven&earth_tarot_Wands06.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Wands06.jpg"
+    },
+    {
+      "id": "wands_07",
+      "label": "7 of Wands",
+      "source": "heaven&earth_tarot_Wands07.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Wands07.jpg"
+    },
+    {
+      "id": "wands_08",
+      "label": "8 of Wands",
+      "source": "heaven&earth_tarot_Wands08.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Wands08.jpg"
+    },
+    {
+      "id": "wands_09",
+      "label": "9 of Wands",
+      "source": "heaven&earth_tarot_Wands09.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Wands09.jpg"
+    },
+    {
+      "id": "wands_10",
+      "label": "10 of Wands",
+      "source": "heaven&earth_tarot_Wands10.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Wands10.jpg"
+    },
+    {
+      "id": "wands_11",
+      "label": "Page of Wands",
+      "source": "heaven&earth_tarot_Wands11.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Wands11.jpg"
+    },
+    {
+      "id": "wands_12",
+      "label": "Knight of Wands",
+      "source": "heaven&earth_tarot_Wands12.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Wands12.jpg"
+    },
+    {
+      "id": "wands_13",
+      "label": "Queen of Wands",
+      "source": "heaven&earth_tarot_Wands13.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Wands13.jpg"
+    },
+    {
+      "id": "wands_14",
+      "label": "King of Wands",
+      "source": "heaven&earth_tarot_Wands14.jpg",
+      "image": "assets/tarot/decks/heaven_earth_tarot/minor/Heaven_Earth_Tarot_Wands14.jpg"
+    }
+  ]
+}
