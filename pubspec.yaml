@@ -109,6 +109,10 @@ flutter:
     - assets/tarot/decks/tarot_of_mystical_moments/minor/
     - assets/tarot/decks/tarot_of_mystical_moments/back/
     - assets/tarot/decks/tarot_of_mystical_moments/cover/
+    - assets/oracle/decks/horoscope_belline/
+    - assets/oracle/decks/horoscope_belline/cards/
+    - assets/oracle/decks/horoscope_belline/back/
+    - assets/oracle/decks/horoscope_belline/cover/
 
   fonts:
     - family: Pretendard
