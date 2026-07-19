@@ -13,6 +13,9 @@ import 'core/theme/ryn_tokens.dart';
 import 'core/text/app_text.dart' hide UserText;
 import 'core/text/user_text.dart';
 import 'features/home/presentation/home_cinematic_scene.dart';
+import 'features/oracle/application/oracle_reading_controller.dart';
+import 'features/oracle/presentation/oracle_reading_shell.dart';
+import 'features/reading/presentation/reading_atelier_page.dart';
 import 'features/records/models/session_tarot_results.dart';
 import 'features/records/presentation/records_session_page.dart';
 import 'features/records/presentation/tarot_result_detail_page.dart';
@@ -557,6 +560,7 @@ class _CoreOsShellState extends State<CoreOsShell> {
   bool _readingTarotFocus = false;
   _TarotLoopPreview? _tarotLoopPreview;
   final SessionTarotResults _sessionOnlyTarotResults = SessionTarotResults();
+  final OracleReadingController _oracleSession = OracleReadingController();
   final Map<String, TarotInterpretationSessionDraft>
   _sessionOnlyTarotInterpretationDrafts = {};
   String? _selectedTarotDetailId;
@@ -691,6 +695,12 @@ class _CoreOsShellState extends State<CoreOsShell> {
   }
 
   @override
+  void dispose() {
+    _oracleSession.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: widget.runtimeController == null
@@ -715,6 +725,7 @@ class _CoreOsShellState extends State<CoreOsShell> {
                         ),
                         Expanded(
                           child: _ScrollableShellCanvas(
+                            oracleController: _oracleSession,
                             selectedLabel: _selectedNav,
                             onNavSelected: _selectNav,
                             onReadingTarotFocusChanged: _setReadingTarotFocus,
@@ -741,6 +752,7 @@ class _CoreOsShellState extends State<CoreOsShell> {
                       ],
                     )
                   : _ScrollableShellCanvas(
+                      oracleController: _oracleSession,
                       showCompactNav: !readingImmersive,
                       selectedLabel: _selectedNav,
                       onNavSelected: _selectNav,
@@ -799,6 +811,7 @@ class _DevelopmentDataIndicator extends StatelessWidget {
 class _ScrollableShellCanvas extends StatelessWidget {
   const _ScrollableShellCanvas({
     this.showCompactNav = false,
+    required this.oracleController,
     required this.selectedLabel,
     required this.onNavSelected,
     required this.onReadingTarotFocusChanged,
@@ -821,6 +834,7 @@ class _ScrollableShellCanvas extends StatelessWidget {
   });
 
   final bool showCompactNav;
+  final OracleReadingController oracleController;
   final String selectedLabel;
   final ValueChanged<String> onNavSelected;
   final ValueChanged<bool> onReadingTarotFocusChanged;
@@ -882,6 +896,7 @@ class _ScrollableShellCanvas extends StatelessWidget {
               child: SizedBox(
                 width: contentWidth,
                 child: _ShellPageContent(
+                  oracleController: oracleController,
                   showCompactNav: showCompactNav,
                   selectedLabel: selectedLabel,
                   onNavSelected: onNavSelected,
@@ -915,6 +930,7 @@ class _ScrollableShellCanvas extends StatelessWidget {
 
 class _ShellPageContent extends StatelessWidget {
   const _ShellPageContent({
+    required this.oracleController,
     required this.showCompactNav,
     required this.selectedLabel,
     required this.onNavSelected,
@@ -937,6 +953,7 @@ class _ShellPageContent extends StatelessWidget {
     required this.onShowTarotResultOnHome,
   });
 
+  final OracleReadingController oracleController;
   final bool showCompactNav;
   final String selectedLabel;
   final ValueChanged<String> onNavSelected;
@@ -1082,6 +1099,7 @@ class _ShellPageContent extends StatelessWidget {
         : selectedLabel == UserText.navReading
         ? <Widget>[
             _BusinessAreaPage(
+              oracleController: oracleController,
               label: selectedLabel,
               onReadingTarotFocusChanged: onReadingTarotFocusChanged,
               onTarotResultCompleted: onTarotResultCompleted,
@@ -3031,6 +3049,7 @@ class _HomeQuickLinkChip extends StatelessWidget {
 class _BusinessAreaPage extends StatelessWidget {
   const _BusinessAreaPage({
     required this.label,
+    this.oracleController,
     this.onReadingTarotFocusChanged,
     this.onTarotResultCompleted,
     this.onTarotDraftChanged,
@@ -3043,6 +3062,7 @@ class _BusinessAreaPage extends StatelessWidget {
   });
 
   final String label;
+  final OracleReadingController? oracleController;
   final ValueChanged<bool>? onReadingTarotFocusChanged;
   final ValueChanged<TarotReadingResultSnapshot>? onTarotResultCompleted;
   final ValueChanged<TarotInterpretationSessionDraft>? onTarotDraftChanged;
@@ -3143,6 +3163,7 @@ class _BusinessAreaPage extends StatelessWidget {
   Widget build(BuildContext context) {
     if (label == UserText.navReading) {
       return _ReadingWorkspacePage(
+        oracleController: oracleController!,
         onTarotFocusChanged: onReadingTarotFocusChanged,
         onTarotResultCompleted: onTarotResultCompleted,
         onTarotDraftChanged: onTarotDraftChanged,
@@ -3450,6 +3471,7 @@ class _BusinessModuleSummary extends StatelessWidget {
 
 class _ReadingWorkspacePage extends StatefulWidget {
   const _ReadingWorkspacePage({
+    required this.oracleController,
     this.onTarotFocusChanged,
     this.onTarotResultCompleted,
     this.onTarotDraftChanged,
@@ -3461,6 +3483,7 @@ class _ReadingWorkspacePage extends StatefulWidget {
     this.onStartSession,
   });
 
+  final OracleReadingController oracleController;
   final ValueChanged<bool>? onTarotFocusChanged;
   final ValueChanged<TarotReadingResultSnapshot>? onTarotResultCompleted;
   final ValueChanged<TarotInterpretationSessionDraft>? onTarotDraftChanged;
@@ -3477,11 +3500,18 @@ class _ReadingWorkspacePage extends StatefulWidget {
 
 class _ReadingWorkspacePageState extends State<_ReadingWorkspacePage> {
   bool _tarotOpen = false;
+  bool _oracleOpen = false;
 
   void _setTarotOpen(bool open) {
     if (_tarotOpen == open) return;
     widget.onTarotFocusChanged?.call(open);
     setState(() => _tarotOpen = open);
+  }
+
+  void _setOracleOpen(bool open) {
+    if (_oracleOpen == open) return;
+    widget.onTarotFocusChanged?.call(open);
+    setState(() => _oracleOpen = open);
   }
 
   void _finishTarotToHome(TarotReadingResultSnapshot snapshot) {
@@ -3506,160 +3536,32 @@ class _ReadingWorkspacePageState extends State<_ReadingWorkspacePage> {
         onSaveInterpretation: widget.onSaveTarotInterpretation,
       );
     }
+    if (_oracleOpen) {
+      return OracleReadingShell(
+        controller: widget.oracleController,
+        onBackToAtelier: () => _setOracleOpen(false),
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const _TopSystemBar(showDailyHome: false),
         const SizedBox(height: 16),
-        _LightCard(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const _BusinessIconBadge(icon: Icons.auto_stories_rounded),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          UserText.readingWorkspaceTitle,
-                          style: TextStyle(
-                            color: RynPalette.text(context),
-                            fontSize: 28,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: -0.7,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          UserText.readingAreaBody,
-                          style: TextStyle(
-                            color: RynPalette.subtext(context),
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            height: 1.45,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (widget.onStartSession != null &&
-                      MediaQuery.sizeOf(context).width >= 720) ...[
-                    const SizedBox(width: 12),
-                    FilledButton.icon(
-                      onPressed: widget.onStartSession,
-                      icon: const Icon(Icons.add_rounded),
-                      label: const Text('새 만남 시작'),
-                    ),
-                  ],
-                ],
-              ),
-              const SizedBox(height: 20),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  _ReadingToolCard(
-                    label: UserText.readingToolTarot,
-                    caption: UserText.tarotSubtitle,
-                    icon: Icons.style_rounded,
-                    prominent: true,
-                    onTap: () => _setTarotOpen(true),
-                  ),
-                  const _ReadingToolCard(
-                    label: UserText.readingToolSaju,
-                    caption: '사주와 명리 흐름은 타로 이후에 준비합니다.',
-                    icon: Icons.grid_view_rounded,
-                  ),
-                  const _ReadingToolCard(
-                    label: UserText.readingToolAstrology,
-                    caption: '별자리와 차트 읽기를 위한 자리입니다.',
-                    icon: Icons.public_rounded,
-                  ),
-                  const _ReadingToolCard(
-                    label: UserText.readingToolHumanDesign,
-                    caption: '휴먼디자인 노트를 위한 자리입니다.',
-                    icon: Icons.hub_rounded,
-                  ),
-                ],
-              ),
-            ],
-          ),
+        ReadingAtelierPage(
+          onStartTarot: () => _setTarotOpen(true),
+          onStartOracle: () {
+            widget.oracleController.startNewReading();
+            _setOracleOpen(true);
+          },
+          recentOracleResult: widget.oracleController.latestResult,
+          onResumeOracle: widget.oracleController.latestResult == null
+              ? null
+              : () {
+                  widget.oracleController.resumeLatest();
+                  _setOracleOpen(true);
+                },
         ),
       ],
-    );
-  }
-}
-
-class _ReadingToolCard extends StatelessWidget {
-  const _ReadingToolCard({
-    required this.label,
-    required this.caption,
-    required this.icon,
-    this.prominent = false,
-    this.onTap,
-  });
-
-  final String label;
-  final String caption;
-  final IconData icon;
-  final bool prominent;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 260,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: prominent
-                  ? RynPalette.accentSoft(context)
-                  : RynPalette.surfaceElevated(context),
-              borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
-              border: Border.all(
-                color: prominent
-                    ? RynPalette.accent(context).withValues(alpha: 0.24)
-                    : RynPalette.line(context),
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(icon, color: RynPalette.accent(context), size: 24),
-                const SizedBox(height: 14),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: RynPalette.text(context),
-                    fontSize: 18,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  caption,
-                  style: TextStyle(
-                    color: RynPalette.subtext(context),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    height: 1.35,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

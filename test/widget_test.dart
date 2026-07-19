@@ -470,29 +470,52 @@ void main() {
         )
         .map((image) => (image.image as AssetImage).assetName)
         .toSet();
+    expect(deckSelectorAssets.length, inInclusiveRange(1, 7));
     expect(
       deckSelectorAssets,
       contains('assets/tarot/decks/rws_public_domain/cover/cover.jpg'),
     );
+
     expect(
-      deckSelectorAssets,
-      contains(
-        'assets/tarot/decks/universal_waite/cover/Universal_Waite_Tarot_Card_Cover.png',
+      find.byKey(const ValueKey('tarot-deck-carousel-card-rws_public_domain')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('tarot-jukebox-center-card')), findsOneWidget);
+
+    final previousDeck = find.byKey(const Key('tarot-deck-fan-left'));
+    await tester.ensureVisible(previousDeck);
+    await tester.pumpAndSettle();
+    for (var step = 0; step < 6; step++) {
+      await tester.tap(previousDeck);
+      await tester.pumpAndSettle();
+    }
+
+    final goldenDeck = find.byKey(
+      const ValueKey('tarot-deck-carousel-card-golden_art_nouveau_tarot'),
+    );
+    expect(goldenDeck, findsOneWidget);
+    expect(
+      find.descendant(
+        of: goldenDeck,
+        matching: find.byKey(const Key('tarot-selected-card-edge-glow')),
+      ),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('tarot-deck-carousel-card-universal_waite')),
+      findsOneWidget,
+    );
+    final selectedCover = tester.widget<Image>(
+      find.descendant(
+        of: goldenDeck,
+        matching: find.byKey(const Key('tarot-representative-deck-image')),
       ),
     );
     expect(
-      deckSelectorAssets,
-      contains(
-        'assets/tarot/decks/golden_art_nouveau_tarot/cover/Golden_Art_Nouveau_Tarot_Cover.jpg',
-      ),
+      (selectedCover.image as AssetImage).assetName,
+      'assets/tarot/decks/golden_art_nouveau_tarot/cover/Golden_Art_Nouveau_Tarot_Cover.jpg',
     );
 
-    await tester.tap(
-      find.byKey(
-        const ValueKey('tarot-deck-carousel-card-golden_art_nouveau_tarot'),
-      ),
-    );
-    await tester.pumpAndSettle();
     await tester.tap(find.text('다음'));
     await tester.pumpAndSettle();
 
@@ -882,7 +905,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text(UserText.navReading).first);
     await tester.pumpAndSettle();
-    await tester.tap(find.text(UserText.readingToolTarot).last);
+    await tester.tap(find.byKey(const Key('atelier-tarot-action')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('바로 덱 선택'));
     await tester.pumpAndSettle();
@@ -1422,9 +1445,16 @@ void main() {
     expect(internalTextFile.existsSync(), isTrue);
 
     final userText = userTextFile.readAsStringSync();
-    final userVisibleStrings = RegExp(
-      "'([^']*)'",
-    ).allMatches(userText).map((match) => match.group(1) ?? '').join('\n');
+    final userVisibleStrings =
+        RegExp(
+              r'''static const (?:\w+\s+)?\w+\s*=\s*('(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*")\s*;''',
+            )
+            .allMatches(userText)
+            .map((match) {
+              final literal = match.group(1) ?? '';
+              return literal.substring(1, literal.length - 1);
+            })
+            .join('\n');
     const rawDeveloperTerms = <String>[
       'DB',
       'schema',
@@ -1775,13 +1805,13 @@ void main() {
 
       await tester.tap(find.text(UserText.navReading).first);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('새 만남 시작').first);
-      await tester.pumpAndSettle();
-
-      expect(find.text(UserText.quickStartGuidance), findsOneWidget);
-      expect(find.text('나의 기록'), findsOneWidget);
-      expect(find.text('타로 리딩'), findsOneWidget);
-      expect(find.text('오늘 어떤 만남을 시작할까요?'), findsNothing);
+      expect(find.byKey(const Key('reading-atelier-page')), findsOneWidget);
+      expect(find.byKey(const Key('reading-atelier-scene')), findsOneWidget);
+      expect(find.byKey(const Key('atelier-tarot-doorway')), findsOneWidget);
+      expect(find.byKey(const Key('atelier-oracle-doorway')), findsOneWidget);
+      expect(find.byKey(const Key('atelier-tarot-action')), findsOneWidget);
+      expect(find.byKey(const Key('atelier-oracle-action')), findsOneWidget);
+      expect(find.text(UserText.quickStartGuidance), findsNothing);
     },
   );
 
@@ -2090,8 +2120,12 @@ void main() {
     await tester.tap(find.text(UserText.navReading).last);
     await tester.pumpAndSettle();
     expect(find.text(UserText.readingWorkspaceTitle), findsAtLeastNWidgets(1));
-    expect(find.text(UserText.readingToolTarot), findsOneWidget);
-    expect(find.text(UserText.readingToolSaju), findsOneWidget);
+    expect(find.byKey(const Key('reading-atelier-page')), findsOneWidget);
+    expect(find.byKey(const Key('reading-atelier-scene')), findsOneWidget);
+    expect(find.byKey(const Key('atelier-tarot-doorway')), findsOneWidget);
+    expect(find.byKey(const Key('atelier-oracle-doorway')), findsOneWidget);
+    expect(find.byKey(const Key('atelier-tarot-action')), findsOneWidget);
+    expect(find.byKey(const Key('atelier-oracle-action')), findsOneWidget);
   });
 
   testWidgets(
@@ -2359,9 +2393,12 @@ void main() {
 
     await tester.tap(find.text(UserText.navReading).first);
     await tester.pumpAndSettle();
-    expect(find.text(UserText.readingToolTarot), findsAtLeastNWidgets(1));
+    expect(find.byKey(const Key('reading-atelier-page')), findsOneWidget);
+    expect(find.byKey(const Key('reading-atelier-scene')), findsOneWidget);
+    expect(find.byKey(const Key('atelier-tarot-doorway')), findsOneWidget);
+    expect(find.byKey(const Key('atelier-oracle-doorway')), findsOneWidget);
 
-    await tester.tap(find.text(UserText.readingToolTarot).last);
+    await tester.tap(find.byKey(const Key('atelier-tarot-action')));
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('tarot-active-setup-step-0')), findsOneWidget);
@@ -2391,11 +2428,7 @@ void main() {
     );
     expect(centerDeckRect.width, greaterThan(neighborDeckRect.width));
     expect(centerDeckRect.top, lessThan(neighborDeckRect.top));
-    expect(
-      find.text(UserText.tarotDeckUniversalWaite),
-      findsAtLeastNWidgets(1),
-    );
-    for (var index = 0; index < 8; index++) {
+    for (var index = 0; index < TarotDeckRegistry.decks.length; index++) {
       expect(find.byKey(Key('tarot-deck-fan-dot-$index')), findsOneWidget);
     }
     expect(find.byKey(const Key('tarot-coverflow-hero-card')), findsOneWidget);
@@ -2403,27 +2436,31 @@ void main() {
       find.byKey(const Key('tarot-selected-card-edge-glow')),
       findsOneWidget,
     );
-    expect(
-      find.byKey(const Key('tarot-coverflow-near-card-thoth')),
-      findsOneWidget,
+    final rwsDeck = find.byKey(
+      const ValueKey('tarot-deck-carousel-card-rws_public_domain'),
     );
-    expect(
-      find.byKey(const Key('tarot-coverflow-side-card-marseille')),
-      findsOneWidget,
+    final thothDeck = find.byKey(
+      const ValueKey('tarot-deck-carousel-card-thoth'),
     );
+    final marseilleDeck = find.byKey(
+      const ValueKey('tarot-deck-carousel-card-marseille'),
+    );
+    expect(rwsDeck, findsOneWidget);
+    expect(thothDeck, findsOneWidget);
+    expect(marseilleDeck, findsOneWidget);
     expect(
-      find.byKey(
-        const Key('tarot-coverflow-near-card-golden_art_nouveau_tarot'),
+      find.descendant(
+        of: rwsDeck,
+        matching: find.byKey(const Key('tarot-jukebox-center-card')),
       ),
       findsOneWidget,
     );
     expect(
-      find.byKey(const Key('tarot-coverflow-side-card-universal_waite')),
+      find.descendant(
+        of: rwsDeck,
+        matching: find.byKey(const Key('tarot-selected-card-edge-glow')),
+      ),
       findsOneWidget,
-    );
-    expect(
-      find.byKey(const Key('tarot-coverflow-far-card-oracle')),
-      findsNothing,
     );
     expect(find.text(UserText.tarotSpreadSelect), findsNothing);
 
@@ -2699,7 +2736,9 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text(UserText.navReading).first);
       await tester.pumpAndSettle();
-      await tester.tap(find.text(UserText.readingToolTarot).last);
+      await tester.ensureVisible(find.byKey(const Key('atelier-tarot-action')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('atelier-tarot-action')));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('바로 덱 선택'));
       await tester.pumpAndSettle();
@@ -2745,7 +2784,9 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text(UserText.navReading).first);
       await tester.pumpAndSettle();
-      await tester.tap(find.text(UserText.readingToolTarot).last);
+      await tester.ensureVisible(find.byKey(const Key('atelier-tarot-action')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('atelier-tarot-action')));
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.text('바로 덱 선택'));
       await tester.pumpAndSettle();
@@ -3149,27 +3190,54 @@ void main() {
         find.byKey(const Key('tarot-selected-card-edge-glow')),
         findsOneWidget,
       );
+      final rwsDeck = find.byKey(
+        const ValueKey('tarot-deck-carousel-card-rws_public_domain'),
+      );
+      final thothDeck = find.byKey(
+        const ValueKey('tarot-deck-carousel-card-thoth'),
+      );
+      final marseilleDeck = find.byKey(
+        const ValueKey('tarot-deck-carousel-card-marseille'),
+      );
+      expect(rwsDeck, findsOneWidget);
+      expect(thothDeck, findsOneWidget);
+      expect(marseilleDeck, findsOneWidget);
       expect(
-        find.byKey(const Key('tarot-coverflow-near-card-thoth')),
+        find.descendant(
+          of: rwsDeck,
+          matching: find.byKey(const Key('tarot-jukebox-center-card')),
+        ),
         findsOneWidget,
       );
+
+      final nextDeck = find.byKey(const Key('tarot-deck-fan-right'));
+      await tester.ensureVisible(nextDeck);
+      await tester.pumpAndSettle();
+      await tester.tap(nextDeck);
+      await tester.pumpAndSettle();
       expect(
-        find.byKey(const Key('tarot-coverflow-side-card-marseille')),
-        findsOneWidget,
-      );
-      expect(
-        find.byKey(
-          const Key('tarot-coverflow-near-card-golden_art_nouveau_tarot'),
+        find.descendant(
+          of: thothDeck,
+          matching: find.byKey(const Key('tarot-jukebox-center-card')),
         ),
         findsOneWidget,
       );
       expect(
-        find.byKey(const Key('tarot-coverflow-side-card-universal_waite')),
+        find.descendant(
+          of: thothDeck,
+          matching: find.byKey(const Key('tarot-selected-card-edge-glow')),
+        ),
         findsOneWidget,
       );
+
+      await tester.tap(find.byKey(const Key('tarot-deck-fan-left')));
+      await tester.pumpAndSettle();
       expect(
-        find.byKey(const Key('tarot-coverflow-far-card-oracle')),
-        findsNothing,
+        find.descendant(
+          of: rwsDeck,
+          matching: find.byKey(const Key('tarot-jukebox-center-card')),
+        ),
+        findsOneWidget,
       );
       expect(
         find.byKey(const Key('tarot-immersive-deck-stage')),
@@ -3428,7 +3496,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text(UserText.navReading).first);
     await tester.pumpAndSettle();
-    await tester.tap(find.text(UserText.readingToolTarot).last);
+    await tester.tap(find.byKey(const Key('atelier-tarot-action')));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('바로 덱 선택'));
     await tester.pumpAndSettle();

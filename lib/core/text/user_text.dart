@@ -60,6 +60,14 @@ abstract final class UserText {
 
   // Area pages
   static const readingWorkspaceTitle = '리딩';
+  static const readingAtelierTarotTitle = '구조를 읽다';
+  static const readingAtelierOracleTitle = '메시지를 듣다';
+  static const readingAtelierStartTarot = '타로 시작';
+  static const readingAtelierStartOracle = '오라클 리딩 시작';
+  static const readingAtelierEmptyTitle = '오늘의 질문을 위한 조용한 자리';
+  static const readingAtelierEmptyBody = '타로의 구조를 펼치거나, 오라클의 메시지를 만나보세요.';
+  static const readingAtelierRecentOracle = '최근 오라클 리딩';
+  static const oracleReadingTitle = '호로스코프 벨린 오라클';
   static const readingToolTarot = '타로';
   static const readingToolSaju = '사주';
   static const readingToolAstrology = '점성학';
