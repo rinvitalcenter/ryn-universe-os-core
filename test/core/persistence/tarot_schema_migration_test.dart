@@ -4,7 +4,7 @@ import 'package:ryn_universe_os_core/core/persistence/app_database.dart';
 import 'package:ryn_universe_os_core/core/persistence/migrations.dart';
 
 void main() {
-  group('Tarot schema v5', () {
+  group('Tarot schema preserved in v6', () {
     late RynAppDatabase database;
 
     setUp(() {
@@ -16,10 +16,10 @@ void main() {
     });
 
     test(
-      'fresh database creates schema version 5 and four Tarot tables',
+      'fresh database creates schema version 6 and preserves four Tarot tables',
       () async {
-        expect(database.schemaVersion, 5);
-        expect(plannedCurrentSchemaVersion, 5);
+        expect(database.schemaVersion, 6);
+        expect(plannedCurrentSchemaVersion, 6);
 
         final tables = await _tableNames(database);
         expect(
@@ -225,7 +225,7 @@ void main() {
     );
   });
 
-  group('Tarot add-only migration 4 to 5', () {
+  group('Tarot-preserving add-only migration 4 to 5 to 6', () {
     test(
       'preserves governance data, adds four tables, and fabricates no Tarot rows',
       () async {
@@ -286,7 +286,7 @@ void main() {
           NativeDatabase.memory(
             setup: (raw) {
               raw.execute(_version4AppSettingsSql);
-              raw.execute('PRAGMA user_version = 6');
+              raw.execute('PRAGMA user_version = 7');
             },
           ),
         );

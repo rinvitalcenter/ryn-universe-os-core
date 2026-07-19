@@ -7,12 +7,12 @@ import '../../../core/persistence/app_database.dart';
 import '../../../core/persistence/migrations.dart';
 import '../../../core/persistence/runtime_data_profile.dart';
 import '../../../core/repositories/repository_result.dart';
+import '../../../core/runtime/ryn_runtime_services.dart';
 import '../../records/models/session_tarot_results.dart';
 import '../backup_recovery/application/tarot_restore_coordinator.dart';
 import '../backup_recovery/application/tarot_restore_startup_recovery_coordinator.dart';
 import '../backup_recovery/infrastructure/tarot_backup_path_contract.dart';
-import '../data/persistence/drift_tarot_reading_repository.dart';
-import '../data/persistence/tarot_reading_repository.dart';
+
 import '../domain/tarot_persistence_models.dart';
 import '../models/tarot_interpretation_session_draft.dart';
 import '../models/tarot_reading_result_snapshot.dart';
@@ -101,8 +101,7 @@ final class TarotRuntimeController extends ChangeNotifier {
   final Map<String, TarotInterpretationSessionDraft> _lastSavedDrafts = {};
   final Map<String, TarotDraftSaveStatus> _saveStatuses = {};
   List<PersistedTarotReadingRecord> _records = const [];
-  RynAppDatabase? _database;
-  TarotReadingRepository? _repository;
+  RynRuntimeServices? _runtimeServices;
   Future<void>? _databaseCloseFuture;
   TarotRuntimeStartupStatus _startupStatus =
       TarotRuntimeStartupStatus.initializing;
@@ -118,6 +117,7 @@ final class TarotRuntimeController extends ChangeNotifier {
   TarotRestoreStartupRecoveryResult? get startupRecoveryResult =>
       _startupRecoveryResult;
   bool get isClosed => _closed;
+  RynRuntimeServices? get runtimeServices => _runtimeServices;
   SessionTarotResults get sessionResults => _sessionResults;
   List<TarotReadingResultSnapshot> get snapshots => _sessionResults.results;
   String? get activeReadingInstanceId =>
@@ -170,11 +170,10 @@ final class TarotRuntimeController extends ChangeNotifier {
         return;
       }
       _verifyExistingSchemaBeforeOpen(resolvedPath.databasePath);
-      final database =
-          _database ??
-          await RynAppDatabase.openDevelopment(resolvedPath: resolvedPath);
-      _database = database;
-      _repository = DriftTarotReadingRepository(database);
+      final database = await RynAppDatabase.openDevelopment(
+        resolvedPath: resolvedPath,
+      );
+      _runtimeServices = RynRuntimeServices(database);
       await database.customSelect('PRAGMA user_version').getSingle();
       await _reload();
     } on _UnsupportedRuntimeSchema {
@@ -206,7 +205,7 @@ final class TarotRuntimeController extends ChangeNotifier {
     required int readingTimezoneOffsetMinutes,
     TarotInterpretationSessionDraft? interpretation,
   }) async {
-    final repository = _repository;
+    final repository = _runtimeServices?.tarotReadings;
     if (repository == null) return _writeUnavailable();
     final result = await repository.createCompletedReading(
       CompletedTarotReadingPersistenceInput(
@@ -232,7 +231,7 @@ final class TarotRuntimeController extends ChangeNotifier {
   }
 
   Future<bool> saveInterpretation(String readingInstanceId) async {
-    final repository = _repository;
+    final repository = _runtimeServices?.tarotReadings;
     final draft = _drafts[readingInstanceId];
     if (repository == null || draft == null) return _writeUnavailable();
     _saveStatuses[readingInstanceId] = TarotDraftSaveStatus.saving;
@@ -267,7 +266,7 @@ final class TarotRuntimeController extends ChangeNotifier {
   }
 
   Future<bool> hideActiveFromHome() async {
-    final repository = _repository;
+    final repository = _runtimeServices?.tarotReadings;
     if (repository == null) return _writeUnavailable();
     final result = await repository.hideActiveHomeReading();
     if (result.isFailure) return _captureRepositoryWriteFailure(result.error!);
@@ -276,7 +275,7 @@ final class TarotRuntimeController extends ChangeNotifier {
   }
 
   Future<bool> featureReading(String readingInstanceId) async {
-    final repository = _repository;
+    final repository = _runtimeServices?.tarotReadings;
     if (repository == null) return _writeUnavailable();
     final record = recordFor(readingInstanceId);
     if (record == null) return _writeUnavailable();
@@ -327,13 +326,14 @@ final class TarotRuntimeController extends ChangeNotifier {
 
   Future<void> _reopenForRestore(RynResolvedDatabasePath resolvedPath) async {
     await _closeDatabase();
-    _database = await RynAppDatabase.openDevelopment(
+    final database = await RynAppDatabase.openDevelopment(
       resolvedPath: resolvedPath,
     );
+    _runtimeServices = RynRuntimeServices(database);
   }
 
   Future<void> _validateBasicRestoreRead() async {
-    final database = _database;
+    final database = _runtimeServices?.database;
     if (database == null) throw StateError('restore runtime is closed');
     await database.customSelect('PRAGMA user_version').getSingle();
   }
@@ -354,7 +354,7 @@ final class TarotRuntimeController extends ChangeNotifier {
   }
 
   Future<void> _reload({bool preserveLiveDrafts = false}) async {
-    final repository = _repository!;
+    final repository = _runtimeServices!.tarotReadings;
     final recordsResult = await repository.loadAllReadings();
     final activeResult = await repository.getActiveHomeReadingId();
     if (recordsResult.isFailure || activeResult.isFailure) {
@@ -467,9 +467,8 @@ final class TarotRuntimeController extends ChangeNotifier {
       await closing;
       return;
     }
-    final database = _database;
-    _database = null;
-    _repository = null;
+    final database = _runtimeServices?.database;
+    _runtimeServices = null;
     if (database == null) return;
     final closeFuture = database.close();
     _databaseCloseFuture = closeFuture;

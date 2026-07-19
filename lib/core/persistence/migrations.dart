@@ -3,10 +3,11 @@ const int plannedInitialSchemaVersion = 1;
 
 /// Current global schema version.
 ///
-/// Version 5 adds only the approved Tarot aggregate tables and typed Home
-/// singleton state to the existing version 4 governance schema.
-const int plannedCurrentSchemaVersion = 5;
+/// Version 6 adds the approved Person Core foundation without changing the
+/// existing governance or Tarot tables.
+const int plannedCurrentSchemaVersion = 6;
 
-/// The only supported upgrade in this phase is the truthful add-only 4 -> 5
-/// migration implemented by [RynAppDatabase.migration].
-const String migrationImplementationStatus = 'add_only_4_to_5_implemented';
+/// Supported upgrades are truthful add-only 5 -> 6 and chained 4 -> 5 -> 6
+/// migrations implemented by [RynAppDatabase.migration].
+const String migrationImplementationStatus =
+    'add_only_5_to_6_and_4_to_5_to_6_implemented';

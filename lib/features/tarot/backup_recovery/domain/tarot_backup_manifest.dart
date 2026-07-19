@@ -30,8 +30,10 @@ final class TarotBackupManifest {
 
   static const int backupFormatVersion = 1;
   static const String applicationIdentity = 'RinVitalCenter/RynUniverseOS';
-  static const String contentScope = 'tarot_persistence_v0_2';
-  static const int schemaVersion = 5;
+  static const String contentScope = 'person_core_tarot_persistence_v0_3';
+  static const int schemaVersion = 6;
+  static const String schemaV5RestorePolicy =
+      'restore_with_schema_v5_application_then_reopen_to_migrate';
   static const String databasePayloadFilename =
       'data/ryn_universe_os_core_snapshot.sqlite';
   static const String checksumFilename = 'checksums/sha256.txt';
@@ -77,6 +79,12 @@ final class TarotBackupManifest {
     'tarot_card_placements',
     'tarot_interpretations',
     'app_runtime_state',
+    'persons',
+    'person_roles',
+    'person_relationships',
+    'person_birth_profiles',
+    'encounters',
+    'encounter_notes',
   ];
 
   static const Map<String, List<String>> requiredColumnsByTableV1 =
@@ -211,6 +219,81 @@ final class TarotBackupManifest {
           'state_key',
           'active_home_tarot_reading_id',
           'updated_at_utc_us',
+        ],
+        'persons': <String>[
+          'id',
+          'display_name',
+          'status',
+          'relationship_summary',
+          'first_met_on_utc_us',
+          'archived_at_utc_us',
+          'created_at_utc_us',
+          'updated_at_utc_us',
+        ],
+        'person_roles': <String>[
+          'id',
+          'person_id',
+          'role_type',
+          'effective_from_utc_us',
+          'effective_to_utc_us',
+          'note',
+          'created_at_utc_us',
+          'updated_at_utc_us',
+        ],
+        'person_relationships': <String>[
+          'id',
+          'from_person_id',
+          'to_person_id',
+          'relationship_type',
+          'effective_from_utc_us',
+          'effective_to_utc_us',
+          'note',
+          'created_at_utc_us',
+          'updated_at_utc_us',
+        ],
+        'person_birth_profiles': <String>[
+          'id',
+          'person_id',
+          'revision_number',
+          'birth_date',
+          'birth_date_precision',
+          'birth_time',
+          'birth_time_precision',
+          'birthplace_label',
+          'time_zone_id',
+          'utc_offset_minutes_at_birth',
+          'calendar_system',
+          'is_leap_month',
+          'source_note',
+          'verification_state',
+          'supersedes_birth_profile_id',
+          'superseded_at_utc_us',
+          'created_at_utc_us',
+        ],
+        'encounters': <String>[
+          'id',
+          'person_id',
+          'occurred_at_utc_us',
+          'occurred_precision',
+          'encounter_type',
+          'title',
+          'summary',
+          'status',
+          'follow_up_at_utc_us',
+          'archived_at_utc_us',
+          'created_at_utc_us',
+          'updated_at_utc_us',
+        ],
+        'encounter_notes': <String>[
+          'id',
+          'encounter_id',
+          'note_type',
+          'body',
+          'recorded_at_utc_us',
+          'updated_at_utc_us',
+          'supersedes_note_id',
+          'superseded_at_utc_us',
+          'redacted_at_utc_us',
         ],
       };
 

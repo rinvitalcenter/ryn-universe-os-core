@@ -94,9 +94,21 @@ final class TarotBackupDatabaseInspector {
         'tarot_interpretations',
         'app_runtime_state',
       ].every(tableNames.contains);
-      final aggregate = hasTarotTables
+      final tarotAggregate = hasTarotTables
           ? _inspectAggregate(database)
           : const _AggregateEvidence.invalid();
+      final hasPersonCoreTables = <String>[
+        'persons',
+        'person_roles',
+        'person_relationships',
+        'person_birth_profiles',
+        'encounters',
+        'encounter_notes',
+      ].every(tableNames.contains);
+      final personCoreInvariantsOk =
+          hasPersonCoreTables && _inspectPersonCore(database);
+      final personSchemaContractOk =
+          hasPersonCoreTables && _inspectPersonSchemaContract(database);
       final integrityCheckOk =
           database.select('PRAGMA integrity_check').length == 1 &&
           database.select('PRAGMA integrity_check').first.values.first == 'ok';
@@ -115,16 +127,17 @@ final class TarotBackupDatabaseInspector {
         unexpectedTablesAbsent: unexpectedTablesAbsent,
         tableRowCounts: rowCounts,
         readingRowCount: rowCounts['tarot_readings'] ?? 0,
-        distinctReadingIdCount: aggregate.distinctReadingIdCount,
+        distinctReadingIdCount: tarotAggregate.distinctReadingIdCount,
         placementCount: rowCounts['tarot_card_placements'] ?? 0,
         interpretationCount: rowCounts['tarot_interpretations'] ?? 0,
         runtimeStateRowCount: rowCounts['app_runtime_state'] ?? 0,
-        lifecycleStateCounts: aggregate.lifecycleStateCounts,
-        activeHomeReadingIdPresent: aggregate.activeHomeReadingIdPresent,
+        lifecycleStateCounts: tarotAggregate.lifecycleStateCounts,
+        activeHomeReadingIdPresent: tarotAggregate.activeHomeReadingIdPresent,
         unsupportedTableRowsZero: unsupportedRowsZero,
         integrityCheckOk: integrityCheckOk,
         foreignKeyCheckOk: foreignKeyCheckOk,
-        aggregateInvariantsOk: aggregate.valid,
+        schemaContractOk: personSchemaContractOk,
+        aggregateInvariantsOk: tarotAggregate.valid && personCoreInvariantsOk,
         freelistCount: _scalar(database, 'PRAGMA freelist_count'),
         hasUnexpectedNonEmptySidecar: false,
       );
@@ -159,6 +172,11 @@ final class TarotBackupDatabaseInspector {
     bool requireAcceptableSidecars = false,
   }) {
     final evidence = inspect(databasePath, policy: policy);
+    if (evidence.schemaVersion == 5) {
+      throw const TarotBackupInspectionException(
+        'schema_v5_restore_requires_v5_application',
+      );
+    }
     if (evidence.schemaVersion != TarotBackupManifest.schemaVersion) {
       throw const TarotBackupInspectionException('schema_version_mismatch');
     }
@@ -179,6 +197,9 @@ final class TarotBackupDatabaseInspector {
     }
     if (!evidence.foreignKeyCheckOk) {
       throw const TarotBackupInspectionException('foreign_key_check_failed');
+    }
+    if (!evidence.schemaContractOk) {
+      throw const TarotBackupInspectionException('schema_contract_mismatch');
     }
     if (!evidence.unsupportedTableRowsZero) {
       throw const TarotBackupInspectionException('unsupported_table_nonzero');
@@ -301,6 +322,248 @@ final class TarotBackupDatabaseInspector {
           invalidActiveHome == 0,
     );
   }
+
+  bool _inspectPersonCore(Database database) {
+    final invalidEnums = _scalar(database, '''SELECT
+      (SELECT count(*) FROM persons
+        WHERE status NOT IN ('active', 'inactive')) +
+      (SELECT count(*) FROM person_roles
+        WHERE role_type NOT IN ('self', 'family', 'friend', 'studyMember',
+          'client', 'student', 'instructor', 'practiceParticipant', 'other')) +
+      (SELECT count(*) FROM person_birth_profiles
+        WHERE birth_date_precision NOT IN ('exact', 'approximate', 'unknown')
+          OR birth_time_precision NOT IN ('exact', 'approximate', 'unknown')
+          OR calendar_system NOT IN ('solar', 'lunar', 'unknown')
+          OR verification_state NOT IN ('unverified', 'confirmed', 'disputed')) +
+      (SELECT count(*) FROM encounters
+        WHERE occurred_precision NOT IN ('exact', 'approximate', 'dateOnly')
+          OR encounter_type NOT IN ('inPersonCounseling', 'onlineCounseling',
+            'phoneCall', 'studyMeeting', 'practiceInstruction',
+            'followUpReview', 'selfReview', 'other')
+          OR status NOT IN ('completed', 'voided')) +
+      (SELECT count(*) FROM encounter_notes
+        WHERE note_type NOT IN ('reportedFact', 'ownerObservation',
+          'toolInterpretation', 'workingHypothesis', 'agreedAction',
+          'privateReflection'))''');
+    final invalidLifecycle = _scalar(database, '''SELECT
+      (SELECT count(*) FROM person_roles
+        WHERE effective_to_utc_us IS NOT NULL
+          AND effective_to_utc_us < effective_from_utc_us) +
+      (SELECT count(*) FROM person_relationships
+        WHERE from_person_id = to_person_id OR
+          (effective_to_utc_us IS NOT NULL
+            AND effective_to_utc_us < effective_from_utc_us)) +
+      (SELECT count(*) FROM person_birth_profiles
+        WHERE revision_number < 1 OR
+          (supersedes_birth_profile_id IS NOT NULL
+            AND supersedes_birth_profile_id = id)) +
+      (SELECT count(*) FROM encounter_notes
+        WHERE (redacted_at_utc_us IS NULL AND length(trim(body)) = 0) OR
+          (redacted_at_utc_us IS NOT NULL AND body != ''))''');
+    final duplicateCurrentRoles = _scalar(database, '''SELECT count(*) FROM (
+      SELECT person_id, role_type FROM person_roles
+      WHERE effective_to_utc_us IS NULL
+      GROUP BY person_id, role_type HAVING count(*) > 1
+    )''');
+    final duplicateActiveSelf = _scalar(database, '''SELECT count(*) FROM (
+      SELECT role_type FROM person_roles
+      WHERE role_type = 'self' AND effective_to_utc_us IS NULL
+      GROUP BY role_type HAVING count(*) > 1
+    )''');
+    final duplicateCurrentBirthProfiles = _scalar(
+      database,
+      '''SELECT count(*) FROM (
+      SELECT person_id FROM person_birth_profiles
+      WHERE superseded_at_utc_us IS NULL
+      GROUP BY person_id HAVING count(*) > 1
+    )''',
+    );
+    return invalidEnums == 0 &&
+        invalidLifecycle == 0 &&
+        duplicateCurrentRoles == 0 &&
+        duplicateActiveSelf == 0 &&
+        duplicateCurrentBirthProfiles == 0;
+  }
+
+  bool _inspectPersonSchemaContract(Database database) {
+    const expectedForeignKeys = <String, Set<String>>{
+      'persons': <String>{},
+      'person_roles': <String>{'person_id|persons|id|cascade'},
+      'person_relationships': <String>{
+        'from_person_id|persons|id|cascade',
+        'to_person_id|persons|id|cascade',
+      },
+      'person_birth_profiles': <String>{
+        'person_id|persons|id|cascade',
+        'supersedes_birth_profile_id|person_birth_profiles|id|set null',
+      },
+      'encounters': <String>{'person_id|persons|id|cascade'},
+      'encounter_notes': <String>{
+        'encounter_id|encounters|id|cascade',
+        'supersedes_note_id|encounter_notes|id|set null',
+      },
+    };
+    const requiredChecks = <String, List<String>>{
+      'persons': <String>[
+        'CHECK (length(trim(id)) > 0)',
+        'CHECK (length(trim(display_name)) > 0)',
+        "CHECK (status IN ('active', 'inactive'))",
+        'CHECK (updated_at_utc_us >= created_at_utc_us)',
+      ],
+      'person_roles': <String>[
+        "CHECK (role_type IN ('self', 'family', 'friend', 'studyMember', 'client', 'student', 'instructor', 'practiceParticipant', 'other'))",
+        'CHECK (effective_to_utc_us IS NULL OR effective_to_utc_us >= effective_from_utc_us)',
+        'CHECK (updated_at_utc_us >= created_at_utc_us)',
+      ],
+      'person_relationships': <String>[
+        'CHECK (from_person_id != to_person_id)',
+        'CHECK (length(trim(relationship_type)) > 0)',
+        'CHECK (effective_to_utc_us IS NULL OR effective_to_utc_us >= effective_from_utc_us)',
+        'CHECK (updated_at_utc_us >= created_at_utc_us)',
+      ],
+      'person_birth_profiles': <String>[
+        'CHECK (revision_number >= 1)',
+        "CHECK (birth_date_precision IN ('exact', 'approximate', 'unknown'))",
+        "CHECK (birth_time_precision IN ('exact', 'approximate', 'unknown'))",
+        "CHECK (calendar_system IN ('solar', 'lunar', 'unknown'))",
+        "CHECK (verification_state IN ('unverified', 'confirmed', 'disputed'))",
+        'CHECK (utc_offset_minutes_at_birth IS NULL OR utc_offset_minutes_at_birth BETWEEN -840 AND 840)',
+        "CHECK (calendar_system = 'lunar' OR is_leap_month IS NULL)",
+        'CHECK (supersedes_birth_profile_id IS NULL OR supersedes_birth_profile_id != id)',
+      ],
+      'encounters': <String>[
+        "CHECK (occurred_precision IN ('exact', 'approximate', 'dateOnly'))",
+        "CHECK (encounter_type IN ('inPersonCounseling', 'onlineCounseling', 'phoneCall', 'studyMeeting', 'practiceInstruction', 'followUpReview', 'selfReview', 'other'))",
+        'CHECK (length(trim(title)) > 0)',
+        "CHECK (status IN ('completed', 'voided'))",
+        'CHECK (updated_at_utc_us >= created_at_utc_us)',
+      ],
+      'encounter_notes': <String>[
+        "CHECK (note_type IN ('reportedFact', 'ownerObservation', 'toolInterpretation', 'workingHypothesis', 'agreedAction', 'privateReflection'))",
+        "CHECK ((redacted_at_utc_us IS NULL AND length(trim(body)) > 0) OR (redacted_at_utc_us IS NOT NULL AND body = ''))",
+        'CHECK (supersedes_note_id IS NULL OR supersedes_note_id != id)',
+        'CHECK (updated_at_utc_us >= recorded_at_utc_us)',
+      ],
+    };
+    const requiredIndexes = <String, _IndexContract>{
+      'persons_status_archive_idx': _IndexContract('persons', <String>[
+        'status',
+        'archived_at_utc_us',
+      ]),
+      'persons_display_name_idx': _IndexContract('persons', <String>[
+        'display_name',
+      ]),
+      'person_roles_person_period_idx': _IndexContract('person_roles', <String>[
+        'person_id',
+        'effective_from_utc_us',
+      ]),
+      'person_roles_active_unique': _IndexContract(
+        'person_roles',
+        <String>['person_id', 'role_type'],
+        unique: true,
+        partialSql: 'WHERE effective_to_utc_us IS NULL',
+      ),
+      'person_roles_single_active_self': _IndexContract(
+        'person_roles',
+        <String>['role_type'],
+        unique: true,
+        partialSql: "WHERE role_type = 'self' AND effective_to_utc_us IS NULL",
+      ),
+      'person_relationships_from_idx': _IndexContract(
+        'person_relationships',
+        <String>['from_person_id', 'effective_from_utc_us'],
+      ),
+      'person_relationships_to_idx': _IndexContract(
+        'person_relationships',
+        <String>['to_person_id', 'effective_from_utc_us'],
+      ),
+      'person_birth_profiles_history_idx': _IndexContract(
+        'person_birth_profiles',
+        <String>['person_id', 'revision_number'],
+      ),
+      'person_birth_profiles_current_unique': _IndexContract(
+        'person_birth_profiles',
+        <String>['person_id'],
+        unique: true,
+        partialSql: 'WHERE superseded_at_utc_us IS NULL',
+      ),
+      'encounters_person_occurred_idx': _IndexContract('encounters', <String>[
+        'person_id',
+        'occurred_at_utc_us',
+      ]),
+      'encounters_person_follow_up_idx': _IndexContract('encounters', <String>[
+        'person_id',
+        'follow_up_at_utc_us',
+      ]),
+      'encounter_notes_encounter_recorded_idx': _IndexContract(
+        'encounter_notes',
+        <String>['encounter_id', 'recorded_at_utc_us'],
+      ),
+    };
+
+    for (final entry in expectedForeignKeys.entries) {
+      final primaryKeys = database
+          .select('PRAGMA table_info("${entry.key}")')
+          .where((row) => (row['pk']! as int) > 0)
+          .map((row) => row['name']! as String)
+          .toList(growable: false);
+      if (!_sameList(primaryKeys, const <String>['id'])) return false;
+      final actualForeignKeys = database
+          .select('PRAGMA foreign_key_list("${entry.key}")')
+          .map(
+            (row) =>
+                '${row['from']}|${row['table']}|${row['to']}|${row['on_delete']}'
+                    .toLowerCase(),
+          )
+          .toSet();
+      if (!_sameSet(actualForeignKeys, entry.value)) return false;
+
+      final tableSql =
+          database.select(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?",
+                <Object?>[entry.key],
+              ).single['sql']!
+              as String;
+      final normalizedTableSql = _normalizeSchemaSql(tableSql);
+      if (!requiredChecks[entry.key]!.every(
+        (check) => normalizedTableSql.contains(_normalizeSchemaSql(check)),
+      )) {
+        return false;
+      }
+    }
+
+    if (!_hasUniqueColumns(database, 'person_relationships', const <String>[
+      'from_person_id',
+      'to_person_id',
+      'relationship_type',
+      'effective_from_utc_us',
+    ])) {
+      return false;
+    }
+    if (!_hasUniqueColumns(database, 'person_birth_profiles', const <String>[
+      'person_id',
+      'revision_number',
+    ])) {
+      return false;
+    }
+    return requiredIndexes.entries.every(
+      (entry) => _matchesIndex(database, entry.key, entry.value),
+    );
+  }
+}
+
+final class _IndexContract {
+  const _IndexContract(
+    this.table,
+    this.columns, {
+    this.unique = false,
+    this.partialSql,
+  });
+
+  final String table;
+  final List<String> columns;
+  final bool unique;
+  final String? partialSql;
 }
 
 final class TarotDatabaseEvidence {
@@ -321,6 +584,7 @@ final class TarotDatabaseEvidence {
     required this.unsupportedTableRowsZero,
     required this.integrityCheckOk,
     required this.foreignKeyCheckOk,
+    required this.schemaContractOk,
     required this.aggregateInvariantsOk,
     required this.freelistCount,
     required this.hasUnexpectedNonEmptySidecar,
@@ -346,6 +610,7 @@ final class TarotDatabaseEvidence {
   final bool unsupportedTableRowsZero;
   final bool integrityCheckOk;
   final bool foreignKeyCheckOk;
+  final bool schemaContractOk;
   final bool aggregateInvariantsOk;
   final int freelistCount;
   final bool hasUnexpectedNonEmptySidecar;
@@ -370,6 +635,7 @@ final class TarotDatabaseEvidence {
       unsupportedTableRowsZero == other.unsupportedTableRowsZero &&
       unexpectedTablesAbsent == other.unexpectedTablesAbsent &&
       exactColumnsMatch == other.exactColumnsMatch &&
+      schemaContractOk == other.schemaContractOk &&
       aggregateInvariantsOk == other.aggregateInvariantsOk;
 
   TarotDatabaseEvidence withSidecarState(bool hasUnexpectedSidecar) =>
@@ -390,6 +656,7 @@ final class TarotDatabaseEvidence {
         unsupportedTableRowsZero: unsupportedTableRowsZero,
         integrityCheckOk: integrityCheckOk,
         foreignKeyCheckOk: foreignKeyCheckOk,
+        schemaContractOk: schemaContractOk,
         aggregateInvariantsOk: aggregateInvariantsOk,
         freelistCount: freelistCount,
         hasUnexpectedNonEmptySidecar: hasUnexpectedSidecar,
@@ -433,6 +700,65 @@ final class _AggregateEvidence {
 
 int _scalar(Database database, String sql) =>
     database.select(sql).first.values.first! as int;
+
+bool _matchesIndex(
+  Database database,
+  String indexName,
+  _IndexContract contract,
+) {
+  final indexRows = database.select('PRAGMA index_list("${contract.table}")');
+  final matches = indexRows.where((row) => row['name'] == indexName).toList();
+  if (matches.length != 1) return false;
+  final row = matches.single;
+  if ((row['unique']! as int) != (contract.unique ? 1 : 0)) return false;
+  final expectsPartial = contract.partialSql != null;
+  if ((row['partial']! as int) != (expectsPartial ? 1 : 0)) return false;
+  final columns = database
+      .select('PRAGMA index_info("$indexName")')
+      .map((item) => item['name']! as String)
+      .toList(growable: false);
+  if (!_sameList(columns, contract.columns)) return false;
+  if (contract.partialSql == null) return true;
+  final indexSql =
+      database.select(
+            "SELECT sql FROM sqlite_master WHERE type = 'index' AND name = ?",
+            <Object?>[indexName],
+          ).single['sql']!
+          as String;
+  return _normalizeSchemaSql(
+    indexSql,
+  ).contains(_normalizeSchemaSql(contract.partialSql!));
+}
+
+bool _hasUniqueColumns(
+  Database database,
+  String table,
+  List<String> expectedColumns,
+) {
+  for (final row in database.select('PRAGMA index_list("$table")')) {
+    if ((row['unique']! as int) != 1 || (row['partial']! as int) != 0) {
+      continue;
+    }
+    final name = row['name']! as String;
+    final columns = database
+        .select('PRAGMA index_info("$name")')
+        .map((item) => item['name']! as String)
+        .toList(growable: false);
+    if (_sameList(columns, expectedColumns)) return true;
+  }
+  return false;
+}
+
+String _normalizeSchemaSql(String sql) =>
+    sql.toLowerCase().replaceAll(RegExp(r'[\s"`\[\]]'), '');
+
+bool _sameList<T>(List<T> left, List<T> right) {
+  if (left.length != right.length) return false;
+  for (var index = 0; index < left.length; index += 1) {
+    if (left[index] != right[index]) return false;
+  }
+  return true;
+}
 
 bool _hasNonEmptySidecar(String path) {
   for (final suffix in const <String>['-wal', '-shm', '-journal']) {

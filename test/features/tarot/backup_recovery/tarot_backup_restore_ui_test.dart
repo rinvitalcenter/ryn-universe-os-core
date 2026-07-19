@@ -22,7 +22,7 @@ void main() {
     createdAtUtc: DateTime.utc(2026, 7, 17, 2, 3, 4),
     operationId: 'deadbeef',
     backupFormatVersion: 1,
-    schemaVersion: 5,
+    schemaVersion: 6,
     snapshotSha256: 'a' * 64,
     snapshotSizeBytes: 4096,
   );

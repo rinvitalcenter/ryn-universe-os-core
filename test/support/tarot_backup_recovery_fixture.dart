@@ -136,6 +136,74 @@ final class TarotBackupRecoveryFixture {
     );
   }
 
+  void insertSyntheticPersonCore(Database database) {
+    final now = DateTime.utc(2026, 7, 17).microsecondsSinceEpoch;
+    database.execute(
+      '''INSERT INTO persons (
+        id, display_name, status, relationship_summary,
+        created_at_utc_us, updated_at_utc_us
+      ) VALUES (?, ?, 'active', ?, ?, ?)''',
+      <Object?>[
+        'person.synthetic.study.01',
+        '합성 인물 A',
+        'SYNTHETIC_RELATIONSHIP_SUMMARY',
+        now,
+        now,
+      ],
+    );
+    database.execute(
+      '''INSERT INTO person_roles (
+        id, person_id, role_type, effective_from_utc_us,
+        created_at_utc_us, updated_at_utc_us
+      ) VALUES (?, ?, 'studyMember', ?, ?, ?)''',
+      <Object?>[
+        'person-role.synthetic.study.01',
+        'person.synthetic.study.01',
+        now,
+        now,
+        now,
+      ],
+    );
+    database.execute(
+      '''INSERT INTO person_birth_profiles (
+        id, person_id, revision_number, birth_date_precision,
+        birth_time_precision, calendar_system, verification_state,
+        created_at_utc_us
+      ) VALUES (?, ?, 1, 'unknown', 'unknown', 'unknown', 'unverified', ?)''',
+      <Object?>[
+        'birth-profile.synthetic.study.01.r1',
+        'person.synthetic.study.01',
+        now,
+      ],
+    );
+    database.execute(
+      '''INSERT INTO encounters (
+        id, person_id, occurred_at_utc_us, occurred_precision,
+        encounter_type, title, status, created_at_utc_us, updated_at_utc_us
+      ) VALUES (?, ?, ?, 'exact', 'studyMeeting', ?, 'completed', ?, ?)''',
+      <Object?>[
+        'encounter.synthetic.study.01',
+        'person.synthetic.study.01',
+        now,
+        'SYNTHETIC_STUDY_MEETING',
+        now,
+        now,
+      ],
+    );
+    database.execute(
+      '''INSERT INTO encounter_notes (
+        id, encounter_id, note_type, body, recorded_at_utc_us, updated_at_utc_us
+      ) VALUES (?, ?, 'ownerObservation', ?, ?, ?)''',
+      <Object?>[
+        'encounter-note.synthetic.study.01',
+        'encounter.synthetic.study.01',
+        'SYNTHETIC_PERSON_NOTE',
+        now,
+        now,
+      ],
+    );
+  }
+
   Map<String, Object?> logicalEvidence(Database database) => <String, Object?>{
     'userVersion': database.userVersion,
     'readingCount': _scalar(database, 'SELECT count(*) FROM tarot_readings'),

@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 
+import '../../features/people/data/persistence/person_tables.dart';
 import '../../features/tarot/data/persistence/tarot_tables.dart';
 import 'database_connection.dart';
 import 'migrations.dart';
@@ -300,11 +301,8 @@ class ApprovalRecords extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
-/// Generated Drift database for approved governance and Tarot persistence slices.
-///
-/// Runtime opening remains deferred: production bootstrap has no caller of
-/// [RynAppDatabase.open]. Tarot tables are exercised with in-memory executors in
-/// this phase.
+/// Generated Drift database for approved governance, Person Core, and Tarot
+/// persistence slices.
 @DriftDatabase(
   tables: [
     AppSettings,
@@ -318,6 +316,12 @@ class ApprovalRecords extends Table {
     TarotCardPlacements,
     TarotInterpretations,
     AppRuntimeState,
+    Persons,
+    PersonRoles,
+    PersonRelationships,
+    PersonBirthProfiles,
+    Encounters,
+    EncounterNotes,
   ],
 )
 final class RynAppDatabase extends _$RynAppDatabase {
@@ -340,16 +344,26 @@ final class RynAppDatabase extends _$RynAppDatabase {
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (migrator) async {
       await migrator.createAll();
+      await _ensurePersonCoreIndexes();
       await _ensureMainRuntimeState();
     },
     onUpgrade: (migrator, from, to) async {
-      if (from != 4 || to != 5) {
+      if (to != 6 || (from != 4 && from != 5)) {
         throw StateError('Unsupported database migration path: $from -> $to');
       }
-      await migrator.createTable(tarotReadings);
-      await migrator.createTable(tarotCardPlacements);
-      await migrator.createTable(tarotInterpretations);
-      await migrator.createTable(appRuntimeState);
+      if (from == 4) {
+        await migrator.createTable(tarotReadings);
+        await migrator.createTable(tarotCardPlacements);
+        await migrator.createTable(tarotInterpretations);
+        await migrator.createTable(appRuntimeState);
+      }
+      await migrator.createTable(persons);
+      await migrator.createTable(personRoles);
+      await migrator.createTable(personRelationships);
+      await migrator.createTable(personBirthProfiles);
+      await migrator.createTable(encounters);
+      await migrator.createTable(encounterNotes);
+      await _ensurePersonCoreIndexes();
       await _ensureMainRuntimeState();
     },
     beforeOpen: (details) async {
@@ -368,4 +382,24 @@ final class RynAppDatabase extends _$RynAppDatabase {
     "(state_key, active_home_tarot_reading_id, updated_at_utc_us) "
     "VALUES ('main', NULL, 0)",
   );
+
+  Future<void> _ensurePersonCoreIndexes() async {
+    const statements = <String>[
+      'CREATE INDEX IF NOT EXISTS persons_status_archive_idx ON persons (status, archived_at_utc_us)',
+      'CREATE INDEX IF NOT EXISTS persons_display_name_idx ON persons (display_name)',
+      'CREATE INDEX IF NOT EXISTS person_roles_person_period_idx ON person_roles (person_id, effective_from_utc_us)',
+      'CREATE UNIQUE INDEX IF NOT EXISTS person_roles_active_unique ON person_roles (person_id, role_type) WHERE effective_to_utc_us IS NULL',
+      "CREATE UNIQUE INDEX IF NOT EXISTS person_roles_single_active_self ON person_roles (role_type) WHERE role_type = 'self' AND effective_to_utc_us IS NULL",
+      'CREATE INDEX IF NOT EXISTS person_relationships_from_idx ON person_relationships (from_person_id, effective_from_utc_us)',
+      'CREATE INDEX IF NOT EXISTS person_relationships_to_idx ON person_relationships (to_person_id, effective_from_utc_us)',
+      'CREATE INDEX IF NOT EXISTS person_birth_profiles_history_idx ON person_birth_profiles (person_id, revision_number)',
+      'CREATE UNIQUE INDEX IF NOT EXISTS person_birth_profiles_current_unique ON person_birth_profiles (person_id) WHERE superseded_at_utc_us IS NULL',
+      'CREATE INDEX IF NOT EXISTS encounters_person_occurred_idx ON encounters (person_id, occurred_at_utc_us DESC)',
+      'CREATE INDEX IF NOT EXISTS encounters_person_follow_up_idx ON encounters (person_id, follow_up_at_utc_us)',
+      'CREATE INDEX IF NOT EXISTS encounter_notes_encounter_recorded_idx ON encounter_notes (encounter_id, recorded_at_utc_us)',
+    ];
+    for (final statement in statements) {
+      await customStatement(statement);
+    }
+  }
 }
