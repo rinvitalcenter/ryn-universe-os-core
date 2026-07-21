@@ -1,5 +1,316 @@
 import 'package:flutter/material.dart';
 
+/// Canonical Apple-neutral semantic colors for Ryn Universe OS.
+///
+/// Feature widgets consume roles from this extension instead of embedding
+/// palette values. Legacy constants below remain available as compatibility
+/// aliases while modules migrate in separately approved work.
+@immutable
+final class RynSemanticColors extends ThemeExtension<RynSemanticColors> {
+  const RynSemanticColors({
+    required this.appCanvas,
+    required this.primarySurface,
+    required this.secondarySurface,
+    required this.tertiarySurface,
+    required this.primaryText,
+    required this.secondaryText,
+    required this.mutedText,
+    required this.hairline,
+    required this.primaryAction,
+    required this.primaryActionOnDark,
+    required this.selectedState,
+    required this.focusRing,
+    required this.success,
+    required this.warning,
+    required this.destructive,
+    required this.peopleIdentity,
+  });
+
+  static const light = RynSemanticColors(
+    appCanvas: Color(0xFFF5F5F7),
+    primarySurface: Color(0xFFFFFFFF),
+    secondarySurface: Color(0xFFFAFAFC),
+    tertiarySurface: Color(0xFFF0F0F2),
+    primaryText: Color(0xFF1D1D1F),
+    secondaryText: Color(0xFF515154),
+    mutedText: Color(0xFF7A7A7A),
+    hairline: Color(0xFFE0E0E0),
+    primaryAction: Color(0xFF0066CC),
+    primaryActionOnDark: Color(0xFF2997FF),
+    selectedState: Color(0x140066CC),
+    focusRing: Color(0xFF0071E3),
+    success: Color(0xFF248A3D),
+    warning: Color(0xFFB25000),
+    destructive: Color(0xFFD70015),
+    peopleIdentity: Color(0xFF248A3D),
+  );
+
+  static const dark = RynSemanticColors(
+    appCanvas: Color(0xFF000000),
+    primarySurface: Color(0xFF1D1D1F),
+    secondarySurface: Color(0xFF272729),
+    tertiarySurface: Color(0xFF2A2A2C),
+    primaryText: Color(0xFFFFFFFF),
+    secondaryText: Color(0xFFCCCCCC),
+    mutedText: Color(0xFF999999),
+    hairline: Color(0x33FFFFFF),
+    primaryAction: Color(0xFF2997FF),
+    primaryActionOnDark: Color(0xFF2997FF),
+    selectedState: Color(0x292997FF),
+    focusRing: Color(0xFF2997FF),
+    success: Color(0xFF32D74B),
+    warning: Color(0xFFFFD60A),
+    destructive: Color(0xFFFF453A),
+    peopleIdentity: Color(0xFF32D74B),
+  );
+
+  final Color appCanvas;
+  final Color primarySurface;
+  final Color secondarySurface;
+  final Color tertiarySurface;
+  final Color primaryText;
+  final Color secondaryText;
+  final Color mutedText;
+  final Color hairline;
+  final Color primaryAction;
+  final Color primaryActionOnDark;
+  final Color selectedState;
+  final Color focusRing;
+  final Color success;
+  final Color warning;
+  final Color destructive;
+  final Color peopleIdentity;
+
+  @override
+  RynSemanticColors copyWith({
+    Color? appCanvas,
+    Color? primarySurface,
+    Color? secondarySurface,
+    Color? tertiarySurface,
+    Color? primaryText,
+    Color? secondaryText,
+    Color? mutedText,
+    Color? hairline,
+    Color? primaryAction,
+    Color? primaryActionOnDark,
+    Color? selectedState,
+    Color? focusRing,
+    Color? success,
+    Color? warning,
+    Color? destructive,
+    Color? peopleIdentity,
+  }) => RynSemanticColors(
+    appCanvas: appCanvas ?? this.appCanvas,
+    primarySurface: primarySurface ?? this.primarySurface,
+    secondarySurface: secondarySurface ?? this.secondarySurface,
+    tertiarySurface: tertiarySurface ?? this.tertiarySurface,
+    primaryText: primaryText ?? this.primaryText,
+    secondaryText: secondaryText ?? this.secondaryText,
+    mutedText: mutedText ?? this.mutedText,
+    hairline: hairline ?? this.hairline,
+    primaryAction: primaryAction ?? this.primaryAction,
+    primaryActionOnDark: primaryActionOnDark ?? this.primaryActionOnDark,
+    selectedState: selectedState ?? this.selectedState,
+    focusRing: focusRing ?? this.focusRing,
+    success: success ?? this.success,
+    warning: warning ?? this.warning,
+    destructive: destructive ?? this.destructive,
+    peopleIdentity: peopleIdentity ?? this.peopleIdentity,
+  );
+
+  @override
+  RynSemanticColors lerp(
+    covariant ThemeExtension<RynSemanticColors>? other,
+    double t,
+  ) {
+    if (other is! RynSemanticColors) return this;
+    return RynSemanticColors(
+      appCanvas: Color.lerp(appCanvas, other.appCanvas, t)!,
+      primarySurface: Color.lerp(primarySurface, other.primarySurface, t)!,
+      secondarySurface: Color.lerp(
+        secondarySurface,
+        other.secondarySurface,
+        t,
+      )!,
+      tertiarySurface: Color.lerp(tertiarySurface, other.tertiarySurface, t)!,
+      primaryText: Color.lerp(primaryText, other.primaryText, t)!,
+      secondaryText: Color.lerp(secondaryText, other.secondaryText, t)!,
+      mutedText: Color.lerp(mutedText, other.mutedText, t)!,
+      hairline: Color.lerp(hairline, other.hairline, t)!,
+      primaryAction: Color.lerp(primaryAction, other.primaryAction, t)!,
+      primaryActionOnDark: Color.lerp(
+        primaryActionOnDark,
+        other.primaryActionOnDark,
+        t,
+      )!,
+      selectedState: Color.lerp(selectedState, other.selectedState, t)!,
+      focusRing: Color.lerp(focusRing, other.focusRing, t)!,
+      success: Color.lerp(success, other.success, t)!,
+      warning: Color.lerp(warning, other.warning, t)!,
+      destructive: Color.lerp(destructive, other.destructive, t)!,
+      peopleIdentity: Color.lerp(peopleIdentity, other.peopleIdentity, t)!,
+    );
+  }
+}
+
+extension RynSemanticTheme on BuildContext {
+  RynSemanticColors get rynColors =>
+      Theme.of(this).extension<RynSemanticColors>() ??
+      (Theme.of(this).brightness == Brightness.dark
+          ? RynSemanticColors.dark
+          : RynSemanticColors.light);
+}
+
+/// Shared ThemeData factory for the Apple-neutral foundation.
+final class RynTheme {
+  const RynTheme._();
+
+  static ThemeData light({
+    required String fontFamily,
+    required List<String> fontFamilyFallback,
+  }) => _build(
+    colors: RynSemanticColors.light,
+    brightness: Brightness.light,
+    fontFamily: fontFamily,
+    fontFamilyFallback: fontFamilyFallback,
+  );
+
+  static ThemeData dark({
+    required String fontFamily,
+    required List<String> fontFamilyFallback,
+  }) => _build(
+    colors: RynSemanticColors.dark,
+    brightness: Brightness.dark,
+    fontFamily: fontFamily,
+    fontFamilyFallback: fontFamilyFallback,
+  );
+
+  static ThemeData _build({
+    required RynSemanticColors colors,
+    required Brightness brightness,
+    required String fontFamily,
+    required List<String> fontFamilyFallback,
+  }) {
+    final dark = brightness == Brightness.dark;
+    final scheme =
+        ColorScheme.fromSeed(
+          seedColor: colors.primaryAction,
+          brightness: brightness,
+        ).copyWith(
+          primary: colors.primaryAction,
+          onPrimary: Colors.white,
+          secondary: colors.primaryAction,
+          onSecondary: Colors.white,
+          error: colors.destructive,
+          surface: colors.primarySurface,
+          onSurface: colors.primaryText,
+          onSurfaceVariant: colors.secondaryText,
+          outline: colors.hairline,
+          outlineVariant: colors.hairline,
+          surfaceContainerLowest: colors.appCanvas,
+          surfaceContainerLow: colors.secondarySurface,
+          surfaceContainer: colors.tertiarySurface,
+          surfaceContainerHigh: colors.tertiarySurface,
+          surfaceContainerHighest: colors.tertiarySurface,
+        );
+    final inputBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(RynTokens.radiusMd),
+      borderSide: BorderSide(color: colors.hairline),
+    );
+    return ThemeData(
+      brightness: brightness,
+      colorScheme: scheme,
+      scaffoldBackgroundColor: colors.appCanvas,
+      canvasColor: colors.appCanvas,
+      dividerColor: colors.hairline,
+      shadowColor: Colors.transparent,
+      fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
+      useMaterial3: true,
+      extensions: [colors],
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: colors.primaryAction,
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: colors.tertiarySurface,
+          disabledForegroundColor: colors.mutedText,
+          elevation: RynTokens.elevationNone,
+          shadowColor: Colors.transparent,
+          shape: const StadiumBorder(),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 11),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colors.primaryAction,
+          foregroundColor: Colors.white,
+          elevation: RynTokens.elevationNone,
+          shadowColor: Colors.transparent,
+          shape: const StadiumBorder(),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: colors.primaryAction,
+          side: BorderSide(color: colors.hairline),
+          elevation: RynTokens.elevationNone,
+          shape: const StadiumBorder(),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(foregroundColor: colors.primaryAction),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: colors.primarySurface,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 12,
+        ),
+        border: inputBorder,
+        enabledBorder: inputBorder,
+        focusedBorder: inputBorder.copyWith(
+          borderSide: BorderSide(color: colors.focusRing, width: 2),
+        ),
+        errorBorder: inputBorder.copyWith(
+          borderSide: BorderSide(color: colors.destructive),
+        ),
+        focusedErrorBorder: inputBorder.copyWith(
+          borderSide: BorderSide(color: colors.destructive, width: 2),
+        ),
+        labelStyle: TextStyle(color: colors.secondaryText),
+        hintStyle: TextStyle(color: colors.mutedText),
+      ),
+      tabBarTheme: TabBarThemeData(
+        indicatorColor: colors.primaryAction,
+        labelColor: colors.primaryAction,
+        unselectedLabelColor: colors.secondaryText,
+        dividerColor: colors.hairline,
+      ),
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
+          elevation: const WidgetStatePropertyAll(RynTokens.elevationNone),
+          shadowColor: const WidgetStatePropertyAll(Colors.transparent),
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? colors.primaryAction
+                : colors.secondaryText,
+          ),
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? colors.selectedState
+                : Colors.transparent,
+          ),
+          side: WidgetStatePropertyAll(BorderSide(color: colors.hairline)),
+        ),
+      ),
+      focusColor: colors.focusRing.withValues(alpha: dark ? 0.28 : 0.18),
+      splashColor: colors.primaryAction.withValues(alpha: 0.08),
+      highlightColor: colors.primaryAction.withValues(alpha: 0.05),
+    );
+  }
+}
+
 /// Semantic visual tokens for Ryn Universe OS Core.
 ///
 /// This file is intentionally lightweight: it defines reusable constants only.

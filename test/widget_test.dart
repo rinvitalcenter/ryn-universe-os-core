@@ -1,17 +1,56 @@
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:ryn_universe_os_core/core/persistence/app_database.dart';
+import 'package:ryn_universe_os_core/core/runtime/ryn_runtime_services.dart';
 import 'package:ryn_universe_os_core/core/text/user_text.dart';
 import 'package:ryn_universe_os_core/features/home/presentation/home_cinematic_scene.dart';
+import 'package:ryn_universe_os_core/features/people/domain/person_core_models.dart';
 import 'package:ryn_universe_os_core/features/tarot/data/tarot_card_meaning_registry.dart';
 import 'package:ryn_universe_os_core/features/tarot/data/tarot_deck_registry.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_reading_result_snapshot.dart';
 import 'package:ryn_universe_os_core/features/tarot/tarot_spread_shell.dart';
 import 'package:ryn_universe_os_core/main.dart';
+
+Future<RynRuntimeServices> _durablePeopleServices({
+  bool includeAll = false,
+}) async {
+  final database = RynAppDatabase(NativeDatabase.memory());
+  final services = RynRuntimeServices(database);
+  final createdAt = DateTime.utc(2026, 7, 20, 9);
+  final people = includeAll
+      ? const ['합성 인물 A', '합성 인물 B', '나의 기록', '스터디 참여자']
+      : const ['합성 인물 A'];
+  for (var index = 0; index < people.length; index++) {
+    await services.people.createPerson(
+      Person(
+        id: 'person.synthetic.shell.${index + 1}',
+        displayName: people[index],
+        status: PersonStatuses.active,
+        relationshipSummary: index == 0 ? '함께 공부하며 변화를 이어보는 사람' : null,
+        firstMetOn: index == 0 ? DateTime.utc(2026, 7, 1) : null,
+        createdAt: createdAt,
+        updatedAt: createdAt,
+      ),
+    );
+  }
+  await services.personRoles.addRole(
+    PersonRole(
+      id: 'role.synthetic.shell.01',
+      personId: 'person.synthetic.shell.1',
+      roleType: PersonRoleTypes.studyMember,
+      effectiveFrom: createdAt,
+      createdAt: createdAt,
+      updatedAt: createdAt,
+    ),
+  );
+  return services;
+}
 
 TarotReadingResultSnapshot _homeSnapshot({
   int cardCount = 3,
@@ -1722,7 +1761,7 @@ void main() {
     expect(find.text(UserText.themeSystem), findsAtLeastNWidgets(1));
   });
 
-  testWidgets('native people session flow and records archive follow v0.2 IA', (
+  testWidgets('durable People shell opens Person detail and quick start', (
     WidgetTester tester,
   ) async {
     tester.view.physicalSize = const Size(1200, 900);
@@ -1732,24 +1771,25 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
 
-    await tester.pumpWidget(const RynUniverseApp());
+    final services = await _durablePeopleServices();
+    addTearDown(services.database.close);
+    await tester.pumpWidget(RynUniverseApp(runtimeServices: services));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text(UserText.navPeople).first);
     await tester.pumpAndSettle();
 
-    expect(find.text('샘플 사람 A'), findsAtLeastNWidgets(1));
-    expect(find.text('이해 지도'), findsAtLeastNWidgets(1));
-    expect(find.text('타고난 기질'), findsOneWidget);
-    expect(find.text('현재의 흐름'), findsOneWidget);
-    expect(find.text('성장 여정'), findsOneWidget);
+    expect(find.text('합성 인물 A'), findsAtLeastNWidgets(1));
+    expect(find.text('스터디 회원'), findsOneWidget);
+    expect(find.text('함께 공부하며 변화를 이어보는 사람'), findsAtLeastNWidgets(1));
+    expect(find.text('개요'), findsOneWidget);
 
-    await tester.tap(find.text('새 만남 시작').first);
+    await tester.tap(find.byKey(const Key('person-start-session-action')));
     await tester.pumpAndSettle();
 
-    expect(find.text('새 만남 빠른 시작'), findsOneWidget);
+    expect(find.text('새 만남 빠른 시작'), findsAtLeastNWidgets(1));
     expect(find.text(UserText.quickStartGuidance), findsOneWidget);
-    expect(find.text('샘플 사람 A'), findsAtLeastNWidgets(1));
+    expect(find.text('합성 인물 A'), findsAtLeastNWidgets(1));
     expect(find.text('타로 리딩'), findsAtLeastNWidgets(1));
     expect(find.byKey(const Key('quick-start-question-field')), findsOneWidget);
     expect(find.text('자세히 설정'), findsOneWidget);
@@ -1773,7 +1813,7 @@ void main() {
     expect(find.text('이번 실행에서 완료한 리딩을 살펴봅니다.'), findsOneWidget);
     expect(find.text('아직 완료한 리딩이 없습니다'), findsOneWidget);
     expect(find.text('새 셀프 타로 시작'), findsOneWidget);
-    expect(find.text('샘플 사람 A'), findsNothing);
+    expect(find.text('합성 인물 A'), findsNothing);
     expect(find.text('만남 기록'), findsNothing);
     expect(find.text('리딩 기록'), findsNothing);
     expect(find.text('기록 홈'), findsNothing);
@@ -1790,12 +1830,14 @@ void main() {
         tester.view.resetDevicePixelRatio();
       });
 
-      await tester.pumpWidget(const RynUniverseApp());
+      final services = await _durablePeopleServices();
+      addTearDown(services.database.close);
+      await tester.pumpWidget(RynUniverseApp(runtimeServices: services));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text(UserText.navPeople).first);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('새 만남 시작').first);
+      await tester.tap(find.byKey(const Key('person-start-session-action')));
       await tester.pumpAndSettle();
       expect(find.text(UserText.quickStartGuidance), findsOneWidget);
       expect(find.text('오늘 어떤 만남을 시작할까요?'), findsNothing);
@@ -1825,12 +1867,14 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
 
-    await tester.pumpWidget(const RynUniverseApp());
+    final services = await _durablePeopleServices();
+    addTearDown(services.database.close);
+    await tester.pumpWidget(RynUniverseApp(runtimeServices: services));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text(UserText.navPeople).first);
     await tester.pumpAndSettle();
-    await tester.tap(find.text('새 만남 시작').first);
+    await tester.tap(find.byKey(const Key('person-start-session-action')));
     await tester.pumpAndSettle();
     await tester.enterText(
       find.byKey(const Key('quick-start-question-field')),
@@ -1862,22 +1906,26 @@ void main() {
     await tester.tap(find.byIcon(Icons.close_rounded));
     await tester.pumpAndSettle();
 
-    expect(find.text('현재의 흐름'), findsOneWidget);
-    expect(find.text('현재 질문 · 지금 선택의 기준은?'), findsOneWidget);
+    expect(find.byKey(const Key('people-page')), findsOneWidget);
+    expect(find.text('현재 질문 · 지금 선택의 기준은?'), findsNothing);
+
+    await tester.tap(find.text(UserText.navHome).first);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('home-empty-scene')), findsOneWidget);
+    expect(find.text('현재 질문 · 지금 선택의 기준은?'), findsNothing);
 
     await tester.tap(find.text(UserText.navPeople).first);
     await tester.pumpAndSettle();
 
-    expect(find.text('현재의 흐름'), findsOneWidget);
-    expect(find.text('타로 리딩 · 방금 이어본 질문 있음'), findsOneWidget);
-    expect(find.text('현재 질문 · 지금 선택의 기준은?'), findsOneWidget);
-    expect(find.text('다음에 볼 것 · 현재의 흐름 다시 보기'), findsOneWidget);
+    expect(find.byKey(const Key('people-page')), findsOneWidget);
+    expect(find.text('합성 인물 A'), findsAtLeastNWidgets(1));
+    expect(find.text('현재 질문 · 지금 선택의 기준은?'), findsNothing);
 
     await tester.tap(find.text(UserText.navRecord).first);
     await tester.pumpAndSettle();
 
     expect(find.text('아직 완료한 리딩이 없습니다'), findsOneWidget);
-    expect(find.textContaining('대상: 샘플 사람 A'), findsNothing);
+    expect(find.textContaining('대상: 합성 인물 A'), findsNothing);
     expect(find.textContaining('아직 저장하지 않음 / preview'), findsNothing);
     expect(find.text('오늘 어떤 만남을 시작할까요?'), findsNothing);
   });
@@ -1892,21 +1940,20 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
 
-    const targets = ['샘플 사람 A', '샘플 사람 B', '나의 기록', '스터디 참여자'];
+    const targets = ['합성 인물 A', '합성 인물 B', '나의 기록', '스터디 참여자'];
     for (final target in targets) {
-      await tester.pumpWidget(const RynUniverseApp());
+      final services = await _durablePeopleServices(includeAll: true);
+      await tester.pumpWidget(RynUniverseApp(runtimeServices: services));
       await tester.pumpAndSettle();
       await tester.tap(find.text(UserText.navPeople).first);
       await tester.pumpAndSettle();
 
-      final peopleList = find.byWidgetPredicate(
-        (widget) => widget.runtimeType.toString() == '_PeopleListPanel',
-      );
+      final peopleList = find.byKey(const Key('people-active-list'));
       await tester.tap(
         find.descendant(of: peopleList, matching: find.text(target)).first,
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('새 만남 시작').first);
+      await tester.tap(find.byKey(const Key('person-start-session-action')));
       await tester.pumpAndSettle();
 
       final dialog = find.byType(Dialog);
@@ -1923,10 +1970,13 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('tarot-loop-reflect-button')));
       await tester.pumpAndSettle();
+      expect(find.textContaining('현재의 흐름에 표시했습니다'), findsOneWidget);
       await tester.tap(find.byIcon(Icons.close_rounded));
       await tester.pumpAndSettle();
 
-      expect(find.text('현재 질문 · $target 확인'), findsOneWidget);
+      expect(find.byKey(const Key('people-page')), findsOneWidget);
+      expect(find.text(target), findsAtLeastNWidgets(1));
+      expect(find.text('현재 질문 · $target 확인'), findsNothing);
       await tester.tap(find.text(UserText.navHome).first);
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('home-empty-scene')), findsOneWidget);
@@ -1939,6 +1989,7 @@ void main() {
 
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pumpAndSettle();
+      await services.database.close();
     }
   });
 
@@ -1952,11 +2003,13 @@ void main() {
         tester.view.resetDevicePixelRatio();
       });
 
-      await tester.pumpWidget(const RynUniverseApp());
+      final services = await _durablePeopleServices(includeAll: true);
+      addTearDown(services.database.close);
+      await tester.pumpWidget(RynUniverseApp(runtimeServices: services));
       await tester.pumpAndSettle();
       await tester.tap(find.text(UserText.navPeople).first);
       await tester.pumpAndSettle();
-      await tester.tap(find.text('새 만남 시작').first);
+      await tester.tap(find.byKey(const Key('person-start-session-action')));
       await tester.pumpAndSettle();
       await tester.enterText(
         find.byKey(const Key('quick-start-question-field')),
@@ -1968,17 +2021,21 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.close_rounded));
       await tester.pumpAndSettle();
-      expect(find.text('현재 질문 · 기존 질문 유지'), findsOneWidget);
+      expect(find.byKey(const Key('people-page')), findsOneWidget);
+      expect(find.text('현재 질문 · 기존 질문 유지'), findsNothing);
 
-      await tester.tap(find.text('새 만남 시작').first);
-      await tester.pumpAndSettle();
-      final dialog = find.byType(Dialog);
+      final peopleList = find.byKey(const Key('people-active-list'));
       await tester.tap(
-        find.descendant(of: dialog, matching: find.text('샘플 사람 A')),
+        find.descendant(of: peopleList, matching: find.text('합성 인물 B')).first,
       );
       await tester.pumpAndSettle();
-      await tester.tap(find.text('샘플 사람 B').last);
+      await tester.tap(find.byKey(const Key('person-start-session-action')));
       await tester.pumpAndSettle();
+      final dialog = find.byType(Dialog);
+      expect(
+        find.descendant(of: dialog, matching: find.text('합성 인물 B')),
+        findsOneWidget,
+      );
       await tester.tap(
         find.descendant(of: dialog, matching: find.text('타로 리딩')).first,
       );
@@ -2003,9 +2060,11 @@ void main() {
 
       await tester.tap(find.byIcon(Icons.close_rounded));
       await tester.pumpAndSettle();
-      expect(find.text('타로 리딩 · 방금 이어본 질문 있음'), findsOneWidget);
-      expect(find.text('현재 질문 · 기존 질문 유지'), findsOneWidget);
-      expect(find.textContaining('샘플 사람 B · 상담 메모'), findsNothing);
+      expect(find.byKey(const Key('people-page')), findsOneWidget);
+      expect(find.text('현재 질문 · 기존 질문 유지'), findsNothing);
+      expect(find.textContaining('합성 인물 B · 상담 메모'), findsNothing);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
     },
   );
 
@@ -5225,7 +5284,7 @@ void main() {
   });
 
   testWidgets(
-    'Records nav hides old ledger dashboard while people nav keeps insight map',
+    'Records nav stays focused while People nav shows durable overview',
     (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1500, 1100);
       tester.view.devicePixelRatio = 1.0;
@@ -5234,7 +5293,9 @@ void main() {
         tester.view.resetDevicePixelRatio();
       });
 
-      await tester.pumpWidget(const RynUniverseApp());
+      final services = await _durablePeopleServices();
+      addTearDown(services.database.close);
+      await tester.pumpWidget(RynUniverseApp(runtimeServices: services));
       await tester.pumpAndSettle();
       await tester.tap(find.text(UserText.navRecord).first);
       await tester.pumpAndSettle();
@@ -5251,14 +5312,14 @@ void main() {
       await tester.tap(find.text(UserText.navPeople).first);
       await tester.pumpAndSettle();
 
-      expect(find.text('샘플 사람 A'), findsAtLeastNWidgets(1));
-      expect(find.text('이해 지도'), findsAtLeastNWidgets(1));
-      expect(find.text('타고난 기질'), findsOneWidget);
-      expect(find.text('현재의 흐름'), findsOneWidget);
-      expect(find.text('성장 여정'), findsOneWidget);
-      expect(find.textContaining('사주 정보 · 아직 연결하지 않음'), findsOneWidget);
-      expect(find.textContaining('타로 리딩 · 최근 리딩 있음'), findsOneWidget);
-      expect(find.textContaining('타로 스터디 4회차 참여'), findsOneWidget);
+      expect(find.text('합성 인물 A'), findsAtLeastNWidgets(1));
+      expect(find.text('스터디 회원'), findsOneWidget);
+      expect(find.text('개요'), findsOneWidget);
+      expect(
+        find.textContaining('함께 공부하며 변화를 이어보는 사람'),
+        findsAtLeastNWidgets(1),
+      );
+      expect(find.textContaining('첫 만남이나 리딩이 연결되면'), findsOneWidget);
 
       final visibleText = tester
           .widgetList<Text>(find.byType(Text))
@@ -5284,6 +5345,8 @@ void main() {
       ]) {
         expect(visibleText.contains(forbidden), isFalse, reason: forbidden);
       }
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
     },
   );
 }
