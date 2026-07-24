@@ -29,6 +29,7 @@ void main() {
     final controller = PeopleController(
       peopleRepository: services.people,
       roleRepository: services.personRoles,
+      groupRepository: services.personGroups,
       now: () => now,
       idFactory: (prefix) => '$prefix.filter.${serial++}',
     );
@@ -213,6 +214,7 @@ void main() {
       final controller = PeopleController(
         peopleRepository: services.people,
         roleRepository: services.personRoles,
+        groupRepository: services.personGroups,
         now: () => now,
         idFactory: (prefix) => '$prefix.synthetic.01',
       );
@@ -257,6 +259,7 @@ void main() {
       final reopened = PeopleController(
         peopleRepository: services.people,
         roleRepository: services.personRoles,
+        groupRepository: services.personGroups,
       );
       addTearDown(reopened.dispose);
       reopened.start();
@@ -278,6 +281,7 @@ void main() {
       final controller = PeopleController(
         peopleRepository: services.people,
         roleRepository: services.personRoles,
+        groupRepository: services.personGroups,
         now: () => now,
         idFactory: (() {
           var serial = 0;
@@ -310,6 +314,84 @@ void main() {
           (person) => person.displayName,
         ),
         isNot(contains('합성 인물 Self 충돌')),
+      );
+    },
+  );
+
+  test(
+    'group commands persist multi-membership and search role group intersect',
+    () async {
+      final controller = await readyController();
+      await createSynthetic(
+        controller,
+        name: '테스트 인물 001',
+        roles: const {PersonRoleTypes.friend},
+      );
+      final firstId = controller.selectedPerson!.id;
+      await createSynthetic(
+        controller,
+        name: '테스트 인물 002',
+        roles: const {PersonRoleTypes.friend},
+      );
+      final secondId = controller.selectedPerson!.id;
+
+      expect(await controller.createGroup('테스트 그룹 A'), isTrue);
+      expect(await controller.createGroup('테스트 그룹 B'), isTrue);
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      final groupA = controller.activeGroups.firstWhere(
+        (group) => group.name == '테스트 그룹 A',
+      );
+      final groupB = controller.activeGroups.firstWhere(
+        (group) => group.name == '테스트 그룹 B',
+      );
+
+      controller.selectPerson(firstId);
+      expect(await controller.assignSelectedToGroup(groupA.id), isTrue);
+      expect(await controller.assignSelectedToGroup(groupB.id), isTrue);
+      controller.selectPerson(secondId);
+      expect(await controller.assignSelectedToGroup(groupB.id), isTrue);
+
+      controller
+        ..updateSearchQuery('테스트')
+        ..updatePrimaryRoleFilter(PersonRoleTypes.friend)
+        ..updateGroupFilter(groupA.id);
+      expect(controller.visiblePeople.single.id, firstId);
+      expect(controller.selectedPerson?.id, firstId);
+
+      controller
+        ..updateGroupFilter(null)
+        ..updatePrimaryRoleFilter(null)
+        ..updateSearchQuery('그룹 A');
+      expect(controller.visiblePeople.single.id, firstId);
+
+      controller
+        ..updateSearchQuery('')
+        ..updateGroupFilter(groupA.id);
+      expect(await controller.archiveGroup(groupA.id), isTrue);
+      expect(controller.selectedGroupFilter, isNull);
+      expect(
+        controller.activeGroups.map((group) => group.id),
+        isNot(contains(groupA.id)),
+      );
+      expect(
+        controller.archivedGroups.map((group) => group.id),
+        contains(groupA.id),
+      );
+      expect(
+        controller.groupsForPerson(firstId).map((group) => group.id),
+        isNot(contains(groupA.id)),
+      );
+
+      expect(await controller.restoreGroup(groupA.id), isTrue);
+      expect(
+        controller.groupsForPerson(firstId).map((group) => group.id),
+        contains(groupA.id),
+      );
+      controller.selectPerson(firstId);
+      expect(await controller.removeSelectedFromGroup(groupB.id), isTrue);
+      expect(
+        controller.groupsForPerson(firstId).map((group) => group.id),
+        isNot(contains(groupB.id)),
       );
     },
   );

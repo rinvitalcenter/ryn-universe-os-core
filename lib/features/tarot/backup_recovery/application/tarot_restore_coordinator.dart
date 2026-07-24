@@ -1,8 +1,11 @@
 import 'dart:io';
 
+import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 
 import '../../../../../core/backup_recovery/sha256_digest_service.dart';
+import '../../../../../core/persistence/app_database.dart';
+import '../domain/tarot_backup_manifest.dart';
 import '../domain/tarot_restore_candidate.dart';
 import '../domain/tarot_restore_operation_marker.dart';
 import '../domain/tarot_restore_operation_result.dart';
@@ -132,6 +135,36 @@ final class TarotRestoreCoordinator {
       );
     }
 
+    final legacyCandidate =
+        candidate.schemaVersion == TarotBackupManifest.legacySchemaVersion;
+    if (legacyCandidate) {
+      try {
+        await resolvedPaths.requireSafeAncestry(stagingFile.path);
+        await _copyFile(File(candidate.snapshotPath), stagingFile);
+        await resolvedPaths.requireSafeAncestry(stagingFile.path);
+        final stagedSize = await stagingFile.length();
+        final stagedHash = await digestService.digestFile(stagingFile);
+        if (stagedSize != candidate.snapshotSizeBytes ||
+            stagedHash != candidate.snapshotSha256) {
+          throw StateError('staged candidate mismatch');
+        }
+        await _migrateLegacyCandidate(
+          sourceSnapshotPath: candidate.snapshotPath,
+          stagedFile: stagingFile,
+        );
+      } on Object {
+        try {
+          if (stagingFile.existsSync()) await stagingFile.delete();
+        } on Object {
+          // No live database mutation occurred. Leave evidence fail-closed.
+        }
+        return TarotRestoreOperationResult.failedBeforeMutation(
+          failureCode: 'candidate_migration_failed',
+          safetyBackupPackagePath: safetyPath,
+        );
+      }
+    }
+
     late TarotRestoreOperationMarker marker;
     try {
       await resolvedPaths.requireSafeAncestry(rollbackDirectory.path);
@@ -187,14 +220,16 @@ final class TarotRestoreCoordinator {
         resolvedPaths,
       );
 
-      await resolvedPaths.requireSafeAncestry(stagingFile.path);
-      await _copyFile(File(candidate.snapshotPath), stagingFile);
-      await resolvedPaths.requireSafeAncestry(stagingFile.path);
-      final stagedSize = await stagingFile.length();
-      final stagedHash = await digestService.digestFile(stagingFile);
-      if (stagedSize != candidate.snapshotSizeBytes ||
-          stagedHash != candidate.snapshotSha256) {
-        throw StateError('staged candidate mismatch');
+      if (!legacyCandidate) {
+        await resolvedPaths.requireSafeAncestry(stagingFile.path);
+        await _copyFile(File(candidate.snapshotPath), stagingFile);
+        await resolvedPaths.requireSafeAncestry(stagingFile.path);
+        final stagedSize = await stagingFile.length();
+        final stagedHash = await digestService.digestFile(stagingFile);
+        if (stagedSize != candidate.snapshotSizeBytes ||
+            stagedHash != candidate.snapshotSha256) {
+          throw StateError('staged candidate mismatch');
+        }
       }
       await _renameFile(stagingFile, liveFile.path);
       candidateInstalled = true;
@@ -259,6 +294,40 @@ final class TarotRestoreCoordinator {
       sourceProfileEvidence: sourceProfileEvidence,
       applicationVersion: applicationVersion,
     );
+  }
+
+  Future<void> _migrateLegacyCandidate({
+    required String sourceSnapshotPath,
+    required File stagedFile,
+  }) async {
+    final before = databaseInspector.inspectVerified(
+      sourceSnapshotPath,
+      policy: TarotDatabaseInspectionPolicy.immutableReadOnlyFrozenTarget,
+      requireAcceptableSidecars: true,
+      acceptedSchemaVersions: const <int>{
+        TarotBackupManifest.legacySchemaVersion,
+      },
+    );
+    final database = RynAppDatabase(NativeDatabase(stagedFile));
+    try {
+      await database.customSelect('SELECT 1').get();
+    } finally {
+      await database.close();
+    }
+    final after = databaseInspector.inspectVerified(
+      stagedFile.path,
+      policy: TarotDatabaseInspectionPolicy.immutableReadOnlyFrozenTarget,
+      requireAcceptableSidecars: true,
+    );
+    for (final table in TarotBackupManifest.requiredTablesV6) {
+      if (after.tableRowCounts[table] != before.tableRowCounts[table]) {
+        throw StateError('legacy migration changed table rows');
+      }
+    }
+    if ((after.tableRowCounts['person_groups'] ?? -1) != 0 ||
+        (after.tableRowCounts['person_group_memberships'] ?? -1) != 0) {
+      throw StateError('legacy migration fabricated group rows');
+    }
   }
 
   Future<void> _preserveOriginalSet({

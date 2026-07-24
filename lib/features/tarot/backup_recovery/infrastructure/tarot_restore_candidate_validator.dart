@@ -133,11 +133,16 @@ final class TarotRestoreCandidateValidator {
         snapshotPath,
         policy: TarotDatabaseInspectionPolicy.immutableReadOnlyFrozenTarget,
         requireAcceptableSidecars: true,
+        acceptedSchemaVersions: const <int>{
+          TarotBackupManifest.legacySchemaVersion,
+          TarotBackupManifest.schemaVersion,
+        },
       );
     } on TarotBackupInspectionException {
       throw const TarotRestoreCandidateValidationException('snapshot_invalid');
     }
-    if (!_sameMap(evidence.tableRowCounts, manifest.tableRowCounts) ||
+    if (evidence.schemaVersion != manifest.payloadSchemaVersion ||
+        !_sameMap(evidence.tableRowCounts, manifest.tableRowCounts) ||
         evidence.distinctReadingIdCount != manifest.readingIdCount ||
         evidence.placementCount != manifest.placementCount ||
         evidence.interpretationCount != manifest.interpretationCount ||

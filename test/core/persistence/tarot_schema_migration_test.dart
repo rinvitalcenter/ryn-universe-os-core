@@ -1,10 +1,13 @@
+import 'dart:io';
+
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ryn_universe_os_core/core/persistence/app_database.dart';
 import 'package:ryn_universe_os_core/core/persistence/migrations.dart';
+import 'package:sqlite3/sqlite3.dart';
 
 void main() {
-  group('Tarot schema preserved in v6', () {
+  group('Tarot and Person schema preserved in v7', () {
     late RynAppDatabase database;
 
     setUp(() {
@@ -16,10 +19,10 @@ void main() {
     });
 
     test(
-      'fresh database creates schema version 6 and preserves four Tarot tables',
+      'fresh database creates schema version 7 with Tarot and Person group tables',
       () async {
-        expect(database.schemaVersion, 6);
-        expect(plannedCurrentSchemaVersion, 6);
+        expect(database.schemaVersion, 7);
+        expect(plannedCurrentSchemaVersion, 7);
 
         final tables = await _tableNames(database);
         expect(
@@ -29,8 +32,12 @@ void main() {
             'tarot_card_placements',
             'tarot_interpretations',
             'app_runtime_state',
+            'person_groups',
+            'person_group_memberships',
           }),
         );
+        expect(await _count(database, 'person_groups'), 0);
+        expect(await _count(database, 'person_group_memberships'), 0);
       },
     );
 
@@ -225,7 +232,52 @@ void main() {
     );
   });
 
-  group('Tarot-preserving add-only migration 4 to 5 to 6', () {
+  group('Tarot and Person preserving add-only migration through v7', () {
+    test(
+      'file-backed v6 to v7 preserves Person Role and creates empty group tables across restart',
+      () async {
+        final root = await Directory.systemTemp.createTemp('ryn-group-v6-v7-');
+        addTearDown(() async {
+          if (await root.exists()) await root.delete(recursive: true);
+        });
+        final file = File(
+          '${root.path}${Platform.pathSeparator}migration.sqlite',
+        );
+        var database = RynAppDatabase(NativeDatabase(file));
+        await database.customSelect('SELECT 1').get();
+        await database.customStatement(
+          "INSERT INTO persons (id, display_name, status, created_at_utc_us, updated_at_utc_us) "
+          "VALUES ('person.synthetic.001', '테스트 인물 001', 'active', 1, 1)",
+        );
+        await database.customStatement(
+          "INSERT INTO person_roles (id, person_id, role_type, effective_from_utc_us, created_at_utc_us, updated_at_utc_us) "
+          "VALUES ('role.synthetic.001', 'person.synthetic.001', 'friend', 1, 1, 1)",
+        );
+        await database.close();
+
+        final raw = sqlite3.open(file.path);
+        raw.execute('DROP TABLE person_group_memberships');
+        raw.execute('DROP TABLE person_groups');
+        raw.userVersion = 6;
+        raw.close();
+
+        database = RynAppDatabase(NativeDatabase(file));
+        expect(await _count(database, 'persons'), 1);
+        expect(await _count(database, 'person_roles'), 1);
+        expect(await _count(database, 'person_groups'), 0);
+        expect(await _count(database, 'person_group_memberships'), 0);
+        expect(database.schemaVersion, 7);
+        await database.close();
+
+        database = RynAppDatabase(NativeDatabase(file));
+        expect(await _count(database, 'persons'), 1);
+        expect(await _count(database, 'person_roles'), 1);
+        expect(await _count(database, 'person_groups'), 0);
+        expect(await _count(database, 'person_group_memberships'), 0);
+        await database.close();
+      },
+    );
+
     test(
       'preserves governance data, adds four tables, and fabricates no Tarot rows',
       () async {
@@ -286,7 +338,7 @@ void main() {
           NativeDatabase.memory(
             setup: (raw) {
               raw.execute(_version4AppSettingsSql);
-              raw.execute('PRAGMA user_version = 7');
+              raw.execute('PRAGMA user_version = 8');
             },
           ),
         );

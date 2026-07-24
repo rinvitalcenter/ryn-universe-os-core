@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ryn_universe_os_core/features/tarot/backup_recovery/application/tarot_backup_snapshot_coordinator.dart';
 import 'package:ryn_universe_os_core/features/tarot/backup_recovery/application/tarot_restore_coordinator.dart';
+import 'package:ryn_universe_os_core/features/tarot/backup_recovery/domain/tarot_backup_manifest.dart';
 import 'package:ryn_universe_os_core/features/tarot/backup_recovery/domain/tarot_restore_operation_result.dart';
 import 'package:ryn_universe_os_core/features/tarot/backup_recovery/infrastructure/tarot_backup_database_inspector.dart';
 import 'package:ryn_universe_os_core/features/tarot/backup_recovery/infrastructure/tarot_restore_candidate_validator.dart';
@@ -24,15 +25,20 @@ void main() {
   Future<Map<String, int>> roundTrip({
     required bool includePerson,
     required bool includeTarot,
+    bool includeGroups = false,
+    int candidateSchemaVersion = TarotBackupManifest.schemaVersion,
   }) async {
     fixture = await TarotBackupRecoveryFixture.create(
       validReading: includeTarot,
     );
     var database = fixture!.openSource();
     if (includePerson) fixture!.insertSyntheticPersonCore(database);
+    if (includeGroups) fixture!.insertSyntheticPersonGroups(database);
     fixture!.release(database);
 
-    final package = await fixture!.createRestoreCandidate();
+    final package = await fixture!.createRestoreCandidate(
+      schemaVersion: candidateSchemaVersion,
+    );
 
     database = fixture!.openSource();
     if (includePerson) {
@@ -43,6 +49,11 @@ void main() {
     }
     if (includeTarot) {
       fixture!.insertValidReading(database, id: 'synthetic-r2');
+    }
+    if (includeGroups) {
+      database.execute(
+        "DELETE FROM person_groups WHERE id = 'group.synthetic.a'",
+      );
     }
     fixture!.release(database);
 
@@ -82,11 +93,14 @@ void main() {
       'encounters': lifecycle!.count('encounters'),
       'notes': lifecycle!.count('encounter_notes'),
       'readings': lifecycle!.count('tarot_readings'),
+      'groups': lifecycle!.count('person_groups'),
+      'memberships': lifecycle!.count('person_group_memberships'),
+      'schema': lifecycle!.schemaVersion,
     };
   }
 
   test(
-    'Person-only schema v6 backup validates and restores synthetic rows',
+    'Person-only schema v7 backup validates and restores synthetic rows',
     () async {
       final counts = await roundTrip(includePerson: true, includeTarot: false);
 
@@ -97,11 +111,14 @@ void main() {
         'encounters': 1,
         'notes': 1,
         'readings': 0,
+        'groups': 0,
+        'memberships': 0,
+        'schema': 7,
       });
     },
   );
 
-  test('Tarot-only schema v6 backup restore remains compatible', () async {
+  test('Tarot-only schema v7 backup restore remains compatible', () async {
     final counts = await roundTrip(includePerson: false, includeTarot: true);
 
     expect(counts['persons'], 0);
@@ -109,7 +126,7 @@ void main() {
   });
 
   test(
-    'mixed Person and Tarot schema v6 backup restores both domains',
+    'mixed Person and Tarot schema v7 backup restores both domains',
     () async {
       final counts = await roundTrip(includePerson: true, includeTarot: true);
 
@@ -118,6 +135,81 @@ void main() {
       expect(counts['readings'], 1);
     },
   );
+
+  test(
+    'exact v6 backup is migrated in isolation and restored as v7 with empty groups',
+    () async {
+      final counts = await roundTrip(
+        includePerson: true,
+        includeTarot: true,
+        candidateSchemaVersion: TarotBackupManifest.legacySchemaVersion,
+      );
+
+      expect(counts['schema'], 7);
+      expect(counts['persons'], 1);
+      expect(counts['roles'], 1);
+      expect(counts['readings'], 1);
+      expect(counts['groups'], 0);
+      expect(counts['memberships'], 0);
+    },
+  );
+
+  test('v7 backup restores groups and memberships across reopen', () async {
+    final counts = await roundTrip(
+      includePerson: true,
+      includeTarot: false,
+      includeGroups: true,
+    );
+
+    expect(counts['schema'], 7);
+    expect(counts['groups'], 2);
+    expect(counts['memberships'], 2);
+  });
+
+  test('tampered v7 group schema with an extra column is rejected', () async {
+    fixture = await TarotBackupRecoveryFixture.create(validReading: false);
+    final database = fixture!.openSource();
+    database.execute('ALTER TABLE person_groups ADD COLUMN unexpected TEXT');
+    fixture!.release(database);
+
+    expect(
+      () => const TarotBackupDatabaseInspector().inspectVerified(
+        fixture!.sourceFile.path,
+      ),
+      throwsA(
+        isA<TarotBackupInspectionException>().having(
+          (error) => error.code,
+          'code',
+          'unexpected_column_present',
+        ),
+      ),
+    );
+  });
+
+  test('v7 orphan group membership candidate is rejected', () async {
+    fixture = await TarotBackupRecoveryFixture.create(validReading: false);
+    final database = fixture!.openSource();
+    database.execute('PRAGMA foreign_keys = OFF');
+    database.execute(
+      "INSERT INTO person_group_memberships "
+      "(group_id, person_id, created_at_utc_us) "
+      "VALUES ('missing.group', 'missing.person', 1)",
+    );
+    fixture!.release(database);
+
+    expect(
+      () => const TarotBackupDatabaseInspector().inspectVerified(
+        fixture!.sourceFile.path,
+      ),
+      throwsA(
+        isA<TarotBackupInspectionException>().having(
+          (error) => error.code,
+          'code',
+          'foreign_key_check_failed',
+        ),
+      ),
+    );
+  });
 
   test(
     'schema v5 backup fails closed with explicit compatibility policy',
@@ -153,7 +245,7 @@ void main() {
   );
 
   test(
-    'schema v6 restore rejects missing Person constraints and indexes',
+    'schema v7 restore rejects missing Person constraints and indexes',
     () async {
       fixture = await TarotBackupRecoveryFixture.create(validReading: false);
       var database = fixture!.openSource();
@@ -222,6 +314,8 @@ final class _PersonRestoreLifecycle implements TarotRestoreRuntimeLifecycle {
       _database!.select('SELECT count(*) FROM $table').single.values.single
           as int;
 
+  int get schemaVersion => _database!.userVersion;
+
   @override
   Future<void> close() async {
     closeCount += 1;
@@ -238,7 +332,7 @@ final class _PersonRestoreLifecycle implements TarotRestoreRuntimeLifecycle {
   @override
   Future<void> validateBasicRead() async {
     validateCount += 1;
-    if (_database?.userVersion != 6) {
+    if (_database?.userVersion != 7) {
       throw StateError('synthetic schema read failed');
     }
     const TarotBackupDatabaseInspector().inspectVerified(liveFile.path);

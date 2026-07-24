@@ -1058,6 +1058,7 @@ class _ShellPageContent extends StatelessWidget {
               PeoplePage(
                 peopleRepository: services.people,
                 roleRepository: services.personRoles,
+                groupRepository: services.personGroups,
                 onStartSession: (person) => _openQuickStartSheet(
                   context,
                   target: person.displayName,

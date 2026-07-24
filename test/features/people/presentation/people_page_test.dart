@@ -41,6 +41,7 @@ void main() {
             child: PeoplePage(
               peopleRepository: services.people,
               roleRepository: services.personRoles,
+              groupRepository: services.personGroups,
             ),
           ),
         ),
@@ -190,6 +191,102 @@ void main() {
       await tester.pumpAndSettle();
     }
   });
+
+  testWidgets(
+    'custom group loop creates renames archives restores assigns filters and removes',
+    (tester) async {
+      await seedPerson(
+        id: 'person.synthetic.groups',
+        name: '테스트 인물 001',
+        relationship: '그룹 UI 검증용 합성 관계',
+        roleType: PersonRoleTypes.friend,
+        updatedAt: DateTime.utc(2026, 7, 21, 10),
+      );
+      await pumpPeople(tester);
+
+      expect(find.byKey(const Key('people-group-filter')), findsOneWidget);
+      expect(find.byKey(const Key('people-no-groups')), findsOneWidget);
+      expect(
+        find.byKey(const Key('person-no-group-membership')),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.byKey(const Key('people-group-manage')));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('people-group-management-sheet')),
+        findsOneWidget,
+      );
+
+      for (final name in ['테스트 그룹 A', '테스트 그룹 B']) {
+        await tester.enterText(
+          find.byKey(const Key('people-group-name-field')),
+          name,
+        );
+        await tester.tap(find.byKey(const Key('people-group-create-action')));
+        await tester.pumpAndSettle();
+      }
+      expect(find.text('테스트 그룹 A'), findsOneWidget);
+      expect(find.text('테스트 그룹 B'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('그룹 이름 바꾸기').first);
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('people-group-rename-field')),
+        '테스트 그룹 A 수정',
+      );
+      await tester.tap(find.byKey(const Key('people-group-rename-save')));
+      await tester.pumpAndSettle();
+      expect(find.text('테스트 그룹 A 수정'), findsOneWidget);
+
+      await tester.tap(find.byTooltip('그룹 보관').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('people-group-archive-confirm')));
+      await tester.pumpAndSettle();
+      expect(find.text('테스트 그룹 A 수정'), findsOneWidget);
+      await tester.tap(find.widgetWithText(OutlinedButton, '복원'));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('people-group-management-close')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('person-group-membership-action')));
+      await tester.pumpAndSettle();
+      expect(
+        find.byKey(const Key('person-group-membership-sheet')),
+        findsOneWidget,
+      );
+      await tester.tap(find.widgetWithText(CheckboxListTile, '테스트 그룹 A 수정'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(CheckboxListTile, '테스트 그룹 B'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('person-group-membership-close')));
+      await tester.pumpAndSettle();
+
+      expect(find.widgetWithText(InputChip, '테스트 그룹 A 수정'), findsOneWidget);
+      expect(find.widgetWithText(InputChip, '테스트 그룹 B'), findsOneWidget);
+
+      final removable = tester.widget<InputChip>(
+        find.widgetWithText(InputChip, '테스트 그룹 B'),
+      );
+      removable.onDeleted!();
+      await tester.pumpAndSettle();
+      expect(find.widgetWithText(InputChip, '테스트 그룹 B'), findsNothing);
+
+      await tester.tap(find.byKey(const Key('people-group-filter')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('테스트 그룹 A 수정 · 1명').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('people-search-field')),
+        '일치하지 않는 합성 검색어',
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('people-group-no-results')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    },
+  );
 
   testWidgets('empty add detail archive and restore happy path', (
     tester,

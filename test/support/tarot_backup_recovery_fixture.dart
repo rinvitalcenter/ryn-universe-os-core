@@ -204,6 +204,34 @@ final class TarotBackupRecoveryFixture {
     );
   }
 
+  void insertSyntheticPersonGroups(Database database) {
+    final now = DateTime.utc(2026, 7, 17).microsecondsSinceEpoch;
+    database.execute(
+      '''INSERT INTO person_groups (
+        id, name, normalized_name, created_at_utc_us, updated_at_utc_us
+      ) VALUES (?, ?, ?, ?, ?)''',
+      <Object?>['group.synthetic.a', '테스트 그룹 A', '테스트 그룹 a', now, now],
+    );
+    database.execute(
+      '''INSERT INTO person_groups (
+        id, name, normalized_name, created_at_utc_us, updated_at_utc_us
+      ) VALUES (?, ?, ?, ?, ?)''',
+      <Object?>['group.synthetic.b', '테스트 그룹 B', '테스트 그룹 b', now, now],
+    );
+    database.execute(
+      '''INSERT INTO person_group_memberships (
+        group_id, person_id, created_at_utc_us
+      ) VALUES (?, ?, ?)''',
+      <Object?>['group.synthetic.a', 'person.synthetic.study.01', now],
+    );
+    database.execute(
+      '''INSERT INTO person_group_memberships (
+        group_id, person_id, created_at_utc_us
+      ) VALUES (?, ?, ?)''',
+      <Object?>['group.synthetic.b', 'person.synthetic.study.01', now],
+    );
+  }
+
   Map<String, Object?> logicalEvidence(Database database) => <String, Object?>{
     'userVersion': database.userVersion,
     'readingCount': _scalar(database, 'SELECT count(*) FROM tarot_readings'),
@@ -224,6 +252,7 @@ final class TarotBackupRecoveryFixture {
   Future<Directory> createRestoreCandidate({
     DateTime? createdAtUtc,
     String operationId = 'a1b2c3d4',
+    int schemaVersion = TarotBackupManifest.schemaVersion,
   }) async {
     final createdAt = createdAtUtc ?? DateTime.utc(2026, 7, 17, 1, 2, 3);
     final package = resolvedPaths()
@@ -240,10 +269,19 @@ final class TarotBackupRecoveryFixture {
       '${TarotBackupManifest.databasePayloadFilename.replaceAll('/', Platform.pathSeparator)}',
     );
     await sourceFile.copy(snapshot.path);
+    if (schemaVersion == TarotBackupManifest.legacySchemaVersion) {
+      final legacy = sqlite3.open(snapshot.path);
+      legacy.execute('DROP TABLE person_group_memberships');
+      legacy.execute('DROP TABLE person_groups');
+      legacy.execute('VACUUM');
+      legacy.userVersion = TarotBackupManifest.legacySchemaVersion;
+      legacy.close();
+    }
     final evidence = const TarotBackupDatabaseInspector().inspectVerified(
       snapshot.path,
       policy: TarotDatabaseInspectionPolicy.immutableReadOnlyFrozenTarget,
       requireAcceptableSidecars: true,
+      acceptedSchemaVersions: <int>{schemaVersion},
     );
     const digest = DartSha256DigestService();
     final payloadHash = await digest.digestFile(snapshot);
@@ -255,8 +293,10 @@ final class TarotBackupRecoveryFixture {
       createdAtUtc: createdAt,
       databasePayloadSizeBytes: await snapshot.length(),
       databasePayloadSha256: payloadHash,
-      requiredTables: TarotBackupManifest.requiredTablesV1,
-      requiredColumnsByTable: TarotBackupManifest.requiredColumnsByTableV1,
+      requiredTables: TarotBackupManifest.requiredTablesFor(schemaVersion),
+      requiredColumnsByTable: TarotBackupManifest.requiredColumnsFor(
+        schemaVersion,
+      ),
       tableRowCounts: evidence.tableRowCounts,
       readingIdCount: evidence.distinctReadingIdCount,
       placementCount: evidence.placementCount,
@@ -266,6 +306,7 @@ final class TarotBackupRecoveryFixture {
       lifecycleStateCounts: evidence.lifecycleStateCounts,
       unsupportedTableRowsZero: evidence.unsupportedTableRowsZero,
       verifiedAtUtc: createdAt,
+      payloadSchemaVersion: schemaVersion,
     );
     await _writeRestoreCandidateIntegrity(package, manifest);
     return package;
@@ -299,6 +340,7 @@ final class TarotBackupRecoveryFixture {
       lifecycleStateCounts: previous.lifecycleStateCounts,
       unsupportedTableRowsZero: previous.unsupportedTableRowsZero,
       verifiedAtUtc: previous.verifiedAtUtc,
+      payloadSchemaVersion: previous.payloadSchemaVersion,
     );
     await _writeRestoreCandidateIntegrity(package, refreshed);
   }

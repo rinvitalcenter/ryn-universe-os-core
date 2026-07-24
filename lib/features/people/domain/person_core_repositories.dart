@@ -28,6 +28,47 @@ abstract interface class PersonRoleRepository {
   Stream<List<PersonRole>> watchRolesForPerson(String personId);
 }
 
+abstract interface class PersonGroupRepository {
+  Stream<List<PersonGroup>> watchActiveGroups();
+
+  Stream<List<PersonGroup>> watchArchivedGroups();
+
+  Stream<List<PersonGroupMembership>> watchMembershipsForPerson(
+    String personId,
+  );
+
+  Stream<List<Person>> watchPeopleInGroup(String groupId);
+
+  Future<RepositoryResult<PersonGroup>> createGroup(PersonGroup group);
+
+  Future<RepositoryResult<PersonGroup>> renameGroup(
+    String id, {
+    required String name,
+    required DateTime updatedAt,
+  });
+
+  Future<RepositoryResult<PersonGroup>> archiveGroup(
+    String id, {
+    required DateTime at,
+  });
+
+  Future<RepositoryResult<PersonGroup>> restoreGroup(
+    String id, {
+    required DateTime at,
+  });
+
+  Future<RepositoryResult<PersonGroupMembership>> assignPerson({
+    required String groupId,
+    required String personId,
+    required DateTime createdAt,
+  });
+
+  Future<RepositoryResult<bool>> removePerson({
+    required String groupId,
+    required String personId,
+  });
+}
+
 abstract interface class PersonRelationshipRepository {
   Future<RepositoryResult<PersonRelationship>> createRelationship(
     PersonRelationship relationship,

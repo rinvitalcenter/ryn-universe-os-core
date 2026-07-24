@@ -191,6 +191,57 @@ final class PersonRole {
   );
 }
 
+String normalizePersonGroupName(String value) =>
+    value.trim().replaceAll(RegExp(r'\s+'), ' ').toLowerCase();
+
+final class PersonGroup {
+  const PersonGroup({
+    required this.id,
+    required this.name,
+    required this.normalizedName,
+    required this.createdAt,
+    required this.updatedAt,
+    this.archivedAt,
+  });
+
+  final String id;
+  final String name;
+  final String normalizedName;
+  final DateTime? archivedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  PersonGroup copyWith({
+    String? id,
+    String? name,
+    String? normalizedName,
+    Object? archivedAt = _unset,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => PersonGroup(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    normalizedName: normalizedName ?? this.normalizedName,
+    archivedAt: identical(archivedAt, _unset)
+        ? this.archivedAt
+        : archivedAt as DateTime?,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+}
+
+final class PersonGroupMembership {
+  const PersonGroupMembership({
+    required this.groupId,
+    required this.personId,
+    required this.createdAt,
+  });
+
+  final String groupId;
+  final String personId;
+  final DateTime createdAt;
+}
+
 final class PersonRelationship {
   const PersonRelationship({
     required this.id,

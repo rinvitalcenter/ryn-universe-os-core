@@ -318,6 +318,8 @@ class ApprovalRecords extends Table {
     AppRuntimeState,
     Persons,
     PersonRoles,
+    PersonGroups,
+    PersonGroupMemberships,
     PersonRelationships,
     PersonBirthProfiles,
     Encounters,
@@ -348,7 +350,7 @@ final class RynAppDatabase extends _$RynAppDatabase {
       await _ensureMainRuntimeState();
     },
     onUpgrade: (migrator, from, to) async {
-      if (to != 6 || (from != 4 && from != 5)) {
+      if (to != 7 || (from != 4 && from != 5 && from != 6)) {
         throw StateError('Unsupported database migration path: $from -> $to');
       }
       if (from == 4) {
@@ -357,12 +359,16 @@ final class RynAppDatabase extends _$RynAppDatabase {
         await migrator.createTable(tarotInterpretations);
         await migrator.createTable(appRuntimeState);
       }
-      await migrator.createTable(persons);
-      await migrator.createTable(personRoles);
-      await migrator.createTable(personRelationships);
-      await migrator.createTable(personBirthProfiles);
-      await migrator.createTable(encounters);
-      await migrator.createTable(encounterNotes);
+      if (from <= 5) {
+        await migrator.createTable(persons);
+        await migrator.createTable(personRoles);
+        await migrator.createTable(personRelationships);
+        await migrator.createTable(personBirthProfiles);
+        await migrator.createTable(encounters);
+        await migrator.createTable(encounterNotes);
+      }
+      await migrator.createTable(personGroups);
+      await migrator.createTable(personGroupMemberships);
       await _ensurePersonCoreIndexes();
       await _ensureMainRuntimeState();
     },
@@ -390,6 +396,8 @@ final class RynAppDatabase extends _$RynAppDatabase {
       'CREATE INDEX IF NOT EXISTS person_roles_person_period_idx ON person_roles (person_id, effective_from_utc_us)',
       'CREATE UNIQUE INDEX IF NOT EXISTS person_roles_active_unique ON person_roles (person_id, role_type) WHERE effective_to_utc_us IS NULL',
       "CREATE UNIQUE INDEX IF NOT EXISTS person_roles_single_active_self ON person_roles (role_type) WHERE role_type = 'self' AND effective_to_utc_us IS NULL",
+      'CREATE INDEX IF NOT EXISTS person_groups_archive_name_idx ON person_groups (archived_at_utc_us, normalized_name)',
+      'CREATE INDEX IF NOT EXISTS person_group_memberships_person_idx ON person_group_memberships (person_id, group_id)',
       'CREATE INDEX IF NOT EXISTS person_relationships_from_idx ON person_relationships (from_person_id, effective_from_utc_us)',
       'CREATE INDEX IF NOT EXISTS person_relationships_to_idx ON person_relationships (to_person_id, effective_from_utc_us)',
       'CREATE INDEX IF NOT EXISTS person_birth_profiles_history_idx ON person_birth_profiles (person_id, revision_number)',

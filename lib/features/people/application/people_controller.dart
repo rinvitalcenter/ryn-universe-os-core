@@ -42,11 +42,13 @@ final class PeopleController extends ChangeNotifier {
   factory PeopleController({
     required PersonRepository peopleRepository,
     required PersonRoleRepository roleRepository,
+    required PersonGroupRepository groupRepository,
     DateTime Function()? now,
     PeopleIdFactory? idFactory,
   }) => PeopleController._(
     peopleRepository,
     roleRepository,
+    groupRepository,
     now ?? DateTime.now,
     idFactory,
   );
@@ -54,20 +56,29 @@ final class PeopleController extends ChangeNotifier {
   PeopleController._(
     this._peopleRepository,
     this._roleRepository,
+    this._groupRepository,
     this._now,
     this._idFactory,
   );
 
   final PersonRepository _peopleRepository;
   final PersonRoleRepository _roleRepository;
+  final PersonGroupRepository _groupRepository;
   final DateTime Function() _now;
   final PeopleIdFactory? _idFactory;
 
   StreamSubscription<List<Person>>? _peopleSubscription;
+  StreamSubscription<List<PersonGroup>>? _activeGroupsSubscription;
+  StreamSubscription<List<PersonGroup>>? _archivedGroupsSubscription;
   final Map<String, StreamSubscription<List<PersonRole>>> _roleSubscriptions =
       {};
+  final Map<String, StreamSubscription<List<PersonGroupMembership>>>
+  _membershipSubscriptions = {};
   final Map<String, List<PersonRole>> _rolesByPerson = {};
+  final Map<String, List<PersonGroupMembership>> _membershipsByPerson = {};
   List<Person> _people = const [];
+  List<PersonGroup> _activeGroups = const [];
+  List<PersonGroup> _archivedGroups = const [];
   PeopleLoadState _state = PeopleLoadState.loading;
   String? _selectedPersonId;
   String? _errorMessage;
@@ -75,6 +86,7 @@ final class PeopleController extends ChangeNotifier {
   bool _operationInProgress = false;
   String _searchQuery = '';
   String? _primaryRoleFilter;
+  String? _selectedGroupFilter;
   int _idSerial = 0;
 
   PeopleLoadState get state => _state;
@@ -83,6 +95,9 @@ final class PeopleController extends ChangeNotifier {
   bool get operationInProgress => _operationInProgress;
   String get searchQuery => _searchQuery;
   String? get primaryRoleFilter => _primaryRoleFilter;
+  String? get selectedGroupFilter => _selectedGroupFilter;
+  List<PersonGroup> get activeGroups => List.unmodifiable(_activeGroups);
+  List<PersonGroup> get archivedGroups => List.unmodifiable(_archivedGroups);
   List<Person> get activePeople => _people
       .where((person) => person.archivedAt == null)
       .toList(growable: false);
@@ -92,6 +107,7 @@ final class PeopleController extends ChangeNotifier {
   List<Person> get lanePeople => _showArchived ? archivedPeople : activePeople;
   List<Person> get visiblePeople => lanePeople
       .where(_matchesPrimaryRole)
+      .where(_matchesGroup)
       .where(_matchesSearch)
       .toList(growable: false);
   int get resultCount => visiblePeople.length;
@@ -113,6 +129,14 @@ final class PeopleController extends ChangeNotifier {
     _peopleSubscription = _peopleRepository
         .watchPeople(includeArchived: true)
         .listen(_acceptPeople, onError: _acceptStreamFailure);
+    _activeGroupsSubscription = _groupRepository.watchActiveGroups().listen(
+      _acceptActiveGroups,
+      onError: (_) => _acceptGroupStreamFailure(),
+    );
+    _archivedGroupsSubscription = _groupRepository.watchArchivedGroups().listen(
+      _acceptArchivedGroups,
+      onError: (_) => _acceptGroupStreamFailure(),
+    );
   }
 
   void _acceptPeople(List<Person> people) {
@@ -120,6 +144,7 @@ final class PeopleController extends ChangeNotifier {
       ..sort((left, right) => right.updatedAt.compareTo(left.updatedAt));
     _state = PeopleLoadState.ready;
     _syncRoleSubscriptions();
+    _syncMembershipSubscriptions();
     _keepSelectionVisible();
     notifyListeners();
   }
@@ -127,6 +152,28 @@ final class PeopleController extends ChangeNotifier {
   void _acceptStreamFailure(Object _) {
     _state = PeopleLoadState.failure;
     _errorMessage = '사람 기록을 불러오지 못했습니다. 다시 시도해 주세요.';
+    notifyListeners();
+  }
+
+  void _acceptActiveGroups(List<PersonGroup> groups) {
+    _activeGroups = [...groups]
+      ..sort((left, right) => left.name.compareTo(right.name));
+    final filter = _selectedGroupFilter;
+    if (filter != null && !_activeGroups.any((group) => group.id == filter)) {
+      _selectedGroupFilter = null;
+    }
+    _keepSelectionVisible();
+    notifyListeners();
+  }
+
+  void _acceptArchivedGroups(List<PersonGroup> groups) {
+    _archivedGroups = [...groups]
+      ..sort((left, right) => left.name.compareTo(right.name));
+    notifyListeners();
+  }
+
+  void _acceptGroupStreamFailure() {
+    _errorMessage = '그룹 기록을 불러오지 못했습니다. 다시 시도해 주세요.';
     notifyListeners();
   }
 
@@ -156,6 +203,26 @@ final class PeopleController extends ChangeNotifier {
     }
   }
 
+  void _syncMembershipSubscriptions() {
+    final personIds = _people.map((person) => person.id).toSet();
+    for (final id in _membershipSubscriptions.keys.toList()) {
+      if (!personIds.contains(id)) {
+        unawaited(_membershipSubscriptions.remove(id)?.cancel());
+        _membershipsByPerson.remove(id);
+      }
+    }
+    for (final id in personIds) {
+      if (_membershipSubscriptions.containsKey(id)) continue;
+      _membershipSubscriptions[id] = _groupRepository
+          .watchMembershipsForPerson(id)
+          .listen((memberships) {
+            _membershipsByPerson[id] = memberships;
+            _keepSelectionVisible();
+            notifyListeners();
+          }, onError: (_) => _acceptGroupStreamFailure());
+    }
+  }
+
   void _keepSelectionVisible() {
     final visibleIds = visiblePeople.map((person) => person.id).toSet();
     if (_selectedPersonId == null || !visibleIds.contains(_selectedPersonId)) {
@@ -178,9 +245,36 @@ final class PeopleController extends ChangeNotifier {
     return null;
   }
 
+  List<PersonGroupMembership> membershipsForPerson(String personId) =>
+      List.unmodifiable(_membershipsByPerson[personId] ?? const []);
+
+  List<PersonGroup> groupsForPerson(String personId) {
+    final groupIds = membershipsForPerson(
+      personId,
+    ).map((membership) => membership.groupId).toSet();
+    return _activeGroups
+        .where((group) => groupIds.contains(group.id))
+        .toList(growable: false);
+  }
+
+  int peopleCountForGroup(String groupId) => _membershipsByPerson.values
+      .where(
+        (memberships) =>
+            memberships.any((membership) => membership.groupId == groupId),
+      )
+      .length;
+
   bool _matchesPrimaryRole(Person person) {
     final filter = _primaryRoleFilter;
     return filter == null || primaryRoleFor(person.id) == filter;
+  }
+
+  bool _matchesGroup(Person person) {
+    final filter = _selectedGroupFilter;
+    return filter == null ||
+        membershipsForPerson(
+          person.id,
+        ).any((membership) => membership.groupId == filter);
   }
 
   bool _matchesSearch(Person person) {
@@ -190,9 +284,13 @@ final class PeopleController extends ChangeNotifier {
     final roleLabel = PeopleRoleCatalog.labelFor(
       primaryRoleFor(person.id),
     ).toLowerCase();
+    final groupNames = groupsForPerson(
+      person.id,
+    ).map((group) => group.name.toLowerCase());
     return person.displayName.toLowerCase().contains(query) ||
         relationship.contains(query) ||
-        roleLabel.contains(query);
+        roleLabel.contains(query) ||
+        groupNames.any((name) => name.contains(query));
   }
 
   void selectPerson(String personId) {
@@ -224,10 +322,25 @@ final class PeopleController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateGroupFilter(String? groupId) {
+    if (groupId != null && !_activeGroups.any((group) => group.id == groupId)) {
+      return;
+    }
+    if (_selectedGroupFilter == groupId) return;
+    _selectedGroupFilter = groupId;
+    _keepSelectionVisible();
+    notifyListeners();
+  }
+
   void clearFilters() {
-    if (_searchQuery.isEmpty && _primaryRoleFilter == null) return;
+    if (_searchQuery.isEmpty &&
+        _primaryRoleFilter == null &&
+        _selectedGroupFilter == null) {
+      return;
+    }
     _searchQuery = '';
     _primaryRoleFilter = null;
+    _selectedGroupFilter = null;
     _keepSelectionVisible();
     notifyListeners();
   }
@@ -241,10 +354,133 @@ final class PeopleController extends ChangeNotifier {
   Future<void> stop() async {
     await _peopleSubscription?.cancel();
     _peopleSubscription = null;
+    await _activeGroupsSubscription?.cancel();
+    _activeGroupsSubscription = null;
+    await _archivedGroupsSubscription?.cancel();
+    _archivedGroupsSubscription = null;
     for (final subscription in _roleSubscriptions.values) {
       await subscription.cancel();
     }
     _roleSubscriptions.clear();
+    for (final subscription in _membershipSubscriptions.values) {
+      await subscription.cancel();
+    }
+    _membershipSubscriptions.clear();
+  }
+
+  Future<bool> createGroup(String name) async {
+    _setOperation(true);
+    final at = _now().toUtc();
+    final trimmed = name.trim();
+    final result = await _groupRepository.createGroup(
+      PersonGroup(
+        id: _nextId('person-group'),
+        name: trimmed,
+        normalizedName: normalizePersonGroupName(trimmed),
+        createdAt: at,
+        updatedAt: at,
+      ),
+    );
+    if (result.isFailure) {
+      _setGroupRepositoryFailure(result.error!);
+      return false;
+    }
+    _upsertLocalGroup(result.value!);
+    _setOperation(false);
+    return true;
+  }
+
+  Future<bool> renameGroup(String groupId, String name) async {
+    _setOperation(true);
+    final result = await _groupRepository.renameGroup(
+      groupId,
+      name: name,
+      updatedAt: _now().toUtc(),
+    );
+    if (result.isFailure) {
+      _setGroupRepositoryFailure(result.error!);
+      return false;
+    }
+    _upsertLocalGroup(result.value!);
+    _setOperation(false);
+    return true;
+  }
+
+  Future<bool> archiveGroup(String groupId) async {
+    _setOperation(true);
+    final result = await _groupRepository.archiveGroup(
+      groupId,
+      at: _now().toUtc(),
+    );
+    if (result.isFailure) {
+      _setGroupRepositoryFailure(result.error!);
+      return false;
+    }
+    _upsertLocalGroup(result.value!);
+    if (_selectedGroupFilter == groupId) _selectedGroupFilter = null;
+    _keepSelectionVisible();
+    _setOperation(false);
+    return true;
+  }
+
+  Future<bool> restoreGroup(String groupId) async {
+    _setOperation(true);
+    final result = await _groupRepository.restoreGroup(
+      groupId,
+      at: _now().toUtc(),
+    );
+    if (result.isFailure) {
+      _setGroupRepositoryFailure(result.error!);
+      return false;
+    }
+    _upsertLocalGroup(result.value!);
+    _setOperation(false);
+    return true;
+  }
+
+  Future<bool> assignSelectedToGroup(String groupId) async {
+    final person = selectedPerson;
+    if (person == null || person.archivedAt != null) return false;
+    _setOperation(true);
+    final result = await _groupRepository.assignPerson(
+      groupId: groupId,
+      personId: person.id,
+      createdAt: _now().toUtc(),
+    );
+    if (result.isFailure) {
+      _setGroupRepositoryFailure(result.error!);
+      return false;
+    }
+    final memberships = _membershipsByPerson[person.id] ?? const [];
+    _membershipsByPerson[person.id] = [
+      for (final membership in memberships)
+        if (membership.groupId != groupId) membership,
+      result.value!,
+    ];
+    _keepSelectionVisible();
+    _setOperation(false);
+    return true;
+  }
+
+  Future<bool> removeSelectedFromGroup(String groupId) async {
+    final person = selectedPerson;
+    if (person == null) return false;
+    _setOperation(true);
+    final result = await _groupRepository.removePerson(
+      groupId: groupId,
+      personId: person.id,
+    );
+    if (result.isFailure) {
+      _setGroupRepositoryFailure(result.error!);
+      return false;
+    }
+    _membershipsByPerson[person.id] =
+        (_membershipsByPerson[person.id] ?? const [])
+            .where((membership) => membership.groupId != groupId)
+            .toList(growable: false);
+    _keepSelectionVisible();
+    _setOperation(false);
+    return true;
   }
 
   Future<bool> createPerson({
@@ -352,12 +588,27 @@ final class PeopleController extends ChangeNotifier {
     ]..sort((left, right) => right.updatedAt.compareTo(left.updatedAt));
   }
 
+  void _upsertLocalGroup(PersonGroup group) {
+    _activeGroups = [
+      for (final existing in _activeGroups)
+        if (existing.id != group.id) existing,
+      if (group.archivedAt == null) group,
+    ]..sort((left, right) => left.name.compareTo(right.name));
+    _archivedGroups = [
+      for (final existing in _archivedGroups)
+        if (existing.id != group.id) existing,
+      if (group.archivedAt != null) group,
+    ]..sort((left, right) => left.name.compareTo(right.name));
+  }
+
   void _removeLocalPerson(String id) {
     _people = _people
         .where((person) => person.id != id)
         .toList(growable: false);
     _rolesByPerson.remove(id);
     unawaited(_roleSubscriptions.remove(id)?.cancel());
+    _membershipsByPerson.remove(id);
+    unawaited(_membershipSubscriptions.remove(id)?.cancel());
   }
 
   String _nextId(String prefix) {
@@ -389,13 +640,29 @@ final class PeopleController extends ChangeNotifier {
     _setFailure(message);
   }
 
+  void _setGroupRepositoryFailure(RepositoryError error) {
+    final message = switch (error.code) {
+      RepositoryErrorCode.validationFailed => '그룹 이름과 상태를 다시 확인해 주세요.',
+      RepositoryErrorCode.conflict => '이미 같은 이름의 그룹이 있습니다.',
+      RepositoryErrorCode.notFound => '그룹 또는 사람 기록을 찾을 수 없습니다.',
+      _ => '그룹 기록을 저장하지 못했습니다. 다시 시도해 주세요.',
+    };
+    _setFailure(message);
+  }
+
   @override
   void dispose() {
     unawaited(_peopleSubscription?.cancel());
+    unawaited(_activeGroupsSubscription?.cancel());
+    unawaited(_archivedGroupsSubscription?.cancel());
     for (final subscription in _roleSubscriptions.values) {
       unawaited(subscription.cancel());
     }
     _roleSubscriptions.clear();
+    for (final subscription in _membershipSubscriptions.values) {
+      unawaited(subscription.cancel());
+    }
+    _membershipSubscriptions.clear();
     super.dispose();
   }
 }

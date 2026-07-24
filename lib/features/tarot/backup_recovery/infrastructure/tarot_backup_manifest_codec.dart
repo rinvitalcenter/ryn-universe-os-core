@@ -42,6 +42,13 @@ final class TarotBackupManifestCodec {
       throw const FormatException('manifest_not_object');
     }
     _requireExactKeys(decoded, TarotBackupManifest.canonicalFieldOrder);
+    final payloadSchemaVersion = _integer(decoded, 'schemaVersion');
+    final requiredTables = TarotBackupManifest.requiredTablesFor(
+      payloadSchemaVersion,
+    );
+    if (requiredTables.isEmpty) {
+      throw const FormatException('invalid_schemaVersion');
+    }
 
     final manifest = TarotBackupManifest(
       applicationVersion: _string(decoded, 'applicationVersion'),
@@ -56,8 +63,12 @@ final class TarotBackupManifestCodec {
       ),
       databasePayloadSha256: _string(decoded, 'databasePayloadSha256'),
       requiredTables: _stringList(decoded, 'requiredTables'),
-      requiredColumnsByTable: _columnsMap(decoded),
-      tableRowCounts: _countMap(decoded, 'tableRowCounts'),
+      requiredColumnsByTable: _columnsMap(decoded, requiredTables),
+      tableRowCounts: _countMap(
+        decoded,
+        'tableRowCounts',
+        exactKeys: requiredTables,
+      ),
       readingIdCount: _integer(decoded, 'readingIdCount'),
       placementCount: _integer(decoded, 'placementCount'),
       interpretationCount: _integer(decoded, 'interpretationCount'),
@@ -73,6 +84,7 @@ final class TarotBackupManifestCodec {
       ),
       unsupportedTableRowsZero: _boolean(decoded, 'unsupportedTableRowsZero'),
       verifiedAtUtc: _timestamp(decoded, 'verifiedAtUtc'),
+      payloadSchemaVersion: payloadSchemaVersion,
     );
 
     _requireFixed(decoded, 'backupFormatVersion', 1);
@@ -82,7 +94,7 @@ final class TarotBackupManifestCodec {
       TarotBackupManifest.applicationIdentity,
     );
     _requireFixed(decoded, 'contentScope', TarotBackupManifest.contentScope);
-    _requireFixed(decoded, 'schemaVersion', TarotBackupManifest.schemaVersion);
+
     _requireFixed(
       decoded,
       'databasePayloadFilename',
@@ -117,18 +129,18 @@ final class TarotBackupManifestCodec {
         'sourcePurpose': manifest.sourcePurpose,
         'contentScope': TarotBackupManifest.contentScope,
         'createdAtUtc': _formatTimestamp(manifest.createdAtUtc),
-        'schemaVersion': TarotBackupManifest.schemaVersion,
+        'schemaVersion': manifest.payloadSchemaVersion,
         'databasePayloadFilename': TarotBackupManifest.databasePayloadFilename,
         'databasePayloadSizeBytes': manifest.databasePayloadSizeBytes,
         'databasePayloadSha256': manifest.databasePayloadSha256,
         'checksumFilename': TarotBackupManifest.checksumFilename,
         'requiredTables': manifest.requiredTables,
         'requiredColumnsByTable': <String, Object?>{
-          for (final table in TarotBackupManifest.requiredTablesV1)
+          for (final table in manifest.requiredTables)
             table: manifest.requiredColumnsByTable[table],
         },
         'tableRowCounts': <String, Object?>{
-          for (final table in TarotBackupManifest.requiredTablesV1)
+          for (final table in manifest.requiredTables)
             table: manifest.tableRowCounts[table],
         },
         'readingIdCount': manifest.readingIdCount,
@@ -146,24 +158,21 @@ final class TarotBackupManifestCodec {
       };
 
   void _validateManifest(TarotBackupManifest manifest) {
+    final requiredTables = TarotBackupManifest.requiredTablesFor(
+      manifest.payloadSchemaVersion,
+    );
+    final requiredColumns = TarotBackupManifest.requiredColumnsFor(
+      manifest.payloadSchemaVersion,
+    );
     if (!isValidApplicationVersion(manifest.applicationVersion) ||
         manifest.sourceRuntimeMode != 'tarot_backup_recovery_qa' ||
         manifest.sourceEnvironment != 'development' ||
         manifest.sourcePurpose != 'core_tarot_backup_recovery_v0_2' ||
         manifest.databasePayloadSizeBytes <= 0 ||
         !_sha256.hasMatch(manifest.databasePayloadSha256) ||
-        !_sameList(
-          manifest.requiredTables,
-          TarotBackupManifest.requiredTablesV1,
-        ) ||
-        !_sameColumns(
-          manifest.requiredColumnsByTable,
-          TarotBackupManifest.requiredColumnsByTableV1,
-        ) ||
-        !_hasExactCountKeys(
-          manifest.tableRowCounts,
-          TarotBackupManifest.requiredTablesV1,
-        ) ||
+        !_sameList(manifest.requiredTables, requiredTables) ||
+        !_sameColumns(manifest.requiredColumnsByTable, requiredColumns) ||
+        !_hasExactCountKeys(manifest.tableRowCounts, requiredTables) ||
         !_hasExactCountKeys(manifest.lifecycleStateCounts, const <String>[
           'continuing',
           'finished',
@@ -230,15 +239,17 @@ final class TarotBackupManifestCodec {
     return result;
   }
 
-  static Map<String, List<String>> _columnsMap(Map<String, Object?> map) {
+  static Map<String, List<String>> _columnsMap(
+    Map<String, Object?> map,
+    List<String> requiredTables,
+  ) {
     final value = map['requiredColumnsByTable'];
     if (value is! Map<String, Object?>) {
       throw const FormatException('invalid_requiredColumnsByTable');
     }
-    _requireExactKeys(value, TarotBackupManifest.requiredTablesV1);
+    _requireExactKeys(value, requiredTables);
     return <String, List<String>>{
-      for (final table in TarotBackupManifest.requiredTablesV1)
-        table: _stringList(value, table),
+      for (final table in requiredTables) table: _stringList(value, table),
     };
   }
 

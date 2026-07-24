@@ -50,17 +50,30 @@ final class TarotBackupDatabaseInspector {
       );
       database.execute('PRAGMA query_only = ON');
       final schemaVersion = database.userVersion;
+      if (schemaVersion == 5) {
+        throw const TarotBackupInspectionException(
+          'schema_v5_restore_requires_v5_application',
+        );
+      }
+      final requiredTables = TarotBackupManifest.requiredTablesFor(
+        schemaVersion,
+      );
+      final requiredColumns = TarotBackupManifest.requiredColumnsFor(
+        schemaVersion,
+      );
+      if (requiredTables.isEmpty) {
+        throw const TarotBackupInspectionException('schema_version_mismatch');
+      }
       final tableNames = database
           .select("SELECT name FROM sqlite_master WHERE type = 'table'")
           .map((row) => row['name']! as String)
           .toSet();
       final tableExistence = <String, bool>{
-        for (final table in TarotBackupManifest.requiredTablesV1)
-          table: tableNames.contains(table),
+        for (final table in requiredTables) table: tableNames.contains(table),
       };
       final columnResults = <String, bool>{};
       final exactColumnResults = <String, bool>{};
-      for (final table in TarotBackupManifest.requiredTablesV1) {
+      for (final table in requiredTables) {
         if (!tableNames.contains(table)) {
           columnResults[table] = false;
           exactColumnResults[table] = false;
@@ -70,7 +83,7 @@ final class TarotBackupDatabaseInspector {
             .select('PRAGMA table_info("$table")')
             .map((row) => row['name']! as String)
             .toSet();
-        final required = TarotBackupManifest.requiredColumnsByTableV1[table]!;
+        final required = requiredColumns[table]!;
         columnResults[table] = required.every(actual.contains);
         exactColumnResults[table] = _sameSet(actual, required.toSet());
       }
@@ -79,11 +92,11 @@ final class TarotBackupDatabaseInspector {
           .toSet();
       final unexpectedTablesAbsent = _sameSet(
         applicationTables,
-        TarotBackupManifest.requiredTablesV1.toSet(),
+        requiredTables.toSet(),
       );
 
       final rowCounts = <String, int>{};
-      for (final table in TarotBackupManifest.requiredTablesV1) {
+      for (final table in requiredTables) {
         rowCounts[table] = tableNames.contains(table)
             ? _scalar(database, 'SELECT count(*) FROM "$table"')
             : 0;
@@ -108,7 +121,14 @@ final class TarotBackupDatabaseInspector {
       final personCoreInvariantsOk =
           hasPersonCoreTables && _inspectPersonCore(database);
       final personSchemaContractOk =
-          hasPersonCoreTables && _inspectPersonSchemaContract(database);
+          hasPersonCoreTables &&
+          _inspectPersonSchemaContract(
+            database,
+            includeGroups: schemaVersion == TarotBackupManifest.schemaVersion,
+          );
+      final groupInvariantsOk =
+          schemaVersion == TarotBackupManifest.legacySchemaVersion ||
+          _inspectPersonGroups(database);
       final integrityCheckOk =
           database.select('PRAGMA integrity_check').length == 1 &&
           database.select('PRAGMA integrity_check').first.values.first == 'ok';
@@ -137,7 +157,8 @@ final class TarotBackupDatabaseInspector {
         integrityCheckOk: integrityCheckOk,
         foreignKeyCheckOk: foreignKeyCheckOk,
         schemaContractOk: personSchemaContractOk,
-        aggregateInvariantsOk: tarotAggregate.valid && personCoreInvariantsOk,
+        aggregateInvariantsOk:
+            tarotAggregate.valid && personCoreInvariantsOk && groupInvariantsOk,
         freelistCount: _scalar(database, 'PRAGMA freelist_count'),
         hasUnexpectedNonEmptySidecar: false,
       );
@@ -170,6 +191,9 @@ final class TarotBackupDatabaseInspector {
     TarotDatabaseInspectionPolicy policy =
         TarotDatabaseInspectionPolicy.normalReadOnlySource,
     bool requireAcceptableSidecars = false,
+    Set<int> acceptedSchemaVersions = const <int>{
+      TarotBackupManifest.schemaVersion,
+    },
   }) {
     final evidence = inspect(databasePath, policy: policy);
     if (evidence.schemaVersion == 5) {
@@ -177,7 +201,7 @@ final class TarotBackupDatabaseInspector {
         'schema_v5_restore_requires_v5_application',
       );
     }
-    if (evidence.schemaVersion != TarotBackupManifest.schemaVersion) {
+    if (!acceptedSchemaVersions.contains(evidence.schemaVersion)) {
       throw const TarotBackupInspectionException('schema_version_mismatch');
     }
     if (!evidence.requiredTablesPresent) {
@@ -385,7 +409,43 @@ final class TarotBackupDatabaseInspector {
         duplicateCurrentBirthProfiles == 0;
   }
 
-  bool _inspectPersonSchemaContract(Database database) {
+  bool _inspectPersonGroups(Database database) {
+    final groups = database.select(
+      'SELECT id, name, normalized_name, archived_at_utc_us, '
+      'created_at_utc_us, updated_at_utc_us FROM person_groups',
+    );
+    for (final row in groups) {
+      final id = row['id']! as String;
+      final name = row['name']! as String;
+      final normalizedName = row['normalized_name']! as String;
+      final createdAt = row['created_at_utc_us']! as int;
+      final updatedAt = row['updated_at_utc_us']! as int;
+      final archivedAt = row['archived_at_utc_us'] as int?;
+      if (id.trim().isEmpty ||
+          name.trim().isEmpty ||
+          name.runes.length > 60 ||
+          normalizedName != _normalizeGroupName(name) ||
+          updatedAt < createdAt ||
+          (archivedAt != null && archivedAt < createdAt)) {
+        return false;
+      }
+    }
+    final duplicateNames = _scalar(database, '''SELECT count(*) FROM (
+      SELECT normalized_name FROM person_groups
+      GROUP BY normalized_name HAVING count(*) > 1
+    )''');
+    final orphanMemberships = _scalar(database, '''SELECT count(*)
+      FROM person_group_memberships m
+      LEFT JOIN person_groups g ON g.id = m.group_id
+      LEFT JOIN persons p ON p.id = m.person_id
+      WHERE g.id IS NULL OR p.id IS NULL''');
+    return duplicateNames == 0 && orphanMemberships == 0;
+  }
+
+  bool _inspectPersonSchemaContract(
+    Database database, {
+    required bool includeGroups,
+  }) {
     const expectedForeignKeys = <String, Set<String>>{
       'persons': <String>{},
       'person_roles': <String>{'person_id|persons|id|cascade'},
@@ -546,9 +606,84 @@ final class TarotBackupDatabaseInspector {
     ])) {
       return false;
     }
-    return requiredIndexes.entries.every(
+    final baseMatches = requiredIndexes.entries.every(
       (entry) => _matchesIndex(database, entry.key, entry.value),
     );
+    return baseMatches &&
+        (!includeGroups || _inspectPersonGroupSchemaContract(database));
+  }
+
+  bool _inspectPersonGroupSchemaContract(Database database) {
+    final groupPrimaryKeys = database
+        .select('PRAGMA table_info("person_groups")')
+        .where((row) => (row['pk']! as int) > 0)
+        .map((row) => row['name']! as String)
+        .toList(growable: false);
+    final membershipPrimaryKeys = database
+        .select('PRAGMA table_info("person_group_memberships")')
+        .where((row) => (row['pk']! as int) > 0)
+        .map((row) => row['name']! as String)
+        .toList(growable: false);
+    if (!_sameList(groupPrimaryKeys, const <String>['id']) ||
+        !_sameList(membershipPrimaryKeys, const <String>[
+          'group_id',
+          'person_id',
+        ])) {
+      return false;
+    }
+
+    final membershipForeignKeys = database
+        .select('PRAGMA foreign_key_list("person_group_memberships")')
+        .map(
+          (row) =>
+              '${row['from']}|${row['table']}|${row['to']}|${row['on_delete']}'
+                  .toLowerCase(),
+        )
+        .toSet();
+    if (!_sameSet(membershipForeignKeys, const <String>{
+      'group_id|person_groups|id|cascade',
+      'person_id|persons|id|cascade',
+    })) {
+      return false;
+    }
+
+    final groupSql =
+        database
+                .select(
+                  "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'person_groups'",
+                )
+                .single['sql']!
+            as String;
+    final normalizedSql = _normalizeSchemaSql(groupSql);
+    for (final check in const <String>[
+      'CHECK (length(trim(id)) > 0)',
+      'CHECK (length(trim(name)) BETWEEN 1 AND 60)',
+      'CHECK (length(normalized_name) BETWEEN 1 AND 60)',
+      'CHECK (archived_at_utc_us IS NULL OR archived_at_utc_us >= created_at_utc_us)',
+      'CHECK (updated_at_utc_us >= created_at_utc_us)',
+    ]) {
+      if (!normalizedSql.contains(_normalizeSchemaSql(check))) return false;
+    }
+
+    return _hasUniqueColumns(database, 'person_groups', const <String>[
+          'normalized_name',
+        ]) &&
+        _matchesIndex(
+          database,
+          'person_groups_archive_name_idx',
+          const _IndexContract('person_groups', <String>[
+            'archived_at_utc_us',
+            'normalized_name',
+          ]),
+        ) &&
+        _matchesIndex(
+          database,
+          'person_group_memberships_person_idx',
+          const _IndexContract('person_group_memberships', <String>[
+            'person_id',
+            'group_id',
+          ]),
+        );
   }
 }
 
@@ -697,6 +832,9 @@ final class _AggregateEvidence {
   final bool activeHomeReadingIdPresent;
   final bool valid;
 }
+
+String _normalizeGroupName(String value) =>
+    value.trim().replaceAll(RegExp(r'\s+'), ' ').toLowerCase();
 
 int _scalar(Database database, String sql) =>
     database.select(sql).first.values.first! as int;

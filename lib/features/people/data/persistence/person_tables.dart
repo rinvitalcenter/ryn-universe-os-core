@@ -54,6 +54,49 @@ class PersonRoles extends Table {
   ];
 }
 
+@DataClassName('PersonGroupRow')
+class PersonGroups extends Table {
+  TextColumn get id => text().withLength(min: 1, max: 120)();
+  TextColumn get name => text().withLength(min: 1, max: 60)();
+  TextColumn get normalizedName =>
+      text().named('normalized_name').withLength(min: 1, max: 60)();
+  IntColumn get archivedAtUtcUs =>
+      integer().named('archived_at_utc_us').nullable()();
+  IntColumn get createdAtUtcUs => integer().named('created_at_utc_us')();
+  IntColumn get updatedAtUtcUs => integer().named('updated_at_utc_us')();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {normalizedName},
+  ];
+
+  @override
+  List<String> get customConstraints => const [
+    "CHECK (length(trim(id)) > 0)",
+    'CHECK (length(trim(name)) BETWEEN 1 AND 60)',
+    'CHECK (length(normalized_name) BETWEEN 1 AND 60)',
+    'CHECK (archived_at_utc_us IS NULL OR archived_at_utc_us >= created_at_utc_us)',
+    'CHECK (updated_at_utc_us >= created_at_utc_us)',
+  ];
+}
+
+@DataClassName('PersonGroupMembershipRow')
+class PersonGroupMemberships extends Table {
+  TextColumn get groupId => text()
+      .named('group_id')
+      .references(PersonGroups, #id, onDelete: KeyAction.cascade)();
+  TextColumn get personId => text()
+      .named('person_id')
+      .references(Persons, #id, onDelete: KeyAction.cascade)();
+  IntColumn get createdAtUtcUs => integer().named('created_at_utc_us')();
+
+  @override
+  Set<Column<Object>> get primaryKey => {groupId, personId};
+}
+
 @DataClassName('PersonRelationshipRow')
 class PersonRelationships extends Table {
   TextColumn get id => text().withLength(min: 1, max: 120)();

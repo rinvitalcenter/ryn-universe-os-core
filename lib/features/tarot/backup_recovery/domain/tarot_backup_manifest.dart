@@ -20,6 +20,7 @@ final class TarotBackupManifest {
     required Map<String, int> lifecycleStateCounts,
     required this.unsupportedTableRowsZero,
     required this.verifiedAtUtc,
+    this.payloadSchemaVersion = schemaVersion,
   }) : requiredTables = List.unmodifiable(requiredTables),
        requiredColumnsByTable = UnmodifiableMapView(<String, List<String>>{
          for (final entry in requiredColumnsByTable.entries)
@@ -31,7 +32,8 @@ final class TarotBackupManifest {
   static const int backupFormatVersion = 1;
   static const String applicationIdentity = 'RinVitalCenter/RynUniverseOS';
   static const String contentScope = 'person_core_tarot_persistence_v0_3';
-  static const int schemaVersion = 6;
+  static const int schemaVersion = 7;
+  static const int legacySchemaVersion = 6;
   static const String schemaV5RestorePolicy =
       'restore_with_schema_v5_application_then_reopen_to_migrate';
   static const String databasePayloadFilename =
@@ -67,7 +69,7 @@ final class TarotBackupManifest {
     'verifiedAtUtc',
   ];
 
-  static const List<String> requiredTablesV1 = <String>[
+  static const List<String> requiredTablesV6 = <String>[
     'app_settings',
     'obsidian_report_refs',
     'audit_trail',
@@ -87,7 +89,7 @@ final class TarotBackupManifest {
     'encounter_notes',
   ];
 
-  static const Map<String, List<String>> requiredColumnsByTableV1 =
+  static const Map<String, List<String>> requiredColumnsByTableV6 =
       <String, List<String>>{
         'app_settings': <String>[
           'key',
@@ -297,6 +299,48 @@ final class TarotBackupManifest {
         ],
       };
 
+  static const List<String> requiredTablesV7 = <String>[
+    ...requiredTablesV6,
+    'person_groups',
+    'person_group_memberships',
+  ];
+
+  static const Map<String, List<String>> requiredColumnsByTableV7 =
+      <String, List<String>>{
+        ...requiredColumnsByTableV6,
+        'person_groups': <String>[
+          'id',
+          'name',
+          'normalized_name',
+          'archived_at_utc_us',
+          'created_at_utc_us',
+          'updated_at_utc_us',
+        ],
+        'person_group_memberships': <String>[
+          'group_id',
+          'person_id',
+          'created_at_utc_us',
+        ],
+      };
+
+  /// Current backup-format-v1 physical inventory.
+  static const List<String> requiredTablesV1 = requiredTablesV7;
+  static const Map<String, List<String>> requiredColumnsByTableV1 =
+      requiredColumnsByTableV7;
+
+  static List<String> requiredTablesFor(int version) => switch (version) {
+    legacySchemaVersion => requiredTablesV6,
+    schemaVersion => requiredTablesV7,
+    _ => const <String>[],
+  };
+
+  static Map<String, List<String>> requiredColumnsFor(int version) =>
+      switch (version) {
+        legacySchemaVersion => requiredColumnsByTableV6,
+        schemaVersion => requiredColumnsByTableV7,
+        _ => const <String, List<String>>{},
+      };
+
   final String applicationVersion;
   final String sourceRuntimeMode;
   final String sourceEnvironment;
@@ -315,4 +359,5 @@ final class TarotBackupManifest {
   final Map<String, int> lifecycleStateCounts;
   final bool unsupportedTableRowsZero;
   final DateTime verifiedAtUtc;
+  final int payloadSchemaVersion;
 }

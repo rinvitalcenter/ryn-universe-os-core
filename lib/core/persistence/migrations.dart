@@ -3,11 +3,10 @@ const int plannedInitialSchemaVersion = 1;
 
 /// Current global schema version.
 ///
-/// Version 6 adds the approved Person Core foundation without changing the
-/// existing governance or Tarot tables.
-const int plannedCurrentSchemaVersion = 6;
+/// Version 7 adds persistent custom Person groups and memberships without
+/// changing the meaning of existing Person, Role, governance, or Tarot data.
+const int plannedCurrentSchemaVersion = 7;
 
-/// Supported upgrades are truthful add-only 5 -> 6 and chained 4 -> 5 -> 6
-/// migrations implemented by [RynAppDatabase.migration].
+/// Supported upgrades remain truthful and add-only through schema version 7.
 const String migrationImplementationStatus =
-    'add_only_5_to_6_and_4_to_5_to_6_implemented';
+    'add_only_6_to_7_with_4_and_5_chained_to_7_implemented';

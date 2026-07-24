@@ -4,6 +4,7 @@ import '../../../core/theme/ryn_tokens.dart';
 import '../application/people_controller.dart';
 import '../domain/person_core_models.dart';
 import '../domain/person_core_repositories.dart';
+import 'people_group_sheets.dart';
 
 class PeopleUnavailablePage extends StatelessWidget {
   const PeopleUnavailablePage({super.key});
@@ -30,11 +31,13 @@ class PeoplePage extends StatefulWidget {
     super.key,
     required this.peopleRepository,
     required this.roleRepository,
+    required this.groupRepository,
     this.onStartSession,
   });
 
   final PersonRepository peopleRepository;
   final PersonRoleRepository roleRepository;
+  final PersonGroupRepository groupRepository;
   final ValueChanged<Person>? onStartSession;
 
   @override
@@ -52,6 +55,7 @@ class _PeoplePageState extends State<PeoplePage> {
     _controller = PeopleController(
       peopleRepository: widget.peopleRepository,
       roleRepository: widget.roleRepository,
+      groupRepository: widget.groupRepository,
     )..start();
   }
 
@@ -226,6 +230,7 @@ class _PeopleReadyScene extends StatelessWidget {
         );
         final detail = selected == null
             ? _PeopleNoResultsScene(
+                groupFiltered: controller.selectedGroupFilter != null,
                 onClear: () {
                   searchController.clear();
                   controller.clearFilters();
@@ -234,9 +239,13 @@ class _PeopleReadyScene extends StatelessWidget {
             : PersonDetailPage(
                 person: selected,
                 roles: controller.activeRolesFor(selected.id),
+                groups: controller.groupsForPerson(selected.id),
                 busy: controller.operationInProgress,
                 onArchive: () => _confirmArchive(context),
                 onRestore: () => _restore(context),
+                onManageGroups: () =>
+                    showPersonGroupMemberships(context, controller),
+                onRemoveGroup: controller.removeSelectedFromGroup,
                 onStartSession: onStartSession == null
                     ? null
                     : () => onStartSession!(selected),
@@ -370,33 +379,90 @@ class _PeopleMasterPanel extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          Container(
-            key: const Key('people-primary-role-filter'),
-            child: DropdownButtonFormField<String>(
-              key: ValueKey(
-                'people-primary-role-filter-${controller.primaryRoleFilter ?? 'all'}',
-              ),
-              initialValue: controller.primaryRoleFilter ?? 'all',
-              isExpanded: true,
-              isDense: true,
-              decoration: const InputDecoration(
-                labelText: '대표 역할',
-                prefixIcon: Icon(Icons.filter_alt_outlined),
-                isDense: true,
-              ),
-              items: [
-                const DropdownMenuItem(value: 'all', child: Text('전체')),
-                for (final roleType in PeopleRoleCatalog.orderedTypes)
-                  DropdownMenuItem(
-                    value: roleType,
-                    child: Text(PeopleRoleCatalog.labelFor(roleType)),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Container(
+                  key: const Key('people-primary-role-filter'),
+                  child: DropdownButtonFormField<String>(
+                    key: ValueKey(
+                      'people-primary-role-filter-${controller.primaryRoleFilter ?? 'all'}',
+                    ),
+                    initialValue: controller.primaryRoleFilter ?? 'all',
+                    isExpanded: true,
+                    isDense: true,
+                    decoration: const InputDecoration(
+                      labelText: '대표 역할',
+                      isDense: true,
+                    ),
+                    items: [
+                      const DropdownMenuItem(value: 'all', child: Text('전체')),
+                      for (final roleType in PeopleRoleCatalog.orderedTypes)
+                        DropdownMenuItem(
+                          value: roleType,
+                          child: Text(PeopleRoleCatalog.labelFor(roleType)),
+                        ),
+                    ],
+                    onChanged: (value) => controller.updatePrimaryRoleFilter(
+                      value == 'all' ? null : value,
+                    ),
                   ),
-              ],
-              onChanged: (value) => controller.updatePrimaryRoleFilter(
-                value == 'all' ? null : value,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  key: const Key('people-group-filter'),
+                  child: DropdownButtonFormField<String>(
+                    key: ValueKey(
+                      'people-group-filter-${controller.selectedGroupFilter ?? 'all'}',
+                    ),
+                    initialValue: controller.selectedGroupFilter ?? 'all',
+                    isExpanded: true,
+                    isDense: true,
+                    decoration: const InputDecoration(
+                      labelText: '그룹',
+                      isDense: true,
+                    ),
+                    items: [
+                      const DropdownMenuItem(
+                        value: 'all',
+                        child: Text('모든 그룹'),
+                      ),
+                      for (final group in controller.activeGroups)
+                        DropdownMenuItem(
+                          value: group.id,
+                          child: Text(
+                            '${group.name} · ${controller.peopleCountForGroup(group.id)}명',
+                          ),
+                        ),
+                    ],
+                    onChanged: (value) => controller.updateGroupFilter(
+                      value == 'all' ? null : value,
+                    ),
+                  ),
+                ),
+              ),
+              IconButton(
+                key: const Key('people-group-manage'),
+                tooltip: '그룹 관리',
+                onPressed: () => showPeopleGroupManagement(context, controller),
+                icon: const Icon(Icons.settings_outlined),
+              ),
+            ],
+          ),
+          if (controller.activeGroups.isEmpty) ...[
+            const SizedBox(height: 7),
+            Text(
+              '아직 만든 그룹이 없습니다.',
+              key: const Key('people-no-groups'),
+              style: TextStyle(
+                color: _PeopleColors.muted(context),
+                fontSize: 12,
               ),
             ),
-          ),
+          ],
           const SizedBox(height: 10),
           Text(
             '${controller.resultCount}명',
@@ -591,17 +657,23 @@ class PersonDetailPage extends StatelessWidget {
     super.key,
     required this.person,
     required this.roles,
+    required this.groups,
     required this.busy,
     required this.onArchive,
     required this.onRestore,
+    required this.onManageGroups,
+    required this.onRemoveGroup,
     this.onStartSession,
   });
 
   final Person person;
   final List<PersonRole> roles;
+  final List<PersonGroup> groups;
   final bool busy;
   final VoidCallback onArchive;
   final VoidCallback onRestore;
+  final VoidCallback onManageGroups;
+  final Future<bool> Function(String groupId) onRemoveGroup;
   final VoidCallback? onStartSession;
 
   @override
@@ -699,6 +771,9 @@ class PersonDetailPage extends StatelessWidget {
                   _PersonOverview(
                     person: person,
                     roles: roles,
+                    groups: groups,
+                    onManageGroups: onManageGroups,
+                    onRemoveGroup: onRemoveGroup,
                     onStartSession: onStartSession,
                   ),
                   const _IntentionalEmpty(
@@ -739,10 +814,16 @@ class _PersonOverview extends StatelessWidget {
   const _PersonOverview({
     required this.person,
     required this.roles,
+    required this.groups,
+    required this.onManageGroups,
+    required this.onRemoveGroup,
     this.onStartSession,
   });
   final Person person;
   final List<PersonRole> roles;
+  final List<PersonGroup> groups;
+  final VoidCallback onManageGroups;
+  final Future<bool> Function(String groupId) onRemoveGroup;
   final VoidCallback? onStartSession;
 
   @override
@@ -764,7 +845,7 @@ class _PersonOverview extends StatelessWidget {
                       ),
                   ],
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           _OverviewLine(
             icon: Icons.nature_people_outlined,
             label: '관계의 맥락',
@@ -793,6 +874,43 @@ class _PersonOverview extends StatelessWidget {
               label: const Text('새 만남 빠른 시작'),
             ),
           ],
+          const SizedBox(height: 18),
+          Text(
+            '그룹',
+            style: Theme.of(
+              context,
+            ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 8),
+          if (groups.isEmpty)
+            Text(
+              '소속 그룹이 없습니다.',
+              key: const Key('person-no-group-membership'),
+              style: TextStyle(color: _PeopleColors.muted(context)),
+            )
+          else
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final group in groups)
+                  InputChip(
+                    key: Key('person-group-pill-${group.id}'),
+                    label: Text(group.name),
+                    tooltip: '${group.name}에서 제외',
+                    onDeleted: () => onRemoveGroup(group.id),
+                  ),
+              ],
+            ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              key: const Key('person-group-membership-action'),
+              onPressed: onManageGroups,
+              icon: const Icon(Icons.group_add_outlined),
+              label: const Text('그룹 연결 관리'),
+            ),
+          ),
         ],
       ),
     );
@@ -1039,12 +1157,16 @@ class _PeopleEmptyScene extends StatelessWidget {
 }
 
 class _PeopleNoResultsScene extends StatelessWidget {
-  const _PeopleNoResultsScene({required this.onClear});
+  const _PeopleNoResultsScene({
+    required this.onClear,
+    required this.groupFiltered,
+  });
   final VoidCallback onClear;
+  final bool groupFiltered;
 
   @override
   Widget build(BuildContext context) => Container(
-    key: const Key('people-no-results'),
+    key: Key(groupFiltered ? 'people-group-no-results' : 'people-no-results'),
     constraints: const BoxConstraints(minHeight: 360),
     decoration: BoxDecoration(
       color: _PeopleColors.detail(context),
@@ -1053,8 +1175,10 @@ class _PeopleNoResultsScene extends StatelessWidget {
     ),
     child: _IntentionalEmpty(
       icon: Icons.search_off_rounded,
-      text: '검색 결과가 없습니다',
-      supporting: '검색어나 대표 역할을 바꾸면 전체 사람을 다시 볼 수 있습니다.',
+      text: groupFiltered ? '이 그룹에 조건과 맞는 사람이 없습니다' : '검색 결과가 없습니다',
+      supporting: groupFiltered
+          ? '그룹, 검색어 또는 대표 역할을 바꾸어 보세요.'
+          : '검색어나 대표 역할을 바꾸면 전체 사람을 다시 볼 수 있습니다.',
       action: TextButton.icon(
         key: const Key('people-clear-filters'),
         onPressed: onClear,
