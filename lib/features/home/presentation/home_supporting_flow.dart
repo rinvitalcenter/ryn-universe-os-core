@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/ryn_tokens.dart';
 import '../../../core/text/user_text.dart';
 
 class HomeSupportingFlow extends StatelessWidget {
@@ -20,18 +21,21 @@ class HomeSupportingFlow extends StatelessWidget {
   Widget build(BuildContext context) {
     final items = <Widget>[
       _QuietDestination(
+        key: const Key('home-flow-records'),
         icon: Icons.auto_stories_outlined,
         title: UserText.homeGrowthRecords,
         subtitle: '완료한 흐름을 기록에서 살펴봅니다.',
         onTap: onOpenRecords,
       ),
       _QuietDestination(
+        key: const Key('home-flow-people'),
         icon: Icons.people_outline_rounded,
         title: UserText.homePeople,
         subtitle: '사람을 이해하는 작업 공간으로 갑니다.',
         onTap: onOpenPeople,
       ),
       _QuietDestination(
+        key: const Key('home-flow-new-tarot'),
         icon: Icons.auto_awesome_outlined,
         title: UserText.homeNewSelfTarot,
         subtitle: '새로운 질문으로 흐름을 엽니다.',
@@ -39,36 +43,43 @@ class HomeSupportingFlow extends StatelessWidget {
       ),
     ];
 
+    final colors = context.rynColors;
     return Semantics(
       container: true,
       label: '이어갈 흐름',
-      child: compact
-          ? Column(
-              children: [
-                for (var index = 0; index < items.length; index++) ...[
-                  items[index],
-                  if (index != items.length - 1) const SizedBox(height: 8),
-                ],
-              ],
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  '이어갈 흐름',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 14),
-                ...[
-                  for (var index = 0; index < items.length; index++) ...[
-                    items[index],
-                    if (index != items.length - 1) const SizedBox(height: 10),
-                  ],
-                ],
-              ],
+      child: Container(
+        key: const Key('home-supporting-flow-panel'),
+        padding: EdgeInsets.fromLTRB(
+          compact ? 16 : 18,
+          compact ? 15 : 18,
+          compact ? 16 : 18,
+          compact ? 12 : 14,
+        ),
+        decoration: BoxDecoration(
+          color: colors.primarySurface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: colors.hairline),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              '이어갈 흐름',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: colors.primaryText,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.2,
+              ),
             ),
+            SizedBox(height: compact ? 8 : 10),
+            for (var index = 0; index < items.length; index++) ...[
+              items[index],
+              if (index != items.length - 1)
+                Divider(height: 1, color: colors.hairline),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }
@@ -79,6 +90,7 @@ class _QuietDestination extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
+    super.key,
   });
 
   final IconData icon;
@@ -88,28 +100,21 @@ class _QuietDestination extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final foreground = dark ? const Color(0xFFF1EEE7) : const Color(0xFF273047);
-    final muted = dark ? const Color(0xFFA8ADBC) : const Color(0xFF697085);
+    final colors = context.rynColors;
 
     return Material(
-      color: dark
-          ? const Color(0xFF181E2D).withValues(alpha: 0.72)
-          : const Color(0xFFFFFDF8).withValues(alpha: 0.78),
-      borderRadius: BorderRadius.circular(16),
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(12),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        focusColor: dark ? const Color(0x338EA0C8) : const Color(0x182D3854),
+        borderRadius: BorderRadius.circular(12),
+        focusColor: colors.focusRing.withValues(alpha: 0.18),
+        hoverColor: colors.hoverOverlay,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 13),
           child: Row(
             children: [
-              Icon(
-                icon,
-                size: 20,
-                color: dark ? const Color(0xFFC0A66B) : const Color(0xFF59688C),
-              ),
+              Icon(icon, size: 20, color: colors.primaryAction),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -118,7 +123,7 @@ class _QuietDestination extends StatelessWidget {
                     Text(
                       title,
                       style: TextStyle(
-                        color: foreground,
+                        color: colors.primaryText,
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
                       ),
@@ -129,7 +134,7 @@ class _QuietDestination extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        color: muted,
+                        color: colors.mutedText,
                         fontSize: 11.5,
                         height: 1.35,
                       ),
@@ -137,7 +142,11 @@ class _QuietDestination extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(Icons.chevron_right_rounded, color: muted, size: 20),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: colors.mutedText,
+                size: 20,
+              ),
             ],
           ),
         ),

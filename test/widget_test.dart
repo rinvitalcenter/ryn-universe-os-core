@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ryn_universe_os_core/core/persistence/app_database.dart';
 import 'package:ryn_universe_os_core/core/runtime/ryn_runtime_services.dart';
 import 'package:ryn_universe_os_core/core/text/user_text.dart';
+import 'package:ryn_universe_os_core/core/theme/ryn_tokens.dart';
 import 'package:ryn_universe_os_core/features/home/presentation/home_cinematic_scene.dart';
 import 'package:ryn_universe_os_core/features/people/domain/person_core_models.dart';
 import 'package:ryn_universe_os_core/features/tarot/data/tarot_card_meaning_registry.dart';
@@ -1600,6 +1601,7 @@ void main() {
       TarotReadingResultSnapshot? result,
       Brightness brightness = Brightness.light,
       Size size = const Size(1440, 900),
+      double textScale = 1,
       VoidCallback? onOpenRecords,
       VoidCallback? onStartSelfTarot,
       VoidCallback? onOpenPeople,
@@ -1613,6 +1615,12 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: ThemeData(brightness: brightness, useMaterial3: true),
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(
+              context,
+            ).copyWith(textScaler: TextScaler.linear(textScale)),
+            child: child!,
+          ),
           home: Scaffold(
             body: HomeCinematicScene(
               activeTarotResult: result,
@@ -1655,6 +1663,136 @@ void main() {
       expect(find.text('결과 자세히 보기'), findsOneWidget);
       await tester.tap(find.byKey(const Key('home-primary-cta')));
       expect(recordsOpened, isTrue);
+    });
+
+    testWidgets(
+      'keeps the Hero and continuation aligned across Compact and Pinned widths',
+      (tester) async {
+        for (final size in const [Size(1368, 900), Size(1208, 900)]) {
+          await pumpScene(tester, result: _homeSnapshot(), size: size);
+
+          final hero = tester.getRect(
+            find.byKey(const Key('home-actual-result-hero')),
+          );
+          final stage = tester.getRect(
+            find.byKey(const Key('home-tarot-stage-surface')),
+          );
+          final continuation = tester.getRect(
+            find.byKey(const Key('home-supporting-flow-panel')),
+          );
+          final primaryCta = tester.getRect(
+            find.byKey(const Key('home-primary-cta')),
+          );
+
+          expect((hero.top - continuation.top).abs(), lessThan(0.1));
+          expect(continuation.width, closeTo(280, 0.1));
+          expect(hero.right, lessThan(continuation.left));
+          expect(stage.left, greaterThanOrEqualTo(hero.left));
+          expect(stage.right, lessThanOrEqualTo(hero.right));
+          expect(primaryCta.left, greaterThanOrEqualTo(hero.left));
+          expect(primaryCta.right, lessThanOrEqualTo(hero.right));
+          expect(hero.height, lessThanOrEqualTo(700.0));
+          expect(tester.takeException(), isNull);
+        }
+      },
+    );
+
+    testWidgets('allows the wide Hero to grow for expanded scaled text', (
+      tester,
+    ) async {
+      const longQuestion =
+          '지금 내가 오랫동안 놓치고 있던 마음의 방향을 다시 바라보고 앞으로의 작은 선택을 어떻게 이어가면 좋을까?';
+      await pumpScene(
+        tester,
+        result: _homeSnapshot(question: longQuestion),
+        size: const Size(1208, 900),
+        textScale: 2,
+      );
+
+      await tester.tap(find.byKey(const Key('home-question-expand')));
+      await tester.pumpAndSettle();
+
+      final hero = tester.getRect(
+        find.byKey(const Key('home-actual-result-hero')),
+      );
+      final primaryCta = tester.getRect(
+        find.byKey(const Key('home-primary-cta')),
+      );
+      final stage = tester.getRect(
+        find.byKey(const Key('home-tarot-stage-surface')),
+      );
+      expect(primaryCta.bottom, lessThanOrEqualTo(hero.bottom));
+      expect(stage.bottom, lessThanOrEqualTo(hero.bottom));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('uses neutral R2 surfaces and semantic blue interaction', (
+      tester,
+    ) async {
+      void expectTheme(RynSemanticColors expected) {
+        final scene = tester.widget<Container>(
+          find.byKey(const Key('home-cinematic-scene')),
+        );
+        final hero = tester.widget<Container>(
+          find.byKey(const Key('home-actual-result-hero')),
+        );
+        final continuation = tester.widget<Container>(
+          find.byKey(const Key('home-supporting-flow-panel')),
+        );
+        final button = tester.widget<FilledButton>(
+          find.byKey(const Key('home-primary-cta')),
+        );
+        final heroDecoration = hero.decoration! as BoxDecoration;
+        final continuationDecoration =
+            continuation.decoration! as BoxDecoration;
+
+        expect(scene.color, expected.appCanvas);
+        expect(heroDecoration.color, expected.primarySurface);
+        expect(heroDecoration.gradient, isNull);
+        expect(heroDecoration.boxShadow, isNull);
+        expect(continuationDecoration.color, expected.primarySurface);
+        expect(
+          button.style?.backgroundColor?.resolve({}),
+          expected.primaryAction,
+        );
+        expect(
+          button.style?.foregroundColor?.resolve({}),
+          expected.onPrimaryInteractive,
+        );
+      }
+
+      await pumpScene(tester, result: _homeSnapshot());
+      expectTheme(RynSemanticColors.light);
+
+      await pumpScene(
+        tester,
+        result: _homeSnapshot(),
+        brightness: Brightness.dark,
+      );
+      expectTheme(RynSemanticColors.dark);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('preserves the three continuation actions', (tester) async {
+      var recordsOpened = false;
+      var peopleOpened = false;
+      var selfTarotOpened = false;
+      await pumpScene(
+        tester,
+        result: _homeSnapshot(),
+        onOpenRecords: () => recordsOpened = true,
+        onOpenPeople: () => peopleOpened = true,
+        onStartSelfTarot: () => selfTarotOpened = true,
+      );
+
+      await tester.tap(find.byKey(const Key('home-flow-records')));
+      await tester.tap(find.byKey(const Key('home-flow-people')));
+      await tester.tap(find.byKey(const Key('home-flow-new-tarot')));
+
+      expect(recordsOpened, isTrue);
+      expect(peopleOpened, isTrue);
+      expect(selfTarotOpened, isTrue);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('renders one and multi-card policies without a dashboard row', (

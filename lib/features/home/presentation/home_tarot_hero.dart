@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/formatters/korean_date_time_formatter.dart';
 import '../../../core/text/user_text.dart';
+import '../../../core/theme/ryn_tokens.dart';
 import '../../tarot/data/tarot_deck_registry.dart';
 import '../../tarot/models/tarot_card_definition.dart';
 import '../../tarot/models/tarot_reading_result_snapshot.dart';
@@ -35,27 +36,15 @@ class _HomeTarotHeroState extends State<HomeTarotHero> {
 
   @override
   Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.rynColors;
     final snapshot = widget.snapshot;
     return Container(
       key: const Key('home-actual-result-hero'),
       constraints: BoxConstraints(minHeight: widget.minHeight),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(26),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: dark
-              ? const [Color(0xFF161D32), Color(0xFF0B1120)]
-              : const [Color(0xFFFFFCF5), Color(0xFFF2EDF6)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: dark ? 0.28 : 0.08),
-            blurRadius: 36,
-            offset: const Offset(0, 18),
-          ),
-        ],
+        color: colors.primarySurface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: colors.hairline),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -75,22 +64,60 @@ class _HomeTarotHeroState extends State<HomeTarotHero> {
             snapshot: snapshot,
             onOpenFullSpread: widget.onOpenRecords,
           );
+          final stageSurface = Container(
+            key: const Key('home-tarot-stage-surface'),
+            padding: EdgeInsets.all(compact ? 16 : 20),
+            decoration: BoxDecoration(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF171C2A)
+                  : const Color(0xFFFAF8F3),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: colors.hairline.withValues(alpha: 0.72),
+              ),
+            ),
+            child: stage,
+          );
+          final wideMinimumHeight = math.max(440.0, widget.minHeight - 56);
           return Padding(
-            padding: EdgeInsets.all(compact ? 24 : 38),
+            padding: EdgeInsets.all(compact ? 24 : 28),
             child: compact
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       narrative,
-                      const SizedBox(height: 26),
-                      SizedBox(height: 340, child: stage),
+                      const SizedBox(height: 22),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(minHeight: 360),
+                        child: stageSurface,
+                      ),
                     ],
                   )
                 : Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(flex: 4, child: narrative),
-                      const SizedBox(width: 30),
-                      Expanded(flex: 6, child: stage),
+                      Expanded(
+                        flex: 5,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: wideMinimumHeight,
+                          ),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: narrative,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 24),
+                      Expanded(
+                        flex: 6,
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: wideMinimumHeight,
+                          ),
+                          child: stageSurface,
+                        ),
+                      ),
                     ],
                   ),
           );
@@ -122,8 +149,7 @@ class _ResultNarrative extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    final foreground = dark ? const Color(0xFFF7F1E8) : const Color(0xFF20283A);
-    final muted = dark ? const Color(0xFFADB3C2) : const Color(0xFF697085);
+    final colors = context.rynColors;
     final longQuestion = questionDisplayText.characters.length > 48;
     final time = KoreanDateTimeFormatter.compact(snapshot.readingAt);
 
@@ -134,7 +160,7 @@ class _ResultNarrative extends StatelessWidget {
         Text(
           UserText.homeCompletedTarotEyebrow,
           style: TextStyle(
-            color: dark ? const Color(0xFFC6AA70) : const Color(0xFF75669B),
+            color: dark ? const Color(0xFFD0B77F) : const Color(0xFF7B5B2E),
             fontSize: 13,
             fontWeight: FontWeight.w800,
             letterSpacing: 0.5,
@@ -146,8 +172,8 @@ class _ResultNarrative extends StatelessWidget {
           maxLines: showFullQuestion ? null : 3,
           overflow: showFullQuestion ? TextOverflow.visible : TextOverflow.fade,
           style: TextStyle(
-            color: foreground,
-            fontSize: longQuestion ? 29 : 35,
+            color: colors.primaryText,
+            fontSize: longQuestion ? 28 : 32,
             height: 1.25,
             letterSpacing: -1.0,
             fontWeight: FontWeight.w700,
@@ -159,7 +185,7 @@ class _ResultNarrative extends StatelessWidget {
             onPressed: onToggleQuestion,
             child: Text(showFullQuestion ? '질문 접기' : '질문 전체 보기'),
           ),
-        const SizedBox(height: 18),
+        const SizedBox(height: 16),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -175,17 +201,15 @@ class _ResultNarrative extends StatelessWidget {
             _MetaPill(icon: Icons.schedule_rounded, label: time),
           ],
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 24),
         FilledButton.icon(
           key: const Key('home-primary-cta'),
           onPressed: onOpenResult,
           icon: const Icon(Icons.arrow_forward_rounded),
           label: const Text(UserText.homeOpenResult),
           style: FilledButton.styleFrom(
-            backgroundColor: dark
-                ? const Color(0xFFC1A66B)
-                : const Color(0xFF303B56),
-            foregroundColor: dark ? const Color(0xFF171A22) : Colors.white,
+            backgroundColor: colors.primaryAction,
+            foregroundColor: colors.onPrimaryInteractive,
             padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 17),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
@@ -201,14 +225,18 @@ class _ResultNarrative extends StatelessWidget {
               onPressed: onOpenRecords,
               icon: const Icon(Icons.auto_stories_outlined, size: 18),
               label: const Text(UserText.homeGrowthRecords),
-              style: TextButton.styleFrom(foregroundColor: muted),
+              style: TextButton.styleFrom(
+                foregroundColor: colors.secondaryText,
+              ),
             ),
             TextButton.icon(
               key: const Key('home-hide-result'),
               onPressed: onHideResult,
               icon: const Icon(Icons.visibility_off_outlined, size: 17),
               label: const Text('홈에서 닫기'),
-              style: TextButton.styleFrom(foregroundColor: muted),
+              style: TextButton.styleFrom(
+                foregroundColor: colors.secondaryText,
+              ),
             ),
           ],
         ),
@@ -225,28 +253,25 @@ class _MetaPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
+    final colors = context.rynColors;
     return Semantics(
       label: label,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
         decoration: BoxDecoration(
-          color: dark ? const Color(0x331F2942) : const Color(0xAAFFFFFF),
+          color: colors.secondarySurface,
           borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: colors.hairline.withValues(alpha: 0.7)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 15,
-              color: dark ? const Color(0xFFB6BBC8) : const Color(0xFF657087),
-            ),
+            Icon(icon, size: 15, color: colors.mutedText),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
-                color: dark ? const Color(0xFFD8D9DF) : const Color(0xFF4D566A),
+                color: colors.secondaryText,
                 fontSize: 11.5,
                 fontWeight: FontWeight.w700,
               ),
@@ -285,25 +310,37 @@ class HomeTarotCardStage extends StatelessWidget {
       );
     }
     if (placements.length == 3) {
-      return Center(
-        key: const Key('home-card-layout-three'),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            for (var index = 0; index < placements.length; index++) ...[
-              SizedBox(
-                width: index == 1 ? 148 : 136,
-                child: _PlacementCard(
-                  deckId: snapshot.deckId,
-                  placement: placements[index],
-                  width: index == 1 ? 148 : 136,
-                ),
-              ),
-              if (index != placements.length - 1) const SizedBox(width: 12),
-            ],
-          ],
-        ),
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          const naturalWidth = 444.0;
+          final availableWidth = constraints.maxWidth.isFinite
+              ? constraints.maxWidth
+              : naturalWidth;
+          final scale = math.min(1.0, availableWidth / naturalWidth);
+          final sideWidth = 136 * scale;
+          final centerWidth = 148 * scale;
+          final gap = 12 * scale;
+          return Center(
+            key: const Key('home-card-layout-three'),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                for (var index = 0; index < placements.length; index++) ...[
+                  SizedBox(
+                    width: index == 1 ? centerWidth : sideWidth,
+                    child: _PlacementCard(
+                      deckId: snapshot.deckId,
+                      placement: placements[index],
+                      width: index == 1 ? centerWidth : sideWidth,
+                    ),
+                  ),
+                  if (index != placements.length - 1) SizedBox(width: gap),
+                ],
+              ],
+            ),
+          );
+        },
       );
     }
 
@@ -355,13 +392,11 @@ class _PlacementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.rynColors;
     final card = _resolveCard(deckId, placement.cardId);
     final reversed = placement.orientation == TarotCardOrientation.reversed;
     final notUsed = placement.orientation == TarotCardOrientation.notUsed;
     final imageHeight = width / 0.58;
-    final labelColor = Theme.of(context).brightness == Brightness.dark
-        ? const Color(0xFFE6E0D7)
-        : const Color(0xFF30384A);
 
     return Semantics(
       label:
@@ -379,14 +414,12 @@ class _PlacementCard extends StatelessWidget {
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(compact ? 8 : 12),
-              color: Theme.of(context).brightness == Brightness.dark
-                  ? const Color(0xFF262C3A)
-                  : const Color(0xFFE7E2D8),
+              color: colors.tertiarySurface,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.24),
-                  blurRadius: compact ? 10 : 18,
-                  offset: Offset(0, compact ? 6 : 10),
+                  color: Colors.black.withValues(alpha: 0.18),
+                  blurRadius: compact ? 8 : 12,
+                  offset: Offset(0, compact ? 4 : 7),
                 ),
               ],
             ),
@@ -408,7 +441,7 @@ class _PlacementCard extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: labelColor,
+              color: colors.primaryText,
               fontSize: compact ? 9.5 : 11.5,
               fontWeight: FontWeight.w800,
             ),
