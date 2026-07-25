@@ -9,6 +9,9 @@ import 'package:path/path.dart' as p;
 
 import 'core/persistence/runtime_data_profile.dart';
 import 'core/runtime/ryn_runtime_services.dart';
+import 'core/shell/ryn_adaptive_navigation_rail.dart';
+import 'core/shell/ryn_app_shell.dart';
+import 'core/shell/ryn_top_utility_bar.dart';
 
 import 'core/theme/ryn_tokens.dart';
 import 'core/text/app_text.dart' hide UserText;
@@ -547,6 +550,20 @@ class CoreOsShell extends StatefulWidget {
 }
 
 class _CoreOsShellState extends State<CoreOsShell> {
+  static const _destinationIds = <String>[
+    'home',
+    'operating',
+    'people',
+    'study',
+    'reading',
+    'practice',
+    'content',
+    'records',
+    'output',
+    'ai',
+    'settings',
+  ];
+
   String _selectedNav = UserText.navHome;
   bool _readingTarotFocus = false;
   _TarotLoopPreview? _tarotLoopPreview;
@@ -570,6 +587,29 @@ class _CoreOsShellState extends State<CoreOsShell> {
     }
     return null;
   }
+
+  String _destinationIdForLabel(String label) {
+    final index = CoreOsShell.navigationItems.indexWhere(
+      (item) => item.label == label,
+    );
+    assert(index >= 0, 'Unknown shell destination label: $label');
+    return _destinationIds[index];
+  }
+
+  String _labelForDestinationId(String id) {
+    final index = _destinationIds.indexOf(id);
+    assert(index >= 0, 'Unknown shell destination id: $id');
+    return CoreOsShell.navigationItems[index].label;
+  }
+
+  List<RynShellDestination> get _shellDestinations => [
+    for (var index = 0; index < CoreOsShell.navigationItems.length; index++)
+      RynShellDestination(
+        id: _destinationIds[index],
+        label: CoreOsShell.navigationItems[index].label,
+        icon: CoreOsShell.navigationItems[index].icon,
+      ),
+  ];
 
   void _selectNav(String label) {
     setState(() {
@@ -693,84 +733,54 @@ class _CoreOsShellState extends State<CoreOsShell> {
 
   @override
   Widget build(BuildContext context) {
+    final readingImmersive =
+        _selectedNav == UserText.navReading && _readingTarotFocus;
     return Scaffold(
       floatingActionButton: widget.runtimeController == null
           ? null
           : const _DevelopmentDataIndicator(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final readingImmersive =
-                _selectedNav == UserText.navReading && _readingTarotFocus;
-            final useRail = constraints.maxWidth >= 1600 && !readingImmersive;
-            return Container(
-              color: context.rynColors.appCanvas,
-              child: useRail
-                  ? Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _NavigationRailPanel(
-                          selectedLabel: _selectedNav,
-                          onSelected: _selectNav,
-                        ),
-                        Expanded(
-                          child: _ScrollableShellCanvas(
-                            runtimeServices: widget.runtimeServices,
-                            oracleController: _oracleSession,
-                            selectedLabel: _selectedNav,
-                            onNavSelected: _selectNav,
-                            onReadingTarotFocusChanged: _setReadingTarotFocus,
-                            tarotLoopPreview: _tarotLoopPreview,
-                            onTarotLoopReflected: _reflectTarotLoop,
-                            activeTarotResult: _activeTarotResult,
-                            sessionTarotResults: _tarotResults.results,
-                            activeTarotResultId:
-                                _tarotResults.activeReadingInstanceId,
-                            questionDisplayTextFor: _questionDisplayTextFor,
-                            selectedTarotDetail: _selectedTarotDetail,
-                            onTarotResultCompleted: _receiveTarotResult,
-                            onTarotDraftChanged: _retainTarotDraft,
-                            onPersistCompletedTarotReading:
-                                _persistCompletedTarotReading,
-                            onSaveTarotInterpretation: _saveTarotInterpretation,
-                            tarotDraftLookup: _lookupTarotDraft,
-                            onOpenTarotResultDetail: _openTarotResultDetail,
-                            onCloseTarotResultDetail: _closeTarotResultDetail,
-                            onHideTarotResultFromHome: _hideTarotResultFromHome,
-                            onShowTarotResultOnHome: _showTarotResultOnHome,
-                          ),
-                        ),
-                      ],
-                    )
-                  : _ScrollableShellCanvas(
-                      runtimeServices: widget.runtimeServices,
-                      oracleController: _oracleSession,
-                      showCompactNav: !readingImmersive,
-                      selectedLabel: _selectedNav,
-                      onNavSelected: _selectNav,
-                      onReadingTarotFocusChanged: _setReadingTarotFocus,
-                      tarotLoopPreview: _tarotLoopPreview,
-                      onTarotLoopReflected: _reflectTarotLoop,
-                      activeTarotResult: _activeTarotResult,
-                      sessionTarotResults: _tarotResults.results,
-                      activeTarotResultId:
-                          _tarotResults.activeReadingInstanceId,
-                      questionDisplayTextFor: _questionDisplayTextFor,
-                      selectedTarotDetail: _selectedTarotDetail,
-                      onTarotResultCompleted: _receiveTarotResult,
-                      onTarotDraftChanged: _retainTarotDraft,
-                      onPersistCompletedTarotReading:
-                          _persistCompletedTarotReading,
-                      onSaveTarotInterpretation: _saveTarotInterpretation,
-                      tarotDraftLookup: _lookupTarotDraft,
-                      onOpenTarotResultDetail: _openTarotResultDetail,
-                      onCloseTarotResultDetail: _closeTarotResultDetail,
-                      onHideTarotResultFromHome: _hideTarotResultFromHome,
-                      onShowTarotResultOnHome: _showTarotResultOnHome,
-                    ),
-            );
-          },
+        child: RynAppShell(
+          destinations: _shellDestinations,
+          selectedDestinationId: _destinationIdForLabel(_selectedNav),
+          onDestinationSelected: (id) => _selectNav(_labelForDestinationId(id)),
+          navigationHidden: readingImmersive,
+          utilityBar: RynTopUtilityBar(
+            title: _selectedNav,
+            themeControl: const _HeaderThemeToggle(),
+            ownerControl: const _OwnerChip(),
+          ),
+          pageHost: RynLazyPersistentPageHost(
+            selectedPageId: _selectedNav,
+            pageBuilders: {
+              for (final item in CoreOsShell.navigationItems)
+                item.label: (_) => _ScrollableShellCanvas(
+                  key: PageStorageKey<String>('shell-canvas-${item.label}'),
+                  runtimeServices: widget.runtimeServices,
+                  oracleController: _oracleSession,
+                  selectedLabel: item.label,
+                  onNavSelected: _selectNav,
+                  onReadingTarotFocusChanged: _setReadingTarotFocus,
+                  tarotLoopPreview: _tarotLoopPreview,
+                  onTarotLoopReflected: _reflectTarotLoop,
+                  activeTarotResult: _activeTarotResult,
+                  sessionTarotResults: _tarotResults.results,
+                  activeTarotResultId: _tarotResults.activeReadingInstanceId,
+                  questionDisplayTextFor: _questionDisplayTextFor,
+                  selectedTarotDetail: _selectedTarotDetail,
+                  onTarotResultCompleted: _receiveTarotResult,
+                  onTarotDraftChanged: _retainTarotDraft,
+                  onPersistCompletedTarotReading: _persistCompletedTarotReading,
+                  onSaveTarotInterpretation: _saveTarotInterpretation,
+                  tarotDraftLookup: _lookupTarotDraft,
+                  onOpenTarotResultDetail: _openTarotResultDetail,
+                  onCloseTarotResultDetail: _closeTarotResultDetail,
+                  onHideTarotResultFromHome: _hideTarotResultFromHome,
+                  onShowTarotResultOnHome: _showTarotResultOnHome,
+                ),
+            },
+          ),
         ),
       ),
     );
@@ -803,8 +813,8 @@ class _DevelopmentDataIndicator extends StatelessWidget {
 
 class _ScrollableShellCanvas extends StatelessWidget {
   const _ScrollableShellCanvas({
+    super.key,
     required this.runtimeServices,
-    this.showCompactNav = false,
     required this.oracleController,
     required this.selectedLabel,
     required this.onNavSelected,
@@ -828,7 +838,6 @@ class _ScrollableShellCanvas extends StatelessWidget {
   });
 
   final RynRuntimeServices? runtimeServices;
-  final bool showCompactNav;
   final OracleReadingController oracleController;
   final String selectedLabel;
   final ValueChanged<String> onNavSelected;
@@ -867,33 +876,28 @@ class _ScrollableShellCanvas extends StatelessWidget {
         // preserving the older screenshot/mobile-style 900~1120px cap. The
         // 린님-facing Home still gets a small right-edge reserve so screenshots
         // show the full command-center shell instead of cropping the edge.
-        final railMode = !showCompactNav;
         final readingFocus = selectedLabel == UserText.navReading;
         final maxContentWidth = readingFocus
             ? math.max(900.0, width - (padding * 2))
             : ultraCompact
             ? 260.0
-            : railMode
-            ? (width < 2200 ? 1480.0 : 1680.0)
-            : width < 1200
-            ? 900.0
-            : 1240.0;
+            : (width < 2200 ? 1480.0 : 1680.0);
         final runtimeEdgeReserve = ultraCompact ? 64.0 : 0.0;
         final contentWidth = math.max(
           0.0,
           math.min(width - (padding * 2) - runtimeEdgeReserve, maxContentWidth),
         );
         return SingleChildScrollView(
+          key: PageStorageKey<String>('shell-scroll-$selectedLabel'),
           child: Padding(
             padding: EdgeInsets.fromLTRB(padding, 16, padding, 28),
             child: Align(
-              alignment: railMode ? Alignment.centerLeft : Alignment.center,
+              alignment: Alignment.centerLeft,
               child: SizedBox(
                 width: contentWidth,
                 child: _ShellPageContent(
                   runtimeServices: runtimeServices,
                   oracleController: oracleController,
-                  showCompactNav: showCompactNav,
                   selectedLabel: selectedLabel,
                   onNavSelected: onNavSelected,
                   onReadingTarotFocusChanged: onReadingTarotFocusChanged,
@@ -928,7 +932,6 @@ class _ShellPageContent extends StatelessWidget {
   const _ShellPageContent({
     required this.runtimeServices,
     required this.oracleController,
-    required this.showCompactNav,
     required this.selectedLabel,
     required this.onNavSelected,
     required this.onReadingTarotFocusChanged,
@@ -952,7 +955,6 @@ class _ShellPageContent extends StatelessWidget {
 
   final RynRuntimeServices? runtimeServices;
   final OracleReadingController oracleController;
-  final bool showCompactNav;
   final String selectedLabel;
   final ValueChanged<String> onNavSelected;
   final ValueChanged<bool> onReadingTarotFocusChanged;
@@ -1007,8 +1009,6 @@ class _ShellPageContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final body = _isHome
         ? <Widget>[
-            const _TopSystemBar(showDailyHome: false, compactHome: true),
-            const SizedBox(height: 14),
             HomeCinematicScene(
               minSceneHeight: math.max(
                 520,
@@ -1033,8 +1033,6 @@ class _ShellPageContent extends StatelessWidget {
           ]
         : _isStudy
         ? <Widget>[
-            const _TopSystemBar(showDailyHome: false),
-            const SizedBox(height: 16),
             Align(
               alignment: Alignment.centerLeft,
               child: FilledButton.icon(
@@ -1052,8 +1050,6 @@ class _ShellPageContent extends StatelessWidget {
           ]
         : selectedLabel == UserText.navPeople
         ? <Widget>[
-            const _TopSystemBar(showDailyHome: false),
-            const SizedBox(height: 16),
             if (runtimeServices case final services?)
               PeoplePage(
                 peopleRepository: services.people,
@@ -1070,8 +1066,6 @@ class _ShellPageContent extends StatelessWidget {
           ]
         : selectedLabel == UserText.navRecord
         ? <Widget>[
-            const _TopSystemBar(showDailyHome: false),
-            const SizedBox(height: 16),
             if (selectedTarotDetail != null)
               TarotResultDetailPage(
                 snapshot: selectedTarotDetail!,
@@ -1116,121 +1110,11 @@ class _ShellPageContent extends StatelessWidget {
                   _openQuickStartSheet(context, target: '나의 기록', lens: '타로 리딩'),
             ),
           ]
-        : <Widget>[
-            const _TopSystemBar(showDailyHome: false),
-            const SizedBox(height: 16),
-            _BusinessAreaPage(label: selectedLabel),
-          ];
+        : <Widget>[_BusinessAreaPage(label: selectedLabel)];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (showCompactNav) ...[
-          _CompactNavigationPanel(
-            selectedLabel: selectedLabel,
-            onSelected: onNavSelected,
-          ),
-          const SizedBox(height: 12),
-        ],
-        ...body,
-      ],
-    );
-  }
-}
-
-class _NavigationRailPanel extends StatelessWidget {
-  const _NavigationRailPanel({
-    required this.selectedLabel,
-    required this.onSelected,
-  });
-
-  final String selectedLabel;
-  final ValueChanged<String> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 168,
-      margin: const EdgeInsets.fromLTRB(0, 0, 12, 0),
-      padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
-      decoration: BoxDecoration(
-        color: context.rynColors.secondarySurface,
-        border: Border(right: BorderSide(color: context.rynColors.hairline)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const _BrandBlock(compact: true),
-          const SizedBox(height: 18),
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                for (final item in CoreOsShell.navigationItems)
-                  _NavPill(
-                    item: item,
-                    active: item.label == selectedLabel,
-                    onTap: () => onSelected(item.label),
-                  ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-          const _SidebarHint(),
-        ],
-      ),
-    );
-  }
-}
-
-class _CompactNavigationPanel extends StatelessWidget {
-  const _CompactNavigationPanel({
-    required this.selectedLabel,
-    required this.onSelected,
-  });
-
-  final String selectedLabel;
-  final ValueChanged<String> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    Widget navWrap(Iterable<NavItem> items) {
-      return Wrap(
-        spacing: 6,
-        runSpacing: 6,
-        children: [
-          for (final item in items)
-            _CompactNavChip(
-              item: item,
-              active: item.label == selectedLabel,
-              onTap: () => onSelected(item.label),
-            ),
-        ],
-      );
-    }
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final twoLine = constraints.maxWidth < 980;
-        final firstLine = CoreOsShell.navigationItems.take(4);
-        final secondLine = CoreOsShell.navigationItems.skip(4);
-
-        return _LightCard(
-          semantic: true,
-          padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (twoLine) ...[
-                navWrap(firstLine),
-                const SizedBox(height: 6),
-                navWrap(secondLine),
-              ] else
-                navWrap(CoreOsShell.navigationItems),
-            ],
-          ),
-        );
-      },
+      children: body,
     );
   }
 }
@@ -3050,8 +2934,6 @@ class _ReadingWorkspacePageState extends State<_ReadingWorkspacePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const _TopSystemBar(showDailyHome: false),
-        const SizedBox(height: 16),
         ReadingAtelierPage(
           onStartTarot: () => _setTarotOpen(true),
           onStartOracle: () {
@@ -3122,125 +3004,6 @@ class _BusinessActionSpec {
   final String title;
   final String body;
   final IconData icon;
-}
-
-class _TopSystemBar extends StatelessWidget {
-  const _TopSystemBar({this.showDailyHome = true, this.compactHome = false});
-
-  final bool showDailyHome;
-  final bool compactHome;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, outerConstraints) {
-        final ultraCompact = outerConstraints.maxWidth < 360;
-        if (compactHome) {
-          return Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-              decoration: BoxDecoration(
-                color: RynPalette.surfaceSoft(context),
-                borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
-                border: Border.all(color: RynPalette.line(context)),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    tooltip: '검색 열기',
-                    onPressed: () {},
-                    icon: const Icon(Icons.search_rounded),
-                  ),
-                  const SizedBox(width: 6),
-                  if (outerConstraints.maxWidth >= 600) ...const [
-                    _HeaderThemeToggle(),
-                    SizedBox(width: 6),
-                  ],
-                  const _OwnerChip(),
-                ],
-              ),
-            ),
-          );
-        }
-        return _LightCard(
-          semantic: true,
-          padding: compactHome
-              ? const EdgeInsets.fromLTRB(12, 8, 12, 8)
-              : ultraCompact
-              ? const EdgeInsets.fromLTRB(12, 12, 12, 12)
-              : const EdgeInsets.fromLTRB(16, 14, 16, 14),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final tight = constraints.maxWidth < 1240;
-              final veryTight = constraints.maxWidth < 360;
-              if (compactHome) {
-                return Row(
-                  children: [
-                    const Spacer(),
-                    IconButton(
-                      tooltip: '검색 열기',
-                      onPressed: () {},
-                      icon: const Icon(Icons.search_rounded),
-                    ),
-                    const SizedBox(width: 8),
-                    if (constraints.maxWidth >= 600) ...const [
-                      _HeaderThemeToggle(),
-                      SizedBox(width: 8),
-                    ],
-                    const _OwnerChip(),
-                  ],
-                );
-              }
-              final content = [
-                Expanded(
-                  child: _CommandSearchPlaceholder(compact: compactHome),
-                ),
-                if (!tight) SizedBox(width: compactHome ? 10 : 12),
-                const _HeaderThemeToggle(),
-                if (!tight) SizedBox(width: compactHome ? 10 : 12),
-                const _OwnerChip(),
-              ];
-              if (tight) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (veryTight) ...[
-                      const _OwnerChip(),
-                    ] else
-                      Row(
-                        children: const [
-                          Expanded(child: _CommandSearchPlaceholder()),
-                          SizedBox(width: 10),
-                          _HeaderThemeToggle(),
-                          SizedBox(width: 10),
-                          _OwnerChip(),
-                        ],
-                      ),
-                    if (showDailyHome) ...[
-                      SizedBox(height: veryTight ? 8 : 10),
-                      const _DailyHomeSurface(),
-                    ],
-                  ],
-                );
-              }
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(children: content),
-                  if (showDailyHome) ...[
-                    const SizedBox(height: 12),
-                    const _DailyHomeSurface(),
-                  ],
-                ],
-              );
-            },
-          ),
-        );
-      },
-    );
-  }
 }
 
 class _HeaderThemeToggle extends StatelessWidget {
@@ -6699,15 +6462,13 @@ class _PrincipleFooter extends StatelessWidget {
 }
 
 class _BrandBlock extends StatelessWidget {
-  const _BrandBlock({this.compact = false});
-
-  final bool compact;
+  const _BrandBlock();
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final ultraCompact = compact && constraints.maxWidth < 260;
+        final ultraCompact = constraints.maxWidth < 260;
         final iconSize = ultraCompact ? 36.0 : 40.0;
         final gap = ultraCompact ? 8.0 : 10.0;
         final titleSize = ultraCompact ? 14.0 : 16.0;
@@ -6751,66 +6512,22 @@ class _BrandBlock extends StatelessWidget {
                       letterSpacing: -0.2,
                     ),
                   ),
-                  if (!compact)
-                    Text(
-                      'AI-native · Local-first · Calm · Premium',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: RynPalette.subtext(context),
-                        fontSize: 10.5,
-                        fontWeight: FontWeight.w800,
-                      ),
+                  Text(
+                    'AI-native · Local-first · Calm · Premium',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: RynPalette.subtext(context),
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
                     ),
+                  ),
                 ],
               ),
             ),
           ],
         );
       },
-    );
-  }
-}
-
-class _CommandSearchPlaceholder extends StatelessWidget {
-  const _CommandSearchPlaceholder({this.compact = false});
-
-  final bool compact;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: BoxConstraints(minHeight: compact ? 34 : 42),
-      padding: EdgeInsets.symmetric(
-        horizontal: compact ? 12 : 14,
-        vertical: compact ? 7 : 10,
-      ),
-      decoration: BoxDecoration(
-        color: context.rynColors.secondarySurface,
-        borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
-        border: Border.all(color: context.rynColors.hairline),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.search_rounded,
-            size: compact ? 16 : 18,
-            color: context.rynColors.secondaryText,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              '검색 / 자료 / 기록 / 일정...',
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: context.rynColors.secondaryText,
-                fontSize: compact ? 12 : 13,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -6955,84 +6672,22 @@ class _NavPill extends StatelessWidget {
   }
 }
 
-class _CompactNavChip extends StatelessWidget {
-  const _CompactNavChip({
-    required this.item,
-    required this.active,
-    required this.onTap,
-  });
-  final NavItem item;
-  final bool active;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-        decoration: BoxDecoration(
-          color: active
-              ? context.rynColors.selectedState
-              : context.rynColors.secondarySurface,
-          borderRadius: BorderRadius.circular(RynMetrics.radiusSoft),
-          border: Border.all(
-            color: active
-                ? context.rynColors.primaryAction
-                : context.rynColors.hairline,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              item.icon,
-              size: 14,
-              color: active
-                  ? context.rynColors.primaryAction
-                  : context.rynColors.secondaryText,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              item.label,
-              style: TextStyle(
-                color: context.rynColors.primaryText,
-                fontWeight: FontWeight.w900,
-                fontSize: 10.5,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _LightCard extends StatelessWidget {
   const _LightCard({
     required this.child,
     this.padding = const EdgeInsets.all(16),
-    this.semantic = false,
   });
   final Widget child;
   final EdgeInsets padding;
-  final bool semantic;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: semantic
-            ? context.rynColors.primarySurface
-            : RynPalette.surface(context),
+        color: RynPalette.surface(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusShell),
-        border: Border.all(
-          color: semantic
-              ? context.rynColors.hairline
-              : RynPalette.line(context),
-        ),
+        border: Border.all(color: RynPalette.line(context)),
       ),
       child: child,
     );

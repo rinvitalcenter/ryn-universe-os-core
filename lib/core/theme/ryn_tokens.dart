@@ -12,10 +12,12 @@ final class RynSemanticColors extends ThemeExtension<RynSemanticColors> {
     required this.primarySurface,
     required this.secondarySurface,
     required this.tertiarySurface,
+    required this.raisedUtilityMaterial,
     required this.primaryText,
     required this.secondaryText,
     required this.mutedText,
     required this.hairline,
+    required this.divider,
     required this.primaryAction,
     required this.primaryActionOnDark,
     required this.selectedState,
@@ -23,55 +25,85 @@ final class RynSemanticColors extends ThemeExtension<RynSemanticColors> {
     required this.success,
     required this.warning,
     required this.destructive,
+    required this.onPrimaryInteractive,
+    required this.onSuccess,
+    required this.onWarning,
+    required this.onDestructive,
+    required this.scrim,
+    required this.hoverOverlay,
+    required this.pressedOverlay,
+    required this.disabledContent,
     required this.peopleIdentity,
   });
 
   static const light = RynSemanticColors(
-    appCanvas: Color(0xFFF5F5F7),
+    appCanvas: Color(0xFFF5F6F8),
     primarySurface: Color(0xFFFFFFFF),
-    secondarySurface: Color(0xFFFAFAFC),
-    tertiarySurface: Color(0xFFF0F0F2),
-    primaryText: Color(0xFF1D1D1F),
-    secondaryText: Color(0xFF515154),
-    mutedText: Color(0xFF7A7A7A),
-    hairline: Color(0xFFE0E0E0),
-    primaryAction: Color(0xFF0066CC),
-    primaryActionOnDark: Color(0xFF2997FF),
-    selectedState: Color(0x140066CC),
-    focusRing: Color(0xFF0071E3),
-    success: Color(0xFF248A3D),
-    warning: Color(0xFFB25000),
-    destructive: Color(0xFFD70015),
-    peopleIdentity: Color(0xFF248A3D),
+    secondarySurface: Color(0xFFF8F9FB),
+    tertiarySurface: Color(0xFFECEFF3),
+    raisedUtilityMaterial: Color(0xFFF2F5F9),
+    primaryText: Color(0xFF1B1D21),
+    secondaryText: Color(0xFF4E545F),
+    mutedText: Color(0xFF6D7582),
+    hairline: Color(0xFFD8DDE5),
+    divider: Color(0xFFC9D0DA),
+    primaryAction: Color(0xFF0A63D8),
+    primaryActionOnDark: Color(0xFF63A8FF),
+    selectedState: Color(0x1A0A63D8),
+    focusRing: Color(0xFF0067E5),
+    success: Color(0xFF147A39),
+    warning: Color(0xFF9A5A00),
+    destructive: Color(0xFFC81E2A),
+    onPrimaryInteractive: Color(0xFFFFFFFF),
+    onSuccess: Color(0xFFFFFFFF),
+    onWarning: Color(0xFFFFFFFF),
+    onDestructive: Color(0xFFFFFFFF),
+    scrim: Color(0x52000000),
+    hoverOverlay: Color(0x0D1B1D21),
+    pressedOverlay: Color(0x171B1D21),
+    disabledContent: Color(0x9E6D7582),
+    peopleIdentity: Color(0xFF147A39),
   );
 
   static const dark = RynSemanticColors(
-    appCanvas: Color(0xFF000000),
-    primarySurface: Color(0xFF1D1D1F),
-    secondarySurface: Color(0xFF272729),
-    tertiarySurface: Color(0xFF2A2A2C),
-    primaryText: Color(0xFFFFFFFF),
-    secondaryText: Color(0xFFCCCCCC),
-    mutedText: Color(0xFF999999),
-    hairline: Color(0x33FFFFFF),
-    primaryAction: Color(0xFF2997FF),
-    primaryActionOnDark: Color(0xFF2997FF),
-    selectedState: Color(0x292997FF),
-    focusRing: Color(0xFF2997FF),
-    success: Color(0xFF32D74B),
-    warning: Color(0xFFFFD60A),
-    destructive: Color(0xFFFF453A),
-    peopleIdentity: Color(0xFF32D74B),
+    appCanvas: Color(0xFF101216),
+    primarySurface: Color(0xFF17191E),
+    secondarySurface: Color(0xFF1E2127),
+    tertiarySurface: Color(0xFF262A31),
+    raisedUtilityMaterial: Color(0xFF2B3038),
+    primaryText: Color(0xFFF5F7FA),
+    secondaryText: Color(0xFFC0C6D0),
+    mutedText: Color(0xFF929AA7),
+    hairline: Color(0xFF343943),
+    divider: Color(0xFF454B57),
+    primaryAction: Color(0xFF63A8FF),
+    primaryActionOnDark: Color(0xFF63A8FF),
+    selectedState: Color(0x1F63A8FF),
+    focusRing: Color(0xFF7CB7FF),
+    success: Color(0xFF45C56A),
+    warning: Color(0xFFF2B84B),
+    destructive: Color(0xFFFF6B73),
+    onPrimaryInteractive: Color(0xFF0B1524),
+    onSuccess: Color(0xFF17191E),
+    onWarning: Color(0xFF17191E),
+    onDestructive: Color(0xFF17191E),
+    scrim: Color(0x7A000000),
+    hoverOverlay: Color(0x12F5F7FA),
+    pressedOverlay: Color(0x1CF5F7FA),
+    disabledContent: Color(0x9E929AA7),
+    peopleIdentity: Color(0xFF45C56A),
   );
 
   final Color appCanvas;
   final Color primarySurface;
   final Color secondarySurface;
   final Color tertiarySurface;
+  final Color raisedUtilityMaterial;
   final Color primaryText;
   final Color secondaryText;
   final Color mutedText;
   final Color hairline;
+  final Color divider;
   final Color primaryAction;
   final Color primaryActionOnDark;
   final Color selectedState;
@@ -79,6 +111,14 @@ final class RynSemanticColors extends ThemeExtension<RynSemanticColors> {
   final Color success;
   final Color warning;
   final Color destructive;
+  final Color onPrimaryInteractive;
+  final Color onSuccess;
+  final Color onWarning;
+  final Color onDestructive;
+  final Color scrim;
+  final Color hoverOverlay;
+  final Color pressedOverlay;
+  final Color disabledContent;
   final Color peopleIdentity;
 
   @override
@@ -87,10 +127,12 @@ final class RynSemanticColors extends ThemeExtension<RynSemanticColors> {
     Color? primarySurface,
     Color? secondarySurface,
     Color? tertiarySurface,
+    Color? raisedUtilityMaterial,
     Color? primaryText,
     Color? secondaryText,
     Color? mutedText,
     Color? hairline,
+    Color? divider,
     Color? primaryAction,
     Color? primaryActionOnDark,
     Color? selectedState,
@@ -98,16 +140,26 @@ final class RynSemanticColors extends ThemeExtension<RynSemanticColors> {
     Color? success,
     Color? warning,
     Color? destructive,
+    Color? onPrimaryInteractive,
+    Color? onSuccess,
+    Color? onWarning,
+    Color? onDestructive,
+    Color? scrim,
+    Color? hoverOverlay,
+    Color? pressedOverlay,
+    Color? disabledContent,
     Color? peopleIdentity,
   }) => RynSemanticColors(
     appCanvas: appCanvas ?? this.appCanvas,
     primarySurface: primarySurface ?? this.primarySurface,
     secondarySurface: secondarySurface ?? this.secondarySurface,
     tertiarySurface: tertiarySurface ?? this.tertiarySurface,
+    raisedUtilityMaterial: raisedUtilityMaterial ?? this.raisedUtilityMaterial,
     primaryText: primaryText ?? this.primaryText,
     secondaryText: secondaryText ?? this.secondaryText,
     mutedText: mutedText ?? this.mutedText,
     hairline: hairline ?? this.hairline,
+    divider: divider ?? this.divider,
     primaryAction: primaryAction ?? this.primaryAction,
     primaryActionOnDark: primaryActionOnDark ?? this.primaryActionOnDark,
     selectedState: selectedState ?? this.selectedState,
@@ -115,6 +167,14 @@ final class RynSemanticColors extends ThemeExtension<RynSemanticColors> {
     success: success ?? this.success,
     warning: warning ?? this.warning,
     destructive: destructive ?? this.destructive,
+    onPrimaryInteractive: onPrimaryInteractive ?? this.onPrimaryInteractive,
+    onSuccess: onSuccess ?? this.onSuccess,
+    onWarning: onWarning ?? this.onWarning,
+    onDestructive: onDestructive ?? this.onDestructive,
+    scrim: scrim ?? this.scrim,
+    hoverOverlay: hoverOverlay ?? this.hoverOverlay,
+    pressedOverlay: pressedOverlay ?? this.pressedOverlay,
+    disabledContent: disabledContent ?? this.disabledContent,
     peopleIdentity: peopleIdentity ?? this.peopleIdentity,
   );
 
@@ -133,10 +193,16 @@ final class RynSemanticColors extends ThemeExtension<RynSemanticColors> {
         t,
       )!,
       tertiarySurface: Color.lerp(tertiarySurface, other.tertiarySurface, t)!,
+      raisedUtilityMaterial: Color.lerp(
+        raisedUtilityMaterial,
+        other.raisedUtilityMaterial,
+        t,
+      )!,
       primaryText: Color.lerp(primaryText, other.primaryText, t)!,
       secondaryText: Color.lerp(secondaryText, other.secondaryText, t)!,
       mutedText: Color.lerp(mutedText, other.mutedText, t)!,
       hairline: Color.lerp(hairline, other.hairline, t)!,
+      divider: Color.lerp(divider, other.divider, t)!,
       primaryAction: Color.lerp(primaryAction, other.primaryAction, t)!,
       primaryActionOnDark: Color.lerp(
         primaryActionOnDark,
@@ -148,6 +214,18 @@ final class RynSemanticColors extends ThemeExtension<RynSemanticColors> {
       success: Color.lerp(success, other.success, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
       destructive: Color.lerp(destructive, other.destructive, t)!,
+      onPrimaryInteractive: Color.lerp(
+        onPrimaryInteractive,
+        other.onPrimaryInteractive,
+        t,
+      )!,
+      onSuccess: Color.lerp(onSuccess, other.onSuccess, t)!,
+      onWarning: Color.lerp(onWarning, other.onWarning, t)!,
+      onDestructive: Color.lerp(onDestructive, other.onDestructive, t)!,
+      scrim: Color.lerp(scrim, other.scrim, t)!,
+      hoverOverlay: Color.lerp(hoverOverlay, other.hoverOverlay, t)!,
+      pressedOverlay: Color.lerp(pressedOverlay, other.pressedOverlay, t)!,
+      disabledContent: Color.lerp(disabledContent, other.disabledContent, t)!,
       peopleIdentity: Color.lerp(peopleIdentity, other.peopleIdentity, t)!,
     );
   }
@@ -198,9 +276,9 @@ final class RynTheme {
           brightness: brightness,
         ).copyWith(
           primary: colors.primaryAction,
-          onPrimary: Colors.white,
+          onPrimary: colors.onPrimaryInteractive,
           secondary: colors.primaryAction,
-          onSecondary: Colors.white,
+          onSecondary: colors.onPrimaryInteractive,
           error: colors.destructive,
           surface: colors.primarySurface,
           onSurface: colors.primaryText,
@@ -231,7 +309,7 @@ final class RynTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: colors.primaryAction,
-          foregroundColor: Colors.white,
+          foregroundColor: colors.onPrimaryInteractive,
           disabledBackgroundColor: colors.tertiarySurface,
           disabledForegroundColor: colors.mutedText,
           elevation: RynTokens.elevationNone,
@@ -243,7 +321,7 @@ final class RynTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: colors.primaryAction,
-          foregroundColor: Colors.white,
+          foregroundColor: colors.onPrimaryInteractive,
           elevation: RynTokens.elevationNone,
           shadowColor: Colors.transparent,
           shape: const StadiumBorder(),
@@ -491,6 +569,21 @@ final class RynTokens {
   static const Color interactionSelectedOverlay = Color(0x182D3854);
   static const Duration interactionFast = Duration(milliseconds: 120);
   static const Duration interactionRegular = Duration(milliseconds: 180);
+
+  // R2 global shell geometry and motion.
+  static const double shellRailCompactWidth = 72;
+  static const double shellRailExpandedWidth = 232;
+  static const double shellNavigationTarget = 44;
+  static const double shellLabelSlide = 6;
+  static const double shellFocusWidth = 2;
+  static const Duration motionInstant = Duration.zero;
+  static const Duration motionFast = Duration(milliseconds: 120);
+  static const Duration motionShort = Duration(milliseconds: 150);
+  static const Duration motionStandard = Duration(milliseconds: 200);
+  static const Duration motionEmphasis = Duration(milliseconds: 260);
+  static const Duration shellLabelDuration = Duration(milliseconds: 140);
+  static const Duration shellTooltipDelay = Duration(milliseconds: 500);
+  static const Duration shellPointerExitDelay = Duration(milliseconds: 120);
 
   // ---------------------------------------------------------------------------
   // Command surface / Kanban semantic aliases

@@ -52,6 +52,45 @@ Future<RynRuntimeServices> _durablePeopleServices({
   return services;
 }
 
+const _navIdByLabel = <String, String>{
+  UserText.navHome: 'home',
+  UserText.navOperating: 'operating',
+  UserText.navPeople: 'people',
+  UserText.navStudy: 'study',
+  UserText.navReading: 'reading',
+  UserText.navPractice: 'practice',
+  UserText.navContent: 'content',
+  UserText.navRecord: 'records',
+  UserText.navOutput: 'output',
+  UserText.navAi: 'ai',
+  UserText.navSettings: 'settings',
+};
+
+Finder _navDestination(String label) {
+  final id = _navIdByLabel[label];
+  if (id == null) throw StateError('Unknown navigation label: $label');
+  return find.byKey(Key('ryn-nav-$id'));
+}
+
+Future<void> _tapNav(WidgetTester tester, String label) async {
+  final destination = _navDestination(label);
+  if (destination.evaluate().isEmpty) {
+    final scrollable = find.descendant(
+      of: find.byKey(const Key('ryn-navigation-destination-list')),
+      matching: find.byType(Scrollable),
+    );
+    final position = tester.state<ScrollableState>(scrollable).position;
+    final destinationIndex = _navIdByLabel.keys.toList().indexOf(label);
+    position.jumpTo(
+      position.maxScrollExtent * destinationIndex / (_navIdByLabel.length - 1),
+    );
+    await tester.pump();
+  }
+  await tester.ensureVisible(destination);
+  await tester.pump();
+  await tester.tap(destination);
+}
+
 TarotReadingResultSnapshot _homeSnapshot({
   int cardCount = 3,
   String? question,
@@ -942,7 +981,7 @@ void main() {
 
     await tester.pumpWidget(const RynUniverseApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.text(UserText.navReading).first);
+    await _tapNav(tester, UserText.navReading);
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('atelier-tarot-action')));
     await tester.pumpAndSettle();
@@ -960,7 +999,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('tarot-back-button-strong')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text(UserText.navHome).first);
+    await _tapNav(tester, UserText.navHome);
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('home-actual-result-hero')), findsOneWidget);
@@ -982,13 +1021,13 @@ void main() {
     expect(find.byKey(const Key('records-session-page')), findsOneWidget);
     expect(find.text('현재 홈에 표시 중'), findsOneWidget);
 
-    await tester.tap(find.text(UserText.navHome).first);
+    await _tapNav(tester, UserText.navHome);
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('home-hide-result')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('home-empty-scene')), findsOneWidget);
 
-    await tester.tap(find.text(UserText.navRecord).first);
+    await _tapNav(tester, UserText.navRecord);
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('records-session-page')), findsOneWidget);
     expect(find.text('오늘 가장 먼저 비춰볼 질문'), findsOneWidget);
@@ -1723,7 +1762,7 @@ void main() {
     ];
 
     for (final label in menuLabels) {
-      expect(find.text(label), findsAtLeastNWidgets(1));
+      expect(_navDestination(label), findsOneWidget);
     }
 
     expect(find.byKey(const Key('home-cinematic-scene')), findsOneWidget);
@@ -1751,10 +1790,14 @@ void main() {
     expect(find.text('AI-Native'), findsNothing);
     expect(find.text('AI Command Center'), findsNothing);
 
-    await tester.tap(find.text(UserText.navSettings).first);
+    await _tapNav(tester, UserText.navSettings);
     await tester.pumpAndSettle();
 
-    expect(find.textContaining('검색 / 자료 / 기록 / 일정'), findsOneWidget);
+    expect(
+      find.byKey(const Key('ryn-global-search-coming-soon')),
+      findsOneWidget,
+    );
+    expect(find.text('통합 검색 · 준비 중'), findsOneWidget);
     expect(find.text(UserText.themeSettingTitle), findsOneWidget);
     expect(find.text(UserText.themeLight), findsAtLeastNWidgets(1));
     expect(find.text(UserText.themeDark), findsAtLeastNWidgets(1));
@@ -1776,7 +1819,7 @@ void main() {
     await tester.pumpWidget(RynUniverseApp(runtimeServices: services));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text(UserText.navPeople).first);
+    await _tapNav(tester, UserText.navPeople);
     await tester.pumpAndSettle();
 
     expect(find.text('합성 인물 A'), findsAtLeastNWidgets(1));
@@ -1806,7 +1849,7 @@ void main() {
     await tester.tap(find.byIcon(Icons.close_rounded));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text(UserText.navRecord).first);
+    await _tapNav(tester, UserText.navRecord);
     await tester.pumpAndSettle();
 
     expect(find.text('나의 성장 기록'), findsOneWidget);
@@ -1818,6 +1861,8 @@ void main() {
     expect(find.text('리딩 기록'), findsNothing);
     expect(find.text('기록 홈'), findsNothing);
     expect(find.text('Group Session'), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
   });
 
   testWidgets(
@@ -1835,7 +1880,7 @@ void main() {
       await tester.pumpWidget(RynUniverseApp(runtimeServices: services));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text(UserText.navPeople).first);
+      await _tapNav(tester, UserText.navPeople);
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('person-start-session-action')));
       await tester.pumpAndSettle();
@@ -1845,7 +1890,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.close_rounded));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text(UserText.navReading).first);
+      await _tapNav(tester, UserText.navReading);
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('reading-atelier-page')), findsOneWidget);
       expect(find.byKey(const Key('reading-atelier-scene')), findsOneWidget);
@@ -1854,6 +1899,8 @@ void main() {
       expect(find.byKey(const Key('atelier-tarot-action')), findsOneWidget);
       expect(find.byKey(const Key('atelier-oracle-action')), findsOneWidget);
       expect(find.text(UserText.quickStartGuidance), findsNothing);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
     },
   );
 
@@ -1872,7 +1919,7 @@ void main() {
     await tester.pumpWidget(RynUniverseApp(runtimeServices: services));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text(UserText.navPeople).first);
+    await _tapNav(tester, UserText.navPeople);
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('person-start-session-action')));
     await tester.pumpAndSettle();
@@ -1909,25 +1956,27 @@ void main() {
     expect(find.byKey(const Key('people-page')), findsOneWidget);
     expect(find.text('현재 질문 · 지금 선택의 기준은?'), findsNothing);
 
-    await tester.tap(find.text(UserText.navHome).first);
+    await _tapNav(tester, UserText.navHome);
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('home-empty-scene')), findsOneWidget);
     expect(find.text('현재 질문 · 지금 선택의 기준은?'), findsNothing);
 
-    await tester.tap(find.text(UserText.navPeople).first);
+    await _tapNav(tester, UserText.navPeople);
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('people-page')), findsOneWidget);
     expect(find.text('합성 인물 A'), findsAtLeastNWidgets(1));
     expect(find.text('현재 질문 · 지금 선택의 기준은?'), findsNothing);
 
-    await tester.tap(find.text(UserText.navRecord).first);
+    await _tapNav(tester, UserText.navRecord);
     await tester.pumpAndSettle();
 
     expect(find.text('아직 완료한 리딩이 없습니다'), findsOneWidget);
     expect(find.textContaining('대상: 합성 인물 A'), findsNothing);
     expect(find.textContaining('아직 저장하지 않음 / preview'), findsNothing);
     expect(find.text('오늘 어떤 만남을 시작할까요?'), findsNothing);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
   });
 
   testWidgets('People Quick Start reflects each available selected target', (
@@ -1945,7 +1994,7 @@ void main() {
       final services = await _durablePeopleServices(includeAll: true);
       await tester.pumpWidget(RynUniverseApp(runtimeServices: services));
       await tester.pumpAndSettle();
-      await tester.tap(find.text(UserText.navPeople).first);
+      await _tapNav(tester, UserText.navPeople);
       await tester.pumpAndSettle();
 
       final peopleList = find.byKey(const Key('people-active-list'));
@@ -1977,12 +2026,12 @@ void main() {
       expect(find.byKey(const Key('people-page')), findsOneWidget);
       expect(find.text(target), findsAtLeastNWidgets(1));
       expect(find.text('현재 질문 · $target 확인'), findsNothing);
-      await tester.tap(find.text(UserText.navHome).first);
+      await _tapNav(tester, UserText.navHome);
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('home-empty-scene')), findsOneWidget);
       expect(find.textContaining('$target · 타로 리딩'), findsNothing);
 
-      await tester.tap(find.text(UserText.navRecord).first);
+      await _tapNav(tester, UserText.navRecord);
       await tester.pumpAndSettle();
       expect(find.text('아직 완료한 리딩이 없습니다'), findsOneWidget);
       expect(find.textContaining('대상: $target'), findsNothing);
@@ -2007,7 +2056,7 @@ void main() {
       addTearDown(services.database.close);
       await tester.pumpWidget(RynUniverseApp(runtimeServices: services));
       await tester.pumpAndSettle();
-      await tester.tap(find.text(UserText.navPeople).first);
+      await _tapNav(tester, UserText.navPeople);
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('person-start-session-action')));
       await tester.pumpAndSettle();
@@ -2083,7 +2132,7 @@ void main() {
     expect(find.textContaining('runtime', findRichText: true), findsNothing);
     expect(find.textContaining('CRUD', findRichText: true), findsNothing);
 
-    await tester.tap(find.text(UserText.navOperating).first);
+    await _tapNav(tester, UserText.navOperating);
     await tester.pumpAndSettle();
 
     expect(find.text(UserText.operatingAreaTitle), findsAtLeastNWidgets(1));
@@ -2103,7 +2152,7 @@ void main() {
 
     await tester.pumpWidget(const RynUniverseApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.text(UserText.navAi).first);
+    await _tapNav(tester, UserText.navAi);
     await tester.pumpAndSettle();
 
     expect(find.text(UserText.aiWorkbenchTitle), findsAtLeastNWidgets(1));
@@ -2143,7 +2192,7 @@ void main() {
       expect(find.text('이어보기'), findsNothing);
       expect(find.text('작은 메모'), findsNothing);
 
-      await tester.tap(find.text(UserText.navOperating).first);
+      await _tapNav(tester, UserText.navOperating);
       await tester.pumpAndSettle();
       final workspaceRect = tester.getRect(
         find
@@ -2163,20 +2212,14 @@ void main() {
     await tester.pumpWidget(const RynUniverseApp());
     await tester.pumpAndSettle();
 
-    await tester.ensureVisible(find.text(UserText.navStudy).last);
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(UserText.navStudy).last);
+    await _tapNav(tester, UserText.navStudy);
     await tester.pumpAndSettle();
     expect(find.text(UserText.studyWorkspaceTitle), findsAtLeastNWidgets(1));
     expect(find.text('새 만남 시작'), findsOneWidget);
 
-    await tester.ensureVisible(find.text(UserText.navHome).first);
+    await _tapNav(tester, UserText.navHome);
     await tester.pumpAndSettle();
-    await tester.tap(find.text(UserText.navHome).first);
-    await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text(UserText.navReading).last);
-    await tester.pumpAndSettle();
-    await tester.tap(find.text(UserText.navReading).last);
+    await _tapNav(tester, UserText.navReading);
     await tester.pumpAndSettle();
     expect(find.text(UserText.readingWorkspaceTitle), findsAtLeastNWidgets(1));
     expect(find.byKey(const Key('reading-atelier-page')), findsOneWidget);
@@ -2447,10 +2490,10 @@ void main() {
       UserText.navSettings,
     ];
     for (final label in menuLabels) {
-      expect(find.text(label), findsAtLeastNWidgets(1));
+      expect(_navDestination(label), findsOneWidget);
     }
 
-    await tester.tap(find.text(UserText.navReading).first);
+    await _tapNav(tester, UserText.navReading);
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('reading-atelier-page')), findsOneWidget);
     expect(find.byKey(const Key('reading-atelier-scene')), findsOneWidget);
@@ -2793,7 +2836,7 @@ void main() {
 
       await tester.pumpWidget(const RynUniverseApp());
       await tester.pumpAndSettle();
-      await tester.tap(find.text(UserText.navReading).first);
+      await _tapNav(tester, UserText.navReading);
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.byKey(const Key('atelier-tarot-action')));
       await tester.pumpAndSettle();
@@ -2841,7 +2884,7 @@ void main() {
 
       await tester.pumpWidget(const RynUniverseApp());
       await tester.pumpAndSettle();
-      await tester.tap(find.text(UserText.navReading).first);
+      await _tapNav(tester, UserText.navReading);
       await tester.pumpAndSettle();
       await tester.ensureVisible(find.byKey(const Key('atelier-tarot-action')));
       await tester.pumpAndSettle();
@@ -3319,6 +3362,7 @@ void main() {
         find.byKey(const Key('tarot-card-detail-balanced-layout')),
         findsOneWidget,
       );
+
       expect(find.text(UserText.tarotSpreadSelect), findsOneWidget);
       expect(find.byKey(const Key('tarot-deck-carousel')), findsNothing);
       expect(find.byKey(const Key('tarot-shuffle-button')), findsNothing);
@@ -3553,7 +3597,7 @@ void main() {
 
     await tester.pumpWidget(const RynUniverseApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.text(UserText.navReading).first);
+    await _tapNav(tester, UserText.navReading);
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('atelier-tarot-action')));
     await tester.pumpAndSettle();
@@ -3588,20 +3632,20 @@ void main() {
       await tester.pumpWidget(const RynUniverseApp());
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text(UserText.navOperating).first);
+      await _tapNav(tester, UserText.navOperating);
       await tester.pumpAndSettle();
       expect(find.text(UserText.operatingTodo), findsOneWidget);
       expect(find.text(UserText.operatingSchedule), findsOneWidget);
       expect(find.text(UserText.operatingQuickMemo), findsOneWidget);
 
-      await tester.tap(find.text(UserText.navPractice).first);
+      await _tapNav(tester, UserText.navPractice);
       await tester.pumpAndSettle();
       expect(find.text(UserText.practiceQigong), findsOneWidget);
       expect(find.text(UserText.practiceYoga), findsOneWidget);
       expect(find.text(UserText.practiceMeditation), findsOneWidget);
       expect(find.text(UserText.practiceJournal), findsOneWidget);
 
-      await tester.tap(find.text(UserText.navContent).first);
+      await _tapNav(tester, UserText.navContent);
       await tester.pumpAndSettle();
       expect(find.text(UserText.contentLessonPlan), findsOneWidget);
       expect(find.text(UserText.contentEbook), findsOneWidget);
@@ -3616,7 +3660,7 @@ void main() {
     await tester.pumpWidget(const RynUniverseApp());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text(UserText.navStudy).first);
+    await _tapNav(tester, UserText.navStudy);
     await tester.pumpAndSettle();
 
     expect(find.text(UserText.studyOsTitle), findsOneWidget);
@@ -3689,20 +3733,20 @@ void main() {
     await tester.pumpWidget(const RynUniverseApp());
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text(UserText.navSettings).first);
+    await _tapNav(tester, UserText.navSettings);
     await tester.pumpAndSettle();
     await tester.tap(find.text(UserText.themeDark).first);
     await tester.pumpAndSettle();
 
     expect(find.text(UserText.themeDark), findsAtLeastNWidgets(1));
-    await tester.tap(find.text(UserText.navHome).first);
+    await _tapNav(tester, UserText.navHome);
     await tester.pumpAndSettle();
-    expect(find.text(UserText.navHome), findsAtLeastNWidgets(1));
+    expect(_navDestination(UserText.navHome), findsOneWidget);
 
     expect(find.byKey(const Key('home-cinematic-scene')), findsOneWidget);
     expect(find.text('오늘의 성장 흐름'), findsAtLeastNWidgets(1));
 
-    await tester.tap(find.text(UserText.navStudy).first);
+    await _tapNav(tester, UserText.navStudy);
     await tester.pumpAndSettle();
 
     expect(find.text(UserText.studyOsTitle), findsOneWidget);
@@ -3731,7 +3775,7 @@ void main() {
 
     await tester.pumpWidget(const RynUniverseApp());
     await tester.pumpAndSettle();
-    await tester.tap(find.text(UserText.navAi).first);
+    await _tapNav(tester, UserText.navAi);
     await tester.pumpAndSettle();
 
     expect(find.text(UserText.aiWorkbenchTitle), findsAtLeastNWidgets(1));
@@ -4138,6 +4182,7 @@ void main() {
         find.byKey(const Key('tarot-free-draw-top-strip')),
         findsOneWidget,
       );
+
       expect(
         find.byKey(const Key('tarot-free-draw-draggable-card-0')),
         findsOneWidget,
@@ -5297,7 +5342,7 @@ void main() {
       addTearDown(services.database.close);
       await tester.pumpWidget(RynUniverseApp(runtimeServices: services));
       await tester.pumpAndSettle();
-      await tester.tap(find.text(UserText.navRecord).first);
+      await _tapNav(tester, UserText.navRecord);
       await tester.pumpAndSettle();
 
       expect(find.text('나의 성장 기록'), findsOneWidget);
@@ -5309,7 +5354,7 @@ void main() {
       expect(find.text('새 만남 시작'), findsNothing);
       expect(find.text('Group Session'), findsNothing);
 
-      await tester.tap(find.text(UserText.navPeople).first);
+      await _tapNav(tester, UserText.navPeople);
       await tester.pumpAndSettle();
 
       expect(find.text('합성 인물 A'), findsAtLeastNWidgets(1));
@@ -5349,4 +5394,109 @@ void main() {
       await tester.pumpAndSettle();
     },
   );
+
+  testWidgets(
+    'R2 shell opens core routes from one Compact rail and utility bar',
+    (tester) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(const RynUniverseApp());
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('ryn-app-shell')), findsOneWidget);
+      expect(find.byKey(const Key('ryn-rail-mode-compact')), findsOneWidget);
+      expect(find.byKey(const Key('ryn-top-utility-bar')), findsOneWidget);
+      expect(find.byKey(const Key('home-cinematic-scene')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('ryn-nav-people')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('people-page')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('ryn-nav-records')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('records-session-page')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('ryn-nav-reading')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('reading-atelier-page')), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('ryn-nav-settings')));
+      await tester.pumpAndSettle();
+      expect(find.text(UserText.themeSettingTitle), findsOneWidget);
+      expect(find.byKey(const Key('ryn-top-utility-bar')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'R2 shell preserves People query and selected detail round trip',
+    (tester) async {
+      tester.view.physicalSize = const Size(1400, 900);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final services = await _durablePeopleServices(includeAll: true);
+      addTearDown(services.database.close);
+      await tester.pumpWidget(RynUniverseApp(runtimeServices: services));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('ryn-nav-people')));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byKey(const Key('people-search-field')),
+        '합성 인물 A',
+      );
+      await tester.pumpAndSettle();
+      final activeList = find.byKey(const Key('people-active-list'));
+      await tester.tap(
+        find.descendant(of: activeList, matching: find.text('합성 인물 A')).first,
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('개요'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('ryn-nav-records')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('ryn-nav-people')));
+      await tester.pumpAndSettle();
+
+      final search = tester.widget<TextField>(
+        find.byKey(const Key('people-search-field')),
+      );
+      expect(search.controller?.text, '합성 인물 A');
+      expect(find.text('개요'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    },
+  );
+
+  testWidgets('R2 shell keeps Reading immersive route free of global chrome', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(1400, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(const RynUniverseApp());
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('ryn-nav-reading')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('atelier-tarot-action')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('ryn-navigation-rail')), findsNothing);
+    expect(find.byKey(const Key('ryn-top-utility-bar')), findsNothing);
+    expect(find.byKey(const Key('tarot-back-button-strong')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('tarot-back-button-strong')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('ryn-rail-mode-compact')), findsOneWidget);
+    expect(find.byKey(const Key('reading-atelier-page')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
