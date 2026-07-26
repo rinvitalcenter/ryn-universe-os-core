@@ -16,6 +16,7 @@ import 'package:ryn_universe_os_core/features/tarot/models/tarot_deck_definition
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_interpretation_session_draft.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_reading_context.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_reading_result_snapshot.dart';
+import 'package:ryn_universe_os_core/features/tarot/tarot_person_entry_selector.dart';
 import 'package:ryn_universe_os_core/core/theme/ryn_tokens.dart';
 
 class RynPalette {
@@ -486,6 +487,8 @@ class TarotSpreadShell extends StatefulWidget {
     required this.onBack,
     this.initialReadingContext,
     this.onReadingContextInitialized,
+    this.onReadingContextChanged,
+    this.personOptionsStream,
     this.onResultCompleted,
     this.onFinishToHome,
     this.onOpenInRecords,
@@ -498,6 +501,8 @@ class TarotSpreadShell extends StatefulWidget {
   final VoidCallback onBack;
   final TarotReadingContext? initialReadingContext;
   final ValueChanged<TarotReadingContext>? onReadingContextInitialized;
+  final ValueChanged<TarotReadingContext>? onReadingContextChanged;
+  final Stream<List<TarotPersonOption>>? personOptionsStream;
   final ValueChanged<TarotReadingResultSnapshot>? onResultCompleted;
   final ValueChanged<TarotReadingResultSnapshot>? onFinishToHome;
   final ValueChanged<TarotReadingResultSnapshot>? onOpenInRecords;
@@ -560,7 +565,8 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   String _sensitivityNote = '';
   int _selectedFreeDrawCount = 5;
   _TarotDirectionMode _directionMode = _TarotDirectionMode.auto;
-  late final TarotReadingContext _readingSessionContext;
+  late TarotReadingContext _readingSessionContext;
+  late TarotReadingMode _targetMode;
   late List<TarotCardDefinition> _remainingDeck;
   final List<_DrawnTarotCard> _drawnCards = [];
 
@@ -590,6 +596,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     _readingSessionContext =
         widget.initialReadingContext ??
         TarotReadingContext.defaultReading(sessionId: _newReadingSessionId());
+    _targetMode = _readingSessionContext.mode;
     _positionLabels = _defaultPositionLabelsFor(_selectedSpreadId);
     _prepareFreshDeck(clearDrawn: true);
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -602,6 +609,52 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
     final createdAt = DateTime.now().toUtc();
     final entropy = math.Random.secure().nextInt(0x7fffffff);
     return 'tarot_session_${createdAt.microsecondsSinceEpoch}_${entropy.toRadixString(16)}';
+  }
+
+  void _replaceReadingContext(TarotReadingContext next) {
+    setState(() => _readingSessionContext = next);
+    widget.onReadingContextChanged?.call(next);
+  }
+
+  Future<void> _selectReadingTargetMode(
+    TarotReadingMode mode,
+    List<TarotPersonOption> options,
+  ) async {
+    if (mode == TarotReadingMode.person) {
+      setState(() => _targetMode = TarotReadingMode.person);
+      if (_readingSessionContext.mode != TarotReadingMode.person) {
+        await _openPersonPicker(options);
+      }
+      return;
+    }
+
+    setState(() => _targetMode = mode);
+    _replaceReadingContext(
+      mode == TarotReadingMode.self
+          ? _readingSessionContext.toSelf()
+          : _readingSessionContext.toPractice(),
+    );
+  }
+
+  Future<void> _openPersonPicker(List<TarotPersonOption> options) async {
+    final selected = await showTarotPersonPicker(
+      context: context,
+      options: options,
+      selectedPersonId: _readingSessionContext.personId,
+    );
+    if (!mounted || selected == null) return;
+    setState(() => _targetMode = TarotReadingMode.person);
+    _replaceReadingContext(
+      _readingSessionContext.toPerson(personId: selected.personId),
+    );
+  }
+
+  bool _isReadingTargetReady(List<TarotPersonOption> options) {
+    if (_targetMode != TarotReadingMode.person) return true;
+    final selectedPersonId = _readingSessionContext.personId;
+    return _readingSessionContext.mode == TarotReadingMode.person &&
+        selectedPersonId != null &&
+        options.any((option) => option.personId == selectedPersonId);
   }
 
   TarotDeckDefinition get _selectedDeck => _deckDefinitions.firstWhere(
@@ -1229,59 +1282,74 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   Widget build(BuildContext context) {
     final immersive = _stage != _TarotFlowStage.setup;
     final Widget rawStageContent = switch (_stage) {
-      _TarotFlowStage.setup => _TarotSetupStage(
-        decks: _deckDefinitions,
-        selectedDeckId: _selectedDeckId,
-        onDeckSelected: _selectDeck,
-        cardBacks: _effectiveCardBackDefinitions,
-        selectedCardBackId: _selectedCardBackId,
-        selectedCardBack: _selectedCardBack,
-        onCardBackSelected: _selectCardBack,
-        tableCloths: _tarotTableClothDefinitions,
-        selectedTableClothId: _selectedTableClothId,
-        onTableClothSelected: _selectTableCloth,
-        freeSpreads: _freeSpreadDefinitions,
-        fixedSpreads: _fixedSpreadDefinitions,
-        selectedSpread: _selectedSpreadId,
-        onSpreadSelected: _selectSpread,
-        selectedDeck: _selectedDeck,
-        questionCategories: _tarotQuestionCategories,
-        selectedQuestionCategoryId: _selectedQuestionCategoryId,
-        selectedQuestionCategory: _selectedQuestionCategory,
-        onQuestionCategorySelected: _updateQuestionCategory,
-        freeQuestion: _freeQuestion,
-        questionTitle: _questionTitle,
-        questionDetail: _questionDetail,
-        currentSituation: _currentSituation,
-        desiredClarity: _desiredClarity,
-        onFreeQuestionChanged: _updateFreeQuestion,
-        onQuestionTitleChanged: _updateQuestionTitle,
-        onQuestionDetailChanged: _updateQuestionDetail,
-        onCurrentSituationChanged: _updateCurrentSituation,
-        onDesiredClarityChanged: _updateDesiredClarity,
-        querentAlias: _querentAlias,
-        querentRelationship: _querentRelationship,
-        querentBirthNote: _querentBirthNote,
-        sessionContext: _sessionContext,
-        sensitivityNote: _sensitivityNote,
-        onQuerentAliasChanged: _updateQuerentAlias,
-        onQuerentRelationshipChanged: _updateQuerentRelationship,
-        onQuerentBirthNoteChanged: _updateQuerentBirthNote,
-        onSessionContextChanged: _updateSessionContext,
-        onSensitivityNoteChanged: _updateSensitivityNote,
-        onShuffle: _startShuffle,
-        onAutoDraw: _drawAll,
-        isShuffling: _phase == _TarotDrawPhase.shuffling,
-        readingContext: _readingContext,
-        directionMode: _directionMode,
-        onDirectionModeSelected: _selectDirectionMode,
-        positionLabels: _positionLabels,
-        defaultPositionLabels: _defaultPositionLabelsFor(_selectedSpreadId),
-        onPositionLabelChanged: _updatePositionLabel,
-        selectedFreeDrawCount: _selectedFreeDrawCount,
-        onFreeDrawCountChanged: _selectFreeDrawCount,
-        stepIndex: _setupStepIndex,
-        onStepChanged: _selectSetupStep,
+      _TarotFlowStage.setup => StreamBuilder<List<TarotPersonOption>>(
+        stream: widget.personOptionsStream,
+        initialData: const [],
+        builder: (context, personSnapshot) {
+          final personOptions = personSnapshot.data ?? const [];
+          final targetReady = _isReadingTargetReady(personOptions);
+          return _TarotSetupStage(
+            targetMode: _targetMode,
+            sessionReadingContext: _readingSessionContext,
+            personOptions: personOptions,
+            targetReady: targetReady,
+            onTargetModeSelected: (mode) =>
+                _selectReadingTargetMode(mode, personOptions),
+            onSelectPerson: () => _openPersonPicker(personOptions),
+            decks: _deckDefinitions,
+            selectedDeckId: _selectedDeckId,
+            onDeckSelected: _selectDeck,
+            cardBacks: _effectiveCardBackDefinitions,
+            selectedCardBackId: _selectedCardBackId,
+            selectedCardBack: _selectedCardBack,
+            onCardBackSelected: _selectCardBack,
+            tableCloths: _tarotTableClothDefinitions,
+            selectedTableClothId: _selectedTableClothId,
+            onTableClothSelected: _selectTableCloth,
+            freeSpreads: _freeSpreadDefinitions,
+            fixedSpreads: _fixedSpreadDefinitions,
+            selectedSpread: _selectedSpreadId,
+            onSpreadSelected: _selectSpread,
+            selectedDeck: _selectedDeck,
+            questionCategories: _tarotQuestionCategories,
+            selectedQuestionCategoryId: _selectedQuestionCategoryId,
+            selectedQuestionCategory: _selectedQuestionCategory,
+            onQuestionCategorySelected: _updateQuestionCategory,
+            freeQuestion: _freeQuestion,
+            questionTitle: _questionTitle,
+            questionDetail: _questionDetail,
+            currentSituation: _currentSituation,
+            desiredClarity: _desiredClarity,
+            onFreeQuestionChanged: _updateFreeQuestion,
+            onQuestionTitleChanged: _updateQuestionTitle,
+            onQuestionDetailChanged: _updateQuestionDetail,
+            onCurrentSituationChanged: _updateCurrentSituation,
+            onDesiredClarityChanged: _updateDesiredClarity,
+            querentAlias: _querentAlias,
+            querentRelationship: _querentRelationship,
+            querentBirthNote: _querentBirthNote,
+            sessionContext: _sessionContext,
+            sensitivityNote: _sensitivityNote,
+            onQuerentAliasChanged: _updateQuerentAlias,
+            onQuerentRelationshipChanged: _updateQuerentRelationship,
+            onQuerentBirthNoteChanged: _updateQuerentBirthNote,
+            onSessionContextChanged: _updateSessionContext,
+            onSensitivityNoteChanged: _updateSensitivityNote,
+            onShuffle: _startShuffle,
+            onAutoDraw: _drawAll,
+            isShuffling: _phase == _TarotDrawPhase.shuffling,
+            readingContext: _readingContext,
+            directionMode: _directionMode,
+            onDirectionModeSelected: _selectDirectionMode,
+            positionLabels: _positionLabels,
+            defaultPositionLabels: _defaultPositionLabelsFor(_selectedSpreadId),
+            onPositionLabelChanged: _updatePositionLabel,
+            selectedFreeDrawCount: _selectedFreeDrawCount,
+            onFreeDrawCountChanged: _selectFreeDrawCount,
+            stepIndex: _setupStepIndex,
+            onStepChanged: _selectSetupStep,
+          );
+        },
       ),
       _TarotFlowStage.draw => _TarotFullDeckDrawStage(
         deck: _selectedDeck,
@@ -1723,6 +1791,12 @@ class _TarotImmersiveTopBar extends StatelessWidget {
 
 class _TarotSetupStage extends StatefulWidget {
   const _TarotSetupStage({
+    required this.targetMode,
+    required this.sessionReadingContext,
+    required this.personOptions,
+    required this.targetReady,
+    required this.onTargetModeSelected,
+    required this.onSelectPerson,
     required this.decks,
     required this.selectedDeckId,
     required this.onDeckSelected,
@@ -1777,6 +1851,12 @@ class _TarotSetupStage extends StatefulWidget {
     required this.onStepChanged,
   });
 
+  final TarotReadingMode targetMode;
+  final TarotReadingContext sessionReadingContext;
+  final List<TarotPersonOption> personOptions;
+  final bool targetReady;
+  final ValueChanged<TarotReadingMode> onTargetModeSelected;
+  final VoidCallback onSelectPerson;
   final List<TarotDeckDefinition> decks;
   final String selectedDeckId;
   final ValueChanged<String> onDeckSelected;
@@ -1849,9 +1929,21 @@ class _TarotSetupStageState extends State<_TarotSetupStage> {
       title: '1 질문과 목적',
       subtitle: '카드를 뽑기 전 질문의 결을 차분히 정리합니다.',
       useUnifiedIntakeFrame: true,
-      child: _TarotIntroPanel(
-        onStart: () => _goToStep(1),
-        onSkipToDeck: () => _goToStep(5),
+      child: Column(
+        children: [
+          TarotPersonEntrySelector(
+            targetMode: widget.targetMode,
+            readingContext: widget.sessionReadingContext,
+            personOptions: widget.personOptions,
+            onModeSelected: widget.onTargetModeSelected,
+            onSelectPerson: widget.onSelectPerson,
+          ),
+          const SizedBox(height: 16),
+          _TarotIntroPanel(
+            onStart: () => _goToStep(1),
+            onSkipToDeck: () => _goToStep(5),
+          ),
+        ],
       ),
     );
     final categoryStep = _TarotStepPanel(
@@ -1957,6 +2049,7 @@ class _TarotSetupStageState extends State<_TarotSetupStage> {
       child: _TarotPreparationPanel(
         selectedDeck: widget.selectedDeck,
         selectedSpread: selectedSpreadLabel,
+        targetReady: widget.targetReady,
         isShuffling: widget.isShuffling,
         onShuffle: widget.onShuffle,
         onAutoDraw: widget.onAutoDraw,
@@ -3846,6 +3939,7 @@ class _TarotPreparationPanel extends StatelessWidget {
   const _TarotPreparationPanel({
     required this.selectedDeck,
     required this.selectedSpread,
+    required this.targetReady,
     required this.isShuffling,
     required this.onShuffle,
     required this.onAutoDraw,
@@ -3855,6 +3949,7 @@ class _TarotPreparationPanel extends StatelessWidget {
 
   final TarotDeckDefinition selectedDeck;
   final String selectedSpread;
+  final bool targetReady;
   final bool isShuffling;
   final VoidCallback onShuffle;
   final VoidCallback onAutoDraw;
@@ -3863,7 +3958,7 @@ class _TarotPreparationPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final canStartReading = selectedDeck.cards.isNotEmpty;
+    final canStartReading = targetReady && selectedDeck.cards.isNotEmpty;
     return Container(
       key: const Key('tarot-ritual-shuffle-stage'),
       padding: const EdgeInsets.all(22),
@@ -3929,7 +4024,18 @@ class _TarotPreparationPanel extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   _TarotReadingContextRibbon(readingContext: readingContext),
-                  if (!canStartReading) ...[
+                  if (!targetReady) ...[
+                    const SizedBox(height: 10),
+                    const Text(
+                      '사람을 선택한 뒤 카드 리딩을 시작할 수 있습니다.',
+                      key: Key('tarot-person-target-required-message'),
+                      style: TextStyle(
+                        color: RynPalette.tarotLavender,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ] else if (selectedDeck.cards.isEmpty) ...[
                     const SizedBox(height: 10),
                     const Text(
                       UserText.tarotDeckUnavailable,
@@ -3966,7 +4072,7 @@ class _TarotPreparationPanel extends StatelessWidget {
                   key: const Key('tarot-ritual-hero-deck-stack'),
                   child: _ShuffleDeckStack(
                     isShuffling: isShuffling,
-                    onTap: onShuffle,
+                    onTap: canStartReading ? onShuffle : () {},
                     cardBack: cardBack,
                     large: true,
                   ),

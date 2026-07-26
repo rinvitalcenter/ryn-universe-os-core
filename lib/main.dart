@@ -19,6 +19,7 @@ import 'core/text/user_text.dart';
 import 'features/home/presentation/home_cinematic_scene.dart';
 import 'features/oracle/application/oracle_reading_controller.dart';
 import 'features/oracle/presentation/oracle_reading_shell.dart';
+import 'features/people/domain/person_core_models.dart';
 import 'features/people/presentation/people_page.dart';
 import 'features/reading/presentation/reading_atelier_page.dart';
 import 'features/records/models/session_tarot_results.dart';
@@ -31,6 +32,7 @@ import 'features/tarot/backup_recovery/application/tarot_restore_startup_recover
 import 'features/tarot/backup_recovery/infrastructure/tarot_restore_candidate_validator.dart';
 import 'features/tarot/models/tarot_interpretation_session_draft.dart';
 import 'features/tarot/models/tarot_reading_result_snapshot.dart';
+import 'features/tarot/tarot_person_entry_selector.dart';
 import 'features/tarot/tarot_spread_shell.dart';
 
 void main() {
@@ -460,6 +462,18 @@ String _tarotResultCardSummary(TarotReadingResultSnapshot snapshot) => snapshot
           '${placement.positionNameSnapshot}: ${placement.cardNameSnapshot} (${_tarotOrientationLabel(placement.orientation)})',
     )
     .join(' · ');
+
+List<TarotPersonOption> projectActivePeopleForTarot(Iterable<Person> people) =>
+    people
+        .where((person) => person.archivedAt == null)
+        .map(
+          (person) => TarotPersonOption(
+            personId: person.id,
+            displayName: person.displayName,
+            relationshipSummary: person.relationshipSummary,
+          ),
+        )
+        .toList(growable: false);
 
 class CoreOsShell extends StatefulWidget {
   const CoreOsShell({super.key, this.runtimeController, this.runtimeServices});
@@ -1007,6 +1021,9 @@ class _ShellPageContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tarotPersonOptionsStream = runtimeServices?.people
+        .watchPeople(includeArchived: false)
+        .map(projectActivePeopleForTarot);
     final body = _isHome
         ? <Widget>[
             HomeCinematicScene(
@@ -1098,6 +1115,7 @@ class _ShellPageContent extends StatelessWidget {
             _BusinessAreaPage(
               oracleController: oracleController,
               label: selectedLabel,
+              personOptionsStream: tarotPersonOptionsStream,
               onReadingTarotFocusChanged: onReadingTarotFocusChanged,
               onTarotResultCompleted: onTarotResultCompleted,
               onTarotDraftChanged: onTarotDraftChanged,
@@ -2439,6 +2457,7 @@ class _BusinessAreaPage extends StatelessWidget {
   const _BusinessAreaPage({
     required this.label,
     this.oracleController,
+    this.personOptionsStream,
     this.onReadingTarotFocusChanged,
     this.onTarotResultCompleted,
     this.onTarotDraftChanged,
@@ -2452,6 +2471,7 @@ class _BusinessAreaPage extends StatelessWidget {
 
   final String label;
   final OracleReadingController? oracleController;
+  final Stream<List<TarotPersonOption>>? personOptionsStream;
   final ValueChanged<bool>? onReadingTarotFocusChanged;
   final ValueChanged<TarotReadingResultSnapshot>? onTarotResultCompleted;
   final ValueChanged<TarotInterpretationSessionDraft>? onTarotDraftChanged;
@@ -2553,6 +2573,7 @@ class _BusinessAreaPage extends StatelessWidget {
     if (label == UserText.navReading) {
       return _ReadingWorkspacePage(
         oracleController: oracleController!,
+        personOptionsStream: personOptionsStream,
         onTarotFocusChanged: onReadingTarotFocusChanged,
         onTarotResultCompleted: onTarotResultCompleted,
         onTarotDraftChanged: onTarotDraftChanged,
@@ -2861,6 +2882,7 @@ class _BusinessModuleSummary extends StatelessWidget {
 class _ReadingWorkspacePage extends StatefulWidget {
   const _ReadingWorkspacePage({
     required this.oracleController,
+    this.personOptionsStream,
     this.onTarotFocusChanged,
     this.onTarotResultCompleted,
     this.onTarotDraftChanged,
@@ -2873,6 +2895,7 @@ class _ReadingWorkspacePage extends StatefulWidget {
   });
 
   final OracleReadingController oracleController;
+  final Stream<List<TarotPersonOption>>? personOptionsStream;
   final ValueChanged<bool>? onTarotFocusChanged;
   final ValueChanged<TarotReadingResultSnapshot>? onTarotResultCompleted;
   final ValueChanged<TarotInterpretationSessionDraft>? onTarotDraftChanged;
@@ -2916,6 +2939,7 @@ class _ReadingWorkspacePageState extends State<_ReadingWorkspacePage> {
     if (_tarotOpen) {
       return TarotSpreadShell(
         onBack: () => _setTarotOpen(false),
+        personOptionsStream: widget.personOptionsStream,
         onResultCompleted: widget.onTarotResultCompleted,
         onFinishToHome: _finishTarotToHome,
         onOpenInRecords: _openTarotInRecords,
