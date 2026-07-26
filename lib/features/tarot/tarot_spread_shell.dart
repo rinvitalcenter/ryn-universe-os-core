@@ -14,6 +14,7 @@ import 'package:ryn_universe_os_core/features/tarot/data/tarot_deck_registry.dar
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_card_definition.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_deck_definition.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_interpretation_session_draft.dart';
+import 'package:ryn_universe_os_core/features/tarot/models/tarot_reading_context.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_reading_result_snapshot.dart';
 import 'package:ryn_universe_os_core/core/theme/ryn_tokens.dart';
 
@@ -483,6 +484,8 @@ class TarotSpreadShell extends StatefulWidget {
   const TarotSpreadShell({
     super.key,
     required this.onBack,
+    this.initialReadingContext,
+    this.onReadingContextInitialized,
     this.onResultCompleted,
     this.onFinishToHome,
     this.onOpenInRecords,
@@ -493,6 +496,8 @@ class TarotSpreadShell extends StatefulWidget {
   });
 
   final VoidCallback onBack;
+  final TarotReadingContext? initialReadingContext;
+  final ValueChanged<TarotReadingContext>? onReadingContextInitialized;
   final ValueChanged<TarotReadingResultSnapshot>? onResultCompleted;
   final ValueChanged<TarotReadingResultSnapshot>? onFinishToHome;
   final ValueChanged<TarotReadingResultSnapshot>? onOpenInRecords;
@@ -555,6 +560,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   String _sensitivityNote = '';
   int _selectedFreeDrawCount = 5;
   _TarotDirectionMode _directionMode = _TarotDirectionMode.auto;
+  late final TarotReadingContext _readingSessionContext;
   late List<TarotCardDefinition> _remainingDeck;
   final List<_DrawnTarotCard> _drawnCards = [];
 
@@ -581,8 +587,21 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
   @override
   void initState() {
     super.initState();
+    _readingSessionContext =
+        widget.initialReadingContext ??
+        TarotReadingContext.defaultReading(sessionId: _newReadingSessionId());
     _positionLabels = _defaultPositionLabelsFor(_selectedSpreadId);
     _prepareFreshDeck(clearDrawn: true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      widget.onReadingContextInitialized?.call(_readingSessionContext);
+    });
+  }
+
+  String _newReadingSessionId() {
+    final createdAt = DateTime.now().toUtc();
+    final entropy = math.Random.secure().nextInt(0x7fffffff);
+    return 'tarot_session_${createdAt.microsecondsSinceEpoch}_${entropy.toRadixString(16)}';
   }
 
   TarotDeckDefinition get _selectedDeck => _deckDefinitions.firstWhere(
