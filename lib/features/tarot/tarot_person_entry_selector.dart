@@ -48,33 +48,43 @@ class TarotPersonEntrySelector extends StatelessWidget {
         selectedPerson == null;
     return Container(
       key: const Key('tarot-person-entry-selector'),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: _TargetColors.surface(context),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: _TargetColors.line(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '대상',
-            style: TextStyle(
-              color: _TargetColors.text(context),
-              fontSize: 16,
-              fontWeight: FontWeight.w900,
-            ),
+          Row(
+            children: [
+              Icon(
+                Icons.person_outline_rounded,
+                size: 18,
+                color: _TargetColors.blue(context),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '리딩 대상',
+                style: TextStyle(
+                  color: _TargetColors.text(context),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '사람 리딩은 Person 연결이 필요해요.',
+                style: TextStyle(
+                  color: _TargetColors.subtext(context),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            '누구를 위한 리딩인지 먼저 선택해 주세요.',
-            style: TextStyle(
-              color: _TargetColors.subtext(context),
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           SegmentedButton<TarotReadingMode>(
             key: const Key('tarot-target-mode-selector'),
             showSelectedIcon: false,
@@ -98,6 +108,10 @@ class TarotPersonEntrySelector extends StatelessWidget {
             selected: {targetMode},
             onSelectionChanged: (selection) => onModeSelected(selection.single),
             style: ButtonStyle(
+              visualDensity: VisualDensity.compact,
+              padding: const WidgetStatePropertyAll(
+                EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              ),
               backgroundColor: WidgetStateProperty.resolveWith((states) {
                 return states.contains(WidgetState.selected)
                     ? _TargetColors.selected(context)

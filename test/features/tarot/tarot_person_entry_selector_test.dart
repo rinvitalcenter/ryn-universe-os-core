@@ -145,17 +145,13 @@ void main() {
     final contexts = <TarotReadingContext>[];
     await _pumpShell(tester, options: options, contexts: contexts);
 
-    await tester.tap(find.text('질문 시작하기'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('다음'));
-    await tester.pumpAndSettle();
     await tester.enterText(
       find.byKey(const Key('tarot-free-question-input')),
       '지금 지켜볼 흐름은 무엇일까요?',
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('tarot-global-flow-덱')));
+    await tester.tap(find.byKey(const Key('tarot-rail-change-deck')));
     await tester.pumpAndSettle();
     await tester.tap(
       find.byKey(const ValueKey('tarot-deck-carousel-card-thoth')),
@@ -166,7 +162,9 @@ void main() {
     await tester.tap(find.widgetWithText(ChoiceChip, '1카드'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('tarot-global-flow-인트로')));
+    await tester.tap(
+      find.byKey(const ValueKey('tarot-preparation-progress-step-0')),
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('tarot-target-mode-person')));
     await tester.pumpAndSettle();
@@ -175,14 +173,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byKey(const Key('tarot-global-flow-질문')));
-    await tester.pumpAndSettle();
     final question = tester.widget<TextFormField>(
       find.byKey(const Key('tarot-free-question-input')),
     );
     expect(question.initialValue, '지금 지켜볼 흐름은 무엇일까요?');
 
-    await tester.tap(find.byKey(const Key('tarot-global-flow-덱')));
+    await tester.tap(find.byKey(const Key('tarot-rail-change-deck')));
     await tester.pumpAndSettle();
     expect(
       find.descendant(
@@ -192,7 +188,7 @@ void main() {
       findsOneWidget,
     );
 
-    await tester.tap(find.byKey(const Key('tarot-global-flow-세부 설정')));
+    await tester.tap(find.text('다음'));
     await tester.pumpAndSettle();
     final oneCard = tester.widget<ChoiceChip>(
       find.widgetWithText(ChoiceChip, '1카드'),
@@ -211,27 +207,35 @@ void main() {
 
     expect(find.text('등록된 사람이 없습니다.'), findsOneWidget);
     expect(find.text('사람 모듈에서 먼저 사람을 추가해 주세요.'), findsOneWidget);
-    expect(find.textContaining('추가'), findsOneWidget);
     expect(find.textContaining('편집'), findsNothing);
     expect(find.textContaining('삭제'), findsNothing);
     expect(find.textContaining('관리'), findsNothing);
 
     await tester.tap(find.byKey(const Key('tarot-person-picker-cancel')));
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('바로 덱 선택'));
+    await tester.ensureVisible(find.byKey(const Key('tarot-rail-change-deck')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('바로 덱 선택'));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('다음'));
+    await tester.tap(find.byKey(const Key('tarot-rail-change-deck')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('다음'));
     await tester.pumpAndSettle();
 
-    expect(find.text('사람을 선택한 뒤 카드 리딩을 시작할 수 있습니다.'), findsOneWidget);
-    final shuffle = tester.widget<FilledButton>(
-      find.byKey(const Key('tarot-shuffle-button')),
+    expect(find.text('리딩할 사람을 선택해 주세요'), findsOneWidget);
+    final blockedNext = tester.widget<FilledButton>(
+      find.widgetWithText(FilledButton, '리딩할 사람을 선택해 주세요'),
     );
-    expect(shuffle.onPressed, isNull);
+    expect(blockedNext.onPressed, isNull);
+    await tester.tap(
+      find.byKey(const ValueKey('tarot-preparation-progress-step-0')),
+    );
+    await tester.pumpAndSettle();
+    final railStart = tester.widget<FilledButton>(
+      find.byKey(const Key('tarot-rail-primary-cta')),
+    );
+    expect(railStart.onPressed, isNotNull);
+    await tester.tap(find.byKey(const Key('tarot-rail-primary-cta')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('tarot-person-picker')), findsOneWidget);
     expect(contexts.last.personId, isNull);
   });
 }
