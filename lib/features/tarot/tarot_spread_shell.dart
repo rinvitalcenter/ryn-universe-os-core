@@ -146,6 +146,30 @@ class RynPalette {
         ];
 }
 
+class _TarotSetupColors {
+  const _TarotSetupColors._();
+
+  static RynSemanticColors of(BuildContext context) => context.rynColors;
+
+  static Color workspace(BuildContext context) => of(context).appCanvas;
+  static Color surface(BuildContext context) => of(context).primarySurface;
+  static Color surfaceMuted(BuildContext context) =>
+      of(context).secondarySurface;
+  static Color surfaceSubtle(BuildContext context) =>
+      of(context).tertiarySurface;
+  static Color text(BuildContext context) => of(context).primaryText;
+  static Color subtext(BuildContext context) => of(context).secondaryText;
+  static Color helpText(BuildContext context) => of(context).mutedText;
+  static Color line(BuildContext context) => of(context).hairline;
+  static Color action(BuildContext context) => of(context).primaryAction;
+  static Color onAction(BuildContext context) =>
+      of(context).onPrimaryInteractive;
+  static Color focus(BuildContext context) => of(context).focusRing;
+  static Color selected(BuildContext context) =>
+      Color.alphaBlend(of(context).selectedState, of(context).primarySurface);
+  static Color disabled(BuildContext context) => of(context).disabledContent;
+}
+
 class RynMetrics {
   const RynMetrics._();
 
@@ -160,22 +184,28 @@ class _TarotShellCard extends StatelessWidget {
   const _TarotShellCard({
     required this.child,
     this.padding = const EdgeInsets.all(16),
+    this.r2Setup = false,
   });
 
   final Widget child;
   final EdgeInsets padding;
+  final bool r2Setup;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
-        color: RynPalette.tarotPageShell(context),
+        color: r2Setup
+            ? _TarotSetupColors.workspace(context)
+            : RynPalette.tarotPageShell(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusShell),
         border: Border.all(
-          color: RynPalette.tarotBorder(context).withValues(alpha: 0.72),
+          color: r2Setup
+              ? _TarotSetupColors.line(context)
+              : RynPalette.tarotBorder(context).withValues(alpha: 0.72),
         ),
-        boxShadow: RynPalette.panelShadow(context),
+        boxShadow: r2Setup ? const [] : RynPalette.panelShadow(context),
       ),
       child: child,
     );
@@ -1300,6 +1330,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
         final boundedHeight = shellConstraints.hasBoundedHeight;
         return _TarotShellCard(
           padding: EdgeInsets.all(immersive ? 10 : 22),
+          r2Setup: !immersive,
           child: Column(
             mainAxisSize: boundedHeight ? MainAxisSize.max : MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1313,7 +1344,10 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
               else
                 Row(
                   children: [
-                    _TarotBackButton(onPressed: _requestCoreExit),
+                    _TarotBackButton(
+                      onPressed: _requestCoreExit,
+                      r2Setup: true,
+                    ),
                     const SizedBox(width: 14),
                     Expanded(
                       child: Column(
@@ -1322,7 +1356,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
                           Text(
                             '${UserText.navReading} > ${UserText.tarotTitle}',
                             style: TextStyle(
-                              color: RynPalette.tarotTextSecondary(context),
+                              color: _TarotSetupColors.helpText(context),
                               fontSize: 13,
                               fontWeight: FontWeight.w800,
                             ),
@@ -1331,7 +1365,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
                           Text(
                             UserText.tarotTitle,
                             style: TextStyle(
-                              color: RynPalette.tarotTextPrimary(context),
+                              color: _TarotSetupColors.text(context),
                               fontSize: 30,
                               fontWeight: FontWeight.w900,
                               letterSpacing: -0.8,
@@ -1341,7 +1375,7 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
                           Text(
                             UserText.tarotSubtitle,
                             style: TextStyle(
-                              color: RynPalette.tarotTextSecondary(context),
+                              color: _TarotSetupColors.subtext(context),
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
@@ -1398,10 +1432,15 @@ class _TarotSpreadShellState extends State<TarotSpreadShell> {
 }
 
 class _TarotBackButton extends StatelessWidget {
-  const _TarotBackButton({required this.onPressed, this.compact = false});
+  const _TarotBackButton({
+    required this.onPressed,
+    this.compact = false,
+    this.r2Setup = false,
+  });
 
   final VoidCallback onPressed;
   final bool compact;
+  final bool r2Setup;
 
   @override
   Widget build(BuildContext context) {
@@ -1412,10 +1451,16 @@ class _TarotBackButton extends StatelessWidget {
       child: OutlinedButton.icon(
         key: const Key('tarot-back-button-strong'),
         style: OutlinedButton.styleFrom(
-          foregroundColor: RynPalette.tarotTextPrimary(context),
-          backgroundColor: RynPalette.tarotBentoPanel(context),
+          foregroundColor: r2Setup
+              ? _TarotSetupColors.text(context)
+              : RynPalette.tarotTextPrimary(context),
+          backgroundColor: r2Setup
+              ? _TarotSetupColors.surface(context)
+              : RynPalette.tarotBentoPanel(context),
           side: BorderSide(
-            color: RynPalette.tarotGoldAccent(context).withValues(alpha: 0.38),
+            color: r2Setup
+                ? _TarotSetupColors.line(context)
+                : RynPalette.tarotGoldAccent(context).withValues(alpha: 0.38),
           ),
           padding: EdgeInsets.symmetric(
             horizontal: compact ? 10 : 14,
@@ -1466,13 +1511,9 @@ class _TarotGlobalFlowNav extends StatelessWidget {
       key: const Key('tarot-midnight-atelier-stepper'),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: RynPalette.tarotGuidePanel(
-          context,
-        ).withValues(alpha: RynPalette.isDark(context) ? 0.88 : 0.82),
+        color: _TarotSetupColors.surface(context),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: RynPalette.tarotPurpleAccent(context).withValues(alpha: 0.18),
-        ),
+        border: Border.all(color: _TarotSetupColors.line(context)),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -1532,13 +1573,13 @@ class _TarotAtelierPhaseGroup extends StatelessWidget {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: current
-            ? RynPalette.tarotGuidePanel(context).withValues(alpha: 0.62)
-            : RynPalette.tarotBentoPanel(context).withValues(alpha: 0.54),
+            ? _TarotSetupColors.selected(context)
+            : _TarotSetupColors.surfaceMuted(context),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: current
-              ? RynPalette.tarotGoldAccent(context).withValues(alpha: 0.42)
-              : Colors.white.withValues(alpha: 0.08),
+              ? _TarotSetupColors.focus(context).withValues(alpha: 0.62)
+              : _TarotSetupColors.line(context),
         ),
       ),
       child: Column(
@@ -1548,8 +1589,8 @@ class _TarotAtelierPhaseGroup extends StatelessWidget {
             phase.label,
             style: TextStyle(
               color: current
-                  ? RynPalette.tarotTextPrimary(context)
-                  : RynPalette.tarotTextSecondary(context),
+                  ? _TarotSetupColors.text(context)
+                  : _TarotSetupColors.subtext(context),
               fontSize: 12,
               fontWeight: FontWeight.w800,
               letterSpacing: -0.1,
@@ -1594,10 +1635,10 @@ class _TarotAtelierStepDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final foreground = active
-        ? RynPalette.tarotMidnight
+        ? _TarotSetupColors.onAction(context)
         : enabled
-        ? RynPalette.tarotTextPrimary(context)
-        : RynPalette.tarotTextSecondary(context).withValues(alpha: 0.48);
+        ? _TarotSetupColors.text(context)
+        : _TarotSetupColors.disabled(context);
     return InkWell(
       key: Key('tarot-global-flow-$label'),
       onTap: enabled ? () => onSelected(index) : null,
@@ -1607,13 +1648,15 @@ class _TarotAtelierStepDot extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
         decoration: BoxDecoration(
           color: active
-              ? RynPalette.tarotGoldAccent(context)
-              : Colors.white.withValues(alpha: enabled ? 0.08 : 0.035),
+              ? _TarotSetupColors.action(context)
+              : enabled
+              ? _TarotSetupColors.surfaceSubtle(context)
+              : _TarotSetupColors.surfaceMuted(context),
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
             color: active
-                ? RynPalette.tarotGoldAccent(context)
-                : Colors.white.withValues(alpha: enabled ? 0.14 : 0.06),
+                ? _TarotSetupColors.action(context)
+                : _TarotSetupColors.line(context),
           ),
         ),
         child: Text(
@@ -1857,6 +1900,7 @@ class _TarotSetupStageState extends State<_TarotSetupStage> {
     final deckStep = _TarotStepPanel(
       title: '2 덱 선택',
       subtitle: '상담 분위기에 맞는 덱을 고르세요.',
+      useR2SetupSurface: true,
       child: _TarotDeckChoiceSection(
         title: '',
         decks: widget.decks,
@@ -1867,6 +1911,7 @@ class _TarotSetupStageState extends State<_TarotSetupStage> {
     final detailStep = _TarotStepPanel(
       title: '3 카드 세부 설정',
       subtitle: '카드 뒷면, 스프레드, 방향, 자리 이름을 정합니다.',
+      useR2SetupSurface: true,
       child: _TarotCardDetailSetupLayout(
         cardBacks: widget.cardBacks,
         selectedCardBackId: widget.selectedCardBackId,
@@ -1932,7 +1977,7 @@ class _TarotSetupStageState extends State<_TarotSetupStage> {
                 label: const Text('다음'),
               )
             else
-              _TarotSmallBadge('준비 완료 후 셔플하거나 자동으로 펼치세요'),
+              _TarotSmallBadge('준비 완료 후 셔플하거나 자동으로 펼치세요', r2Setup: true),
           ],
         ),
         const SizedBox(height: 12),
@@ -1951,26 +1996,21 @@ class _TarotStepPanel extends StatelessWidget {
     required this.subtitle,
     required this.child,
     this.useUnifiedIntakeFrame = false,
+    this.useR2SetupSurface = false,
   });
 
   final String title;
   final String subtitle;
   final Widget child;
   final bool useUnifiedIntakeFrame;
+  final bool useR2SetupSurface;
 
   @override
   Widget build(BuildContext context) {
     final isIntakeRoom = useUnifiedIntakeFrame;
-    final panelGradient = isIntakeRoom
-        ? LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              RynPalette.tarotPageShell(context),
-              RynPalette.tarotReadingStage(context),
-              RynPalette.tarotBentoPanel(context),
-            ],
-          )
+    final isR2Setup = isIntakeRoom || useR2SetupSurface;
+    final panelGradient = isR2Setup
+        ? null
         : const LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -1980,37 +2020,44 @@ class _TarotStepPanel extends StatelessWidget {
               RynPalette.tarotPanel,
             ],
           );
-    final titleColor = isIntakeRoom
-        ? RynPalette.tarotTextPrimary(context)
+    final titleColor = isR2Setup
+        ? _TarotSetupColors.text(context)
         : RynPalette.tarotIvory;
-    final subtitleColor = isIntakeRoom
-        ? RynPalette.tarotTextSecondary(context)
+    final subtitleColor = isR2Setup
+        ? _TarotSetupColors.subtext(context)
         : RynPalette.tarotMist;
-    final borderColor = isIntakeRoom
-        ? RynPalette.tarotPurpleAccent(context).withValues(alpha: 0.18)
+    final borderColor = isR2Setup
+        ? _TarotSetupColors.line(context)
         : RynPalette.tarotGold.withValues(alpha: 0.18);
     final stageBody = isIntakeRoom
         ? _TarotUnifiedIntakeStageFrame(child: child)
+        : useR2SetupSurface
+        ? child
         : _TarotReadingTableTheme(child: child);
 
     return Container(
       key: Key(
         isIntakeRoom
             ? 'tarot-light-intake-shell-surface'
+            : useR2SetupSurface
+            ? 'tarot-r2-setup-surface'
             : 'tarot-dark-reading-table-surface',
       ),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
+        color: isR2Setup ? _TarotSetupColors.surface(context) : null,
         gradient: panelGradient,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(color: borderColor),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isIntakeRoom ? 0.08 : 0.30),
-            blurRadius: 28,
-            offset: const Offset(0, 18),
-          ),
-        ],
+        boxShadow: isR2Setup
+            ? const []
+            : const [
+                BoxShadow(
+                  color: Color(0x4D000000),
+                  blurRadius: 28,
+                  offset: Offset(0, 18),
+                ),
+              ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2165,25 +2212,20 @@ ButtonStyle _tarotCompactTextActionStyle() {
 
 ButtonStyle _tarotFilledSetupActionStyle(BuildContext context) {
   return FilledButton.styleFrom(
-    backgroundColor: RynPalette.tarotGoldAccent(context),
-    foregroundColor: RynPalette.tarotMidnight,
-    disabledBackgroundColor: RynPalette.tarotBorder(
-      context,
-    ).withValues(alpha: 0.72),
-    disabledForegroundColor: RynPalette.tarotTextSecondary(context),
+    backgroundColor: _TarotSetupColors.action(context),
+    foregroundColor: _TarotSetupColors.onAction(context),
+    disabledBackgroundColor: _TarotSetupColors.surfaceSubtle(context),
+    disabledForegroundColor: _TarotSetupColors.disabled(context),
     textStyle: const TextStyle(fontWeight: FontWeight.w900),
   );
 }
 
 ButtonStyle _tarotOutlinedSetupActionStyle(BuildContext context) {
   return OutlinedButton.styleFrom(
-    foregroundColor: RynPalette.tarotTextPrimary(context),
-    disabledForegroundColor: RynPalette.tarotTextSecondary(
-      context,
-    ).withValues(alpha: 0.45),
-    side: BorderSide(
-      color: RynPalette.tarotTextSecondary(context).withValues(alpha: 0.22),
-    ),
+    foregroundColor: _TarotSetupColors.text(context),
+    backgroundColor: _TarotSetupColors.surface(context),
+    disabledForegroundColor: _TarotSetupColors.disabled(context),
+    side: BorderSide(color: _TarotSetupColors.line(context)),
     textStyle: const TextStyle(fontWeight: FontWeight.w700),
   );
 }
@@ -2200,26 +2242,9 @@ class _TarotIntroPanel extends StatelessWidget {
       key: const Key('tarot-intro-panel'),
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            RynPalette.tarotPageShell(context).withValues(alpha: 0.98),
-            RynPalette.tarotReadingStage(context).withValues(alpha: 0.96),
-            RynPalette.tarotGuidePanel(context).withValues(alpha: 0.84),
-          ],
-        ),
+        color: _TarotSetupColors.surfaceMuted(context),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(
-          color: RynPalette.tarotGoldAccent(context).withValues(alpha: 0.34),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.34),
-            blurRadius: 28,
-            offset: const Offset(0, 18),
-          ),
-        ],
+        border: Border.all(color: _TarotSetupColors.line(context)),
       ),
       child: Stack(
         children: [
@@ -2228,7 +2253,7 @@ class _TarotIntroPanel extends StatelessWidget {
             top: -24,
             child: Icon(
               Icons.auto_awesome_rounded,
-              color: Colors.white.withValues(alpha: 0.08),
+              color: _TarotSetupColors.action(context).withValues(alpha: 0.07),
               size: 160,
             ),
           ),
@@ -2263,14 +2288,18 @@ class _TarotIntroPanel extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const _TarotSmallBadge('오늘의 리딩 준비', compact: true),
+                  const _TarotSmallBadge(
+                    '오늘의 리딩 준비',
+                    compact: true,
+                    r2Setup: true,
+                  ),
                 ],
               ),
               const SizedBox(height: 58),
               Text(
                 '오늘의 리딩을 시작합니다',
                 style: TextStyle(
-                  color: RynPalette.tarotTextPrimary(context),
+                  color: _TarotSetupColors.text(context),
                   fontSize: 32,
                   fontWeight: FontWeight.w900,
                   letterSpacing: -1.0,
@@ -2283,7 +2312,7 @@ class _TarotIntroPanel extends StatelessWidget {
                 child: Text(
                   '주제를 고르고 질문을 정리한 뒤, 덱을 준비하는 하나의 상담 입장 흐름입니다.\n입력한 내용은 이번 리딩 흐름 안에서만 참고합니다.',
                   style: TextStyle(
-                    color: RynPalette.tarotTextSecondary(context),
+                    color: _TarotSetupColors.subtext(context),
                     fontSize: 14,
                     height: 1.5,
                     fontWeight: FontWeight.w800,
@@ -2295,9 +2324,9 @@ class _TarotIntroPanel extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: const [
-                  _TarotSmallBadge('주제 선택', compact: true),
-                  _TarotSmallBadge('질문 정리', compact: true),
-                  _TarotSmallBadge('덱 준비', compact: true),
+                  _TarotSmallBadge('주제 선택', compact: true, r2Setup: true),
+                  _TarotSmallBadge('질문 정리', compact: true, r2Setup: true),
+                  _TarotSmallBadge('덱 준비', compact: true, r2Setup: true),
                 ],
               ),
               const SizedBox(height: 28),
@@ -2418,45 +2447,16 @@ class _TarotCategoryCard extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          gradient: selected
-              ? LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    RynPalette.tarotSelectedPanel(
-                      context,
-                    ).withValues(alpha: 0.96),
-                    RynPalette.tarotGuidePanel(context).withValues(alpha: 0.86),
-                  ],
-                )
-              : LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    RynPalette.tarotBentoPanel(context).withValues(alpha: 0.96),
-                    RynPalette.tarotReadingStage(
-                      context,
-                    ).withValues(alpha: 0.72),
-                  ],
-                ),
+          color: selected
+              ? _TarotSetupColors.selected(context)
+              : _TarotSetupColors.surface(context),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: selected
-                ? RynPalette.tarotGoldAccent(context).withValues(alpha: 0.74)
-                : RynPalette.tarotPurpleAccent(context).withValues(alpha: 0.16),
+                ? _TarotSetupColors.focus(context)
+                : _TarotSetupColors.line(context),
             width: selected ? 1.3 : 1,
           ),
-          boxShadow: selected
-              ? [
-                  BoxShadow(
-                    color: RynPalette.tarotGoldAccent(
-                      context,
-                    ).withValues(alpha: 0.18),
-                    blurRadius: 18,
-                    offset: const Offset(0, 10),
-                  ),
-                ]
-              : null,
         ),
         child: Row(
           children: [
@@ -2466,18 +2466,14 @@ class _TarotCategoryCard extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: selected
-                    ? RynPalette.tarotGoldAccent(
-                        context,
-                      ).withValues(alpha: 0.14)
-                    : RynPalette.tarotPurpleAccent(
-                        context,
-                      ).withValues(alpha: 0.12),
+                    ? _TarotSetupColors.selected(context)
+                    : _TarotSetupColors.surfaceSubtle(context),
               ),
               child: Icon(
                 category.icon,
                 color: selected
-                    ? RynPalette.tarotGoldAccent(context)
-                    : RynPalette.tarotPurpleAccent(context),
+                    ? _TarotSetupColors.action(context)
+                    : _TarotSetupColors.helpText(context),
                 size: 22,
               ),
             ),
@@ -2490,9 +2486,7 @@ class _TarotCategoryCard extends StatelessWidget {
                   Text(
                     category.label,
                     style: TextStyle(
-                      color: selected
-                          ? RynPalette.tarotTextPrimary(context)
-                          : RynPalette.tarotTextPrimary(context),
+                      color: _TarotSetupColors.text(context),
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.2,
@@ -2504,9 +2498,7 @@ class _TarotCategoryCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: selected
-                          ? RynPalette.tarotTextSecondary(context)
-                          : RynPalette.tarotTextSecondary(context),
+                      color: _TarotSetupColors.subtext(context),
                       fontSize: 11,
                       height: 1.25,
                       fontWeight: FontWeight.w600,
@@ -2664,7 +2656,11 @@ class _TarotQuerentInputPanel extends StatelessWidget {
           icon: Icons.person_outline_rounded,
           title: '내담자 기본 맥락',
           subtitle: '리딩에 도움이 되는 최소 정보만 적습니다.',
-          trailing: const _TarotSmallBadge('이번 리딩 안에서만 참고해요', compact: true),
+          trailing: const _TarotSmallBadge(
+            '이번 리딩 안에서만 참고해요',
+            compact: true,
+            r2Setup: true,
+          ),
           child: Column(
             children: [
               _TarotIntakeTextField(
@@ -2772,20 +2768,9 @@ class _TarotIntakeSummaryPanel extends StatelessWidget {
       key: const Key('tarot-reading-intake-receipt-card'),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            RynPalette.tarotPageShell(context),
-            RynPalette.tarotReadingStage(context),
-            RynPalette.tarotSummaryPanel(context).withValues(alpha: 0.84),
-          ],
-        ),
+        color: _TarotSetupColors.surfaceMuted(context),
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(
-          color: RynPalette.tarotGoldAccent(context).withValues(alpha: 0.22),
-        ),
-        boxShadow: RynPalette.panelShadow(context),
+        border: Border.all(color: _TarotSetupColors.line(context)),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -2797,13 +2782,11 @@ class _TarotIntakeSummaryPanel extends StatelessWidget {
                 height: 52,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: RynPalette.tarotGoldAccent(
-                    context,
-                  ).withValues(alpha: 0.16),
+                  color: _TarotSetupColors.selected(context),
                 ),
                 child: Icon(
                   category.icon,
-                  color: RynPalette.tarotGoldAccent(context),
+                  color: _TarotSetupColors.action(context),
                   size: 26,
                 ),
               ),
@@ -2815,7 +2798,7 @@ class _TarotIntakeSummaryPanel extends StatelessWidget {
                     Text(
                       '리딩 접수 요약',
                       style: TextStyle(
-                        color: RynPalette.tarotTextPrimary(context),
+                        color: _TarotSetupColors.text(context),
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.4,
@@ -2825,7 +2808,7 @@ class _TarotIntakeSummaryPanel extends StatelessWidget {
                     Text(
                       '${category.label} · ${category.helper}',
                       style: TextStyle(
-                        color: RynPalette.tarotTextSecondary(context),
+                        color: _TarotSetupColors.subtext(context),
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         height: 1.3,
@@ -2945,11 +2928,9 @@ class _TarotIntakeSectionCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: RynPalette.tarotBentoPanel(context).withValues(alpha: 0.92),
+        color: _TarotSetupColors.surface(context),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: RynPalette.tarotBorder(context).withValues(alpha: 0.78),
-        ),
+        border: Border.all(color: _TarotSetupColors.line(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2957,11 +2938,7 @@ class _TarotIntakeSectionCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                icon,
-                color: RynPalette.tarotPurpleAccent(context),
-                size: 22,
-              ),
+              Icon(icon, color: _TarotSetupColors.action(context), size: 22),
               const SizedBox(width: 9),
               Expanded(
                 child: Column(
@@ -2970,7 +2947,7 @@ class _TarotIntakeSectionCard extends StatelessWidget {
                     Text(
                       title,
                       style: TextStyle(
-                        color: RynPalette.tarotTextPrimary(context),
+                        color: _TarotSetupColors.text(context),
                         fontSize: 15,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.2,
@@ -2980,7 +2957,7 @@ class _TarotIntakeSectionCard extends StatelessWidget {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: RynPalette.tarotTextSecondary(context),
+                        color: _TarotSetupColors.subtext(context),
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         height: 1.35,
@@ -3011,22 +2988,20 @@ class _TarotConsultationNote extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: RynPalette.tarotGuidePanel(context).withValues(alpha: 0.72),
+        color: _TarotSetupColors.surfaceSubtle(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: RynPalette.tarotPurpleAccent(context).withValues(alpha: 0.10),
-        ),
+        border: Border.all(color: _TarotSetupColors.line(context)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: RynPalette.tarotPurpleAccent(context), size: 18),
+          Icon(icon, color: _TarotSetupColors.helpText(context), size: 18),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               text,
               style: TextStyle(
-                color: RynPalette.tarotTextSecondary(context),
+                color: _TarotSetupColors.subtext(context),
                 fontSize: 12,
                 height: 1.35,
                 fontWeight: FontWeight.w600,
@@ -3067,7 +3042,7 @@ class _TarotIntakeTextField extends StatelessWidget {
       maxLines: minLines == 1 ? 1 : 5,
       onChanged: onChanged,
       style: TextStyle(
-        color: RynPalette.tarotTextPrimary(context),
+        color: _TarotSetupColors.text(context),
         fontWeight: FontWeight.w700,
       ),
       decoration: InputDecoration(
@@ -3075,43 +3050,31 @@ class _TarotIntakeTextField extends StatelessWidget {
         hintText: hint,
         helperText: helperText ?? (minLines > 1 ? '필요한 만큼만 짧게 적어도 좋아요.' : null),
         filled: true,
-        fillColor: RynPalette.tarotInputField(context),
+        fillColor: _TarotSetupColors.surfaceMuted(context),
         labelStyle: TextStyle(
-          color: RynPalette.tarotTextSecondary(context),
+          color: _TarotSetupColors.subtext(context),
           fontWeight: FontWeight.w600,
         ),
-        hintStyle: TextStyle(
-          color: RynPalette.tarotTextSecondary(context).withValues(alpha: 0.58),
-        ),
-        helperStyle: TextStyle(
-          color: RynPalette.tarotTextSecondary(context).withValues(alpha: 0.70),
-        ),
+        hintStyle: TextStyle(color: _TarotSetupColors.helpText(context)),
+        helperStyle: TextStyle(color: _TarotSetupColors.helpText(context)),
         floatingLabelStyle: TextStyle(
-          color: RynPalette.tarotGoldAccent(context),
+          color: _TarotSetupColors.focus(context),
           fontWeight: FontWeight.w800,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: RynPalette.tarotPurpleAccent(
-              context,
-            ).withValues(alpha: 0.14),
-          ),
+          borderSide: BorderSide(color: _TarotSetupColors.line(context)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
-            color: RynPalette.tarotGoldAccent(context),
+            color: _TarotSetupColors.focus(context),
             width: 1.4,
           ),
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(
-            color: RynPalette.tarotPurpleAccent(
-              context,
-            ).withValues(alpha: 0.14),
-          ),
+          borderSide: BorderSide(color: _TarotSetupColors.line(context)),
         ),
       ),
     );
@@ -3134,27 +3097,21 @@ class _TarotSummaryGroup extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: RynPalette.tarotBentoPanel(context).withValues(alpha: 0.94),
+        color: _TarotSetupColors.surface(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: RynPalette.tarotBorder(context).withValues(alpha: 0.74),
-        ),
+        border: Border.all(color: _TarotSetupColors.line(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Icon(
-                icon,
-                color: RynPalette.tarotPurpleAccent(context),
-                size: 19,
-              ),
+              Icon(icon, color: _TarotSetupColors.action(context), size: 19),
               const SizedBox(width: 8),
               Text(
                 title,
                 style: TextStyle(
-                  color: RynPalette.tarotTextPrimary(context),
+                  color: _TarotSetupColors.text(context),
                   fontSize: 14,
                   fontWeight: FontWeight.w800,
                 ),
@@ -3181,11 +3138,9 @@ class _TarotSummaryPill extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: RynPalette.tarotBentoPanelSoft(context).withValues(alpha: 0.72),
+        color: _TarotSetupColors.surfaceMuted(context),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: RynPalette.tarotBorder(context).withValues(alpha: 0.56),
-        ),
+        border: Border.all(color: _TarotSetupColors.line(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -3193,7 +3148,7 @@ class _TarotSummaryPill extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: RynPalette.tarotTextSecondary(context),
+              color: _TarotSetupColors.helpText(context),
               fontSize: 11,
               fontWeight: FontWeight.w700,
             ),
@@ -3204,7 +3159,7 @@ class _TarotSummaryPill extends StatelessWidget {
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              color: RynPalette.tarotTextPrimary(context),
+              color: _TarotSetupColors.text(context),
               fontSize: 13,
               height: 1.35,
               fontWeight: FontWeight.w700,
@@ -3314,11 +3269,9 @@ class _TarotCardDetailSetupLayout extends StatelessWidget {
         return Container(
           key: const Key('tarot-card-detail-balanced-layout'),
           decoration: BoxDecoration(
-            color: RynPalette.tarotReadingStage(context),
+            color: _TarotSetupColors.surfaceMuted(context),
             borderRadius: BorderRadius.circular(26),
-            border: Border.all(
-              color: RynPalette.tarotBorder(context).withValues(alpha: 0.70),
-            ),
+            border: Border.all(color: _TarotSetupColors.line(context)),
           ),
           padding: const EdgeInsets.all(14),
           child: wide
@@ -3354,11 +3307,9 @@ class _TarotFreeDrawCountSelector extends StatelessWidget {
       key: const Key('tarot-free-draw-count-selector'),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: RynPalette.tarotBentoPanel(context),
+        color: _TarotSetupColors.surface(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
-        border: Border.all(
-          color: RynPalette.tarotBorder(context).withValues(alpha: 0.72),
-        ),
+        border: Border.all(color: _TarotSetupColors.line(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -3368,27 +3319,27 @@ class _TarotFreeDrawCountSelector extends StatelessWidget {
               Icon(
                 Icons.style_rounded,
                 size: 18,
-                color: RynPalette.tarotPurpleAccent(context),
+                color: _TarotSetupColors.action(context),
               ),
               const SizedBox(width: 8),
               Text(
                 '카드 수',
                 style: TextStyle(
-                  color: RynPalette.tarotTextPrimary(context),
+                  color: _TarotSetupColors.text(context),
                   fontSize: 14,
                   fontWeight: FontWeight.w900,
                   letterSpacing: -0.2,
                 ),
               ),
               const SizedBox(width: 8),
-              _TarotSmallBadge('$selectedCount장', compact: true),
+              _TarotSmallBadge('$selectedCount장', compact: true, r2Setup: true),
             ],
           ),
           const SizedBox(height: 6),
           Text(
             '몇 장을 펼칠까요? 자유 드로우는 원하는 장수만큼 카드를 펼칠 수 있습니다.',
             style: TextStyle(
-              color: RynPalette.tarotTextSecondary(context),
+              color: _TarotSetupColors.subtext(context),
               fontSize: 12,
               fontWeight: FontWeight.w600,
               height: 1.35,
@@ -3405,6 +3356,13 @@ class _TarotFreeDrawCountSelector extends StatelessWidget {
                   label: Text('$count'),
                   selected: selectedCount == count,
                   onSelected: (_) => onChanged(count),
+                  selectedColor: _TarotSetupColors.selected(context),
+                  backgroundColor: _TarotSetupColors.surfaceMuted(context),
+                  side: BorderSide(
+                    color: selectedCount == count
+                        ? _TarotSetupColors.focus(context)
+                        : _TarotSetupColors.line(context),
+                  ),
                 ),
             ],
           ),
@@ -3426,7 +3384,7 @@ class _TarotFreeDrawCountSelector extends StatelessWidget {
                   '$selectedCount / 30',
                   key: const Key('tarot-free-draw-count-current'),
                   style: TextStyle(
-                    color: RynPalette.tarotTextPrimary(context),
+                    color: _TarotSetupColors.text(context),
                     fontSize: 13,
                     fontWeight: FontWeight.w900,
                   ),
@@ -3466,11 +3424,9 @@ class _TarotPositionSetupSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: RynPalette.tarotBentoPanel(context),
+        color: _TarotSetupColors.surface(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
-        border: Border.all(
-          color: RynPalette.tarotBorder(context).withValues(alpha: 0.72),
-        ),
+        border: Border.all(color: _TarotSetupColors.line(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -3480,27 +3436,27 @@ class _TarotPositionSetupSection extends StatelessWidget {
               Icon(
                 Icons.edit_note_rounded,
                 size: 18,
-                color: RynPalette.tarotPurpleAccent(context),
+                color: _TarotSetupColors.action(context),
               ),
               const SizedBox(width: 8),
               Text(
                 UserText.tarotPositionSetup,
                 style: TextStyle(
-                  color: RynPalette.tarotTextPrimary(context),
+                  color: _TarotSetupColors.text(context),
                   fontSize: 14,
                   fontWeight: FontWeight.w900,
                   letterSpacing: -0.2,
                 ),
               ),
               const SizedBox(width: 8),
-              _TarotSmallBadge(spreadLabel, compact: true),
+              _TarotSmallBadge(spreadLabel, compact: true, r2Setup: true),
             ],
           ),
           const SizedBox(height: 6),
           Text(
             UserText.tarotPositionSetupHelper,
             style: TextStyle(
-              color: RynPalette.tarotTextSecondary(context),
+              color: _TarotSetupColors.subtext(context),
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
@@ -3536,33 +3492,29 @@ class _TarotPositionSetupSection extends StatelessWidget {
                               ? defaultLabels[index]
                               : null,
                           filled: true,
-                          fillColor: RynPalette.tarotInputField(context),
+                          fillColor: _TarotSetupColors.surfaceMuted(context),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
-                              color: RynPalette.tarotBorder(
-                                context,
-                              ).withValues(alpha: 0.72),
+                              color: _TarotSetupColors.line(context),
                             ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
-                              color: RynPalette.tarotBorder(
-                                context,
-                              ).withValues(alpha: 0.72),
+                              color: _TarotSetupColors.line(context),
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(14),
                             borderSide: BorderSide(
-                              color: RynPalette.tarotPurpleAccent(context),
+                              color: _TarotSetupColors.focus(context),
                               width: 1.4,
                             ),
                           ),
                         ),
                         style: TextStyle(
-                          color: RynPalette.tarotTextPrimary(context),
+                          color: _TarotSetupColors.text(context),
                           fontSize: 13,
                           fontWeight: FontWeight.w800,
                         ),
@@ -6076,7 +6028,7 @@ class _TarotDeckChoiceSectionState extends State<_TarotDeckChoiceSection> {
           Text(
             widget.title,
             style: TextStyle(
-              color: RynPalette.tarotTextPrimary(context),
+              color: _TarotSetupColors.text(context),
               fontSize: 15,
               fontWeight: FontWeight.w900,
             ),
@@ -6086,7 +6038,7 @@ class _TarotDeckChoiceSectionState extends State<_TarotDeckChoiceSection> {
         Text(
           '큰 카드 이미지를 중심으로 오늘의 상담 덱을 고르세요.',
           style: TextStyle(
-            color: RynPalette.tarotTextSecondary(context),
+            color: _TarotSetupColors.subtext(context),
             fontSize: 12,
             fontWeight: FontWeight.w600,
           ),
@@ -6095,28 +6047,9 @@ class _TarotDeckChoiceSectionState extends State<_TarotDeckChoiceSection> {
         Container(
           key: const Key('tarot-jukebox-deck-stage'),
           decoration: BoxDecoration(
-            gradient: RadialGradient(
-              center: const Alignment(0, -0.28),
-              radius: 1.08,
-              colors: [
-                RynPalette.tarotGuidePanel(context).withValues(alpha: 0.34),
-                RynPalette.tarotReadingStage(context),
-                RynPalette.tarotPageShell(context),
-              ],
-            ),
+            color: _TarotSetupColors.surfaceMuted(context),
             borderRadius: BorderRadius.circular(32),
-            border: Border.all(
-              color: RynPalette.tarotGoldAccent(
-                context,
-              ).withValues(alpha: 0.18),
-            ),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x99000000),
-                blurRadius: 30,
-                offset: Offset(0, 18),
-              ),
-            ],
+            border: Border.all(color: _TarotSetupColors.line(context)),
           ),
           child: KeyedSubtree(
             key: const Key('tarot-immersive-deck-stage'),
@@ -6203,10 +6136,8 @@ class _TarotDeckChoiceSectionState extends State<_TarotDeckChoiceSection> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: index == selectedIndex
-                                    ? RynPalette.tarotGoldAccent(context)
-                                    : RynPalette.subtext(
-                                        context,
-                                      ).withValues(alpha: 0.25),
+                                    ? _TarotSetupColors.action(context)
+                                    : _TarotSetupColors.line(context),
                               ),
                             ),
                           const SizedBox(width: 14),
@@ -6306,16 +6237,16 @@ class _TarotSelectedDeckCardGlow extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: RynPalette.tarotGoldAccent(
+          color: _TarotSetupColors.focus(
             context,
-          ).withValues(alpha: hovered ? 0.92 : 0.68),
+          ).withValues(alpha: hovered ? 1 : 0.78),
           width: hovered ? 1.6 : 1.2,
         ),
         boxShadow: [
           BoxShadow(
-            color: RynPalette.tarotGoldAccent(
+            color: _TarotSetupColors.action(
               context,
-            ).withValues(alpha: hovered ? 0.34 : 0.24),
+            ).withValues(alpha: hovered ? 0.24 : 0.14),
             blurRadius: hovered ? 28 : 22,
             spreadRadius: 1.2,
           ),
@@ -6345,12 +6276,9 @@ class _TarotDeckFanArrow extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton.filledTonal(
       style: IconButton.styleFrom(
-        backgroundColor: Colors.white.withValues(alpha: 0.12),
-        foregroundColor: Colors.white,
-        side: BorderSide(
-          color: RynPalette.tarotGoldAccent(context).withValues(alpha: 0.24),
-        ),
-        shadowColor: Colors.black.withValues(alpha: 0.18),
+        backgroundColor: _TarotSetupColors.surfaceSubtle(context),
+        foregroundColor: _TarotSetupColors.action(context),
+        side: BorderSide(color: _TarotSetupColors.line(context)),
       ),
       onPressed: onPressed,
       icon: Icon(icon),
@@ -6412,13 +6340,13 @@ class _TarotDeckCarouselCard extends StatelessWidget {
         : 98.0;
     final cardImageHeight = cardImageWidth * 1.535;
     final glowColor = selected
-        ? RynPalette.tarotGoldAccent(context).withValues(alpha: 0.30)
-        : RynPalette.lavenderStrong.withValues(
+        ? _TarotSetupColors.action(context).withValues(alpha: 0.18)
+        : _TarotSetupColors.action(context).withValues(
             alpha: hovered
-                ? 0.18
+                ? 0.12
                 : near
-                ? 0.08
-                : 0.04,
+                ? 0.05
+                : 0.02,
           );
 
     return MouseRegion(
@@ -6501,8 +6429,8 @@ class _TarotDeckCarouselCard extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: selected
-                          ? Colors.white
-                          : RynPalette.tarotPurpleAccent(context),
+                          ? _TarotSetupColors.text(context)
+                          : _TarotSetupColors.subtext(context),
                       fontSize: selected ? 15 : 11,
                       fontWeight: FontWeight.w900,
                       letterSpacing: -0.2,
@@ -6515,9 +6443,7 @@ class _TarotDeckCarouselCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: selected
-                          ? RynPalette.tarotPurpleAccent(context)
-                          : RynPalette.tarotTextSecondary(context),
+                      color: _TarotSetupColors.helpText(context),
                       fontSize: selected ? 11 : 9.5,
                       fontWeight: FontWeight.w700,
                     ),
@@ -6615,35 +6541,13 @@ class _TarotUnavailableDeckPreview extends StatelessWidget {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            RynPalette.tarotBentoPanel(context),
-            RynPalette.tarotGuidePanel(context),
-          ],
-        ),
+        color: _TarotSetupColors.surface(context),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
-          color: RynPalette.tarotBorder(
-            context,
-          ).withValues(alpha: glowing ? 0.82 : 0.46),
+          color: glowing
+              ? _TarotSetupColors.focus(context)
+              : _TarotSetupColors.line(context),
         ),
-        boxShadow: [
-          const BoxShadow(
-            color: Color(0x99000000),
-            blurRadius: 14,
-            offset: Offset(0, 7),
-          ),
-          if (glowing)
-            BoxShadow(
-              color: RynPalette.tarotGoldAccent(
-                context,
-              ).withValues(alpha: 0.16),
-              blurRadius: 22,
-              spreadRadius: 1,
-            ),
-        ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(3),
@@ -6652,9 +6556,7 @@ class _TarotUnavailableDeckPreview extends StatelessWidget {
           children: [
             DecoratedBox(
               decoration: BoxDecoration(
-                color: RynPalette.tarotPageShell(
-                  context,
-                ).withValues(alpha: 0.36),
+                color: _TarotSetupColors.surfaceMuted(context),
               ),
             ),
             Center(
@@ -6673,7 +6575,7 @@ class _TarotUnavailableDeckPreview extends StatelessWidget {
                     '준비 중',
                     key: const Key('tarot-unavailable-deck-preview-label'),
                     style: TextStyle(
-                      color: RynPalette.tarotTextPrimary(context),
+                      color: _TarotSetupColors.text(context),
                       fontSize: width >= 180 ? 13 : 10,
                       fontWeight: FontWeight.w900,
                     ),
@@ -6704,11 +6606,9 @@ class _TarotCardBackChoiceSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: RynPalette.tarotBentoPanel(context),
+        color: _TarotSetupColors.surface(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
-        border: Border.all(
-          color: RynPalette.tarotBorder(context).withValues(alpha: 0.72),
-        ),
+        border: Border.all(color: _TarotSetupColors.line(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -6716,7 +6616,7 @@ class _TarotCardBackChoiceSection extends StatelessWidget {
           Text(
             '카드 뒷면 선택',
             style: TextStyle(
-              color: RynPalette.tarotTextPrimary(context),
+              color: _TarotSetupColors.text(context),
               fontSize: 15,
               fontWeight: FontWeight.w900,
             ),
@@ -6725,7 +6625,7 @@ class _TarotCardBackChoiceSection extends StatelessWidget {
           Text(
             '드로우와 결과 공개 전 카드에 사용할 이미지를 고르세요.',
             style: TextStyle(
-              color: RynPalette.tarotTextSecondary(context),
+              color: _TarotSetupColors.subtext(context),
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
@@ -6768,27 +6668,15 @@ class _TarotCardBackOption extends StatelessWidget {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: selected
-            ? RynPalette.tarotGuidePanel(context).withValues(alpha: 0.78)
-            : RynPalette.tarotBentoPanelSoft(context),
+            ? _TarotSetupColors.selected(context)
+            : _TarotSetupColors.surfaceMuted(context),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: selected
-              ? RynPalette.tarotGoldAccent(context).withValues(alpha: 0.86)
-              : RynPalette.tarotBorder(context).withValues(alpha: 0.72),
+              ? _TarotSetupColors.focus(context)
+              : _TarotSetupColors.line(context),
           width: selected ? 1.4 : 1,
         ),
-        boxShadow: selected
-            ? [
-                BoxShadow(
-                  color: RynPalette.tarotGoldAccent(
-                    context,
-                  ).withValues(alpha: 0.14),
-                  blurRadius: 22,
-                  spreadRadius: 1,
-                  offset: const Offset(0, 10),
-                ),
-              ]
-            : null,
       ),
       child: Material(
         color: Colors.transparent,
@@ -6811,20 +6699,10 @@ class _TarotCardBackOption extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  // PATCH1: selected card-back labels must stay readable on the
-                  // light selected tile; gold remains in the rim/glow, not text.
-                  color: RynPalette.tarotTextPrimary(context),
+                  color: _TarotSetupColors.text(context),
                   fontSize: 12,
                   fontWeight: FontWeight.w900,
                   letterSpacing: -0.1,
-                  shadows: selected
-                      ? [
-                          Shadow(
-                            color: Colors.white.withValues(alpha: 0.65),
-                            blurRadius: 8,
-                          ),
-                        ]
-                      : null,
                 ),
               ),
             ],
@@ -6852,11 +6730,9 @@ class _TarotTableClothChoiceSection extends StatelessWidget {
       key: const Key('tarot-table-cloth-selector'),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: RynPalette.tarotBentoPanel(context),
+        color: _TarotSetupColors.surface(context),
         borderRadius: BorderRadius.circular(RynMetrics.radiusCard),
-        border: Border.all(
-          color: RynPalette.tarotBorder(context).withValues(alpha: 0.76),
-        ),
+        border: Border.all(color: _TarotSetupColors.line(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -6866,13 +6742,13 @@ class _TarotTableClothChoiceSection extends StatelessWidget {
               Icon(
                 Icons.texture_rounded,
                 size: 18,
-                color: RynPalette.tarotPurpleAccent(context),
+                color: _TarotSetupColors.action(context),
               ),
               const SizedBox(width: 8),
               Text(
                 '리딩 천 색상',
                 style: TextStyle(
-                  color: RynPalette.tarotTextPrimary(context),
+                  color: _TarotSetupColors.text(context),
                   fontSize: 15,
                   fontWeight: FontWeight.w900,
                 ),
@@ -6883,7 +6759,7 @@ class _TarotTableClothChoiceSection extends StatelessWidget {
           Text(
             '질문 분위기에 맞춰 테이블의 색감을 은은하게 바꿉니다.',
             style: TextStyle(
-              color: RynPalette.tarotTextSecondary(context),
+              color: _TarotSetupColors.subtext(context),
               fontSize: 12,
               fontWeight: FontWeight.w600,
               height: 1.35,
@@ -6937,19 +6813,10 @@ class _TarotTableClothOption extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: selected
-              ? RynPalette.tarotGoldAccent(context).withValues(alpha: 0.82)
-              : Colors.white.withValues(alpha: 0.10),
+              ? _TarotSetupColors.focus(context)
+              : _TarotSetupColors.line(context),
           width: selected ? 1.4 : 1,
         ),
-        boxShadow: selected
-            ? [
-                BoxShadow(
-                  color: cloth.shadow.withValues(alpha: 0.18),
-                  blurRadius: 22,
-                  offset: const Offset(0, 10),
-                ),
-              ]
-            : null,
       ),
       child: Material(
         color: Colors.transparent,
@@ -7039,7 +6906,7 @@ class _TarotSpreadChoiceSection extends StatelessWidget {
         Text(
           title,
           style: TextStyle(
-            color: RynPalette.tarotTextPrimary(context),
+            color: _TarotSetupColors.text(context),
             fontSize: 15,
             fontWeight: FontWeight.w900,
           ),
@@ -7084,7 +6951,7 @@ class _TarotSpreadGroup extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: RynPalette.tarotTextSecondary(context),
+            color: _TarotSetupColors.helpText(context),
             fontSize: 11,
             fontWeight: FontWeight.w800,
             letterSpacing: 0.2,
@@ -7103,17 +6970,17 @@ class _TarotSpreadGroup extends StatelessWidget {
                 showCheckmark: false,
                 labelStyle: TextStyle(
                   color: spread.id == selected
-                      ? RynPalette.tarotMidnight
-                      : RynPalette.tarotTextPrimary(context),
+                      ? _TarotSetupColors.action(context)
+                      : _TarotSetupColors.text(context),
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
                 ),
-                selectedColor: RynPalette.tarotGoldAccent(context),
-                backgroundColor: RynPalette.tarotBentoPanel(context),
+                selectedColor: _TarotSetupColors.selected(context),
+                backgroundColor: _TarotSetupColors.surface(context),
                 side: BorderSide(
-                  color: RynPalette.tarotBorder(
-                    context,
-                  ).withValues(alpha: 0.72),
+                  color: spread.id == selected
+                      ? _TarotSetupColors.focus(context)
+                      : _TarotSetupColors.line(context),
                 ),
               ),
           ],
@@ -7140,13 +7007,32 @@ class _TarotDirectionChoiceSection extends StatelessWidget {
         Text(
           _TarotUiText.directionMode,
           style: TextStyle(
-            color: RynPalette.tarotTextPrimary(context),
+            color: _TarotSetupColors.text(context),
             fontSize: 15,
             fontWeight: FontWeight.w900,
           ),
         ),
         const SizedBox(height: 8),
         SegmentedButton<_TarotDirectionMode>(
+          style: ButtonStyle(
+            backgroundColor: WidgetStateProperty.resolveWith((states) {
+              return states.contains(WidgetState.selected)
+                  ? _TarotSetupColors.selected(context)
+                  : _TarotSetupColors.surface(context);
+            }),
+            foregroundColor: WidgetStateProperty.resolveWith((states) {
+              return states.contains(WidgetState.selected)
+                  ? _TarotSetupColors.action(context)
+                  : _TarotSetupColors.text(context);
+            }),
+            side: WidgetStateProperty.resolveWith((states) {
+              return BorderSide(
+                color: states.contains(WidgetState.selected)
+                    ? _TarotSetupColors.focus(context)
+                    : _TarotSetupColors.line(context),
+              );
+            }),
+          ),
           segments: const [
             ButtonSegment(
               value: _TarotDirectionMode.uprightOnly,
@@ -9478,10 +9364,15 @@ class _TarotMemoLine extends StatelessWidget {
 }
 
 class _TarotSmallBadge extends StatelessWidget {
-  const _TarotSmallBadge(this.label, {this.compact = false});
+  const _TarotSmallBadge(
+    this.label, {
+    this.compact = false,
+    this.r2Setup = false,
+  });
 
   final String label;
   final bool compact;
+  final bool r2Setup;
 
   @override
   Widget build(BuildContext context) {
@@ -9491,16 +9382,22 @@ class _TarotSmallBadge extends StatelessWidget {
         vertical: compact ? 4 : 7,
       ),
       decoration: BoxDecoration(
-        color: RynPalette.tarotNavy.withValues(alpha: 0.72),
+        color: r2Setup
+            ? _TarotSetupColors.surfaceMuted(context)
+            : RynPalette.tarotNavy.withValues(alpha: 0.72),
         borderRadius: BorderRadius.circular(RynMetrics.radiusPill),
         border: Border.all(
-          color: RynPalette.tarotGoldAccent(context).withValues(alpha: 0.22),
+          color: r2Setup
+              ? _TarotSetupColors.line(context)
+              : RynPalette.tarotGoldAccent(context).withValues(alpha: 0.22),
         ),
       ),
       child: Text(
         label,
         style: TextStyle(
-          color: RynPalette.tarotMist,
+          color: r2Setup
+              ? _TarotSetupColors.subtext(context)
+              : RynPalette.tarotMist,
           fontSize: compact ? 10 : 12,
           fontWeight: FontWeight.w900,
         ),
