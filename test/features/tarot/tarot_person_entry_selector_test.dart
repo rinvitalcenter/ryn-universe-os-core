@@ -154,7 +154,9 @@ void main() {
     await tester.tap(find.byKey(const Key('tarot-rail-change-deck')));
     await tester.pumpAndSettle();
     await tester.tap(
-      find.byKey(const ValueKey('tarot-deck-carousel-card-thoth')),
+      find.byKey(
+        const ValueKey('tarot-deck-carousel-card-golden_art_nouveau_tarot'),
+      ),
     );
     await tester.pumpAndSettle();
     await tester.tap(find.text('다음'));
@@ -183,7 +185,7 @@ void main() {
     expect(
       find.descendant(
         of: find.byKey(const Key('tarot-coverflow-hero-card')),
-        matching: find.text('토트 타로'),
+        matching: find.byKey(const Key('tarot-selected-card-edge-glow')),
       ),
       findsOneWidget,
     );
@@ -195,6 +197,64 @@ void main() {
     );
     expect(oneCard.selected, isTrue);
   });
+
+  testWidgets(
+    'Person and question continue through Ritual Selection and Revelation chrome',
+    (tester) async {
+      final contexts = <TarotReadingContext>[];
+      await _pumpShell(tester, options: options, contexts: contexts);
+
+      await tester.enterText(
+        find.byKey(const Key('tarot-free-question-input')),
+        '지금 함께 바라볼 흐름은 무엇일까요?',
+      );
+      await tester.tap(find.byKey(const Key('tarot-target-mode-person')));
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.byKey(const Key('tarot-person-option-person-synthetic-ara')),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('tarot-rail-primary-cta')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('tarot-r2-reading-stage-chrome')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('tarot-r2-stage-ritual')), findsOneWidget);
+      expect(find.text('리딩 대상 · 김아라 · 함께 공부하는 사람'), findsOneWidget);
+      expect(find.text('지금 함께 바라볼 흐름은 무엇일까요?'), findsOneWidget);
+      expect(
+        find.byKey(const Key('tarot-r2-reading-metadata')),
+        findsOneWidget,
+      );
+
+      await tester.tap(find.byKey(const Key('tarot-shuffle-button')));
+      await tester.pump(const Duration(milliseconds: 1300));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('tarot-r2-stage-selection')), findsOneWidget);
+      expect(find.text('리딩 대상 · 김아라 · 함께 공부하는 사람'), findsOneWidget);
+      expect(find.text('지금 함께 바라볼 흐름은 무엇일까요?'), findsOneWidget);
+      final resultButton = tester.widget<FilledButton>(
+        find.byKey(const Key('tarot-show-result-button')),
+      );
+      expect(resultButton.onPressed, isNull);
+
+      await tester.tap(find.byKey(const Key('tarot-auto-draw-button')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byKey(const Key('tarot-r2-stage-revelation')),
+        findsOneWidget,
+      );
+      expect(find.text('리딩 대상 · 김아라 · 함께 공부하는 사람'), findsOneWidget);
+      expect(find.text('지금 함께 바라볼 흐름은 무엇일까요?'), findsOneWidget);
+      expect(find.text('해석 시작'), findsOneWidget);
+      expect(contexts.last.personId, 'person-synthetic-ara');
+      expect(contexts.last.toString(), isNot(contains('김아라')));
+    },
+  );
 
   testWidgets('empty picker is truthful and unselected Person is fail-closed', (
     tester,

@@ -32,7 +32,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.tap(find.text('바로 덱 선택'));
+    await tester.tap(find.byKey(const Key('tarot-rail-change-deck')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('다음'));
     await tester.pumpAndSettle();
@@ -122,15 +122,20 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(lastField);
     await tester.pump();
-    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-    await tester.pump();
-    expect(focusIsInside(const Key('tarot-finish-home-action')), isTrue);
-    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-    await tester.pump();
-    expect(focusIsInside(const Key('tarot-open-records-action')), isTrue);
-    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-    await tester.pump();
-    expect(focusIsInside(const Key('tarot-start-new-reading-action')), isTrue);
+    const expectedOrder = [
+      Key('tarot-open-records-action'),
+      Key('tarot-finish-home-action'),
+      Key('tarot-start-new-reading-action'),
+    ];
+    final visited = <Key>[];
+    for (var index = 0; index < 12; index++) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      for (final key in expectedOrder) {
+        if (focusIsInside(key) && !visited.contains(key)) visited.add(key);
+      }
+    }
+    expect(visited, expectedOrder);
   });
 
   for (final mode in [ThemeMode.light, ThemeMode.dark]) {

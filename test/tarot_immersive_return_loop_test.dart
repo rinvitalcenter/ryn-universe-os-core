@@ -13,6 +13,9 @@ Future<void> openOneCardInterpretation(WidgetTester tester) async {
   if (skipIntro.evaluate().isNotEmpty) {
     await tester.tap(skipIntro);
     await tester.pumpAndSettle();
+  } else {
+    await tester.tap(find.byKey(const Key('tarot-rail-change-deck')));
+    await tester.pumpAndSettle();
   }
   await tester.tap(find.text('다음'));
   await tester.pumpAndSettle();
@@ -141,7 +144,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('바로 덱 선택'));
+      await tester.tap(find.byKey(const Key('tarot-rail-change-deck')));
       await tester.pumpAndSettle();
       await tester.tap(find.text('다음'));
       await tester.pumpAndSettle();
@@ -446,12 +449,15 @@ void main() {
     );
   }
 
-  test('return-loop copy distinguishes saved and unsaved interpretation', () {
+  test('return-loop copy keeps one quiet draft status vocabulary', () {
     final source = File(
       'lib/features/tarot/tarot_spread_shell.dart',
     ).readAsStringSync();
-    expect(source.contains('저장된 해석은 앱을 다시 열어도 이어집니다.'), isTrue);
-    expect(source.contains('저장하지 않은 해석은 앱을 닫기 전까지 이어집니다.'), isTrue);
+    expect(source.contains('저장하지 않은 변경 사항이 있어요'), isTrue);
+    expect(
+      source.contains("_TarotDraftPersistenceState.saved => '저장됨'"),
+      isTrue,
+    );
     expect(source.contains('영구 저장'), isFalse);
   });
 }
