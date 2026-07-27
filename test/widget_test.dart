@@ -12,6 +12,7 @@ import 'package:ryn_universe_os_core/core/text/user_text.dart';
 import 'package:ryn_universe_os_core/core/theme/ryn_tokens.dart';
 import 'package:ryn_universe_os_core/features/home/presentation/home_cinematic_scene.dart';
 import 'package:ryn_universe_os_core/features/people/domain/person_core_models.dart';
+import 'package:ryn_universe_os_core/features/records/presentation/records_hub_page.dart';
 import 'package:ryn_universe_os_core/features/tarot/data/tarot_card_meaning_registry.dart';
 import 'package:ryn_universe_os_core/features/tarot/data/tarot_deck_registry.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_reading_result_snapshot.dart';
@@ -1002,12 +1003,12 @@ void main() {
     await tester.tap(find.byKey(const Key('home-primary-cta')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('tarot-result-detail-page')), findsOneWidget);
-    expect(find.byKey(const Key('records-session-page')), findsNothing);
+    expect(find.byKey(const Key('records-hub-three-region')), findsNothing);
 
     await tester.tap(find.byKey(const Key('tarot-result-detail-back')));
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('records-session-page')), findsOneWidget);
-    expect(find.text('현재 홈에 표시 중'), findsOneWidget);
+    expect(find.byKey(const Key('records-hub-three-region')), findsOneWidget);
+    expect(find.text('홈에 표시 중'), findsOneWidget);
 
     await _tapNav(tester, UserText.navHome);
     await tester.pumpAndSettle();
@@ -1017,11 +1018,11 @@ void main() {
 
     await _tapNav(tester, UserText.navRecord);
     await tester.pumpAndSettle();
-    expect(find.byKey(const Key('records-session-page')), findsOneWidget);
-    expect(find.text('오늘 가장 먼저 비춰볼 질문'), findsOneWidget);
+    expect(find.byKey(const Key('records-hub-three-region')), findsOneWidget);
+    expect(find.text('오늘 가장 먼저 비춰볼 질문'), findsAtLeastNWidgets(1));
     expect(find.text('홈에 표시'), findsOneWidget);
 
-    await tester.tap(find.text('상세 보기'));
+    await tester.tap(find.text('전체 기록 열기'));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('tarot-result-detail-page')), findsOneWidget);
     await tester.tap(find.byKey(const Key('detail-show-on-home')));
@@ -2053,10 +2054,9 @@ void main() {
     await _tapNav(tester, UserText.navRecord);
     await tester.pumpAndSettle();
 
-    expect(find.text('나의 성장 기록'), findsOneWidget);
-    expect(find.text('이번 실행에서 완료한 리딩을 살펴봅니다.'), findsOneWidget);
-    expect(find.text('아직 완료한 리딩이 없습니다'), findsOneWidget);
-    expect(find.text('새 셀프 타로 시작'), findsOneWidget);
+    expect(find.byType(RecordsHubPage), findsOneWidget);
+    expect(find.text('아직 남긴 기록이 없습니다'), findsOneWidget);
+    expect(find.text('셀프 타로 시작'), findsOneWidget);
     expect(find.text('합성 인물 A'), findsNothing);
     expect(find.text('만남 기록'), findsNothing);
     expect(find.text('리딩 기록'), findsNothing);
@@ -2172,7 +2172,7 @@ void main() {
     await _tapNav(tester, UserText.navRecord);
     await tester.pumpAndSettle();
 
-    expect(find.text('아직 완료한 리딩이 없습니다'), findsOneWidget);
+    expect(find.text('아직 남긴 기록이 없습니다'), findsOneWidget);
     expect(find.textContaining('대상: 합성 인물 A'), findsNothing);
     expect(find.textContaining('아직 저장하지 않음 / preview'), findsNothing);
     expect(find.text('오늘 어떤 만남을 시작할까요?'), findsNothing);
@@ -2234,7 +2234,7 @@ void main() {
 
       await _tapNav(tester, UserText.navRecord);
       await tester.pumpAndSettle();
-      expect(find.text('아직 완료한 리딩이 없습니다'), findsOneWidget);
+      expect(find.text('아직 남긴 기록이 없습니다'), findsOneWidget);
       expect(find.textContaining('대상: $target'), findsNothing);
 
       await tester.pumpWidget(const SizedBox.shrink());
@@ -5556,7 +5556,7 @@ void main() {
   });
 
   testWidgets(
-    'Records nav stays focused while People nav shows durable overview',
+    'Records Hub stays focused while People nav shows durable overview',
     (WidgetTester tester) async {
       tester.view.physicalSize = const Size(1500, 1100);
       tester.view.devicePixelRatio = 1.0;
@@ -5572,10 +5572,11 @@ void main() {
       await _tapNav(tester, UserText.navRecord);
       await tester.pumpAndSettle();
 
-      expect(find.text('나의 성장 기록'), findsOneWidget);
-      expect(find.text('이번 실행에서 완료한 리딩을 살펴봅니다.'), findsOneWidget);
-      expect(find.text('아직 완료한 리딩이 없습니다'), findsOneWidget);
-      expect(find.text('새 셀프 타로 시작'), findsOneWidget);
+      expect(find.byKey(const Key('records-hub-three-region')), findsOneWidget);
+      expect(find.text('기록 탐색'), findsOneWidget);
+      expect(find.text('아직 남긴 기록이 없습니다'), findsOneWidget);
+      expect(find.textContaining('첫 리딩이나 수련 기록을 남기면'), findsOneWidget);
+      expect(find.text('셀프 타로 시작'), findsOneWidget);
       expect(find.text('사람 이해 중심 기록 홈'), findsNothing);
       expect(find.text('기록 홈'), findsNothing);
       expect(find.text('새 만남 시작'), findsNothing);
@@ -5644,7 +5645,7 @@ void main() {
 
       await tester.tap(find.byKey(const Key('ryn-nav-records')));
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('records-session-page')), findsOneWidget);
+      expect(find.byKey(const Key('records-hub-three-region')), findsOneWidget);
 
       await tester.tap(find.byKey(const Key('ryn-nav-reading')));
       await tester.pumpAndSettle();

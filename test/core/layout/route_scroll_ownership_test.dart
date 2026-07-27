@@ -53,9 +53,28 @@ void main() {
 
     await tester.tap(find.byKey(const Key('ryn-nav-records')));
     await tester.pumpAndSettle();
-    final records = find.byKey(const Key('records-session-page'));
+    final records = find.byKey(const Key('records-hub-three-region'));
     expect(records, findsOneWidget);
     expect(_ancestorDocumentScroll(records), findsNothing);
+    expect(
+      find.byKey(
+        RynWorkspacePresentationScope.modeKey(
+          RynWorkspaceScrollMode.independentPanels,
+        ),
+      ),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Home growth records opens the recent Hub state', (tester) async {
+    await _pumpApp(tester);
+
+    await tester.tap(find.byKey(const Key('home-flow-records')));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('records-hub-three-region')), findsOneWidget);
+    expect(find.text('최근 기록'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
 
@@ -106,7 +125,7 @@ void main() {
       expect(find.byKey(const Key('reading-atelier-page')), findsOneWidget);
       await tester.tap(find.byKey(const Key('ryn-nav-records')));
       await tester.pumpAndSettle();
-      expect(find.byKey(const Key('records-session-page')), findsOneWidget);
+      expect(find.byKey(const Key('records-hub-three-region')), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   }
@@ -118,11 +137,8 @@ void main() {
     await tester.tap(find.byKey(const Key('ryn-nav-records')));
     await tester.pumpAndSettle();
 
-    expect(
-      find.byKey(const Key('records-session-status-row')).hitTestable(),
-      findsOneWidget,
-    );
-    expect(find.text('새 셀프 타로 시작').hitTestable(), findsOneWidget);
+    expect(find.text('아직 남긴 기록이 없습니다').hitTestable(), findsOneWidget);
+    expect(find.text('셀프 타로 시작').hitTestable(), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

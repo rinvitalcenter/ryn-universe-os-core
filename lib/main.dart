@@ -24,8 +24,11 @@ import 'features/oracle/presentation/oracle_reading_shell.dart';
 import 'features/people/domain/person_core_models.dart';
 import 'features/people/presentation/people_page.dart';
 import 'features/reading/presentation/reading_atelier_page.dart';
+import 'features/records/application/record_hub_controller.dart';
+import 'features/records/data/tarot_record_summary_adapter.dart';
+import 'features/records/domain/record_summary.dart';
 import 'features/records/models/session_tarot_results.dart';
-import 'features/records/presentation/records_session_page.dart';
+import 'features/records/presentation/records_hub_page.dart';
 import 'features/records/presentation/tarot_result_detail_page.dart';
 import 'features/study_os/study_os_shell.dart';
 import 'features/tarot/application/tarot_runtime_controller.dart';
@@ -588,6 +591,38 @@ class _CoreOsShellState extends State<CoreOsShell> {
   final Map<String, TarotInterpretationSessionDraft>
   _sessionOnlyTarotInterpretationDrafts = {};
   String? _selectedTarotDetailId;
+  late final TarotRecordSummaryAdapter _tarotRecordAdapter;
+  late final RecordHubController _recordHubController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tarotRecordAdapter = TarotRecordSummaryAdapter(
+      recordsLoader: () async {
+        final repository = widget.runtimeServices?.tarotReadings;
+        if (repository == null) return const [];
+        final result = await repository.loadAllReadings();
+        if (result.isFailure) {
+          throw StateError('Tarot Records adapter load failed.');
+        }
+        return result.value!;
+      },
+      sessionSnapshotsProvider: () => _tarotResults.results,
+      questionDisplayTextFor: _questionDisplayTextFor,
+      interpretationFor: _lookupTarotDraft,
+    );
+    _recordHubController = RecordHubController(adapters: [_tarotRecordAdapter]);
+    unawaited(_recordHubController.refresh());
+  }
+
+  @override
+  void didUpdateWidget(covariant CoreOsShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.runtimeServices != widget.runtimeServices ||
+        oldWidget.runtimeController != widget.runtimeController) {
+      unawaited(_recordHubController.refresh());
+    }
+  }
 
   SessionTarotResults get _tarotResults =>
       widget.runtimeController?.sessionResults ?? _sessionOnlyTarotResults;
@@ -628,11 +663,24 @@ class _CoreOsShellState extends State<CoreOsShell> {
   ];
 
   void _selectNav(String label) {
+    if (label == UserText.navRecord) {
+      _recordHubController.updateSection(RecordHubSection.all);
+    }
     setState(() {
       _selectedNav = label;
+      if (label == UserText.navRecord) _selectedTarotDetailId = null;
       if (label != UserText.navReading) {
         _readingTarotFocus = false;
       }
+    });
+  }
+
+  void _openRecentRecords() {
+    _recordHubController.updateSection(RecordHubSection.recent);
+    setState(() {
+      _selectedTarotDetailId = null;
+      _selectedNav = UserText.navRecord;
+      _readingTarotFocus = false;
     });
   }
 
@@ -651,6 +699,7 @@ class _CoreOsShellState extends State<CoreOsShell> {
     if (widget.runtimeController == null) {
       setState(() => _sessionOnlyTarotResults.complete(snapshot));
     }
+    unawaited(_recordHubController.refresh());
   }
 
   void _retainTarotDraft(TarotInterpretationSessionDraft draft) {
@@ -660,6 +709,7 @@ class _CoreOsShellState extends State<CoreOsShell> {
     } else {
       _sessionOnlyTarotInterpretationDrafts[draft.readingInstanceId] = draft;
     }
+    unawaited(_recordHubController.refresh());
   }
 
   TarotInterpretationSessionDraft? _lookupTarotDraft(
@@ -703,6 +753,12 @@ class _CoreOsShellState extends State<CoreOsShell> {
   }
 
   void _openTarotResultDetail(TarotReadingResultSnapshot snapshot) {
+    _recordHubController.select(
+      RecordKey(
+        moduleType: RecordModuleType.tarot,
+        canonicalRecordId: snapshot.readingInstanceId,
+      ),
+    );
     setState(() {
       _selectedTarotDetailId = snapshot.readingInstanceId;
       _selectedNav = UserText.navRecord;
@@ -743,6 +799,7 @@ class _CoreOsShellState extends State<CoreOsShell> {
 
   @override
   void dispose() {
+    _recordHubController.dispose();
     _oracleSession.dispose();
     super.dispose();
   }
@@ -777,6 +834,8 @@ class _CoreOsShellState extends State<CoreOsShell> {
                   oracleController: _oracleSession,
                   selectedLabel: item.label,
                   onNavSelected: _selectNav,
+                  onOpenRecentRecords: _openRecentRecords,
+                  recordHubController: _recordHubController,
                   onReadingTarotFocusChanged: _setReadingTarotFocus,
                   tarotLoopPreview: _tarotLoopPreview,
                   onTarotLoopReflected: _reflectTarotLoop,
@@ -834,6 +893,8 @@ class _RouteAwareWorkspaceCanvas extends StatelessWidget {
     required this.oracleController,
     required this.selectedLabel,
     required this.onNavSelected,
+    required this.onOpenRecentRecords,
+    required this.recordHubController,
     required this.onReadingTarotFocusChanged,
     required this.tarotLoopPreview,
     required this.onTarotLoopReflected,
@@ -857,6 +918,8 @@ class _RouteAwareWorkspaceCanvas extends StatelessWidget {
   final OracleReadingController oracleController;
   final String selectedLabel;
   final ValueChanged<String> onNavSelected;
+  final VoidCallback onOpenRecentRecords;
+  final RecordHubController recordHubController;
   final ValueChanged<bool> onReadingTarotFocusChanged;
   final _TarotLoopPreview? tarotLoopPreview;
   final ValueChanged<_TarotLoopPreview> onTarotLoopReflected;
@@ -878,6 +941,7 @@ class _RouteAwareWorkspaceCanvas extends StatelessWidget {
 
   RynWorkspacePresentation get _presentation => switch (selectedLabel) {
     UserText.navPeople => const RynWorkspacePresentation.independentPanels(),
+    UserText.navRecord => const RynWorkspacePresentation.independentPanels(),
     UserText.navReading => const RynWorkspacePresentation.featurePage(
       bypassAppWorkspaceCap: true,
     ),
@@ -893,6 +957,8 @@ class _RouteAwareWorkspaceCanvas extends StatelessWidget {
         oracleController: oracleController,
         selectedLabel: selectedLabel,
         onNavSelected: onNavSelected,
+        onOpenRecentRecords: onOpenRecentRecords,
+        recordHubController: recordHubController,
         onReadingTarotFocusChanged: onReadingTarotFocusChanged,
         tarotLoopPreview: tarotLoopPreview,
         onTarotLoopReflected: onTarotLoopReflected,
@@ -921,6 +987,8 @@ class _ShellPageContent extends StatelessWidget {
     required this.oracleController,
     required this.selectedLabel,
     required this.onNavSelected,
+    required this.onOpenRecentRecords,
+    required this.recordHubController,
     required this.onReadingTarotFocusChanged,
     required this.tarotLoopPreview,
     required this.onTarotLoopReflected,
@@ -944,6 +1012,8 @@ class _ShellPageContent extends StatelessWidget {
   final OracleReadingController oracleController;
   final String selectedLabel;
   final ValueChanged<String> onNavSelected;
+  final VoidCallback onOpenRecentRecords;
+  final RecordHubController recordHubController;
   final ValueChanged<bool> onReadingTarotFocusChanged;
   final _TarotLoopPreview? tarotLoopPreview;
   final ValueChanged<_TarotLoopPreview> onTarotLoopReflected;
@@ -1012,7 +1082,7 @@ class _ShellPageContent extends StatelessWidget {
                     ),
               onStartSelfTarot: () => onNavSelected(UserText.navReading),
               onOpenPeople: () => onNavSelected(UserText.navPeople),
-              onOpenRecords: () => onNavSelected(UserText.navRecord),
+              onOpenRecords: onOpenRecentRecords,
               onOpenResult: activeTarotResult == null
                   ? null
                   : () => onOpenTarotResultDetail(activeTarotResult!),
@@ -1074,11 +1144,23 @@ class _ShellPageContent extends StatelessWidget {
                 onHideFromHome: () => _hideFromHome(context),
               )
             else
-              RecordsSessionPage(
-                results: sessionTarotResults,
+              RecordsHubPage(
+                controller: recordHubController,
+                snapshotFor: (key) {
+                  if (key.moduleType != RecordModuleType.tarot) return null;
+                  for (final snapshot in sessionTarotResults) {
+                    if (snapshot.readingInstanceId == key.canonicalRecordId) {
+                      return snapshot;
+                    }
+                  }
+                  return null;
+                },
+                interpretationFor: (key) =>
+                    key.moduleType == RecordModuleType.tarot
+                    ? tarotDraftLookup(key.canonicalRecordId)
+                    : null,
                 activeReadingInstanceId: activeTarotResultId,
-                questionDisplayTextFor: questionDisplayTextFor,
-                onOpenDetail: onOpenTarotResultDetail,
+                onOpenFullDetail: onOpenTarotResultDetail,
                 onShowOnHome: onShowTarotResultOnHome,
                 onStartSelfTarot: () => onNavSelected(UserText.navReading),
               ),
