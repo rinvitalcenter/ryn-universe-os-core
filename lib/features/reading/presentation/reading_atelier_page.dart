@@ -49,11 +49,13 @@ class ReadingAtelierPage extends StatelessWidget {
           result: recentOracleResult,
           onResume: onResumeOracle,
         );
+        final textScaleHeightAllowance =
+            (MediaQuery.textScalerOf(context).scale(8) - 8).clamp(0.0, 8.0);
 
         Widget content;
         if (width >= 1180) {
           content = SizedBox(
-            height: 488,
+            height: 488 + textScaleHeightAllowance,
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

@@ -79,6 +79,7 @@ class _SessionNote extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     return Row(
+      key: const Key('records-session-status-row'),
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(

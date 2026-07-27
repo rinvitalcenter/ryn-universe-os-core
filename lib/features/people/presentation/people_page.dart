@@ -107,19 +107,21 @@ class _PeoplePageState extends State<PeoplePage> {
               ),
               const SizedBox(height: 14),
             ],
-            switch (_controller.state) {
-              PeopleLoadState.loading => const _PeopleLoadingScene(),
-              PeopleLoadState.failure => _PeopleFailureScene(
-                message:
-                    _controller.errorMessage ??
-                    '사람 기록을 불러오지 못했습니다. 다시 시도해 주세요.',
-              ),
-              PeopleLoadState.ready => _PeopleReadyScene(
-                controller: _controller,
-                searchController: _searchController,
-                onStartSession: widget.onStartSession,
-              ),
-            },
+            Expanded(
+              child: switch (_controller.state) {
+                PeopleLoadState.loading => const _PeopleLoadingScene(),
+                PeopleLoadState.failure => _PeopleFailureScene(
+                  message:
+                      _controller.errorMessage ??
+                      '사람 기록을 불러오지 못했습니다. 다시 시도해 주세요.',
+                ),
+                PeopleLoadState.ready => _PeopleReadyScene(
+                  controller: _controller,
+                  searchController: _searchController,
+                  onStartSession: widget.onStartSession,
+                ),
+              },
+            ),
           ],
         ),
       ),
@@ -198,7 +200,7 @@ class _PeopleHeader extends StatelessWidget {
   }
 }
 
-class _PeopleReadyScene extends StatelessWidget {
+class _PeopleReadyScene extends StatefulWidget {
   const _PeopleReadyScene({
     required this.controller,
     required this.searchController,
@@ -208,6 +210,17 @@ class _PeopleReadyScene extends StatelessWidget {
   final PeopleController controller;
   final TextEditingController searchController;
   final ValueChanged<Person>? onStartSession;
+
+  @override
+  State<_PeopleReadyScene> createState() => _PeopleReadySceneState();
+}
+
+class _PeopleReadySceneState extends State<_PeopleReadyScene> {
+  bool _showCompactDetail = false;
+
+  PeopleController get controller => widget.controller;
+  TextEditingController get searchController => widget.searchController;
+  ValueChanged<Person>? get onStartSession => widget.onStartSession;
 
   @override
   Widget build(BuildContext context) {
@@ -224,9 +237,13 @@ class _PeopleReadyScene extends StatelessWidget {
     final selected = controller.selectedPerson;
     return LayoutBuilder(
       builder: (context, constraints) {
+        final compact = constraints.maxWidth < 720;
         final master = _PeopleMasterPanel(
           controller: controller,
           searchController: searchController,
+          onPersonSelected: compact
+              ? (_) => setState(() => _showCompactDetail = true)
+              : null,
         );
         final detail = selected == null
             ? _PeopleNoResultsScene(
@@ -246,18 +263,39 @@ class _PeopleReadyScene extends StatelessWidget {
                 onManageGroups: () =>
                     showPersonGroupMemberships(context, controller),
                 onRemoveGroup: controller.removeSelectedFromGroup,
+                bounded: compact,
                 onStartSession: onStartSession == null
                     ? null
                     : () => onStartSession!(selected),
               );
-        if (constraints.maxWidth < 920) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [master, const SizedBox(height: 16), detail],
+        if (compact) {
+          if (_showCompactDetail && selected != null) {
+            return Column(
+              key: const Key('people-compact-detail-mode'),
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextButton.icon(
+                    key: const Key('people-compact-back-to-master'),
+                    onPressed: () => setState(() => _showCompactDetail = false),
+                    icon: const Icon(Icons.arrow_back_rounded),
+                    label: const Text('사람 목록으로'),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Expanded(child: detail),
+              ],
+            );
+          }
+          return KeyedSubtree(
+            key: const Key('people-compact-master-mode'),
+            child: master,
           );
         }
         return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          key: const Key('people-wide-master-detail'),
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(width: 326, child: master),
             const SizedBox(width: 18),
@@ -337,9 +375,11 @@ class _PeopleMasterPanel extends StatelessWidget {
   const _PeopleMasterPanel({
     required this.controller,
     required this.searchController,
+    this.onPersonSelected,
   });
   final PeopleController controller;
   final TextEditingController searchController;
+  final ValueChanged<Person>? onPersonSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -473,41 +513,45 @@ class _PeopleMasterPanel extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          Semantics(
-            label: controller.showingArchived ? '보관한 사람 목록' : '이어가는 사람 목록',
-            child: ConstrainedBox(
-              key: Key(
-                controller.showingArchived
-                    ? 'people-archived-list'
-                    : 'people-active-list',
-              ),
-              constraints: const BoxConstraints(maxHeight: 300),
-              child: controller.visiblePeople.isEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 24),
-                      child: Text(
-                        '조건에 맞는 사람이 없습니다.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: _PeopleColors.muted(context)),
-                      ),
-                    )
-                  : SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          for (final person in controller.visiblePeople) ...[
-                            _PersonListItem(
-                              person: person,
-                              roles: controller.activeRolesFor(person.id),
-                              selected:
-                                  controller.selectedPerson?.id == person.id,
-                              onTap: () => controller.selectPerson(person.id),
-                            ),
-                            if (person != controller.visiblePeople.last)
-                              const SizedBox(height: 8),
+          Expanded(
+            child: Semantics(
+              label: controller.showingArchived ? '보관한 사람 목록' : '이어가는 사람 목록',
+              child: SizedBox.expand(
+                key: Key(
+                  controller.showingArchived
+                      ? 'people-archived-list'
+                      : 'people-active-list',
+                ),
+                child: controller.visiblePeople.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 24),
+                        child: Text(
+                          '조건에 맞는 사람이 없습니다.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: _PeopleColors.muted(context)),
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            for (final person in controller.visiblePeople) ...[
+                              _PersonListItem(
+                                person: person,
+                                roles: controller.activeRolesFor(person.id),
+                                selected:
+                                    controller.selectedPerson?.id == person.id,
+                                onTap: () {
+                                  controller.selectPerson(person.id);
+                                  onPersonSelected?.call(person);
+                                },
+                              ),
+                              if (person != controller.visiblePeople.last)
+                                const SizedBox(height: 8),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
-                    ),
+              ),
             ),
           ),
         ],
@@ -663,6 +707,7 @@ class PersonDetailPage extends StatelessWidget {
     required this.onRestore,
     required this.onManageGroups,
     required this.onRemoveGroup,
+    this.bounded = false,
     this.onStartSession,
   });
 
@@ -674,6 +719,7 @@ class PersonDetailPage extends StatelessWidget {
   final VoidCallback onRestore;
   final VoidCallback onManageGroups;
   final Future<bool> Function(String groupId) onRemoveGroup;
+  final bool bounded;
   final VoidCallback? onStartSession;
 
   @override
@@ -764,43 +810,46 @@ class PersonDetailPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            SizedBox(
-              height: 330,
-              child: TabBarView(
-                children: [
-                  _PersonOverview(
-                    person: person,
-                    roles: roles,
-                    groups: groups,
-                    onManageGroups: onManageGroups,
-                    onRemoveGroup: onRemoveGroup,
-                    onStartSession: onStartSession,
-                  ),
-                  const _IntentionalEmpty(
-                    icon: Icons.hub_outlined,
-                    text: '사주·점성·휴먼디자인 기록이 아직 없습니다.',
-                  ),
-                  const _IntentionalEmpty(
-                    icon: Icons.handshake_outlined,
-                    text: '첫 만남 기록을 남기면 시간의 흐름이 시작됩니다.',
-                  ),
-                  const _IntentionalEmpty(
-                    icon: Icons.auto_stories_outlined,
-                    text: '이 사람과 연결된 타로·오라클 리딩이 아직 없습니다.',
-                  ),
-                  const _IntentionalEmpty(
-                    icon: Icons.self_improvement_outlined,
-                    text: '기공·명상·요가 실천 기록이 아직 없습니다.',
-                  ),
-                  const _IntentionalEmpty(
-                    icon: Icons.groups_2_outlined,
-                    text: '스터디 참여 기록이 아직 없습니다.',
-                  ),
-                  const _IntentionalEmpty(
-                    icon: Icons.timeline_rounded,
-                    text: '만남과 리딩이 쌓이면 이곳에 시간순으로 나타납니다.',
-                  ),
-                ],
+            Flexible(
+              fit: bounded ? FlexFit.tight : FlexFit.loose,
+              child: SizedBox(
+                height: bounded ? double.infinity : 330,
+                child: TabBarView(
+                  children: [
+                    _PersonOverview(
+                      person: person,
+                      roles: roles,
+                      groups: groups,
+                      onManageGroups: onManageGroups,
+                      onRemoveGroup: onRemoveGroup,
+                      onStartSession: onStartSession,
+                    ),
+                    const _IntentionalEmpty(
+                      icon: Icons.hub_outlined,
+                      text: '사주·점성·휴먼디자인 기록이 아직 없습니다.',
+                    ),
+                    const _IntentionalEmpty(
+                      icon: Icons.handshake_outlined,
+                      text: '첫 만남 기록을 남기면 시간의 흐름이 시작됩니다.',
+                    ),
+                    const _IntentionalEmpty(
+                      icon: Icons.auto_stories_outlined,
+                      text: '이 사람과 연결된 타로·오라클 리딩이 아직 없습니다.',
+                    ),
+                    const _IntentionalEmpty(
+                      icon: Icons.self_improvement_outlined,
+                      text: '기공·명상·요가 실천 기록이 아직 없습니다.',
+                    ),
+                    const _IntentionalEmpty(
+                      icon: Icons.groups_2_outlined,
+                      text: '스터디 참여 기록이 아직 없습니다.',
+                    ),
+                    const _IntentionalEmpty(
+                      icon: Icons.timeline_rounded,
+                      text: '만남과 리딩이 쌓이면 이곳에 시간순으로 나타납니다.',
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

@@ -22,11 +22,18 @@ void main() {
     WidgetTester tester, {
     ThemeMode themeMode = ThemeMode.light,
     Size size = const Size(1280, 720),
+    double textScale = 1,
   }) async {
     tester.view.physicalSize = size;
     tester.view.devicePixelRatio = 1;
     await tester.pumpWidget(
       MaterialApp(
+        builder: (context, child) => MediaQuery(
+          data: MediaQuery.of(
+            context,
+          ).copyWith(textScaler: TextScaler.linear(textScale)),
+          child: child!,
+        ),
         themeMode: themeMode,
         theme: RynTheme.light(
           fontFamily: 'Pretendard',
@@ -37,12 +44,10 @@ void main() {
           fontFamilyFallback: const ['Segoe UI', 'Malgun Gothic'],
         ),
         home: Scaffold(
-          body: SingleChildScrollView(
-            child: PeoplePage(
-              peopleRepository: services.people,
-              roleRepository: services.personRoles,
-              groupRepository: services.personGroups,
-            ),
+          body: PeoplePage(
+            peopleRepository: services.people,
+            roleRepository: services.personRoles,
+            groupRepository: services.personGroups,
           ),
         ),
       ),
@@ -344,6 +349,191 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();
   });
+
+  testWidgets(
+    'People keeps intentional list and detail panels without outer document scroll',
+    (tester) async {
+      await seedPerson(
+        id: 'person.synthetic.panels',
+        name: '합성 패널 검증',
+        relationship: '독립 패널 검증 관계',
+        roleType: PersonRoleTypes.friend,
+        updatedAt: DateTime.utc(2026, 7, 27, 12),
+      );
+      await pumpPeople(tester, size: const Size(1400, 900));
+
+      final page = find.byKey(const Key('people-page'));
+      final master = find.byKey(const Key('people-master-panel'));
+      final detail = find.byKey(
+        const Key('person-detail-person.synthetic.panels'),
+      );
+      final verticalScroll = find.byWidgetPredicate(
+        (widget) =>
+            widget is SingleChildScrollView &&
+            widget.scrollDirection == Axis.vertical,
+      );
+      expect(find.ancestor(of: page, matching: verticalScroll), findsNothing);
+      expect(
+        find.descendant(of: master, matching: verticalScroll),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(of: detail, matching: verticalScroll),
+        findsOneWidget,
+      );
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    },
+  );
+
+  testWidgets('People filters remain reachable at 2.0 text scale', (
+    tester,
+  ) async {
+    await seedPerson(
+      id: 'person.synthetic.text-scale',
+      name: '합성 확대 검증',
+      relationship: '접근성 확대 검증 관계',
+      roleType: PersonRoleTypes.friend,
+      updatedAt: DateTime.utc(2026, 7, 27, 13),
+    );
+    await pumpPeople(tester, size: const Size(1400, 900), textScale: 2);
+
+    expect(find.byKey(const Key('people-search-field')), findsOneWidget);
+    expect(
+      find.byKey(const Key('people-primary-role-filter')).hitTestable(),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const Key('people-group-filter')).hitTestable(),
+      findsOneWidget,
+    );
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets(
+    'loaded People uses deterministic compact panels from 260 through 719',
+    (tester) async {
+      final now = DateTime.utc(2026, 7, 27, 14);
+      await seedPerson(
+        id: 'person.synthetic.compact.a',
+        name: '합성 좁은 화면 A',
+        relationship: '좁은 화면 선택 검증 A',
+        roleType: PersonRoleTypes.friend,
+        updatedAt: now,
+      );
+      await seedPerson(
+        id: 'person.synthetic.compact.b',
+        name: '합성 좁은 화면 B',
+        relationship: '좁은 화면 선택 검증 B',
+        roleType: PersonRoleTypes.studyMember,
+        updatedAt: now.add(const Duration(minutes: 1)),
+      );
+
+      for (final width in [260.0, 419.0, 420.0, 719.0, 720.0]) {
+        await pumpPeople(tester, size: Size(width, 900));
+
+        final page = find.byKey(const Key('people-page'));
+        final outerDocumentScroll = find.ancestor(
+          of: page,
+          matching: find.byWidgetPredicate(
+            (widget) =>
+                widget is SingleChildScrollView &&
+                widget.scrollDirection == Axis.vertical,
+          ),
+        );
+        expect(outerDocumentScroll, findsNothing, reason: 'width=$width');
+        expect(
+          find.byKey(const Key('people-compact-master-mode')),
+          findsOneWidget,
+          reason: 'width=$width',
+        );
+        expect(
+          find.byKey(const Key('people-search-field')).hitTestable(),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('people-primary-role-filter')).hitTestable(),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('people-group-filter')).hitTestable(),
+          findsOneWidget,
+        );
+
+        await tester.tap(
+          find.byKey(const Key('person-list-item-person.synthetic.compact.a')),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('people-compact-detail-mode')),
+          findsOneWidget,
+          reason: 'width=$width',
+        );
+        expect(
+          find.byKey(const Key('person-detail-person.synthetic.compact.a')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(const Key('people-compact-back-to-master')).hitTestable(),
+          findsOneWidget,
+        );
+        expect(tester.takeException(), isNull, reason: 'width=$width');
+
+        await tester.tap(
+          find.byKey(const Key('people-compact-back-to-master')),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          find.byKey(const Key('people-compact-master-mode')),
+          findsOneWidget,
+        );
+        expect(
+          find.byKey(
+            const Key('person-selected-indicator-person.synthetic.compact.a'),
+          ),
+          findsOneWidget,
+        );
+        expect(
+          tester.takeException(),
+          isNull,
+          reason: 'width=$width after back',
+        );
+        await tester.pumpWidget(const SizedBox.shrink());
+        await tester.pumpAndSettle();
+      }
+    },
+  );
+
+  testWidgets(
+    'loaded People keeps wide independent panels at content width 720',
+    (tester) async {
+      await seedPerson(
+        id: 'person.synthetic.boundary.720',
+        name: '합성 720 경계',
+        relationship: '넓은 패널 경계 검증',
+        roleType: PersonRoleTypes.friend,
+        updatedAt: DateTime.utc(2026, 7, 27, 15),
+      );
+      await pumpPeople(tester, size: const Size(770, 900));
+
+      expect(
+        find.byKey(const Key('people-wide-master-detail')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('people-master-panel')), findsOneWidget);
+      expect(
+        find.byKey(const Key('person-detail-person.synthetic.boundary.720')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('people-compact-master-mode')), findsNothing);
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
+    },
+  );
 
   testWidgets('light and dark People scenes remain usable at desktop widths', (
     tester,

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 
 import 'core/layout/desktop_viewport.dart';
+import 'core/layout/ryn_workspace_host.dart';
 import 'core/persistence/runtime_data_profile.dart';
 import 'core/runtime/ryn_runtime_services.dart';
 import 'core/shell/ryn_adaptive_navigation_rail.dart';
@@ -770,7 +771,7 @@ class _CoreOsShellState extends State<CoreOsShell> {
             selectedPageId: _selectedNav,
             pageBuilders: {
               for (final item in CoreOsShell.navigationItems)
-                item.label: (_) => _ScrollableShellCanvas(
+                item.label: (_) => _RouteAwareWorkspaceCanvas(
                   key: PageStorageKey<String>('shell-canvas-${item.label}'),
                   runtimeServices: widget.runtimeServices,
                   oracleController: _oracleSession,
@@ -826,8 +827,8 @@ class _DevelopmentDataIndicator extends StatelessWidget {
   }
 }
 
-class _ScrollableShellCanvas extends StatelessWidget {
-  const _ScrollableShellCanvas({
+class _RouteAwareWorkspaceCanvas extends StatelessWidget {
+  const _RouteAwareWorkspaceCanvas({
     super.key,
     required this.runtimeServices,
     required this.oracleController,
@@ -875,76 +876,41 @@ class _ScrollableShellCanvas extends StatelessWidget {
   final Future<bool> Function(TarotReadingResultSnapshot)
   onShowTarotResultOnHome;
 
+  RynWorkspacePresentation get _presentation => switch (selectedLabel) {
+    UserText.navPeople => const RynWorkspacePresentation.independentPanels(),
+    UserText.navReading => const RynWorkspacePresentation.featurePage(
+      bypassAppWorkspaceCap: true,
+    ),
+    _ => const RynWorkspacePresentation.featurePage(),
+  };
+
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final viewportScope = DesktopViewportScope.of(context);
-        final tokens = viewportScope.tokens;
-        final ultraCompact =
-            width < DesktopWorkspaceTokens.ultraCompactThreshold;
-        final padding = tokens.shellHorizontalPadding;
-        // Keep only the ultra-compact diagnostic guard narrow. Desktop is
-        // Windows-first and should expand like a real OS workspace instead of
-        // preserving the older screenshot/mobile-style 900~1120px cap. The
-        // 린님-facing Home still gets a small right-edge reserve so screenshots
-        // show the full command-center shell instead of cropping the edge.
-        final readingFocus = selectedLabel == UserText.navReading;
-        final maxContentWidth = readingFocus
-            ? math.max(900.0, width - (padding * 2))
-            : tokens.appWorkspaceMaxWidth;
-        final runtimeEdgeReserve = ultraCompact ? 64.0 : 0.0;
-        final contentWidth = math.max(
-          0.0,
-          math.min(width - (padding * 2) - runtimeEdgeReserve, maxContentWidth),
-        );
-        final workspaceMetrics = viewportScope.metrics.copyWithWorkspace(
-          workspaceWidth: contentWidth,
-          workspaceHeight: constraints.maxHeight,
-          effectiveContentWidth: contentWidth,
-        );
-        return SingleChildScrollView(
-          key: PageStorageKey<String>('shell-scroll-$selectedLabel'),
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(padding, 16, padding, 28),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: SizedBox(
-                width: contentWidth,
-                child: DesktopViewportScope(
-                  metrics: workspaceMetrics,
-                  tokens: tokens,
-                  child: _ShellPageContent(
-                    runtimeServices: runtimeServices,
-                    oracleController: oracleController,
-                    selectedLabel: selectedLabel,
-                    onNavSelected: onNavSelected,
-                    onReadingTarotFocusChanged: onReadingTarotFocusChanged,
-                    tarotLoopPreview: tarotLoopPreview,
-                    onTarotLoopReflected: onTarotLoopReflected,
-                    activeTarotResult: activeTarotResult,
-                    sessionTarotResults: sessionTarotResults,
-                    activeTarotResultId: activeTarotResultId,
-                    questionDisplayTextFor: questionDisplayTextFor,
-                    selectedTarotDetail: selectedTarotDetail,
-                    onTarotResultCompleted: onTarotResultCompleted,
-                    onTarotDraftChanged: onTarotDraftChanged,
-                    onPersistCompletedTarotReading:
-                        onPersistCompletedTarotReading,
-                    onSaveTarotInterpretation: onSaveTarotInterpretation,
-                    tarotDraftLookup: tarotDraftLookup,
-                    onOpenTarotResultDetail: onOpenTarotResultDetail,
-                    onCloseTarotResultDetail: onCloseTarotResultDetail,
-                    onHideTarotResultFromHome: onHideTarotResultFromHome,
-                    onShowTarotResultOnHome: onShowTarotResultOnHome,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
+    return RynWorkspaceHost(
+      presentation: _presentation,
+      child: _ShellPageContent(
+        runtimeServices: runtimeServices,
+        oracleController: oracleController,
+        selectedLabel: selectedLabel,
+        onNavSelected: onNavSelected,
+        onReadingTarotFocusChanged: onReadingTarotFocusChanged,
+        tarotLoopPreview: tarotLoopPreview,
+        onTarotLoopReflected: onTarotLoopReflected,
+        activeTarotResult: activeTarotResult,
+        sessionTarotResults: sessionTarotResults,
+        activeTarotResultId: activeTarotResultId,
+        questionDisplayTextFor: questionDisplayTextFor,
+        selectedTarotDetail: selectedTarotDetail,
+        onTarotResultCompleted: onTarotResultCompleted,
+        onTarotDraftChanged: onTarotDraftChanged,
+        onPersistCompletedTarotReading: onPersistCompletedTarotReading,
+        onSaveTarotInterpretation: onSaveTarotInterpretation,
+        tarotDraftLookup: tarotDraftLookup,
+        onOpenTarotResultDetail: onOpenTarotResultDetail,
+        onCloseTarotResultDetail: onCloseTarotResultDetail,
+        onHideTarotResultFromHome: onHideTarotResultFromHome,
+        onShowTarotResultOnHome: onShowTarotResultOnHome,
+      ),
     );
   }
 }
@@ -1036,7 +1002,7 @@ class _ShellPageContent extends StatelessWidget {
             HomeCinematicScene(
               minSceneHeight: math.max(
                 520,
-                MediaQuery.sizeOf(context).height - 110,
+                DesktopViewportScope.of(context).metrics.workspaceHeight,
               ),
               activeTarotResult: activeTarotResult,
               questionDisplayText: activeTarotResult == null
@@ -1137,10 +1103,16 @@ class _ShellPageContent extends StatelessWidget {
           ]
         : <Widget>[_BusinessAreaPage(label: selectedLabel)];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: body,
-    );
+    if (_isStudy) {
+      return SingleChildScrollView(
+        key: const Key('study-page-scroll'),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: body,
+        ),
+      );
+    }
+    return SizedBox.expand(child: body.single);
   }
 }
 
@@ -2962,24 +2934,19 @@ class _ReadingWorkspacePageState extends State<_ReadingWorkspacePage> {
         onBackToAtelier: () => _setOracleOpen(false),
       );
     }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        ReadingAtelierPage(
-          onStartTarot: () => _setTarotOpen(true),
-          onStartOracle: () {
-            widget.oracleController.startNewReading();
-            _setOracleOpen(true);
-          },
-          recentOracleResult: widget.oracleController.latestResult,
-          onResumeOracle: widget.oracleController.latestResult == null
-              ? null
-              : () {
-                  widget.oracleController.resumeLatest();
-                  _setOracleOpen(true);
-                },
-        ),
-      ],
+    return ReadingAtelierPage(
+      onStartTarot: () => _setTarotOpen(true),
+      onStartOracle: () {
+        widget.oracleController.startNewReading();
+        _setOracleOpen(true);
+      },
+      recentOracleResult: widget.oracleController.latestResult,
+      onResumeOracle: widget.oracleController.latestResult == null
+          ? null
+          : () {
+              widget.oracleController.resumeLatest();
+              _setOracleOpen(true);
+            },
     );
   }
 }
