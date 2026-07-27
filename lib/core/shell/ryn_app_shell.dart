@@ -3,6 +3,7 @@ import 'dart:collection';
 
 import 'package:flutter/material.dart';
 
+import '../layout/desktop_viewport.dart';
 import '../theme/ryn_tokens.dart';
 import 'ryn_adaptive_navigation_rail.dart';
 
@@ -45,6 +46,15 @@ class _RynAppShellState extends State<RynAppShell> {
       return RynNavigationRailMode.peek;
     }
     return RynNavigationRailMode.compact;
+  }
+
+  DesktopViewportRailState get _viewportRailState {
+    if (widget.navigationHidden) return DesktopViewportRailState.hidden;
+    return switch (_mode) {
+      RynNavigationRailMode.compact => DesktopViewportRailState.compact,
+      RynNavigationRailMode.peek => DesktopViewportRailState.peek,
+      RynNavigationRailMode.pinned => DesktopViewportRailState.pinned,
+    };
   }
 
   void _setPointerInside(bool inside) {
@@ -99,52 +109,80 @@ class _RynAppShellState extends State<RynAppShell> {
     return ColoredBox(
       key: const Key('ryn-app-shell'),
       color: context.rynColors.appCanvas,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (!widget.navigationHidden)
-            RynNavigationRailFocusHost(
-              child: RynAdaptiveNavigationRail(
-                mode: _mode,
-                destinations: widget.destinations,
-                selectedDestinationId: widget.selectedDestinationId,
-                onDestinationSelected: widget.onDestinationSelected,
-                onPointerInsideChanged: _setPointerInside,
-                onFocusInsideChanged: _setFocusInside,
-                onPinToggle: _togglePinned,
-                onTemporaryPeekDismissed: _dismissTemporaryPeek,
-              ),
-            )
-          else
-            const SizedBox.shrink(key: Key('ryn-navigation-hidden')),
-          Expanded(
-            child: Focus(
-              focusNode: _contentFocusNode,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Offstage(
-                    offstage: widget.navigationHidden,
-                    child: ExcludeFocus(
-                      key: const Key('ryn-global-chrome-focus-guard'),
-                      excluding: widget.navigationHidden,
-                      child: ExcludeSemantics(
-                        key: const Key('ryn-global-chrome-semantics-guard'),
-                        excluding: widget.navigationHidden,
-                        child: IgnorePointer(
-                          key: const Key('ryn-global-chrome-pointer-guard'),
-                          ignoring: widget.navigationHidden,
-                          child: widget.utilityBar,
+      child: LayoutBuilder(
+        builder: (context, fullWindowConstraints) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (!widget.navigationHidden)
+                RynNavigationRailFocusHost(
+                  child: RynAdaptiveNavigationRail(
+                    mode: _mode,
+                    destinations: widget.destinations,
+                    selectedDestinationId: widget.selectedDestinationId,
+                    onDestinationSelected: widget.onDestinationSelected,
+                    onPointerInsideChanged: _setPointerInside,
+                    onFocusInsideChanged: _setFocusInside,
+                    onPinToggle: _togglePinned,
+                    onTemporaryPeekDismissed: _dismissTemporaryPeek,
+                  ),
+                )
+              else
+                const SizedBox.shrink(key: Key('ryn-navigation-hidden')),
+              Expanded(
+                child: Focus(
+                  focusNode: _contentFocusNode,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Offstage(
+                        offstage: widget.navigationHidden,
+                        child: ExcludeFocus(
+                          key: const Key('ryn-global-chrome-focus-guard'),
+                          excluding: widget.navigationHidden,
+                          child: ExcludeSemantics(
+                            key: const Key('ryn-global-chrome-semantics-guard'),
+                            excluding: widget.navigationHidden,
+                            child: IgnorePointer(
+                              key: const Key('ryn-global-chrome-pointer-guard'),
+                              ignoring: widget.navigationHidden,
+                              child: widget.utilityBar,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      Expanded(
+                        child: LayoutBuilder(
+                          builder: (context, shellUsableConstraints) {
+                            final metrics = DesktopViewportMetrics.calculate(
+                              windowLogicalSize: MediaQuery.sizeOf(context),
+                              devicePixelRatio: MediaQuery.devicePixelRatioOf(
+                                context,
+                              ),
+                              fullWindowConstraintSize:
+                                  fullWindowConstraints.biggest,
+                              shellUsableSize: shellUsableConstraints.biggest,
+                              railState: _viewportRailState,
+                            );
+                            // Future scroll contract: the host provides viewport
+                            // facts and alignment; normal pages own vertical
+                            // scrolling. Immersive stages stay viewport-bounded,
+                            // and nested scroll is reserved for independent panels.
+                            return DesktopViewportScope(
+                              metrics: metrics,
+                              tokens: DesktopWorkspaceTokens.resolve(metrics),
+                              child: widget.pageHost,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                  Expanded(child: widget.pageHost),
-                ],
+                ),
               ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }

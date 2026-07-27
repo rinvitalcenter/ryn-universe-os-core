@@ -7,6 +7,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 
+import 'core/layout/desktop_viewport.dart';
 import 'core/persistence/runtime_data_profile.dart';
 import 'core/runtime/ryn_runtime_services.dart';
 import 'core/shell/ryn_adaptive_navigation_rail.dart';
@@ -879,12 +880,11 @@ class _ScrollableShellCanvas extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final ultraCompact = width < 420;
-        final padding = ultraCompact
-            ? 6.0
-            : width < 720
-            ? 12.0
-            : 20.0;
+        final viewportScope = DesktopViewportScope.of(context);
+        final tokens = viewportScope.tokens;
+        final ultraCompact =
+            width < DesktopWorkspaceTokens.ultraCompactThreshold;
+        final padding = tokens.shellHorizontalPadding;
         // Keep only the ultra-compact diagnostic guard narrow. Desktop is
         // Windows-first and should expand like a real OS workspace instead of
         // preserving the older screenshot/mobile-style 900~1120px cap. The
@@ -893,13 +893,16 @@ class _ScrollableShellCanvas extends StatelessWidget {
         final readingFocus = selectedLabel == UserText.navReading;
         final maxContentWidth = readingFocus
             ? math.max(900.0, width - (padding * 2))
-            : ultraCompact
-            ? 260.0
-            : (width < 2200 ? 1480.0 : 1680.0);
+            : tokens.appWorkspaceMaxWidth;
         final runtimeEdgeReserve = ultraCompact ? 64.0 : 0.0;
         final contentWidth = math.max(
           0.0,
           math.min(width - (padding * 2) - runtimeEdgeReserve, maxContentWidth),
+        );
+        final workspaceMetrics = viewportScope.metrics.copyWithWorkspace(
+          workspaceWidth: contentWidth,
+          workspaceHeight: constraints.maxHeight,
+          effectiveContentWidth: contentWidth,
         );
         return SingleChildScrollView(
           key: PageStorageKey<String>('shell-scroll-$selectedLabel'),
@@ -909,29 +912,33 @@ class _ScrollableShellCanvas extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: SizedBox(
                 width: contentWidth,
-                child: _ShellPageContent(
-                  runtimeServices: runtimeServices,
-                  oracleController: oracleController,
-                  selectedLabel: selectedLabel,
-                  onNavSelected: onNavSelected,
-                  onReadingTarotFocusChanged: onReadingTarotFocusChanged,
-                  tarotLoopPreview: tarotLoopPreview,
-                  onTarotLoopReflected: onTarotLoopReflected,
-                  activeTarotResult: activeTarotResult,
-                  sessionTarotResults: sessionTarotResults,
-                  activeTarotResultId: activeTarotResultId,
-                  questionDisplayTextFor: questionDisplayTextFor,
-                  selectedTarotDetail: selectedTarotDetail,
-                  onTarotResultCompleted: onTarotResultCompleted,
-                  onTarotDraftChanged: onTarotDraftChanged,
-                  onPersistCompletedTarotReading:
-                      onPersistCompletedTarotReading,
-                  onSaveTarotInterpretation: onSaveTarotInterpretation,
-                  tarotDraftLookup: tarotDraftLookup,
-                  onOpenTarotResultDetail: onOpenTarotResultDetail,
-                  onCloseTarotResultDetail: onCloseTarotResultDetail,
-                  onHideTarotResultFromHome: onHideTarotResultFromHome,
-                  onShowTarotResultOnHome: onShowTarotResultOnHome,
+                child: DesktopViewportScope(
+                  metrics: workspaceMetrics,
+                  tokens: tokens,
+                  child: _ShellPageContent(
+                    runtimeServices: runtimeServices,
+                    oracleController: oracleController,
+                    selectedLabel: selectedLabel,
+                    onNavSelected: onNavSelected,
+                    onReadingTarotFocusChanged: onReadingTarotFocusChanged,
+                    tarotLoopPreview: tarotLoopPreview,
+                    onTarotLoopReflected: onTarotLoopReflected,
+                    activeTarotResult: activeTarotResult,
+                    sessionTarotResults: sessionTarotResults,
+                    activeTarotResultId: activeTarotResultId,
+                    questionDisplayTextFor: questionDisplayTextFor,
+                    selectedTarotDetail: selectedTarotDetail,
+                    onTarotResultCompleted: onTarotResultCompleted,
+                    onTarotDraftChanged: onTarotDraftChanged,
+                    onPersistCompletedTarotReading:
+                        onPersistCompletedTarotReading,
+                    onSaveTarotInterpretation: onSaveTarotInterpretation,
+                    tarotDraftLookup: tarotDraftLookup,
+                    onOpenTarotResultDetail: onOpenTarotResultDetail,
+                    onCloseTarotResultDetail: onCloseTarotResultDetail,
+                    onHideTarotResultFromHome: onHideTarotResultFromHome,
+                    onShowTarotResultOnHome: onShowTarotResultOnHome,
+                  ),
                 ),
               ),
             ),
