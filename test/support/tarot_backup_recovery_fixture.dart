@@ -269,12 +269,15 @@ final class TarotBackupRecoveryFixture {
       '${TarotBackupManifest.databasePayloadFilename.replaceAll('/', Platform.pathSeparator)}',
     );
     await sourceFile.copy(snapshot.path);
-    if (schemaVersion == TarotBackupManifest.legacySchemaVersion) {
+    if (schemaVersion < TarotBackupManifest.schemaVersion) {
       final legacy = sqlite3.open(snapshot.path);
-      legacy.execute('DROP TABLE person_group_memberships');
-      legacy.execute('DROP TABLE person_groups');
+      legacy.execute('ALTER TABLE tarot_readings DROP COLUMN person_id');
+      if (schemaVersion == TarotBackupManifest.legacySchemaVersion) {
+        legacy.execute('DROP TABLE person_group_memberships');
+        legacy.execute('DROP TABLE person_groups');
+      }
       legacy.execute('VACUUM');
-      legacy.userVersion = TarotBackupManifest.legacySchemaVersion;
+      legacy.userVersion = schemaVersion;
       legacy.close();
     }
     final evidence = const TarotBackupDatabaseInspector().inspectVerified(

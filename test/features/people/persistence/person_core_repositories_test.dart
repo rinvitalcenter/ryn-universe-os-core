@@ -154,6 +154,49 @@ void main() {
   );
 
   test(
+    'linked Tarot blocks Person erasure without deleting either row',
+    () async {
+      final person = syntheticPerson('person.synthetic.linked', '합성 인물 연결');
+      await people.createPerson(person);
+      await database.customStatement(
+        'INSERT INTO tarot_readings '
+        '(reading_instance_id, source_type, person_id, question_original_snapshot, '
+        'question_display_text, deck_id, deck_name_snapshot, spread_id, '
+        'spread_name_snapshot, expected_placement_count, reading_at_utc_us, '
+        'reading_timezone_offset_min, created_at_utc_us, updated_at_utc_us, '
+        'lifecycle_status) '
+        'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        <Object?>[
+          'reading.synthetic.linked',
+          'manually_recorded',
+          person.id,
+          'SYNTHETIC_QUESTION',
+          'SYNTHETIC_QUESTION',
+          'deck.synthetic',
+          'SYNTHETIC_DECK',
+          'spread.synthetic',
+          'SYNTHETIC_SPREAD',
+          1,
+          1,
+          0,
+          1,
+          1,
+          'continuing',
+        ],
+      );
+
+      final erased = await people.erasePerson(person.id);
+
+      expect(erased.error?.code.name, 'conflict');
+      expect((await people.getPerson(person.id)).isSuccess, isTrue);
+      final tarotCount = await database
+          .customSelect('SELECT count(*) AS total FROM tarot_readings')
+          .getSingle();
+      expect(tarotCount.read<int>('total'), 1);
+    },
+  );
+
+  test(
     'active roles reject duplicates and allow only one active self Person',
     () async {
       final first = syntheticPerson('person.synthetic.self', '합성 인물 A');

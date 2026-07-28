@@ -47,6 +47,7 @@ final class TarotPersistenceMapper {
     final reading = TarotReadingsCompanion.insert(
       readingInstanceId: snapshot.readingInstanceId,
       sourceType: _originToStorage(input.sourceType),
+      personId: Value(input.personId),
       questionOriginalSnapshot: snapshot.readingQuestionText,
       questionDisplayText: snapshot.readingQuestionText,
       deckId: snapshot.deckId,
@@ -202,6 +203,7 @@ final class TarotPersistenceMapper {
           snapshot: snapshot,
           questionDisplayText: reading.questionDisplayText,
           sourceType: origin,
+          personId: reading.personId,
           lifecycle: lifecycle,
           interpretation: interpretation == null
               ? null

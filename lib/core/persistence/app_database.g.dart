@@ -4882,6 +4882,570 @@ class ApprovalRecordsCompanion extends UpdateCompanion<ApprovalRecord> {
   }
 }
 
+class $PersonsTable extends Persons with TableInfo<$PersonsTable, PersonRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PersonsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 120,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _displayNameMeta = const VerificationMeta(
+    'displayName',
+  );
+  @override
+  late final GeneratedColumn<String> displayName = GeneratedColumn<String>(
+    'display_name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 240,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 40,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _relationshipSummaryMeta =
+      const VerificationMeta('relationshipSummary');
+  @override
+  late final GeneratedColumn<String> relationshipSummary =
+      GeneratedColumn<String>(
+        'relationship_summary',
+        aliasedName,
+        true,
+        additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 2000),
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _firstMetOnUtcUsMeta = const VerificationMeta(
+    'firstMetOnUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> firstMetOnUtcUs = GeneratedColumn<int>(
+    'first_met_on_utc_us',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _archivedAtUtcUsMeta = const VerificationMeta(
+    'archivedAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> archivedAtUtcUs = GeneratedColumn<int>(
+    'archived_at_utc_us',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtUtcUsMeta = const VerificationMeta(
+    'createdAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> createdAtUtcUs = GeneratedColumn<int>(
+    'created_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtUtcUsMeta = const VerificationMeta(
+    'updatedAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAtUtcUs = GeneratedColumn<int>(
+    'updated_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    displayName,
+    status,
+    relationshipSummary,
+    firstMetOnUtcUs,
+    archivedAtUtcUs,
+    createdAtUtcUs,
+    updatedAtUtcUs,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'persons';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PersonRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('display_name')) {
+      context.handle(
+        _displayNameMeta,
+        displayName.isAcceptableOrUnknown(
+          data['display_name']!,
+          _displayNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_displayNameMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('relationship_summary')) {
+      context.handle(
+        _relationshipSummaryMeta,
+        relationshipSummary.isAcceptableOrUnknown(
+          data['relationship_summary']!,
+          _relationshipSummaryMeta,
+        ),
+      );
+    }
+    if (data.containsKey('first_met_on_utc_us')) {
+      context.handle(
+        _firstMetOnUtcUsMeta,
+        firstMetOnUtcUs.isAcceptableOrUnknown(
+          data['first_met_on_utc_us']!,
+          _firstMetOnUtcUsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('archived_at_utc_us')) {
+      context.handle(
+        _archivedAtUtcUsMeta,
+        archivedAtUtcUs.isAcceptableOrUnknown(
+          data['archived_at_utc_us']!,
+          _archivedAtUtcUsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at_utc_us')) {
+      context.handle(
+        _createdAtUtcUsMeta,
+        createdAtUtcUs.isAcceptableOrUnknown(
+          data['created_at_utc_us']!,
+          _createdAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtUtcUsMeta);
+    }
+    if (data.containsKey('updated_at_utc_us')) {
+      context.handle(
+        _updatedAtUtcUsMeta,
+        updatedAtUtcUs.isAcceptableOrUnknown(
+          data['updated_at_utc_us']!,
+          _updatedAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtUtcUsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PersonRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PersonRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      displayName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}display_name'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      relationshipSummary: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}relationship_summary'],
+      ),
+      firstMetOnUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}first_met_on_utc_us'],
+      ),
+      archivedAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}archived_at_utc_us'],
+      ),
+      createdAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at_utc_us'],
+      )!,
+      updatedAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at_utc_us'],
+      )!,
+    );
+  }
+
+  @override
+  $PersonsTable createAlias(String alias) {
+    return $PersonsTable(attachedDatabase, alias);
+  }
+}
+
+class PersonRow extends DataClass implements Insertable<PersonRow> {
+  final String id;
+  final String displayName;
+  final String status;
+  final String? relationshipSummary;
+  final int? firstMetOnUtcUs;
+  final int? archivedAtUtcUs;
+  final int createdAtUtcUs;
+  final int updatedAtUtcUs;
+  const PersonRow({
+    required this.id,
+    required this.displayName,
+    required this.status,
+    this.relationshipSummary,
+    this.firstMetOnUtcUs,
+    this.archivedAtUtcUs,
+    required this.createdAtUtcUs,
+    required this.updatedAtUtcUs,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['display_name'] = Variable<String>(displayName);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || relationshipSummary != null) {
+      map['relationship_summary'] = Variable<String>(relationshipSummary);
+    }
+    if (!nullToAbsent || firstMetOnUtcUs != null) {
+      map['first_met_on_utc_us'] = Variable<int>(firstMetOnUtcUs);
+    }
+    if (!nullToAbsent || archivedAtUtcUs != null) {
+      map['archived_at_utc_us'] = Variable<int>(archivedAtUtcUs);
+    }
+    map['created_at_utc_us'] = Variable<int>(createdAtUtcUs);
+    map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs);
+    return map;
+  }
+
+  PersonsCompanion toCompanion(bool nullToAbsent) {
+    return PersonsCompanion(
+      id: Value(id),
+      displayName: Value(displayName),
+      status: Value(status),
+      relationshipSummary: relationshipSummary == null && nullToAbsent
+          ? const Value.absent()
+          : Value(relationshipSummary),
+      firstMetOnUtcUs: firstMetOnUtcUs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(firstMetOnUtcUs),
+      archivedAtUtcUs: archivedAtUtcUs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(archivedAtUtcUs),
+      createdAtUtcUs: Value(createdAtUtcUs),
+      updatedAtUtcUs: Value(updatedAtUtcUs),
+    );
+  }
+
+  factory PersonRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PersonRow(
+      id: serializer.fromJson<String>(json['id']),
+      displayName: serializer.fromJson<String>(json['displayName']),
+      status: serializer.fromJson<String>(json['status']),
+      relationshipSummary: serializer.fromJson<String?>(
+        json['relationshipSummary'],
+      ),
+      firstMetOnUtcUs: serializer.fromJson<int?>(json['firstMetOnUtcUs']),
+      archivedAtUtcUs: serializer.fromJson<int?>(json['archivedAtUtcUs']),
+      createdAtUtcUs: serializer.fromJson<int>(json['createdAtUtcUs']),
+      updatedAtUtcUs: serializer.fromJson<int>(json['updatedAtUtcUs']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'displayName': serializer.toJson<String>(displayName),
+      'status': serializer.toJson<String>(status),
+      'relationshipSummary': serializer.toJson<String?>(relationshipSummary),
+      'firstMetOnUtcUs': serializer.toJson<int?>(firstMetOnUtcUs),
+      'archivedAtUtcUs': serializer.toJson<int?>(archivedAtUtcUs),
+      'createdAtUtcUs': serializer.toJson<int>(createdAtUtcUs),
+      'updatedAtUtcUs': serializer.toJson<int>(updatedAtUtcUs),
+    };
+  }
+
+  PersonRow copyWith({
+    String? id,
+    String? displayName,
+    String? status,
+    Value<String?> relationshipSummary = const Value.absent(),
+    Value<int?> firstMetOnUtcUs = const Value.absent(),
+    Value<int?> archivedAtUtcUs = const Value.absent(),
+    int? createdAtUtcUs,
+    int? updatedAtUtcUs,
+  }) => PersonRow(
+    id: id ?? this.id,
+    displayName: displayName ?? this.displayName,
+    status: status ?? this.status,
+    relationshipSummary: relationshipSummary.present
+        ? relationshipSummary.value
+        : this.relationshipSummary,
+    firstMetOnUtcUs: firstMetOnUtcUs.present
+        ? firstMetOnUtcUs.value
+        : this.firstMetOnUtcUs,
+    archivedAtUtcUs: archivedAtUtcUs.present
+        ? archivedAtUtcUs.value
+        : this.archivedAtUtcUs,
+    createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+    updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+  );
+  PersonRow copyWithCompanion(PersonsCompanion data) {
+    return PersonRow(
+      id: data.id.present ? data.id.value : this.id,
+      displayName: data.displayName.present
+          ? data.displayName.value
+          : this.displayName,
+      status: data.status.present ? data.status.value : this.status,
+      relationshipSummary: data.relationshipSummary.present
+          ? data.relationshipSummary.value
+          : this.relationshipSummary,
+      firstMetOnUtcUs: data.firstMetOnUtcUs.present
+          ? data.firstMetOnUtcUs.value
+          : this.firstMetOnUtcUs,
+      archivedAtUtcUs: data.archivedAtUtcUs.present
+          ? data.archivedAtUtcUs.value
+          : this.archivedAtUtcUs,
+      createdAtUtcUs: data.createdAtUtcUs.present
+          ? data.createdAtUtcUs.value
+          : this.createdAtUtcUs,
+      updatedAtUtcUs: data.updatedAtUtcUs.present
+          ? data.updatedAtUtcUs.value
+          : this.updatedAtUtcUs,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PersonRow(')
+          ..write('id: $id, ')
+          ..write('displayName: $displayName, ')
+          ..write('status: $status, ')
+          ..write('relationshipSummary: $relationshipSummary, ')
+          ..write('firstMetOnUtcUs: $firstMetOnUtcUs, ')
+          ..write('archivedAtUtcUs: $archivedAtUtcUs, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    displayName,
+    status,
+    relationshipSummary,
+    firstMetOnUtcUs,
+    archivedAtUtcUs,
+    createdAtUtcUs,
+    updatedAtUtcUs,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PersonRow &&
+          other.id == this.id &&
+          other.displayName == this.displayName &&
+          other.status == this.status &&
+          other.relationshipSummary == this.relationshipSummary &&
+          other.firstMetOnUtcUs == this.firstMetOnUtcUs &&
+          other.archivedAtUtcUs == this.archivedAtUtcUs &&
+          other.createdAtUtcUs == this.createdAtUtcUs &&
+          other.updatedAtUtcUs == this.updatedAtUtcUs);
+}
+
+class PersonsCompanion extends UpdateCompanion<PersonRow> {
+  final Value<String> id;
+  final Value<String> displayName;
+  final Value<String> status;
+  final Value<String?> relationshipSummary;
+  final Value<int?> firstMetOnUtcUs;
+  final Value<int?> archivedAtUtcUs;
+  final Value<int> createdAtUtcUs;
+  final Value<int> updatedAtUtcUs;
+  final Value<int> rowid;
+  const PersonsCompanion({
+    this.id = const Value.absent(),
+    this.displayName = const Value.absent(),
+    this.status = const Value.absent(),
+    this.relationshipSummary = const Value.absent(),
+    this.firstMetOnUtcUs = const Value.absent(),
+    this.archivedAtUtcUs = const Value.absent(),
+    this.createdAtUtcUs = const Value.absent(),
+    this.updatedAtUtcUs = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PersonsCompanion.insert({
+    required String id,
+    required String displayName,
+    required String status,
+    this.relationshipSummary = const Value.absent(),
+    this.firstMetOnUtcUs = const Value.absent(),
+    this.archivedAtUtcUs = const Value.absent(),
+    required int createdAtUtcUs,
+    required int updatedAtUtcUs,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       displayName = Value(displayName),
+       status = Value(status),
+       createdAtUtcUs = Value(createdAtUtcUs),
+       updatedAtUtcUs = Value(updatedAtUtcUs);
+  static Insertable<PersonRow> custom({
+    Expression<String>? id,
+    Expression<String>? displayName,
+    Expression<String>? status,
+    Expression<String>? relationshipSummary,
+    Expression<int>? firstMetOnUtcUs,
+    Expression<int>? archivedAtUtcUs,
+    Expression<int>? createdAtUtcUs,
+    Expression<int>? updatedAtUtcUs,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (displayName != null) 'display_name': displayName,
+      if (status != null) 'status': status,
+      if (relationshipSummary != null)
+        'relationship_summary': relationshipSummary,
+      if (firstMetOnUtcUs != null) 'first_met_on_utc_us': firstMetOnUtcUs,
+      if (archivedAtUtcUs != null) 'archived_at_utc_us': archivedAtUtcUs,
+      if (createdAtUtcUs != null) 'created_at_utc_us': createdAtUtcUs,
+      if (updatedAtUtcUs != null) 'updated_at_utc_us': updatedAtUtcUs,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PersonsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? displayName,
+    Value<String>? status,
+    Value<String?>? relationshipSummary,
+    Value<int?>? firstMetOnUtcUs,
+    Value<int?>? archivedAtUtcUs,
+    Value<int>? createdAtUtcUs,
+    Value<int>? updatedAtUtcUs,
+    Value<int>? rowid,
+  }) {
+    return PersonsCompanion(
+      id: id ?? this.id,
+      displayName: displayName ?? this.displayName,
+      status: status ?? this.status,
+      relationshipSummary: relationshipSummary ?? this.relationshipSummary,
+      firstMetOnUtcUs: firstMetOnUtcUs ?? this.firstMetOnUtcUs,
+      archivedAtUtcUs: archivedAtUtcUs ?? this.archivedAtUtcUs,
+      createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+      updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (displayName.present) {
+      map['display_name'] = Variable<String>(displayName.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (relationshipSummary.present) {
+      map['relationship_summary'] = Variable<String>(relationshipSummary.value);
+    }
+    if (firstMetOnUtcUs.present) {
+      map['first_met_on_utc_us'] = Variable<int>(firstMetOnUtcUs.value);
+    }
+    if (archivedAtUtcUs.present) {
+      map['archived_at_utc_us'] = Variable<int>(archivedAtUtcUs.value);
+    }
+    if (createdAtUtcUs.present) {
+      map['created_at_utc_us'] = Variable<int>(createdAtUtcUs.value);
+    }
+    if (updatedAtUtcUs.present) {
+      map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PersonsCompanion(')
+          ..write('id: $id, ')
+          ..write('displayName: $displayName, ')
+          ..write('status: $status, ')
+          ..write('relationshipSummary: $relationshipSummary, ')
+          ..write('firstMetOnUtcUs: $firstMetOnUtcUs, ')
+          ..write('archivedAtUtcUs: $archivedAtUtcUs, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $TarotReadingsTable extends TarotReadings
     with TableInfo<$TarotReadingsTable, TarotReading> {
   @override
@@ -4910,6 +5474,24 @@ class $TarotReadingsTable extends TarotReadings
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _personIdMeta = const VerificationMeta(
+    'personId',
+  );
+  @override
+  late final GeneratedColumn<String> personId = GeneratedColumn<String>(
+    'person_id',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 120,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES persons (id) ON DELETE RESTRICT',
+    ),
   );
   static const VerificationMeta _questionOriginalSnapshotMeta =
       const VerificationMeta('questionOriginalSnapshot');
@@ -5055,6 +5637,7 @@ class $TarotReadingsTable extends TarotReadings
   List<GeneratedColumn> get $columns => [
     readingInstanceId,
     sourceType,
+    personId,
     questionOriginalSnapshot,
     questionDisplayText,
     deckId,
@@ -5099,6 +5682,12 @@ class $TarotReadingsTable extends TarotReadings
       );
     } else if (isInserting) {
       context.missing(_sourceTypeMeta);
+    }
+    if (data.containsKey('person_id')) {
+      context.handle(
+        _personIdMeta,
+        personId.isAcceptableOrUnknown(data['person_id']!, _personIdMeta),
+      );
     }
     if (data.containsKey('question_original_snapshot')) {
       context.handle(
@@ -5252,6 +5841,10 @@ class $TarotReadingsTable extends TarotReadings
         DriftSqlType.string,
         data['${effectivePrefix}source_type'],
       )!,
+      personId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}person_id'],
+      ),
       questionOriginalSnapshot: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}question_original_snapshot'],
@@ -5316,6 +5909,7 @@ class $TarotReadingsTable extends TarotReadings
 class TarotReading extends DataClass implements Insertable<TarotReading> {
   final String readingInstanceId;
   final String sourceType;
+  final String? personId;
   final String questionOriginalSnapshot;
   final String questionDisplayText;
   final String deckId;
@@ -5332,6 +5926,7 @@ class TarotReading extends DataClass implements Insertable<TarotReading> {
   const TarotReading({
     required this.readingInstanceId,
     required this.sourceType,
+    this.personId,
     required this.questionOriginalSnapshot,
     required this.questionDisplayText,
     required this.deckId,
@@ -5351,6 +5946,9 @@ class TarotReading extends DataClass implements Insertable<TarotReading> {
     final map = <String, Expression>{};
     map['reading_instance_id'] = Variable<String>(readingInstanceId);
     map['source_type'] = Variable<String>(sourceType);
+    if (!nullToAbsent || personId != null) {
+      map['person_id'] = Variable<String>(personId);
+    }
     map['question_original_snapshot'] = Variable<String>(
       questionOriginalSnapshot,
     );
@@ -5377,6 +5975,9 @@ class TarotReading extends DataClass implements Insertable<TarotReading> {
     return TarotReadingsCompanion(
       readingInstanceId: Value(readingInstanceId),
       sourceType: Value(sourceType),
+      personId: personId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(personId),
       questionOriginalSnapshot: Value(questionOriginalSnapshot),
       questionDisplayText: Value(questionDisplayText),
       deckId: Value(deckId),
@@ -5403,6 +6004,7 @@ class TarotReading extends DataClass implements Insertable<TarotReading> {
     return TarotReading(
       readingInstanceId: serializer.fromJson<String>(json['readingInstanceId']),
       sourceType: serializer.fromJson<String>(json['sourceType']),
+      personId: serializer.fromJson<String?>(json['personId']),
       questionOriginalSnapshot: serializer.fromJson<String>(
         json['questionOriginalSnapshot'],
       ),
@@ -5434,6 +6036,7 @@ class TarotReading extends DataClass implements Insertable<TarotReading> {
     return <String, dynamic>{
       'readingInstanceId': serializer.toJson<String>(readingInstanceId),
       'sourceType': serializer.toJson<String>(sourceType),
+      'personId': serializer.toJson<String?>(personId),
       'questionOriginalSnapshot': serializer.toJson<String>(
         questionOriginalSnapshot,
       ),
@@ -5457,6 +6060,7 @@ class TarotReading extends DataClass implements Insertable<TarotReading> {
   TarotReading copyWith({
     String? readingInstanceId,
     String? sourceType,
+    Value<String?> personId = const Value.absent(),
     String? questionOriginalSnapshot,
     String? questionDisplayText,
     String? deckId,
@@ -5473,6 +6077,7 @@ class TarotReading extends DataClass implements Insertable<TarotReading> {
   }) => TarotReading(
     readingInstanceId: readingInstanceId ?? this.readingInstanceId,
     sourceType: sourceType ?? this.sourceType,
+    personId: personId.present ? personId.value : this.personId,
     questionOriginalSnapshot:
         questionOriginalSnapshot ?? this.questionOriginalSnapshot,
     questionDisplayText: questionDisplayText ?? this.questionDisplayText,
@@ -5500,6 +6105,7 @@ class TarotReading extends DataClass implements Insertable<TarotReading> {
       sourceType: data.sourceType.present
           ? data.sourceType.value
           : this.sourceType,
+      personId: data.personId.present ? data.personId.value : this.personId,
       questionOriginalSnapshot: data.questionOriginalSnapshot.present
           ? data.questionOriginalSnapshot.value
           : this.questionOriginalSnapshot,
@@ -5543,6 +6149,7 @@ class TarotReading extends DataClass implements Insertable<TarotReading> {
     return (StringBuffer('TarotReading(')
           ..write('readingInstanceId: $readingInstanceId, ')
           ..write('sourceType: $sourceType, ')
+          ..write('personId: $personId, ')
           ..write('questionOriginalSnapshot: $questionOriginalSnapshot, ')
           ..write('questionDisplayText: $questionDisplayText, ')
           ..write('deckId: $deckId, ')
@@ -5564,6 +6171,7 @@ class TarotReading extends DataClass implements Insertable<TarotReading> {
   int get hashCode => Object.hash(
     readingInstanceId,
     sourceType,
+    personId,
     questionOriginalSnapshot,
     questionDisplayText,
     deckId,
@@ -5584,6 +6192,7 @@ class TarotReading extends DataClass implements Insertable<TarotReading> {
       (other is TarotReading &&
           other.readingInstanceId == this.readingInstanceId &&
           other.sourceType == this.sourceType &&
+          other.personId == this.personId &&
           other.questionOriginalSnapshot == this.questionOriginalSnapshot &&
           other.questionDisplayText == this.questionDisplayText &&
           other.deckId == this.deckId &&
@@ -5602,6 +6211,7 @@ class TarotReading extends DataClass implements Insertable<TarotReading> {
 class TarotReadingsCompanion extends UpdateCompanion<TarotReading> {
   final Value<String> readingInstanceId;
   final Value<String> sourceType;
+  final Value<String?> personId;
   final Value<String> questionOriginalSnapshot;
   final Value<String> questionDisplayText;
   final Value<String> deckId;
@@ -5619,6 +6229,7 @@ class TarotReadingsCompanion extends UpdateCompanion<TarotReading> {
   const TarotReadingsCompanion({
     this.readingInstanceId = const Value.absent(),
     this.sourceType = const Value.absent(),
+    this.personId = const Value.absent(),
     this.questionOriginalSnapshot = const Value.absent(),
     this.questionDisplayText = const Value.absent(),
     this.deckId = const Value.absent(),
@@ -5637,6 +6248,7 @@ class TarotReadingsCompanion extends UpdateCompanion<TarotReading> {
   TarotReadingsCompanion.insert({
     required String readingInstanceId,
     required String sourceType,
+    this.personId = const Value.absent(),
     required String questionOriginalSnapshot,
     required String questionDisplayText,
     required String deckId,
@@ -5668,6 +6280,7 @@ class TarotReadingsCompanion extends UpdateCompanion<TarotReading> {
   static Insertable<TarotReading> custom({
     Expression<String>? readingInstanceId,
     Expression<String>? sourceType,
+    Expression<String>? personId,
     Expression<String>? questionOriginalSnapshot,
     Expression<String>? questionDisplayText,
     Expression<String>? deckId,
@@ -5686,6 +6299,7 @@ class TarotReadingsCompanion extends UpdateCompanion<TarotReading> {
     return RawValuesInsertable({
       if (readingInstanceId != null) 'reading_instance_id': readingInstanceId,
       if (sourceType != null) 'source_type': sourceType,
+      if (personId != null) 'person_id': personId,
       if (questionOriginalSnapshot != null)
         'question_original_snapshot': questionOriginalSnapshot,
       if (questionDisplayText != null)
@@ -5711,6 +6325,7 @@ class TarotReadingsCompanion extends UpdateCompanion<TarotReading> {
   TarotReadingsCompanion copyWith({
     Value<String>? readingInstanceId,
     Value<String>? sourceType,
+    Value<String?>? personId,
     Value<String>? questionOriginalSnapshot,
     Value<String>? questionDisplayText,
     Value<String>? deckId,
@@ -5729,6 +6344,7 @@ class TarotReadingsCompanion extends UpdateCompanion<TarotReading> {
     return TarotReadingsCompanion(
       readingInstanceId: readingInstanceId ?? this.readingInstanceId,
       sourceType: sourceType ?? this.sourceType,
+      personId: personId ?? this.personId,
       questionOriginalSnapshot:
           questionOriginalSnapshot ?? this.questionOriginalSnapshot,
       questionDisplayText: questionDisplayText ?? this.questionDisplayText,
@@ -5757,6 +6373,9 @@ class TarotReadingsCompanion extends UpdateCompanion<TarotReading> {
     }
     if (sourceType.present) {
       map['source_type'] = Variable<String>(sourceType.value);
+    }
+    if (personId.present) {
+      map['person_id'] = Variable<String>(personId.value);
     }
     if (questionOriginalSnapshot.present) {
       map['question_original_snapshot'] = Variable<String>(
@@ -5816,6 +6435,7 @@ class TarotReadingsCompanion extends UpdateCompanion<TarotReading> {
     return (StringBuffer('TarotReadingsCompanion(')
           ..write('readingInstanceId: $readingInstanceId, ')
           ..write('sourceType: $sourceType, ')
+          ..write('personId: $personId, ')
           ..write('questionOriginalSnapshot: $questionOriginalSnapshot, ')
           ..write('questionDisplayText: $questionDisplayText, ')
           ..write('deckId: $deckId, ')
@@ -7147,570 +7767,6 @@ class AppRuntimeStateCompanion extends UpdateCompanion<AppRuntimeStateData> {
     return (StringBuffer('AppRuntimeStateCompanion(')
           ..write('stateKey: $stateKey, ')
           ..write('activeHomeTarotReadingId: $activeHomeTarotReadingId, ')
-          ..write('updatedAtUtcUs: $updatedAtUtcUs, ')
-          ..write('rowid: $rowid')
-          ..write(')'))
-        .toString();
-  }
-}
-
-class $PersonsTable extends Persons with TableInfo<$PersonsTable, PersonRow> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $PersonsTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<String> id = GeneratedColumn<String>(
-    'id',
-    aliasedName,
-    false,
-    additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 1,
-      maxTextLength: 120,
-    ),
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _displayNameMeta = const VerificationMeta(
-    'displayName',
-  );
-  @override
-  late final GeneratedColumn<String> displayName = GeneratedColumn<String>(
-    'display_name',
-    aliasedName,
-    false,
-    additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 1,
-      maxTextLength: 240,
-    ),
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _statusMeta = const VerificationMeta('status');
-  @override
-  late final GeneratedColumn<String> status = GeneratedColumn<String>(
-    'status',
-    aliasedName,
-    false,
-    additionalChecks: GeneratedColumn.checkTextLength(
-      minTextLength: 1,
-      maxTextLength: 40,
-    ),
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _relationshipSummaryMeta =
-      const VerificationMeta('relationshipSummary');
-  @override
-  late final GeneratedColumn<String> relationshipSummary =
-      GeneratedColumn<String>(
-        'relationship_summary',
-        aliasedName,
-        true,
-        additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 2000),
-        type: DriftSqlType.string,
-        requiredDuringInsert: false,
-      );
-  static const VerificationMeta _firstMetOnUtcUsMeta = const VerificationMeta(
-    'firstMetOnUtcUs',
-  );
-  @override
-  late final GeneratedColumn<int> firstMetOnUtcUs = GeneratedColumn<int>(
-    'first_met_on_utc_us',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _archivedAtUtcUsMeta = const VerificationMeta(
-    'archivedAtUtcUs',
-  );
-  @override
-  late final GeneratedColumn<int> archivedAtUtcUs = GeneratedColumn<int>(
-    'archived_at_utc_us',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _createdAtUtcUsMeta = const VerificationMeta(
-    'createdAtUtcUs',
-  );
-  @override
-  late final GeneratedColumn<int> createdAtUtcUs = GeneratedColumn<int>(
-    'created_at_utc_us',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _updatedAtUtcUsMeta = const VerificationMeta(
-    'updatedAtUtcUs',
-  );
-  @override
-  late final GeneratedColumn<int> updatedAtUtcUs = GeneratedColumn<int>(
-    'updated_at_utc_us',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [
-    id,
-    displayName,
-    status,
-    relationshipSummary,
-    firstMetOnUtcUs,
-    archivedAtUtcUs,
-    createdAtUtcUs,
-    updatedAtUtcUs,
-  ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'persons';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<PersonRow> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    } else if (isInserting) {
-      context.missing(_idMeta);
-    }
-    if (data.containsKey('display_name')) {
-      context.handle(
-        _displayNameMeta,
-        displayName.isAcceptableOrUnknown(
-          data['display_name']!,
-          _displayNameMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_displayNameMeta);
-    }
-    if (data.containsKey('status')) {
-      context.handle(
-        _statusMeta,
-        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_statusMeta);
-    }
-    if (data.containsKey('relationship_summary')) {
-      context.handle(
-        _relationshipSummaryMeta,
-        relationshipSummary.isAcceptableOrUnknown(
-          data['relationship_summary']!,
-          _relationshipSummaryMeta,
-        ),
-      );
-    }
-    if (data.containsKey('first_met_on_utc_us')) {
-      context.handle(
-        _firstMetOnUtcUsMeta,
-        firstMetOnUtcUs.isAcceptableOrUnknown(
-          data['first_met_on_utc_us']!,
-          _firstMetOnUtcUsMeta,
-        ),
-      );
-    }
-    if (data.containsKey('archived_at_utc_us')) {
-      context.handle(
-        _archivedAtUtcUsMeta,
-        archivedAtUtcUs.isAcceptableOrUnknown(
-          data['archived_at_utc_us']!,
-          _archivedAtUtcUsMeta,
-        ),
-      );
-    }
-    if (data.containsKey('created_at_utc_us')) {
-      context.handle(
-        _createdAtUtcUsMeta,
-        createdAtUtcUs.isAcceptableOrUnknown(
-          data['created_at_utc_us']!,
-          _createdAtUtcUsMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_createdAtUtcUsMeta);
-    }
-    if (data.containsKey('updated_at_utc_us')) {
-      context.handle(
-        _updatedAtUtcUsMeta,
-        updatedAtUtcUs.isAcceptableOrUnknown(
-          data['updated_at_utc_us']!,
-          _updatedAtUtcUsMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_updatedAtUtcUsMeta);
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  PersonRow map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return PersonRow(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}id'],
-      )!,
-      displayName: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}display_name'],
-      )!,
-      status: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}status'],
-      )!,
-      relationshipSummary: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}relationship_summary'],
-      ),
-      firstMetOnUtcUs: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}first_met_on_utc_us'],
-      ),
-      archivedAtUtcUs: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}archived_at_utc_us'],
-      ),
-      createdAtUtcUs: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}created_at_utc_us'],
-      )!,
-      updatedAtUtcUs: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}updated_at_utc_us'],
-      )!,
-    );
-  }
-
-  @override
-  $PersonsTable createAlias(String alias) {
-    return $PersonsTable(attachedDatabase, alias);
-  }
-}
-
-class PersonRow extends DataClass implements Insertable<PersonRow> {
-  final String id;
-  final String displayName;
-  final String status;
-  final String? relationshipSummary;
-  final int? firstMetOnUtcUs;
-  final int? archivedAtUtcUs;
-  final int createdAtUtcUs;
-  final int updatedAtUtcUs;
-  const PersonRow({
-    required this.id,
-    required this.displayName,
-    required this.status,
-    this.relationshipSummary,
-    this.firstMetOnUtcUs,
-    this.archivedAtUtcUs,
-    required this.createdAtUtcUs,
-    required this.updatedAtUtcUs,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<String>(id);
-    map['display_name'] = Variable<String>(displayName);
-    map['status'] = Variable<String>(status);
-    if (!nullToAbsent || relationshipSummary != null) {
-      map['relationship_summary'] = Variable<String>(relationshipSummary);
-    }
-    if (!nullToAbsent || firstMetOnUtcUs != null) {
-      map['first_met_on_utc_us'] = Variable<int>(firstMetOnUtcUs);
-    }
-    if (!nullToAbsent || archivedAtUtcUs != null) {
-      map['archived_at_utc_us'] = Variable<int>(archivedAtUtcUs);
-    }
-    map['created_at_utc_us'] = Variable<int>(createdAtUtcUs);
-    map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs);
-    return map;
-  }
-
-  PersonsCompanion toCompanion(bool nullToAbsent) {
-    return PersonsCompanion(
-      id: Value(id),
-      displayName: Value(displayName),
-      status: Value(status),
-      relationshipSummary: relationshipSummary == null && nullToAbsent
-          ? const Value.absent()
-          : Value(relationshipSummary),
-      firstMetOnUtcUs: firstMetOnUtcUs == null && nullToAbsent
-          ? const Value.absent()
-          : Value(firstMetOnUtcUs),
-      archivedAtUtcUs: archivedAtUtcUs == null && nullToAbsent
-          ? const Value.absent()
-          : Value(archivedAtUtcUs),
-      createdAtUtcUs: Value(createdAtUtcUs),
-      updatedAtUtcUs: Value(updatedAtUtcUs),
-    );
-  }
-
-  factory PersonRow.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return PersonRow(
-      id: serializer.fromJson<String>(json['id']),
-      displayName: serializer.fromJson<String>(json['displayName']),
-      status: serializer.fromJson<String>(json['status']),
-      relationshipSummary: serializer.fromJson<String?>(
-        json['relationshipSummary'],
-      ),
-      firstMetOnUtcUs: serializer.fromJson<int?>(json['firstMetOnUtcUs']),
-      archivedAtUtcUs: serializer.fromJson<int?>(json['archivedAtUtcUs']),
-      createdAtUtcUs: serializer.fromJson<int>(json['createdAtUtcUs']),
-      updatedAtUtcUs: serializer.fromJson<int>(json['updatedAtUtcUs']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
-      'displayName': serializer.toJson<String>(displayName),
-      'status': serializer.toJson<String>(status),
-      'relationshipSummary': serializer.toJson<String?>(relationshipSummary),
-      'firstMetOnUtcUs': serializer.toJson<int?>(firstMetOnUtcUs),
-      'archivedAtUtcUs': serializer.toJson<int?>(archivedAtUtcUs),
-      'createdAtUtcUs': serializer.toJson<int>(createdAtUtcUs),
-      'updatedAtUtcUs': serializer.toJson<int>(updatedAtUtcUs),
-    };
-  }
-
-  PersonRow copyWith({
-    String? id,
-    String? displayName,
-    String? status,
-    Value<String?> relationshipSummary = const Value.absent(),
-    Value<int?> firstMetOnUtcUs = const Value.absent(),
-    Value<int?> archivedAtUtcUs = const Value.absent(),
-    int? createdAtUtcUs,
-    int? updatedAtUtcUs,
-  }) => PersonRow(
-    id: id ?? this.id,
-    displayName: displayName ?? this.displayName,
-    status: status ?? this.status,
-    relationshipSummary: relationshipSummary.present
-        ? relationshipSummary.value
-        : this.relationshipSummary,
-    firstMetOnUtcUs: firstMetOnUtcUs.present
-        ? firstMetOnUtcUs.value
-        : this.firstMetOnUtcUs,
-    archivedAtUtcUs: archivedAtUtcUs.present
-        ? archivedAtUtcUs.value
-        : this.archivedAtUtcUs,
-    createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
-    updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
-  );
-  PersonRow copyWithCompanion(PersonsCompanion data) {
-    return PersonRow(
-      id: data.id.present ? data.id.value : this.id,
-      displayName: data.displayName.present
-          ? data.displayName.value
-          : this.displayName,
-      status: data.status.present ? data.status.value : this.status,
-      relationshipSummary: data.relationshipSummary.present
-          ? data.relationshipSummary.value
-          : this.relationshipSummary,
-      firstMetOnUtcUs: data.firstMetOnUtcUs.present
-          ? data.firstMetOnUtcUs.value
-          : this.firstMetOnUtcUs,
-      archivedAtUtcUs: data.archivedAtUtcUs.present
-          ? data.archivedAtUtcUs.value
-          : this.archivedAtUtcUs,
-      createdAtUtcUs: data.createdAtUtcUs.present
-          ? data.createdAtUtcUs.value
-          : this.createdAtUtcUs,
-      updatedAtUtcUs: data.updatedAtUtcUs.present
-          ? data.updatedAtUtcUs.value
-          : this.updatedAtUtcUs,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('PersonRow(')
-          ..write('id: $id, ')
-          ..write('displayName: $displayName, ')
-          ..write('status: $status, ')
-          ..write('relationshipSummary: $relationshipSummary, ')
-          ..write('firstMetOnUtcUs: $firstMetOnUtcUs, ')
-          ..write('archivedAtUtcUs: $archivedAtUtcUs, ')
-          ..write('createdAtUtcUs: $createdAtUtcUs, ')
-          ..write('updatedAtUtcUs: $updatedAtUtcUs')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    id,
-    displayName,
-    status,
-    relationshipSummary,
-    firstMetOnUtcUs,
-    archivedAtUtcUs,
-    createdAtUtcUs,
-    updatedAtUtcUs,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is PersonRow &&
-          other.id == this.id &&
-          other.displayName == this.displayName &&
-          other.status == this.status &&
-          other.relationshipSummary == this.relationshipSummary &&
-          other.firstMetOnUtcUs == this.firstMetOnUtcUs &&
-          other.archivedAtUtcUs == this.archivedAtUtcUs &&
-          other.createdAtUtcUs == this.createdAtUtcUs &&
-          other.updatedAtUtcUs == this.updatedAtUtcUs);
-}
-
-class PersonsCompanion extends UpdateCompanion<PersonRow> {
-  final Value<String> id;
-  final Value<String> displayName;
-  final Value<String> status;
-  final Value<String?> relationshipSummary;
-  final Value<int?> firstMetOnUtcUs;
-  final Value<int?> archivedAtUtcUs;
-  final Value<int> createdAtUtcUs;
-  final Value<int> updatedAtUtcUs;
-  final Value<int> rowid;
-  const PersonsCompanion({
-    this.id = const Value.absent(),
-    this.displayName = const Value.absent(),
-    this.status = const Value.absent(),
-    this.relationshipSummary = const Value.absent(),
-    this.firstMetOnUtcUs = const Value.absent(),
-    this.archivedAtUtcUs = const Value.absent(),
-    this.createdAtUtcUs = const Value.absent(),
-    this.updatedAtUtcUs = const Value.absent(),
-    this.rowid = const Value.absent(),
-  });
-  PersonsCompanion.insert({
-    required String id,
-    required String displayName,
-    required String status,
-    this.relationshipSummary = const Value.absent(),
-    this.firstMetOnUtcUs = const Value.absent(),
-    this.archivedAtUtcUs = const Value.absent(),
-    required int createdAtUtcUs,
-    required int updatedAtUtcUs,
-    this.rowid = const Value.absent(),
-  }) : id = Value(id),
-       displayName = Value(displayName),
-       status = Value(status),
-       createdAtUtcUs = Value(createdAtUtcUs),
-       updatedAtUtcUs = Value(updatedAtUtcUs);
-  static Insertable<PersonRow> custom({
-    Expression<String>? id,
-    Expression<String>? displayName,
-    Expression<String>? status,
-    Expression<String>? relationshipSummary,
-    Expression<int>? firstMetOnUtcUs,
-    Expression<int>? archivedAtUtcUs,
-    Expression<int>? createdAtUtcUs,
-    Expression<int>? updatedAtUtcUs,
-    Expression<int>? rowid,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (displayName != null) 'display_name': displayName,
-      if (status != null) 'status': status,
-      if (relationshipSummary != null)
-        'relationship_summary': relationshipSummary,
-      if (firstMetOnUtcUs != null) 'first_met_on_utc_us': firstMetOnUtcUs,
-      if (archivedAtUtcUs != null) 'archived_at_utc_us': archivedAtUtcUs,
-      if (createdAtUtcUs != null) 'created_at_utc_us': createdAtUtcUs,
-      if (updatedAtUtcUs != null) 'updated_at_utc_us': updatedAtUtcUs,
-      if (rowid != null) 'rowid': rowid,
-    });
-  }
-
-  PersonsCompanion copyWith({
-    Value<String>? id,
-    Value<String>? displayName,
-    Value<String>? status,
-    Value<String?>? relationshipSummary,
-    Value<int?>? firstMetOnUtcUs,
-    Value<int?>? archivedAtUtcUs,
-    Value<int>? createdAtUtcUs,
-    Value<int>? updatedAtUtcUs,
-    Value<int>? rowid,
-  }) {
-    return PersonsCompanion(
-      id: id ?? this.id,
-      displayName: displayName ?? this.displayName,
-      status: status ?? this.status,
-      relationshipSummary: relationshipSummary ?? this.relationshipSummary,
-      firstMetOnUtcUs: firstMetOnUtcUs ?? this.firstMetOnUtcUs,
-      archivedAtUtcUs: archivedAtUtcUs ?? this.archivedAtUtcUs,
-      createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
-      updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
-      rowid: rowid ?? this.rowid,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<String>(id.value);
-    }
-    if (displayName.present) {
-      map['display_name'] = Variable<String>(displayName.value);
-    }
-    if (status.present) {
-      map['status'] = Variable<String>(status.value);
-    }
-    if (relationshipSummary.present) {
-      map['relationship_summary'] = Variable<String>(relationshipSummary.value);
-    }
-    if (firstMetOnUtcUs.present) {
-      map['first_met_on_utc_us'] = Variable<int>(firstMetOnUtcUs.value);
-    }
-    if (archivedAtUtcUs.present) {
-      map['archived_at_utc_us'] = Variable<int>(archivedAtUtcUs.value);
-    }
-    if (createdAtUtcUs.present) {
-      map['created_at_utc_us'] = Variable<int>(createdAtUtcUs.value);
-    }
-    if (updatedAtUtcUs.present) {
-      map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs.value);
-    }
-    if (rowid.present) {
-      map['rowid'] = Variable<int>(rowid.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('PersonsCompanion(')
-          ..write('id: $id, ')
-          ..write('displayName: $displayName, ')
-          ..write('status: $status, ')
-          ..write('relationshipSummary: $relationshipSummary, ')
-          ..write('firstMetOnUtcUs: $firstMetOnUtcUs, ')
-          ..write('archivedAtUtcUs: $archivedAtUtcUs, ')
-          ..write('createdAtUtcUs: $createdAtUtcUs, ')
           ..write('updatedAtUtcUs: $updatedAtUtcUs, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -12101,6 +12157,7 @@ abstract class _$RynAppDatabase extends GeneratedDatabase {
   late final $ApprovalRecordsTable approvalRecords = $ApprovalRecordsTable(
     this,
   );
+  late final $PersonsTable persons = $PersonsTable(this);
   late final $TarotReadingsTable tarotReadings = $TarotReadingsTable(this);
   late final $TarotCardPlacementsTable tarotCardPlacements =
       $TarotCardPlacementsTable(this);
@@ -12109,7 +12166,6 @@ abstract class _$RynAppDatabase extends GeneratedDatabase {
   late final $AppRuntimeStateTable appRuntimeState = $AppRuntimeStateTable(
     this,
   );
-  late final $PersonsTable persons = $PersonsTable(this);
   late final $PersonRolesTable personRoles = $PersonRolesTable(this);
   late final $PersonGroupsTable personGroups = $PersonGroupsTable(this);
   late final $PersonGroupMembershipsTable personGroupMemberships =
@@ -12132,11 +12188,11 @@ abstract class _$RynAppDatabase extends GeneratedDatabase {
     taskCards,
     agentRuns,
     approvalRecords,
+    persons,
     tarotReadings,
     tarotCardPlacements,
     tarotInterpretations,
     appRuntimeState,
-    persons,
     personRoles,
     personGroups,
     personGroupMemberships,
@@ -14473,10 +14529,992 @@ typedef $$ApprovalRecordsTableProcessedTableManager =
       ApprovalRecord,
       PrefetchHooks Function()
     >;
+typedef $$PersonsTableCreateCompanionBuilder =
+    PersonsCompanion Function({
+      required String id,
+      required String displayName,
+      required String status,
+      Value<String?> relationshipSummary,
+      Value<int?> firstMetOnUtcUs,
+      Value<int?> archivedAtUtcUs,
+      required int createdAtUtcUs,
+      required int updatedAtUtcUs,
+      Value<int> rowid,
+    });
+typedef $$PersonsTableUpdateCompanionBuilder =
+    PersonsCompanion Function({
+      Value<String> id,
+      Value<String> displayName,
+      Value<String> status,
+      Value<String?> relationshipSummary,
+      Value<int?> firstMetOnUtcUs,
+      Value<int?> archivedAtUtcUs,
+      Value<int> createdAtUtcUs,
+      Value<int> updatedAtUtcUs,
+      Value<int> rowid,
+    });
+
+final class $$PersonsTableReferences
+    extends BaseReferences<_$RynAppDatabase, $PersonsTable, PersonRow> {
+  $$PersonsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$TarotReadingsTable, List<TarotReading>>
+  _tarotReadingsRefsTable(_$RynAppDatabase db) => MultiTypedResultKey.fromTable(
+    db.tarotReadings,
+    aliasName: $_aliasNameGenerator(db.persons.id, db.tarotReadings.personId),
+  );
+
+  $$TarotReadingsTableProcessedTableManager get tarotReadingsRefs {
+    final manager = $$TarotReadingsTableTableManager(
+      $_db,
+      $_db.tarotReadings,
+    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_tarotReadingsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$PersonRolesTable, List<PersonRoleRow>>
+  _personRolesRefsTable(_$RynAppDatabase db) => MultiTypedResultKey.fromTable(
+    db.personRoles,
+    aliasName: $_aliasNameGenerator(db.persons.id, db.personRoles.personId),
+  );
+
+  $$PersonRolesTableProcessedTableManager get personRolesRefs {
+    final manager = $$PersonRolesTableTableManager(
+      $_db,
+      $_db.personRoles,
+    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_personRolesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $PersonGroupMembershipsTable,
+    List<PersonGroupMembershipRow>
+  >
+  _personGroupMembershipsRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.personGroupMemberships,
+        aliasName: $_aliasNameGenerator(
+          db.persons.id,
+          db.personGroupMemberships.personId,
+        ),
+      );
+
+  $$PersonGroupMembershipsTableProcessedTableManager
+  get personGroupMembershipsRefs {
+    final manager = $$PersonGroupMembershipsTableTableManager(
+      $_db,
+      $_db.personGroupMemberships,
+    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _personGroupMembershipsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $PersonRelationshipsTable,
+    List<PersonRelationshipRow>
+  >
+  _relationshipsFromPersonTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.personRelationships,
+        aliasName: $_aliasNameGenerator(
+          db.persons.id,
+          db.personRelationships.fromPersonId,
+        ),
+      );
+
+  $$PersonRelationshipsTableProcessedTableManager get relationshipsFromPerson {
+    final manager = $$PersonRelationshipsTableTableManager(
+      $_db,
+      $_db.personRelationships,
+    ).filter((f) => f.fromPersonId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _relationshipsFromPersonTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $PersonRelationshipsTable,
+    List<PersonRelationshipRow>
+  >
+  _relationshipsToPersonTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.personRelationships,
+        aliasName: $_aliasNameGenerator(
+          db.persons.id,
+          db.personRelationships.toPersonId,
+        ),
+      );
+
+  $$PersonRelationshipsTableProcessedTableManager get relationshipsToPerson {
+    final manager = $$PersonRelationshipsTableTableManager(
+      $_db,
+      $_db.personRelationships,
+    ).filter((f) => f.toPersonId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _relationshipsToPersonTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $PersonBirthProfilesTable,
+    List<PersonBirthProfileRow>
+  >
+  _personBirthProfilesRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.personBirthProfiles,
+        aliasName: $_aliasNameGenerator(
+          db.persons.id,
+          db.personBirthProfiles.personId,
+        ),
+      );
+
+  $$PersonBirthProfilesTableProcessedTableManager get personBirthProfilesRefs {
+    final manager = $$PersonBirthProfilesTableTableManager(
+      $_db,
+      $_db.personBirthProfiles,
+    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _personBirthProfilesRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$EncountersTable, List<EncounterRow>>
+  _encountersRefsTable(_$RynAppDatabase db) => MultiTypedResultKey.fromTable(
+    db.encounters,
+    aliasName: $_aliasNameGenerator(db.persons.id, db.encounters.personId),
+  );
+
+  $$EncountersTableProcessedTableManager get encountersRefs {
+    final manager = $$EncountersTableTableManager(
+      $_db,
+      $_db.encounters,
+    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_encountersRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$PersonsTableFilterComposer
+    extends Composer<_$RynAppDatabase, $PersonsTable> {
+  $$PersonsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get relationshipSummary => $composableBuilder(
+    column: $table.relationshipSummary,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get firstMetOnUtcUs => $composableBuilder(
+    column: $table.firstMetOnUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get archivedAtUtcUs => $composableBuilder(
+    column: $table.archivedAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> tarotReadingsRefs(
+    Expression<bool> Function($$TarotReadingsTableFilterComposer f) f,
+  ) {
+    final $$TarotReadingsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.tarotReadings,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TarotReadingsTableFilterComposer(
+            $db: $db,
+            $table: $db.tarotReadings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> personRolesRefs(
+    Expression<bool> Function($$PersonRolesTableFilterComposer f) f,
+  ) {
+    final $$PersonRolesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.personRoles,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonRolesTableFilterComposer(
+            $db: $db,
+            $table: $db.personRoles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> personGroupMembershipsRefs(
+    Expression<bool> Function($$PersonGroupMembershipsTableFilterComposer f) f,
+  ) {
+    final $$PersonGroupMembershipsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.personGroupMemberships,
+          getReferencedColumn: (t) => t.personId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PersonGroupMembershipsTableFilterComposer(
+                $db: $db,
+                $table: $db.personGroupMemberships,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> relationshipsFromPerson(
+    Expression<bool> Function($$PersonRelationshipsTableFilterComposer f) f,
+  ) {
+    final $$PersonRelationshipsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.personRelationships,
+      getReferencedColumn: (t) => t.fromPersonId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonRelationshipsTableFilterComposer(
+            $db: $db,
+            $table: $db.personRelationships,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> relationshipsToPerson(
+    Expression<bool> Function($$PersonRelationshipsTableFilterComposer f) f,
+  ) {
+    final $$PersonRelationshipsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.personRelationships,
+      getReferencedColumn: (t) => t.toPersonId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonRelationshipsTableFilterComposer(
+            $db: $db,
+            $table: $db.personRelationships,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> personBirthProfilesRefs(
+    Expression<bool> Function($$PersonBirthProfilesTableFilterComposer f) f,
+  ) {
+    final $$PersonBirthProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.personBirthProfiles,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonBirthProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.personBirthProfiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> encountersRefs(
+    Expression<bool> Function($$EncountersTableFilterComposer f) f,
+  ) {
+    final $$EncountersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.encounters,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EncountersTableFilterComposer(
+            $db: $db,
+            $table: $db.encounters,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$PersonsTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $PersonsTable> {
+  $$PersonsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get relationshipSummary => $composableBuilder(
+    column: $table.relationshipSummary,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get firstMetOnUtcUs => $composableBuilder(
+    column: $table.firstMetOnUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get archivedAtUtcUs => $composableBuilder(
+    column: $table.archivedAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PersonsTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $PersonsTable> {
+  $$PersonsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get displayName => $composableBuilder(
+    column: $table.displayName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get relationshipSummary => $composableBuilder(
+    column: $table.relationshipSummary,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get firstMetOnUtcUs => $composableBuilder(
+    column: $table.firstMetOnUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get archivedAtUtcUs => $composableBuilder(
+    column: $table.archivedAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => column,
+  );
+
+  Expression<T> tarotReadingsRefs<T extends Object>(
+    Expression<T> Function($$TarotReadingsTableAnnotationComposer a) f,
+  ) {
+    final $$TarotReadingsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.tarotReadings,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TarotReadingsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.tarotReadings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> personRolesRefs<T extends Object>(
+    Expression<T> Function($$PersonRolesTableAnnotationComposer a) f,
+  ) {
+    final $$PersonRolesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.personRoles,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonRolesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.personRoles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> personGroupMembershipsRefs<T extends Object>(
+    Expression<T> Function($$PersonGroupMembershipsTableAnnotationComposer a) f,
+  ) {
+    final $$PersonGroupMembershipsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.personGroupMemberships,
+          getReferencedColumn: (t) => t.personId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PersonGroupMembershipsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.personGroupMemberships,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> relationshipsFromPerson<T extends Object>(
+    Expression<T> Function($$PersonRelationshipsTableAnnotationComposer a) f,
+  ) {
+    final $$PersonRelationshipsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.personRelationships,
+          getReferencedColumn: (t) => t.fromPersonId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PersonRelationshipsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.personRelationships,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> relationshipsToPerson<T extends Object>(
+    Expression<T> Function($$PersonRelationshipsTableAnnotationComposer a) f,
+  ) {
+    final $$PersonRelationshipsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.personRelationships,
+          getReferencedColumn: (t) => t.toPersonId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PersonRelationshipsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.personRelationships,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> personBirthProfilesRefs<T extends Object>(
+    Expression<T> Function($$PersonBirthProfilesTableAnnotationComposer a) f,
+  ) {
+    final $$PersonBirthProfilesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.personBirthProfiles,
+          getReferencedColumn: (t) => t.personId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PersonBirthProfilesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.personBirthProfiles,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> encountersRefs<T extends Object>(
+    Expression<T> Function($$EncountersTableAnnotationComposer a) f,
+  ) {
+    final $$EncountersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.encounters,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EncountersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.encounters,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$PersonsTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $PersonsTable,
+          PersonRow,
+          $$PersonsTableFilterComposer,
+          $$PersonsTableOrderingComposer,
+          $$PersonsTableAnnotationComposer,
+          $$PersonsTableCreateCompanionBuilder,
+          $$PersonsTableUpdateCompanionBuilder,
+          (PersonRow, $$PersonsTableReferences),
+          PersonRow,
+          PrefetchHooks Function({
+            bool tarotReadingsRefs,
+            bool personRolesRefs,
+            bool personGroupMembershipsRefs,
+            bool relationshipsFromPerson,
+            bool relationshipsToPerson,
+            bool personBirthProfilesRefs,
+            bool encountersRefs,
+          })
+        > {
+  $$PersonsTableTableManager(_$RynAppDatabase db, $PersonsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PersonsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PersonsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PersonsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> displayName = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> relationshipSummary = const Value.absent(),
+                Value<int?> firstMetOnUtcUs = const Value.absent(),
+                Value<int?> archivedAtUtcUs = const Value.absent(),
+                Value<int> createdAtUtcUs = const Value.absent(),
+                Value<int> updatedAtUtcUs = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PersonsCompanion(
+                id: id,
+                displayName: displayName,
+                status: status,
+                relationshipSummary: relationshipSummary,
+                firstMetOnUtcUs: firstMetOnUtcUs,
+                archivedAtUtcUs: archivedAtUtcUs,
+                createdAtUtcUs: createdAtUtcUs,
+                updatedAtUtcUs: updatedAtUtcUs,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String displayName,
+                required String status,
+                Value<String?> relationshipSummary = const Value.absent(),
+                Value<int?> firstMetOnUtcUs = const Value.absent(),
+                Value<int?> archivedAtUtcUs = const Value.absent(),
+                required int createdAtUtcUs,
+                required int updatedAtUtcUs,
+                Value<int> rowid = const Value.absent(),
+              }) => PersonsCompanion.insert(
+                id: id,
+                displayName: displayName,
+                status: status,
+                relationshipSummary: relationshipSummary,
+                firstMetOnUtcUs: firstMetOnUtcUs,
+                archivedAtUtcUs: archivedAtUtcUs,
+                createdAtUtcUs: createdAtUtcUs,
+                updatedAtUtcUs: updatedAtUtcUs,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$PersonsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                tarotReadingsRefs = false,
+                personRolesRefs = false,
+                personGroupMembershipsRefs = false,
+                relationshipsFromPerson = false,
+                relationshipsToPerson = false,
+                personBirthProfilesRefs = false,
+                encountersRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (tarotReadingsRefs) db.tarotReadings,
+                    if (personRolesRefs) db.personRoles,
+                    if (personGroupMembershipsRefs) db.personGroupMemberships,
+                    if (relationshipsFromPerson) db.personRelationships,
+                    if (relationshipsToPerson) db.personRelationships,
+                    if (personBirthProfilesRefs) db.personBirthProfiles,
+                    if (encountersRefs) db.encounters,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (tarotReadingsRefs)
+                        await $_getPrefetchedData<
+                          PersonRow,
+                          $PersonsTable,
+                          TarotReading
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PersonsTableReferences
+                              ._tarotReadingsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PersonsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).tarotReadingsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.personId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (personRolesRefs)
+                        await $_getPrefetchedData<
+                          PersonRow,
+                          $PersonsTable,
+                          PersonRoleRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PersonsTableReferences
+                              ._personRolesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PersonsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).personRolesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.personId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (personGroupMembershipsRefs)
+                        await $_getPrefetchedData<
+                          PersonRow,
+                          $PersonsTable,
+                          PersonGroupMembershipRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PersonsTableReferences
+                              ._personGroupMembershipsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PersonsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).personGroupMembershipsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.personId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (relationshipsFromPerson)
+                        await $_getPrefetchedData<
+                          PersonRow,
+                          $PersonsTable,
+                          PersonRelationshipRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PersonsTableReferences
+                              ._relationshipsFromPersonTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PersonsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).relationshipsFromPerson,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.fromPersonId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (relationshipsToPerson)
+                        await $_getPrefetchedData<
+                          PersonRow,
+                          $PersonsTable,
+                          PersonRelationshipRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PersonsTableReferences
+                              ._relationshipsToPersonTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PersonsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).relationshipsToPerson,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.toPersonId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (personBirthProfilesRefs)
+                        await $_getPrefetchedData<
+                          PersonRow,
+                          $PersonsTable,
+                          PersonBirthProfileRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PersonsTableReferences
+                              ._personBirthProfilesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PersonsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).personBirthProfilesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.personId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (encountersRefs)
+                        await $_getPrefetchedData<
+                          PersonRow,
+                          $PersonsTable,
+                          EncounterRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PersonsTableReferences
+                              ._encountersRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PersonsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).encountersRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.personId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$PersonsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $PersonsTable,
+      PersonRow,
+      $$PersonsTableFilterComposer,
+      $$PersonsTableOrderingComposer,
+      $$PersonsTableAnnotationComposer,
+      $$PersonsTableCreateCompanionBuilder,
+      $$PersonsTableUpdateCompanionBuilder,
+      (PersonRow, $$PersonsTableReferences),
+      PersonRow,
+      PrefetchHooks Function({
+        bool tarotReadingsRefs,
+        bool personRolesRefs,
+        bool personGroupMembershipsRefs,
+        bool relationshipsFromPerson,
+        bool relationshipsToPerson,
+        bool personBirthProfilesRefs,
+        bool encountersRefs,
+      })
+    >;
 typedef $$TarotReadingsTableCreateCompanionBuilder =
     TarotReadingsCompanion Function({
       required String readingInstanceId,
       required String sourceType,
+      Value<String?> personId,
       required String questionOriginalSnapshot,
       required String questionDisplayText,
       required String deckId,
@@ -14496,6 +15534,7 @@ typedef $$TarotReadingsTableUpdateCompanionBuilder =
     TarotReadingsCompanion Function({
       Value<String> readingInstanceId,
       Value<String> sourceType,
+      Value<String?> personId,
       Value<String> questionOriginalSnapshot,
       Value<String> questionDisplayText,
       Value<String> deckId,
@@ -14520,6 +15559,25 @@ final class $$TarotReadingsTableReferences
     super.$_table,
     super.$_typedResult,
   );
+
+  static $PersonsTable _personIdTable(_$RynAppDatabase db) =>
+      db.persons.createAlias(
+        $_aliasNameGenerator(db.tarotReadings.personId, db.persons.id),
+      );
+
+  $$PersonsTableProcessedTableManager? get personId {
+    final $_column = $_itemColumn<String>('person_id');
+    if ($_column == null) return null;
+    final manager = $$PersonsTableTableManager(
+      $_db,
+      $_db.persons,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_personIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
 
   static MultiTypedResultKey<
     $TarotCardPlacementsTable,
@@ -14697,6 +15755,29 @@ class $$TarotReadingsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  $$PersonsTableFilterComposer get personId {
+    final $$PersonsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.persons,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonsTableFilterComposer(
+            $db: $db,
+            $table: $db.persons,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
   Expression<bool> tarotCardPlacementsRefs(
     Expression<bool> Function($$TarotCardPlacementsTableFilterComposer f) f,
   ) {
@@ -14856,6 +15937,29 @@ class $$TarotReadingsTableOrderingComposer
     column: $table.finishedAtUtcUs,
     builder: (column) => ColumnOrderings(column),
   );
+
+  $$PersonsTableOrderingComposer get personId {
+    final $$PersonsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.persons,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonsTableOrderingComposer(
+            $db: $db,
+            $table: $db.persons,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$TarotReadingsTableAnnotationComposer
@@ -14937,6 +16041,29 @@ class $$TarotReadingsTableAnnotationComposer
     column: $table.finishedAtUtcUs,
     builder: (column) => column,
   );
+
+  $$PersonsTableAnnotationComposer get personId {
+    final $$PersonsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.persons,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.persons,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 
   Expression<T> tarotCardPlacementsRefs<T extends Object>(
     Expression<T> Function($$TarotCardPlacementsTableAnnotationComposer a) f,
@@ -15030,6 +16157,7 @@ class $$TarotReadingsTableTableManager
           (TarotReading, $$TarotReadingsTableReferences),
           TarotReading,
           PrefetchHooks Function({
+            bool personId,
             bool tarotCardPlacementsRefs,
             bool tarotInterpretationsRefs,
             bool appRuntimeStateRefs,
@@ -15052,6 +16180,7 @@ class $$TarotReadingsTableTableManager
               ({
                 Value<String> readingInstanceId = const Value.absent(),
                 Value<String> sourceType = const Value.absent(),
+                Value<String?> personId = const Value.absent(),
                 Value<String> questionOriginalSnapshot = const Value.absent(),
                 Value<String> questionDisplayText = const Value.absent(),
                 Value<String> deckId = const Value.absent(),
@@ -15069,6 +16198,7 @@ class $$TarotReadingsTableTableManager
               }) => TarotReadingsCompanion(
                 readingInstanceId: readingInstanceId,
                 sourceType: sourceType,
+                personId: personId,
                 questionOriginalSnapshot: questionOriginalSnapshot,
                 questionDisplayText: questionDisplayText,
                 deckId: deckId,
@@ -15088,6 +16218,7 @@ class $$TarotReadingsTableTableManager
               ({
                 required String readingInstanceId,
                 required String sourceType,
+                Value<String?> personId = const Value.absent(),
                 required String questionOriginalSnapshot,
                 required String questionDisplayText,
                 required String deckId,
@@ -15105,6 +16236,7 @@ class $$TarotReadingsTableTableManager
               }) => TarotReadingsCompanion.insert(
                 readingInstanceId: readingInstanceId,
                 sourceType: sourceType,
+                personId: personId,
                 questionOriginalSnapshot: questionOriginalSnapshot,
                 questionDisplayText: questionDisplayText,
                 deckId: deckId,
@@ -15130,6 +16262,7 @@ class $$TarotReadingsTableTableManager
               .toList(),
           prefetchHooksCallback:
               ({
+                personId = false,
                 tarotCardPlacementsRefs = false,
                 tarotInterpretationsRefs = false,
                 appRuntimeStateRefs = false,
@@ -15141,7 +16274,40 @@ class $$TarotReadingsTableTableManager
                     if (tarotInterpretationsRefs) db.tarotInterpretations,
                     if (appRuntimeStateRefs) db.appRuntimeState,
                   ],
-                  addJoins: null,
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (personId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.personId,
+                                    referencedTable:
+                                        $$TarotReadingsTableReferences
+                                            ._personIdTable(db),
+                                    referencedColumn:
+                                        $$TarotReadingsTableReferences
+                                            ._personIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (tarotCardPlacementsRefs)
@@ -15234,6 +16400,7 @@ typedef $$TarotReadingsTableProcessedTableManager =
       (TarotReading, $$TarotReadingsTableReferences),
       TarotReading,
       PrefetchHooks Function({
+        bool personId,
         bool tarotCardPlacementsRefs,
         bool tarotInterpretationsRefs,
         bool appRuntimeStateRefs,
@@ -16320,894 +17487,6 @@ typedef $$AppRuntimeStateTableProcessedTableManager =
       (AppRuntimeStateData, $$AppRuntimeStateTableReferences),
       AppRuntimeStateData,
       PrefetchHooks Function({bool activeHomeTarotReadingId})
-    >;
-typedef $$PersonsTableCreateCompanionBuilder =
-    PersonsCompanion Function({
-      required String id,
-      required String displayName,
-      required String status,
-      Value<String?> relationshipSummary,
-      Value<int?> firstMetOnUtcUs,
-      Value<int?> archivedAtUtcUs,
-      required int createdAtUtcUs,
-      required int updatedAtUtcUs,
-      Value<int> rowid,
-    });
-typedef $$PersonsTableUpdateCompanionBuilder =
-    PersonsCompanion Function({
-      Value<String> id,
-      Value<String> displayName,
-      Value<String> status,
-      Value<String?> relationshipSummary,
-      Value<int?> firstMetOnUtcUs,
-      Value<int?> archivedAtUtcUs,
-      Value<int> createdAtUtcUs,
-      Value<int> updatedAtUtcUs,
-      Value<int> rowid,
-    });
-
-final class $$PersonsTableReferences
-    extends BaseReferences<_$RynAppDatabase, $PersonsTable, PersonRow> {
-  $$PersonsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<$PersonRolesTable, List<PersonRoleRow>>
-  _personRolesRefsTable(_$RynAppDatabase db) => MultiTypedResultKey.fromTable(
-    db.personRoles,
-    aliasName: $_aliasNameGenerator(db.persons.id, db.personRoles.personId),
-  );
-
-  $$PersonRolesTableProcessedTableManager get personRolesRefs {
-    final manager = $$PersonRolesTableTableManager(
-      $_db,
-      $_db.personRoles,
-    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_personRolesRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<
-    $PersonGroupMembershipsTable,
-    List<PersonGroupMembershipRow>
-  >
-  _personGroupMembershipsRefsTable(_$RynAppDatabase db) =>
-      MultiTypedResultKey.fromTable(
-        db.personGroupMemberships,
-        aliasName: $_aliasNameGenerator(
-          db.persons.id,
-          db.personGroupMemberships.personId,
-        ),
-      );
-
-  $$PersonGroupMembershipsTableProcessedTableManager
-  get personGroupMembershipsRefs {
-    final manager = $$PersonGroupMembershipsTableTableManager(
-      $_db,
-      $_db.personGroupMemberships,
-    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(
-      _personGroupMembershipsRefsTable($_db),
-    );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<
-    $PersonRelationshipsTable,
-    List<PersonRelationshipRow>
-  >
-  _relationshipsFromPersonTable(_$RynAppDatabase db) =>
-      MultiTypedResultKey.fromTable(
-        db.personRelationships,
-        aliasName: $_aliasNameGenerator(
-          db.persons.id,
-          db.personRelationships.fromPersonId,
-        ),
-      );
-
-  $$PersonRelationshipsTableProcessedTableManager get relationshipsFromPerson {
-    final manager = $$PersonRelationshipsTableTableManager(
-      $_db,
-      $_db.personRelationships,
-    ).filter((f) => f.fromPersonId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(
-      _relationshipsFromPersonTable($_db),
-    );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<
-    $PersonRelationshipsTable,
-    List<PersonRelationshipRow>
-  >
-  _relationshipsToPersonTable(_$RynAppDatabase db) =>
-      MultiTypedResultKey.fromTable(
-        db.personRelationships,
-        aliasName: $_aliasNameGenerator(
-          db.persons.id,
-          db.personRelationships.toPersonId,
-        ),
-      );
-
-  $$PersonRelationshipsTableProcessedTableManager get relationshipsToPerson {
-    final manager = $$PersonRelationshipsTableTableManager(
-      $_db,
-      $_db.personRelationships,
-    ).filter((f) => f.toPersonId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(
-      _relationshipsToPersonTable($_db),
-    );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<
-    $PersonBirthProfilesTable,
-    List<PersonBirthProfileRow>
-  >
-  _personBirthProfilesRefsTable(_$RynAppDatabase db) =>
-      MultiTypedResultKey.fromTable(
-        db.personBirthProfiles,
-        aliasName: $_aliasNameGenerator(
-          db.persons.id,
-          db.personBirthProfiles.personId,
-        ),
-      );
-
-  $$PersonBirthProfilesTableProcessedTableManager get personBirthProfilesRefs {
-    final manager = $$PersonBirthProfilesTableTableManager(
-      $_db,
-      $_db.personBirthProfiles,
-    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(
-      _personBirthProfilesRefsTable($_db),
-    );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$EncountersTable, List<EncounterRow>>
-  _encountersRefsTable(_$RynAppDatabase db) => MultiTypedResultKey.fromTable(
-    db.encounters,
-    aliasName: $_aliasNameGenerator(db.persons.id, db.encounters.personId),
-  );
-
-  $$EncountersTableProcessedTableManager get encountersRefs {
-    final manager = $$EncountersTableTableManager(
-      $_db,
-      $_db.encounters,
-    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_encountersRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
-
-class $$PersonsTableFilterComposer
-    extends Composer<_$RynAppDatabase, $PersonsTable> {
-  $$PersonsTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get displayName => $composableBuilder(
-    column: $table.displayName,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get status => $composableBuilder(
-    column: $table.status,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get relationshipSummary => $composableBuilder(
-    column: $table.relationshipSummary,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get firstMetOnUtcUs => $composableBuilder(
-    column: $table.firstMetOnUtcUs,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get archivedAtUtcUs => $composableBuilder(
-    column: $table.archivedAtUtcUs,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get createdAtUtcUs => $composableBuilder(
-    column: $table.createdAtUtcUs,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get updatedAtUtcUs => $composableBuilder(
-    column: $table.updatedAtUtcUs,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  Expression<bool> personRolesRefs(
-    Expression<bool> Function($$PersonRolesTableFilterComposer f) f,
-  ) {
-    final $$PersonRolesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.personRoles,
-      getReferencedColumn: (t) => t.personId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PersonRolesTableFilterComposer(
-            $db: $db,
-            $table: $db.personRoles,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> personGroupMembershipsRefs(
-    Expression<bool> Function($$PersonGroupMembershipsTableFilterComposer f) f,
-  ) {
-    final $$PersonGroupMembershipsTableFilterComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.personGroupMemberships,
-          getReferencedColumn: (t) => t.personId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$PersonGroupMembershipsTableFilterComposer(
-                $db: $db,
-                $table: $db.personGroupMemberships,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
-
-  Expression<bool> relationshipsFromPerson(
-    Expression<bool> Function($$PersonRelationshipsTableFilterComposer f) f,
-  ) {
-    final $$PersonRelationshipsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.personRelationships,
-      getReferencedColumn: (t) => t.fromPersonId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PersonRelationshipsTableFilterComposer(
-            $db: $db,
-            $table: $db.personRelationships,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> relationshipsToPerson(
-    Expression<bool> Function($$PersonRelationshipsTableFilterComposer f) f,
-  ) {
-    final $$PersonRelationshipsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.personRelationships,
-      getReferencedColumn: (t) => t.toPersonId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PersonRelationshipsTableFilterComposer(
-            $db: $db,
-            $table: $db.personRelationships,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> personBirthProfilesRefs(
-    Expression<bool> Function($$PersonBirthProfilesTableFilterComposer f) f,
-  ) {
-    final $$PersonBirthProfilesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.personBirthProfiles,
-      getReferencedColumn: (t) => t.personId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PersonBirthProfilesTableFilterComposer(
-            $db: $db,
-            $table: $db.personBirthProfiles,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> encountersRefs(
-    Expression<bool> Function($$EncountersTableFilterComposer f) f,
-  ) {
-    final $$EncountersTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.encounters,
-      getReferencedColumn: (t) => t.personId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$EncountersTableFilterComposer(
-            $db: $db,
-            $table: $db.encounters,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$PersonsTableOrderingComposer
-    extends Composer<_$RynAppDatabase, $PersonsTable> {
-  $$PersonsTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<String> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get displayName => $composableBuilder(
-    column: $table.displayName,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get status => $composableBuilder(
-    column: $table.status,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get relationshipSummary => $composableBuilder(
-    column: $table.relationshipSummary,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get firstMetOnUtcUs => $composableBuilder(
-    column: $table.firstMetOnUtcUs,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get archivedAtUtcUs => $composableBuilder(
-    column: $table.archivedAtUtcUs,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get createdAtUtcUs => $composableBuilder(
-    column: $table.createdAtUtcUs,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get updatedAtUtcUs => $composableBuilder(
-    column: $table.updatedAtUtcUs,
-    builder: (column) => ColumnOrderings(column),
-  );
-}
-
-class $$PersonsTableAnnotationComposer
-    extends Composer<_$RynAppDatabase, $PersonsTable> {
-  $$PersonsTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<String> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get displayName => $composableBuilder(
-    column: $table.displayName,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get status =>
-      $composableBuilder(column: $table.status, builder: (column) => column);
-
-  GeneratedColumn<String> get relationshipSummary => $composableBuilder(
-    column: $table.relationshipSummary,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get firstMetOnUtcUs => $composableBuilder(
-    column: $table.firstMetOnUtcUs,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get archivedAtUtcUs => $composableBuilder(
-    column: $table.archivedAtUtcUs,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get createdAtUtcUs => $composableBuilder(
-    column: $table.createdAtUtcUs,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get updatedAtUtcUs => $composableBuilder(
-    column: $table.updatedAtUtcUs,
-    builder: (column) => column,
-  );
-
-  Expression<T> personRolesRefs<T extends Object>(
-    Expression<T> Function($$PersonRolesTableAnnotationComposer a) f,
-  ) {
-    final $$PersonRolesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.personRoles,
-      getReferencedColumn: (t) => t.personId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PersonRolesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.personRoles,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> personGroupMembershipsRefs<T extends Object>(
-    Expression<T> Function($$PersonGroupMembershipsTableAnnotationComposer a) f,
-  ) {
-    final $$PersonGroupMembershipsTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.personGroupMemberships,
-          getReferencedColumn: (t) => t.personId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$PersonGroupMembershipsTableAnnotationComposer(
-                $db: $db,
-                $table: $db.personGroupMemberships,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
-
-  Expression<T> relationshipsFromPerson<T extends Object>(
-    Expression<T> Function($$PersonRelationshipsTableAnnotationComposer a) f,
-  ) {
-    final $$PersonRelationshipsTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.personRelationships,
-          getReferencedColumn: (t) => t.fromPersonId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$PersonRelationshipsTableAnnotationComposer(
-                $db: $db,
-                $table: $db.personRelationships,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
-
-  Expression<T> relationshipsToPerson<T extends Object>(
-    Expression<T> Function($$PersonRelationshipsTableAnnotationComposer a) f,
-  ) {
-    final $$PersonRelationshipsTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.personRelationships,
-          getReferencedColumn: (t) => t.toPersonId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$PersonRelationshipsTableAnnotationComposer(
-                $db: $db,
-                $table: $db.personRelationships,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
-
-  Expression<T> personBirthProfilesRefs<T extends Object>(
-    Expression<T> Function($$PersonBirthProfilesTableAnnotationComposer a) f,
-  ) {
-    final $$PersonBirthProfilesTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.personBirthProfiles,
-          getReferencedColumn: (t) => t.personId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$PersonBirthProfilesTableAnnotationComposer(
-                $db: $db,
-                $table: $db.personBirthProfiles,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
-
-  Expression<T> encountersRefs<T extends Object>(
-    Expression<T> Function($$EncountersTableAnnotationComposer a) f,
-  ) {
-    final $$EncountersTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.encounters,
-      getReferencedColumn: (t) => t.personId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$EncountersTableAnnotationComposer(
-            $db: $db,
-            $table: $db.encounters,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$PersonsTableTableManager
-    extends
-        RootTableManager<
-          _$RynAppDatabase,
-          $PersonsTable,
-          PersonRow,
-          $$PersonsTableFilterComposer,
-          $$PersonsTableOrderingComposer,
-          $$PersonsTableAnnotationComposer,
-          $$PersonsTableCreateCompanionBuilder,
-          $$PersonsTableUpdateCompanionBuilder,
-          (PersonRow, $$PersonsTableReferences),
-          PersonRow,
-          PrefetchHooks Function({
-            bool personRolesRefs,
-            bool personGroupMembershipsRefs,
-            bool relationshipsFromPerson,
-            bool relationshipsToPerson,
-            bool personBirthProfilesRefs,
-            bool encountersRefs,
-          })
-        > {
-  $$PersonsTableTableManager(_$RynAppDatabase db, $PersonsTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$PersonsTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$PersonsTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$PersonsTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<String> id = const Value.absent(),
-                Value<String> displayName = const Value.absent(),
-                Value<String> status = const Value.absent(),
-                Value<String?> relationshipSummary = const Value.absent(),
-                Value<int?> firstMetOnUtcUs = const Value.absent(),
-                Value<int?> archivedAtUtcUs = const Value.absent(),
-                Value<int> createdAtUtcUs = const Value.absent(),
-                Value<int> updatedAtUtcUs = const Value.absent(),
-                Value<int> rowid = const Value.absent(),
-              }) => PersonsCompanion(
-                id: id,
-                displayName: displayName,
-                status: status,
-                relationshipSummary: relationshipSummary,
-                firstMetOnUtcUs: firstMetOnUtcUs,
-                archivedAtUtcUs: archivedAtUtcUs,
-                createdAtUtcUs: createdAtUtcUs,
-                updatedAtUtcUs: updatedAtUtcUs,
-                rowid: rowid,
-              ),
-          createCompanionCallback:
-              ({
-                required String id,
-                required String displayName,
-                required String status,
-                Value<String?> relationshipSummary = const Value.absent(),
-                Value<int?> firstMetOnUtcUs = const Value.absent(),
-                Value<int?> archivedAtUtcUs = const Value.absent(),
-                required int createdAtUtcUs,
-                required int updatedAtUtcUs,
-                Value<int> rowid = const Value.absent(),
-              }) => PersonsCompanion.insert(
-                id: id,
-                displayName: displayName,
-                status: status,
-                relationshipSummary: relationshipSummary,
-                firstMetOnUtcUs: firstMetOnUtcUs,
-                archivedAtUtcUs: archivedAtUtcUs,
-                createdAtUtcUs: createdAtUtcUs,
-                updatedAtUtcUs: updatedAtUtcUs,
-                rowid: rowid,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$PersonsTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback:
-              ({
-                personRolesRefs = false,
-                personGroupMembershipsRefs = false,
-                relationshipsFromPerson = false,
-                relationshipsToPerson = false,
-                personBirthProfilesRefs = false,
-                encountersRefs = false,
-              }) {
-                return PrefetchHooks(
-                  db: db,
-                  explicitlyWatchedTables: [
-                    if (personRolesRefs) db.personRoles,
-                    if (personGroupMembershipsRefs) db.personGroupMemberships,
-                    if (relationshipsFromPerson) db.personRelationships,
-                    if (relationshipsToPerson) db.personRelationships,
-                    if (personBirthProfilesRefs) db.personBirthProfiles,
-                    if (encountersRefs) db.encounters,
-                  ],
-                  addJoins: null,
-                  getPrefetchedDataCallback: (items) async {
-                    return [
-                      if (personRolesRefs)
-                        await $_getPrefetchedData<
-                          PersonRow,
-                          $PersonsTable,
-                          PersonRoleRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$PersonsTableReferences
-                              ._personRolesRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$PersonsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).personRolesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.personId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (personGroupMembershipsRefs)
-                        await $_getPrefetchedData<
-                          PersonRow,
-                          $PersonsTable,
-                          PersonGroupMembershipRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$PersonsTableReferences
-                              ._personGroupMembershipsRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$PersonsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).personGroupMembershipsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.personId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (relationshipsFromPerson)
-                        await $_getPrefetchedData<
-                          PersonRow,
-                          $PersonsTable,
-                          PersonRelationshipRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$PersonsTableReferences
-                              ._relationshipsFromPersonTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$PersonsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).relationshipsFromPerson,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.fromPersonId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (relationshipsToPerson)
-                        await $_getPrefetchedData<
-                          PersonRow,
-                          $PersonsTable,
-                          PersonRelationshipRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$PersonsTableReferences
-                              ._relationshipsToPersonTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$PersonsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).relationshipsToPerson,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.toPersonId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (personBirthProfilesRefs)
-                        await $_getPrefetchedData<
-                          PersonRow,
-                          $PersonsTable,
-                          PersonBirthProfileRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$PersonsTableReferences
-                              ._personBirthProfilesRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$PersonsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).personBirthProfilesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.personId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (encountersRefs)
-                        await $_getPrefetchedData<
-                          PersonRow,
-                          $PersonsTable,
-                          EncounterRow
-                        >(
-                          currentTable: table,
-                          referencedTable: $$PersonsTableReferences
-                              ._encountersRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$PersonsTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).encountersRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.personId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                    ];
-                  },
-                );
-              },
-        ),
-      );
-}
-
-typedef $$PersonsTableProcessedTableManager =
-    ProcessedTableManager<
-      _$RynAppDatabase,
-      $PersonsTable,
-      PersonRow,
-      $$PersonsTableFilterComposer,
-      $$PersonsTableOrderingComposer,
-      $$PersonsTableAnnotationComposer,
-      $$PersonsTableCreateCompanionBuilder,
-      $$PersonsTableUpdateCompanionBuilder,
-      (PersonRow, $$PersonsTableReferences),
-      PersonRow,
-      PrefetchHooks Function({
-        bool personRolesRefs,
-        bool personGroupMembershipsRefs,
-        bool relationshipsFromPerson,
-        bool relationshipsToPerson,
-        bool personBirthProfilesRefs,
-        bool encountersRefs,
-      })
     >;
 typedef $$PersonRolesTableCreateCompanionBuilder =
     PersonRolesCompanion Function({
@@ -20632,6 +20911,8 @@ class $RynAppDatabaseManager {
       $$AgentRunsTableTableManager(_db, _db.agentRuns);
   $$ApprovalRecordsTableTableManager get approvalRecords =>
       $$ApprovalRecordsTableTableManager(_db, _db.approvalRecords);
+  $$PersonsTableTableManager get persons =>
+      $$PersonsTableTableManager(_db, _db.persons);
   $$TarotReadingsTableTableManager get tarotReadings =>
       $$TarotReadingsTableTableManager(_db, _db.tarotReadings);
   $$TarotCardPlacementsTableTableManager get tarotCardPlacements =>
@@ -20640,8 +20921,6 @@ class $RynAppDatabaseManager {
       $$TarotInterpretationsTableTableManager(_db, _db.tarotInterpretations);
   $$AppRuntimeStateTableTableManager get appRuntimeState =>
       $$AppRuntimeStateTableTableManager(_db, _db.appRuntimeState);
-  $$PersonsTableTableManager get persons =>
-      $$PersonsTableTableManager(_db, _db.persons);
   $$PersonRolesTableTableManager get personRoles =>
       $$PersonRolesTableTableManager(_db, _db.personRoles);
   $$PersonGroupsTableTableManager get personGroups =>

@@ -7,7 +7,7 @@ import 'package:ryn_universe_os_core/core/persistence/migrations.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 void main() {
-  group('Tarot and Person schema preserved in v7', () {
+  group('Tarot and Person schema preserved in v8', () {
     late RynAppDatabase database;
 
     setUp(() {
@@ -19,10 +19,10 @@ void main() {
     });
 
     test(
-      'fresh database creates schema version 7 with Tarot and Person group tables',
+      'fresh database creates schema version 8 with canonical Person FK',
       () async {
-        expect(database.schemaVersion, 7);
-        expect(plannedCurrentSchemaVersion, 7);
+        expect(database.schemaVersion, 8);
+        expect(plannedCurrentSchemaVersion, 8);
 
         final tables = await _tableNames(database);
         expect(
@@ -38,6 +38,24 @@ void main() {
         );
         expect(await _count(database, 'person_groups'), 0);
         expect(await _count(database, 'person_group_memberships'), 0);
+
+        final columns = await database
+            .customSelect('PRAGMA table_info(tarot_readings)')
+            .get();
+        final personId = columns.singleWhere(
+          (row) => row.read<String>('name') == 'person_id',
+        );
+        expect(personId.read<int>('notnull'), 0);
+
+        final foreignKeys = await database
+            .customSelect('PRAGMA foreign_key_list(tarot_readings)')
+            .get();
+        final personForeignKey = foreignKeys.singleWhere(
+          (row) => row.read<String>('from') == 'person_id',
+        );
+        expect(personForeignKey.read<String>('table'), 'persons');
+        expect(personForeignKey.read<String>('to'), 'id');
+        expect(personForeignKey.read<String>('on_delete'), 'RESTRICT');
       },
     );
 
@@ -232,9 +250,9 @@ void main() {
     );
   });
 
-  group('Tarot and Person preserving add-only migration through v7', () {
+  group('Tarot and Person preserving add-only migration through v8', () {
     test(
-      'file-backed v6 to v7 preserves Person Role and creates empty group tables across restart',
+      'file-backed v6 to v8 preserves Person Role and adds nullable Person link',
       () async {
         final root = await Directory.systemTemp.createTemp('ryn-group-v6-v7-');
         addTearDown(() async {
@@ -256,6 +274,7 @@ void main() {
         await database.close();
 
         final raw = sqlite3.open(file.path);
+        raw.execute('ALTER TABLE tarot_readings DROP COLUMN person_id');
         raw.execute('DROP TABLE person_group_memberships');
         raw.execute('DROP TABLE person_groups');
         raw.userVersion = 6;
@@ -266,7 +285,13 @@ void main() {
         expect(await _count(database, 'person_roles'), 1);
         expect(await _count(database, 'person_groups'), 0);
         expect(await _count(database, 'person_group_memberships'), 0);
-        expect(database.schemaVersion, 7);
+        expect(database.schemaVersion, 8);
+        final personId = await database
+            .customSelect(
+              "SELECT person_id FROM tarot_readings WHERE reading_instance_id = 'missing'",
+            )
+            .getSingleOrNull();
+        expect(personId, isNull);
         await database.close();
 
         database = RynAppDatabase(NativeDatabase(file));
@@ -311,6 +336,79 @@ void main() {
       },
     );
 
+    test('file-backed v7 to v8 preserves rows with null Person links', () async {
+      final root = await Directory.systemTemp.createTemp('ryn-tarot-v7-v8-');
+      addTearDown(() async {
+        if (await root.exists()) await root.delete(recursive: true);
+      });
+      final file = File(
+        '${root.path}${Platform.pathSeparator}migration.sqlite',
+      );
+      var database = RynAppDatabase(NativeDatabase(file));
+      await _insertReading(database, id: 'reading.synthetic.v7');
+      await database.close();
+
+      final raw = sqlite3.open(file.path);
+      raw.execute('ALTER TABLE tarot_readings DROP COLUMN person_id');
+      raw.userVersion = 7;
+      raw.close();
+
+      database = RynAppDatabase(NativeDatabase(file));
+      final migrated = await database
+          .customSelect(
+            "SELECT person_id FROM tarot_readings WHERE reading_instance_id = 'reading.synthetic.v7'",
+          )
+          .getSingle();
+      expect(migrated.readNullable<String>('person_id'), isNull);
+      final version = await database
+          .customSelect('PRAGMA user_version')
+          .getSingle();
+      expect(version.read<int>('user_version'), 8);
+      expect(
+        await database.customSelect('PRAGMA foreign_key_check').get(),
+        isEmpty,
+      );
+      expect(
+        (await database.customSelect('PRAGMA integrity_check').getSingle())
+            .read<String>('integrity_check'),
+        'ok',
+      );
+      await database.close();
+
+      database = RynAppDatabase(NativeDatabase(file));
+      expect(await _count(database, 'tarot_readings'), 1);
+      await database.close();
+    });
+
+    test('malformed v7 with person_id fails and remains version 7', () async {
+      final root = await Directory.systemTemp.createTemp('ryn-tarot-v7-bad-');
+      addTearDown(() async {
+        if (await root.exists()) await root.delete(recursive: true);
+      });
+      final file = File(
+        '${root.path}${Platform.pathSeparator}malformed.sqlite',
+      );
+      var database = RynAppDatabase(NativeDatabase(file));
+      await database.customSelect('SELECT 1').get();
+      await database.close();
+      var raw = sqlite3.open(file.path);
+      raw.userVersion = 7;
+      raw.close();
+
+      database = RynAppDatabase(NativeDatabase(file));
+      await expectLater(
+        database.customSelect('SELECT 1').get(),
+        throwsA(anything),
+      );
+      await database.close();
+
+      raw = sqlite3.open(file.path);
+      expect(raw.userVersion, 7);
+      final columns = raw.select('PRAGMA table_info(tarot_readings)');
+      expect(columns.where((row) => row['name'] == 'person_id'), hasLength(1));
+      raw.close();
+    });
+
     test(
       'unsupported older migration path fails without destructive recreation',
       () async {
@@ -338,7 +436,7 @@ void main() {
           NativeDatabase.memory(
             setup: (raw) {
               raw.execute(_version4AppSettingsSql);
-              raw.execute('PRAGMA user_version = 8');
+              raw.execute('PRAGMA user_version = 9');
             },
           ),
         );

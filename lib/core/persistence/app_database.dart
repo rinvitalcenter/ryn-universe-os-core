@@ -350,27 +350,34 @@ final class RynAppDatabase extends _$RynAppDatabase {
       await _ensureMainRuntimeState();
     },
     onUpgrade: (migrator, from, to) async {
-      if (to != 7 || (from != 4 && from != 5 && from != 6)) {
+      if (to != 8 || (from < 4 || from > 7)) {
         throw StateError('Unsupported database migration path: $from -> $to');
       }
-      if (from == 4) {
-        await migrator.createTable(tarotReadings);
-        await migrator.createTable(tarotCardPlacements);
-        await migrator.createTable(tarotInterpretations);
-        await migrator.createTable(appRuntimeState);
-      }
-      if (from <= 5) {
-        await migrator.createTable(persons);
-        await migrator.createTable(personRoles);
-        await migrator.createTable(personRelationships);
-        await migrator.createTable(personBirthProfiles);
-        await migrator.createTable(encounters);
-        await migrator.createTable(encounterNotes);
-      }
-      await migrator.createTable(personGroups);
-      await migrator.createTable(personGroupMemberships);
-      await _ensurePersonCoreIndexes();
-      await _ensureMainRuntimeState();
+      await transaction(() async {
+        if (from == 4) {
+          await migrator.createTable(tarotReadings);
+          await migrator.createTable(tarotCardPlacements);
+          await migrator.createTable(tarotInterpretations);
+          await migrator.createTable(appRuntimeState);
+        }
+        if (from <= 5) {
+          await migrator.createTable(persons);
+          await migrator.createTable(personRoles);
+          await migrator.createTable(personRelationships);
+          await migrator.createTable(personBirthProfiles);
+          await migrator.createTable(encounters);
+          await migrator.createTable(encounterNotes);
+        }
+        if (from <= 6) {
+          await migrator.createTable(personGroups);
+          await migrator.createTable(personGroupMemberships);
+        }
+        if (from != 4) {
+          await migrator.addColumn(tarotReadings, tarotReadings.personId);
+        }
+        await _ensurePersonCoreIndexes();
+        await _ensureMainRuntimeState();
+      });
     },
     beforeOpen: (details) async {
       await customStatement('PRAGMA foreign_keys = ON');

@@ -753,9 +753,13 @@ Future<RepositoryResult<T>> _write<T>(Future<T> Function() body) async {
   } on _InvalidInput {
     return _validation<T>();
   } on SqliteException catch (error) {
+    final message = error.message.toLowerCase();
     final conflict =
-        error.message.toLowerCase().contains('unique') ||
-        error.extendedResultCode == 2067;
+        message.contains('unique') ||
+        message.contains('foreign key') ||
+        error.resultCode == 19 ||
+        error.extendedResultCode == 2067 ||
+        error.extendedResultCode == 787;
     return RepositoryResult.failure(
       RepositoryError(
         code: conflict

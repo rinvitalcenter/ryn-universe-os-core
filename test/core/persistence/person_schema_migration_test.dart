@@ -14,19 +14,19 @@ const personTables = <String>{
 
 void main() {
   test(
-    'fresh database creates schema version 7 and all Person Core tables',
+    'fresh database creates schema version 8 and all Person Core tables',
     () async {
       final database = RynAppDatabase(NativeDatabase.memory());
       addTearDown(database.close);
 
-      expect(database.schemaVersion, 7);
-      expect(plannedCurrentSchemaVersion, 7);
+      expect(database.schemaVersion, 8);
+      expect(plannedCurrentSchemaVersion, 8);
       expect(await _tableNames(database), containsAll(personTables));
     },
   );
 
   test(
-    'schema 5 to 6 preserves Tarot data and adds empty Person tables',
+    'schema 5 to 8 preserves Tarot data and adds nullable Person link',
     () async {
       final database = RynAppDatabase(
         NativeDatabase.memory(setup: _createSyntheticVersion5Database),
@@ -35,7 +35,7 @@ void main() {
 
       final reading = await database
           .customSelect(
-            "SELECT question_display_text FROM tarot_readings WHERE reading_instance_id = 'reading.synthetic.v5'",
+            "SELECT question_display_text, person_id FROM tarot_readings WHERE reading_instance_id = 'reading.synthetic.v5'",
           )
           .getSingle();
       expect(
@@ -44,30 +44,28 @@ void main() {
       );
       expect(await _tableNames(database), containsAll(personTables));
       expect(await _count(database, 'persons'), 0);
+      expect(reading.readNullable<String>('person_id'), isNull);
     },
   );
 
-  test(
-    'schema 4 to 5 to 6 preserves governance data and adds all tables',
-    () async {
-      final database = RynAppDatabase(
-        NativeDatabase.memory(setup: _createSyntheticVersion4Database),
-      );
-      addTearDown(database.close);
+  test('schema 4 to 8 preserves governance data and adds all tables', () async {
+    final database = RynAppDatabase(
+      NativeDatabase.memory(setup: _createSyntheticVersion4Database),
+    );
+    addTearDown(database.close);
 
-      final setting = await database
-          .customSelect(
-            "SELECT value FROM app_settings WHERE key = 'synthetic.setting'",
-          )
-          .getSingle();
-      expect(setting.read<String>('value'), 'SYNTHETIC_VALUE');
-      final tables = await _tableNames(database);
-      expect(tables, containsAll(personTables));
-      expect(tables, contains('tarot_readings'));
-      expect(await _count(database, 'persons'), 0);
-      expect(await _count(database, 'tarot_readings'), 0);
-    },
-  );
+    final setting = await database
+        .customSelect(
+          "SELECT value FROM app_settings WHERE key = 'synthetic.setting'",
+        )
+        .getSingle();
+    expect(setting.read<String>('value'), 'SYNTHETIC_VALUE');
+    final tables = await _tableNames(database);
+    expect(tables, containsAll(personTables));
+    expect(tables, contains('tarot_readings'));
+    expect(await _count(database, 'persons'), 0);
+    expect(await _count(database, 'tarot_readings'), 0);
+  });
 }
 
 Future<Set<String>> _tableNames(RynAppDatabase database) async {

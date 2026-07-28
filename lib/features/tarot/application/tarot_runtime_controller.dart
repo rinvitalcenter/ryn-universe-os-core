@@ -211,6 +211,7 @@ final class TarotRuntimeController extends ChangeNotifier {
       CompletedTarotReadingPersistenceInput(
         snapshot: snapshot,
         sourceType: TarotReadingOrigin.selfDrawn,
+        personId: null,
         readingTimezoneOffsetMinutes: readingTimezoneOffsetMinutes,
         interpretation: interpretation,
       ),

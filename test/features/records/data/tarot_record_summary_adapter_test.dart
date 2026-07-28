@@ -12,6 +12,7 @@ void main() {
       snapshot: snapshot,
       questionDisplayText: '보이는 질문',
       sourceType: TarotReadingOrigin.selfDrawn,
+      personId: null,
       lifecycle: TarotReadingLifecycle.continuing,
       interpretation: const TarotInterpretationSessionDraft(
         readingInstanceId: 'reading-1',
@@ -81,6 +82,7 @@ void main() {
         snapshot: snapshot,
         questionDisplayText: snapshot.readingQuestionText,
         sourceType: TarotReadingOrigin.manuallyRecorded,
+        personId: 'person.synthetic.001',
         lifecycle: TarotReadingLifecycle.finished,
         interpretation: null,
         readingTimezoneOffsetMinutes: 540,
@@ -95,7 +97,7 @@ void main() {
       expect(summary.recordType, RecordType.tarotManualReading);
       expect(summary.status, RecordDisplayStatus.finished);
       expect(projection.snapshot, same(snapshot));
-      expect(summary.personId, isNull);
+      expect(summary.personId, 'person.synthetic.001');
       expect(summary.capabilities.canEdit, isFalse);
     },
   );

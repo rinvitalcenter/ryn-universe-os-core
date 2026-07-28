@@ -135,6 +135,7 @@ final class TarotRestoreCandidateValidator {
         requireAcceptableSidecars: true,
         acceptedSchemaVersions: const <int>{
           TarotBackupManifest.legacySchemaVersion,
+          TarotBackupManifest.schemaVersionV7,
           TarotBackupManifest.schemaVersion,
         },
       );

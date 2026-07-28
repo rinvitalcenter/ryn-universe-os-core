@@ -108,7 +108,7 @@ final class TarotBackupDatabaseInspector {
         'app_runtime_state',
       ].every(tableNames.contains);
       final tarotAggregate = hasTarotTables
-          ? _inspectAggregate(database)
+          ? _inspectAggregate(database, schemaVersion: schemaVersion)
           : const _AggregateEvidence.invalid();
       final hasPersonCoreTables = <String>[
         'persons',
@@ -124,11 +124,14 @@ final class TarotBackupDatabaseInspector {
           hasPersonCoreTables &&
           _inspectPersonSchemaContract(
             database,
-            includeGroups: schemaVersion == TarotBackupManifest.schemaVersion,
+            includeGroups: schemaVersion >= TarotBackupManifest.schemaVersionV7,
           );
       final groupInvariantsOk =
           schemaVersion == TarotBackupManifest.legacySchemaVersion ||
           _inspectPersonGroups(database);
+      final tarotPersonSchemaContractOk =
+          hasTarotTables &&
+          _inspectTarotPersonSchemaContract(database, schemaVersion);
       final integrityCheckOk =
           database.select('PRAGMA integrity_check').length == 1 &&
           database.select('PRAGMA integrity_check').first.values.first == 'ok';
@@ -156,7 +159,7 @@ final class TarotBackupDatabaseInspector {
         unsupportedTableRowsZero: unsupportedRowsZero,
         integrityCheckOk: integrityCheckOk,
         foreignKeyCheckOk: foreignKeyCheckOk,
-        schemaContractOk: personSchemaContractOk,
+        schemaContractOk: personSchemaContractOk && tarotPersonSchemaContractOk,
         aggregateInvariantsOk:
             tarotAggregate.valid && personCoreInvariantsOk && groupInvariantsOk,
         freelistCount: _scalar(database, 'PRAGMA freelist_count'),
@@ -237,7 +240,10 @@ final class TarotBackupDatabaseInspector {
     return evidence;
   }
 
-  _AggregateEvidence _inspectAggregate(Database database) {
+  _AggregateEvidence _inspectAggregate(
+    Database database, {
+    required int schemaVersion,
+  }) {
     final readingRow = database
         .select(
           'SELECT count(*) AS total, '
@@ -290,6 +296,11 @@ final class TarotBackupDatabaseInspector {
           ON r.reading_instance_id = i.reading_instance_id
         WHERE r.reading_instance_id IS NULL''',
     );
+    final orphanPersonLinks = schemaVersion >= TarotBackupManifest.schemaVersion
+        ? _scalar(database, '''SELECT count(*) FROM tarot_readings r
+              LEFT JOIN persons p ON p.id = r.person_id
+              WHERE r.person_id IS NOT NULL AND p.id IS NULL''')
+        : 0;
     final duplicateInterpretations = _scalar(database, '''SELECT count(*) FROM (
         SELECT reading_instance_id FROM tarot_interpretations
         GROUP BY reading_instance_id HAVING count(*) > 1
@@ -340,11 +351,29 @@ final class TarotBackupDatabaseInspector {
           invalidFinishedState == 0 &&
           orphanPlacements == 0 &&
           orphanInterpretations == 0 &&
+          orphanPersonLinks == 0 &&
           duplicateInterpretations == 0 &&
           runtimeCount == 1 &&
           invalidRuntimeState == 0 &&
           invalidActiveHome == 0,
     );
+  }
+
+  bool _inspectTarotPersonSchemaContract(Database database, int schemaVersion) {
+    final foreignKeys = database
+        .select('PRAGMA foreign_key_list("tarot_readings")')
+        .map(
+          (row) =>
+              '${row['from']}|${row['table']}|${row['to']}|'
+                      '${row['on_update']}|${row['on_delete']}'
+                  .toLowerCase(),
+        )
+        .toList(growable: false);
+    final expected = schemaVersion >= TarotBackupManifest.schemaVersion
+        ? const <String>{'person_id|persons|id|no action|restrict'}
+        : const <String>{};
+    return foreignKeys.length == expected.length &&
+        _sameSet(foreignKeys.toSet(), expected);
   }
 
   bool _inspectPersonCore(Database database) {

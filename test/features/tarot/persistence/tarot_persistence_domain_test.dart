@@ -27,6 +27,7 @@ void main() {
         () => CompletedTarotReadingPersistenceInput(
           snapshot: base.snapshot,
           sourceType: TarotReadingOrigin.selfDrawn,
+          personId: null,
           readingTimezoneOffsetMinutes: 540,
           interpretation: const TarotInterpretationSessionDraft(
             readingInstanceId: 'reading.synthetic.other',
@@ -43,10 +44,38 @@ void main() {
         () => CompletedTarotReadingPersistenceInput(
           snapshot: base.snapshot,
           sourceType: TarotReadingOrigin.selfDrawn,
+          personId: null,
           readingTimezoneOffsetMinutes: 841,
         ),
         throwsArgumentError,
       );
+    });
+
+    test('self reading rejects a Person link', () {
+      expect(
+        () => syntheticInput(personId: 'person.synthetic.001'),
+        throwsArgumentError,
+      );
+    });
+
+    test('manual reading requires a trimmed canonical Person ID', () {
+      expect(
+        () => syntheticInput(sourceType: TarotReadingOrigin.manuallyRecorded),
+        throwsArgumentError,
+      );
+      expect(
+        () => syntheticInput(
+          sourceType: TarotReadingOrigin.manuallyRecorded,
+          personId: '   ',
+        ),
+        throwsArgumentError,
+      );
+
+      final input = syntheticInput(
+        sourceType: TarotReadingOrigin.manuallyRecorded,
+        personId: '  person.synthetic.001  ',
+      );
+      expect(input.personId, 'person.synthetic.001');
     });
   });
 

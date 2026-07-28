@@ -26,6 +26,8 @@ void main() {
     required bool includePerson,
     required bool includeTarot,
     bool includeGroups = false,
+    bool includeLinkedManualTarot = false,
+    bool archivePerson = false,
     int candidateSchemaVersion = TarotBackupManifest.schemaVersion,
   }) async {
     fixture = await TarotBackupRecoveryFixture.create(
@@ -34,6 +36,24 @@ void main() {
     var database = fixture!.openSource();
     if (includePerson) fixture!.insertSyntheticPersonCore(database);
     if (includeGroups) fixture!.insertSyntheticPersonGroups(database);
+    if (includeLinkedManualTarot) {
+      fixture!.insertValidReading(database, id: 'synthetic-linked');
+      database.execute(
+        "UPDATE tarot_readings SET source_type = 'manually_recorded', "
+        "person_id = 'person.synthetic.study.01' "
+        "WHERE reading_instance_id = 'synthetic-linked'",
+      );
+      database.execute(
+        "UPDATE app_runtime_state SET active_home_tarot_reading_id = "
+        "'synthetic-r1' WHERE state_key = 'main'",
+      );
+    }
+    if (archivePerson) {
+      database.execute(
+        "UPDATE persons SET archived_at_utc_us = updated_at_utc_us "
+        "WHERE id = 'person.synthetic.study.01'",
+      );
+    }
     fixture!.release(database);
 
     final package = await fixture!.createRestoreCandidate(
@@ -43,6 +63,20 @@ void main() {
     database = fixture!.openSource();
     if (includePerson) {
       database.execute('PRAGMA foreign_keys = ON');
+      if (includeLinkedManualTarot) {
+        database.execute(
+          "DELETE FROM tarot_interpretations "
+          "WHERE reading_instance_id = 'synthetic-linked'",
+        );
+        database.execute(
+          "DELETE FROM tarot_card_placements "
+          "WHERE reading_instance_id = 'synthetic-linked'",
+        );
+        database.execute(
+          "DELETE FROM tarot_readings "
+          "WHERE reading_instance_id = 'synthetic-linked'",
+        );
+      }
       database.execute(
         "DELETE FROM persons WHERE id = 'person.synthetic.study.01'",
       );
@@ -96,11 +130,20 @@ void main() {
       'groups': lifecycle!.count('person_groups'),
       'memberships': lifecycle!.count('person_group_memberships'),
       'schema': lifecycle!.schemaVersion,
+      'linkedReadings': lifecycle!.scalar(
+        'SELECT count(*) FROM tarot_readings WHERE person_id IS NOT NULL',
+      ),
+      'nullReadings': lifecycle!.scalar(
+        'SELECT count(*) FROM tarot_readings WHERE person_id IS NULL',
+      ),
+      'archivedPersons': lifecycle!.scalar(
+        'SELECT count(*) FROM persons WHERE archived_at_utc_us IS NOT NULL',
+      ),
     };
   }
 
   test(
-    'Person-only schema v7 backup validates and restores synthetic rows',
+    'Person-only schema v8 backup validates and restores synthetic rows',
     () async {
       final counts = await roundTrip(includePerson: true, includeTarot: false);
 
@@ -113,12 +156,15 @@ void main() {
         'readings': 0,
         'groups': 0,
         'memberships': 0,
-        'schema': 7,
+        'schema': 8,
+        'linkedReadings': 0,
+        'nullReadings': 0,
+        'archivedPersons': 0,
       });
     },
   );
 
-  test('Tarot-only schema v7 backup restore remains compatible', () async {
+  test('Tarot-only schema v8 backup restore remains compatible', () async {
     final counts = await roundTrip(includePerson: false, includeTarot: true);
 
     expect(counts['persons'], 0);
@@ -126,7 +172,7 @@ void main() {
   });
 
   test(
-    'mixed Person and Tarot schema v7 backup restores both domains',
+    'mixed Person and Tarot schema v8 backup restores both domains',
     () async {
       final counts = await roundTrip(includePerson: true, includeTarot: true);
 
@@ -137,7 +183,7 @@ void main() {
   );
 
   test(
-    'exact v6 backup is migrated in isolation and restored as v7 with empty groups',
+    'exact v6 backup is migrated in isolation and restored as v8 with empty groups',
     () async {
       final counts = await roundTrip(
         includePerson: true,
@@ -145,7 +191,7 @@ void main() {
         candidateSchemaVersion: TarotBackupManifest.legacySchemaVersion,
       );
 
-      expect(counts['schema'], 7);
+      expect(counts['schema'], 8);
       expect(counts['persons'], 1);
       expect(counts['roles'], 1);
       expect(counts['readings'], 1);
@@ -154,14 +200,30 @@ void main() {
     },
   );
 
+  test('v8 round trip preserves linked manual null self and archive', () async {
+    final counts = await roundTrip(
+      includePerson: true,
+      includeTarot: true,
+      includeLinkedManualTarot: true,
+      archivePerson: true,
+    );
+
+    expect(counts['schema'], 8);
+    expect(counts['readings'], 2);
+    expect(counts['linkedReadings'], 1);
+    expect(counts['nullReadings'], 1);
+    expect(counts['archivedPersons'], 1);
+  });
+
   test('v7 backup restores groups and memberships across reopen', () async {
     final counts = await roundTrip(
       includePerson: true,
       includeTarot: false,
       includeGroups: true,
+      candidateSchemaVersion: TarotBackupManifest.schemaVersionV7,
     );
 
-    expect(counts['schema'], 7);
+    expect(counts['schema'], 8);
     expect(counts['groups'], 2);
     expect(counts['memberships'], 2);
   });
@@ -314,6 +376,8 @@ final class _PersonRestoreLifecycle implements TarotRestoreRuntimeLifecycle {
       _database!.select('SELECT count(*) FROM $table').single.values.single
           as int;
 
+  int scalar(String sql) => _database!.select(sql).single.values.single as int;
+
   int get schemaVersion => _database!.userVersion;
 
   @override
@@ -332,7 +396,7 @@ final class _PersonRestoreLifecycle implements TarotRestoreRuntimeLifecycle {
   @override
   Future<void> validateBasicRead() async {
     validateCount += 1;
-    if (_database?.userVersion != 7) {
+    if (_database?.userVersion != TarotBackupManifest.schemaVersion) {
       throw StateError('synthetic schema read failed');
     }
     const TarotBackupDatabaseInspector().inspectVerified(liveFile.path);

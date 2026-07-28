@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ryn_universe_os_core/core/persistence/app_database.dart';
 import 'package:ryn_universe_os_core/core/repositories/repository_result.dart';
 import 'package:ryn_universe_os_core/features/tarot/data/persistence/tarot_persistence_mapper.dart';
+import 'package:ryn_universe_os_core/features/tarot/domain/tarot_persistence_models.dart';
 
 import 'synthetic_tarot_fixtures.dart';
 
@@ -32,6 +33,18 @@ void main() {
       );
 
       expect(result.value!.reading.readingTimezoneOffsetMin.value, -480);
+    });
+
+    test('canonical Person ID maps without display data', () {
+      final result = mapper.toWriteSet(
+        syntheticInput(
+          sourceType: TarotReadingOrigin.manuallyRecorded,
+          personId: 'person.synthetic.001',
+        ),
+        nowUtcUs: nowUs,
+      );
+
+      expect(result.value!.reading.personId.value, 'person.synthetic.001');
     });
 
     test('orientation mapping is exhaustive for reversed and notUsed', () {
@@ -78,6 +91,7 @@ void main() {
           hydrated.value!.snapshot.readingInstanceId,
           input.snapshot.readingInstanceId,
         );
+        expect(hydrated.value!.personId, input.personId);
       });
     }
 
@@ -102,6 +116,18 @@ void main() {
 
       expect(hydrated.isSuccess, isTrue);
       expect(hydrated.value!.interpretation, isNull);
+    });
+
+    test('historical manual row with null Person ID remains hydratable', () {
+      final hydrated = mapper.hydrate(
+        reading: _validReading(sourceType: 'manually_recorded'),
+        placements: <TarotCardPlacement>[_validPlacement()],
+        interpretation: null,
+      );
+
+      expect(hydrated.isSuccess, isTrue);
+      expect(hydrated.value!.sourceType, TarotReadingOrigin.manuallyRecorded);
+      expect(hydrated.value!.personId, isNull);
     });
 
     test(
@@ -186,6 +212,7 @@ void main() {
 TarotReading _readingFrom(TarotPersistenceWriteSet rows) => TarotReading(
   readingInstanceId: rows.reading.readingInstanceId.value,
   sourceType: rows.reading.sourceType.value,
+  personId: rows.reading.personId.value,
   questionOriginalSnapshot: rows.reading.questionOriginalSnapshot.value,
   questionDisplayText: rows.reading.questionDisplayText.value,
   deckId: rows.reading.deckId.value,
@@ -235,9 +262,11 @@ TarotReading _validReading({
   String sourceType = 'self_drawn',
   String lifecycle = 'continuing',
   String questionDisplay = syntheticQuestionA,
+  String? personId,
 }) => TarotReading(
   readingInstanceId: 'reading.synthetic.01',
   sourceType: sourceType,
+  personId: personId,
   questionOriginalSnapshot: syntheticQuestionA,
   questionDisplayText: questionDisplay,
   deckId: 'deck.test',

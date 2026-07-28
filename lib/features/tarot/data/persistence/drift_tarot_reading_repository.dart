@@ -44,6 +44,11 @@ final class DriftTarotReadingRepository implements TarotReadingRepository {
           );
         }
 
+        final personValidation = await _validateManualPerson(input);
+        if (personValidation != null) {
+          return RepositoryResult.failure(personValidation);
+        }
+
         final rows = mapped.value!;
         await _database.into(_database.tarotReadings).insert(rows.reading);
         for (final placement in rows.placements) {
@@ -63,10 +68,12 @@ final class DriftTarotReadingRepository implements TarotReadingRepository {
               .into(_database.tarotInterpretations)
               .insert(interpretation);
         }
-        await _setActiveHomeId(
-          input.snapshot.readingInstanceId,
-          updatedAtUtcUs: nowUs,
-        );
+        if (input.sourceType == TarotReadingOrigin.selfDrawn) {
+          await _setActiveHomeId(
+            input.snapshot.readingInstanceId,
+            updatedAtUtcUs: nowUs,
+          );
+        }
         final created = await _readingRow(input.snapshot.readingInstanceId);
         return _hydrate(created!);
       });
@@ -372,6 +379,7 @@ final class DriftTarotReadingRepository implements TarotReadingRepository {
     final expected = input.snapshot;
     final actual = stored.snapshot;
     if (stored.sourceType != input.sourceType ||
+        stored.personId != input.personId ||
         stored.readingTimezoneOffsetMinutes !=
             input.readingTimezoneOffsetMinutes ||
         actual.readingInstanceId != expected.readingInstanceId ||
@@ -391,6 +399,27 @@ final class DriftTarotReadingRepository implements TarotReadingRepository {
       if (!_samePlacement(left, right)) return false;
     }
     return true;
+  }
+
+  Future<RepositoryError?> _validateManualPerson(
+    CompletedTarotReadingPersistenceInput input,
+  ) async {
+    if (input.sourceType != TarotReadingOrigin.manuallyRecorded) return null;
+    final person = await (_database.select(
+      _database.persons,
+    )..where((table) => table.id.equals(input.personId!))).getSingleOrNull();
+    if (person == null) {
+      return _error(
+        RepositoryErrorCode.notFound,
+        'The selected Person record was not found.',
+      );
+    }
+    if (person.status != 'active' || person.archivedAtUtcUs != null) {
+      return _validationFailure(
+        'The selected Person is not active and available.',
+      );
+    }
+    return null;
   }
 
   int _nowUtcUs() => _clock().toUtc().microsecondsSinceEpoch;

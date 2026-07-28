@@ -35,6 +35,26 @@ void main() {
     }
   });
 
+  test('schema v6 v7 and v8 retain exact versioned inventories', () {
+    expect(TarotBackupManifest.schemaVersion, 8);
+    expect(TarotBackupManifest.requiredTablesFor(6), isNotEmpty);
+    expect(TarotBackupManifest.requiredTablesFor(7), isNotEmpty);
+    expect(TarotBackupManifest.requiredTablesFor(8), isNotEmpty);
+    expect(
+      TarotBackupManifest.requiredColumnsFor(6)['tarot_readings'],
+      isNot(contains('person_id')),
+    );
+    expect(
+      TarotBackupManifest.requiredColumnsFor(7)['tarot_readings'],
+      isNot(contains('person_id')),
+    );
+    expect(
+      TarotBackupManifest.requiredColumnsFor(8)['tarot_readings'],
+      contains('person_id'),
+    );
+    expect(TarotBackupManifest.requiredTablesFor(9), isEmpty);
+  });
+
   test('unknown and privacy-sensitive fields are rejected', () {
     for (final key in <String>[
       'unknownField',

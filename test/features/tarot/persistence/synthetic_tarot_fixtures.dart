@@ -13,6 +13,7 @@ CompletedTarotReadingPersistenceInput syntheticInput({
   String readingId = 'reading.synthetic.01',
   int placementCount = 1,
   TarotReadingOrigin sourceType = TarotReadingOrigin.selfDrawn,
+  String? personId,
   int timezoneOffsetMinutes = 540,
   bool includeInterpretation = true,
   String question = syntheticQuestionA,
@@ -49,6 +50,7 @@ CompletedTarotReadingPersistenceInput syntheticInput({
   return CompletedTarotReadingPersistenceInput(
     snapshot: snapshot,
     sourceType: sourceType,
+    personId: personId,
     readingTimezoneOffsetMinutes: timezoneOffsetMinutes,
     interpretation: includeInterpretation
         ? TarotInterpretationSessionDraft(

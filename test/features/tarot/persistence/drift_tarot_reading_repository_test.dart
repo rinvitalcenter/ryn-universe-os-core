@@ -323,12 +323,104 @@ END
       },
     );
 
-    test('manuallyRecorded source type round trips', () async {
-      final created = await repository.createCompletedReading(
-        syntheticInput(sourceType: TarotReadingOrigin.manuallyRecorded),
+    test(
+      'manuallyRecorded source type and canonical Person round trip',
+      () async {
+        await _insertPerson(database, 'person.synthetic.001');
+        final created = await repository.createCompletedReading(
+          syntheticInput(
+            sourceType: TarotReadingOrigin.manuallyRecorded,
+            personId: 'person.synthetic.001',
+          ),
+        );
+
+        expect(created.value!.sourceType, TarotReadingOrigin.manuallyRecorded);
+        expect(created.value!.personId, 'person.synthetic.001');
+        expect((await repository.getActiveHomeReadingId()).value, isNull);
+      },
+    );
+
+    test('manual create preserves the active self Home reading', () async {
+      await repository.createCompletedReading(
+        syntheticInput(readingId: 'reading.synthetic.self'),
+      );
+      await _insertPerson(database, 'person.synthetic.001');
+
+      final manual = await repository.createCompletedReading(
+        syntheticInput(
+          readingId: 'reading.synthetic.manual',
+          sourceType: TarotReadingOrigin.manuallyRecorded,
+          personId: 'person.synthetic.001',
+        ),
       );
 
-      expect(created.value!.sourceType, TarotReadingOrigin.manuallyRecorded);
+      expect(manual.isSuccess, isTrue);
+      expect(
+        (await repository.getActiveHomeReadingId()).value,
+        'reading.synthetic.self',
+      );
+    });
+
+    test(
+      'missing inactive and archived Persons reject without partial writes',
+      () async {
+        await _insertPerson(
+          database,
+          'person.synthetic.inactive',
+          status: 'inactive',
+        );
+        await _insertPerson(
+          database,
+          'person.synthetic.archived',
+          archivedAtUtcUs: 2,
+        );
+
+        for (final entry in const <(String, String)>[
+          ('reading.synthetic.missing', 'person.synthetic.missing'),
+          ('reading.synthetic.inactive', 'person.synthetic.inactive'),
+          ('reading.synthetic.archived', 'person.synthetic.archived'),
+        ]) {
+          final result = await repository.createCompletedReading(
+            syntheticInput(
+              readingId: entry.$1,
+              sourceType: TarotReadingOrigin.manuallyRecorded,
+              personId: entry.$2,
+            ),
+          );
+          expect(result.isFailure, isTrue, reason: entry.$2);
+        }
+
+        expect(await _count(database, 'tarot_readings'), 0);
+        expect(await _count(database, 'tarot_card_placements'), 0);
+        expect(await _count(database, 'tarot_interpretations'), 0);
+        expect((await repository.getActiveHomeReadingId()).value, isNull);
+      },
+    );
+
+    test('same immutable reading ID with another Person conflicts', () async {
+      await _insertPerson(database, 'person.synthetic.001');
+      await _insertPerson(database, 'person.synthetic.002');
+      await repository.createCompletedReading(
+        syntheticInput(
+          sourceType: TarotReadingOrigin.manuallyRecorded,
+          personId: 'person.synthetic.001',
+        ),
+      );
+
+      final conflict = await repository.createCompletedReading(
+        syntheticInput(
+          sourceType: TarotReadingOrigin.manuallyRecorded,
+          personId: 'person.synthetic.002',
+        ),
+      );
+
+      expect(conflict.error?.code, RepositoryErrorCode.conflict);
+      expect(
+        (await repository.getReadingById(
+          'reading.synthetic.01',
+        )).value!.personId,
+        'person.synthetic.001',
+      );
     });
   });
 }
@@ -361,3 +453,15 @@ Future<int> _stateUpdatedAt(RynAppDatabase database) async {
       .getSingle();
   return row.read<int>('updated_at_utc_us');
 }
+
+Future<void> _insertPerson(
+  RynAppDatabase database,
+  String id, {
+  String status = 'active',
+  int? archivedAtUtcUs,
+}) => database.customStatement(
+  'INSERT INTO persons '
+  '(id, display_name, status, archived_at_utc_us, created_at_utc_us, updated_at_utc_us) '
+  'VALUES (?, ?, ?, ?, 1, 1)',
+  <Object?>[id, 'SYNTHETIC_PERSON', status, archivedAtUtcUs],
+);

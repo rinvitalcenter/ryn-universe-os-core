@@ -1,8 +1,15 @@
 import 'package:drift/drift.dart';
 
+import '../../../people/data/persistence/person_tables.dart';
+
 class TarotReadings extends Table {
   TextColumn get readingInstanceId => text().named('reading_instance_id')();
   TextColumn get sourceType => text().named('source_type')();
+  TextColumn get personId => text()
+      .named('person_id')
+      .withLength(min: 1, max: 120)
+      .nullable()
+      .references(Persons, #id, onDelete: KeyAction.restrict)();
   TextColumn get questionOriginalSnapshot =>
       text().named('question_original_snapshot')();
   TextColumn get questionDisplayText => text().named('question_display_text')();

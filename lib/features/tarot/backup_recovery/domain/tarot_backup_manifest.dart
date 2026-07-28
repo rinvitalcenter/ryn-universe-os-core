@@ -32,7 +32,8 @@ final class TarotBackupManifest {
   static const int backupFormatVersion = 1;
   static const String applicationIdentity = 'RinVitalCenter/RynUniverseOS';
   static const String contentScope = 'person_core_tarot_persistence_v0_3';
-  static const int schemaVersion = 7;
+  static const int schemaVersion = 8;
+  static const int schemaVersionV7 = 7;
   static const int legacySchemaVersion = 6;
   static const String schemaV5RestorePolicy =
       'restore_with_schema_v5_application_then_reopen_to_migrate';
@@ -323,21 +324,47 @@ final class TarotBackupManifest {
         ],
       };
 
+  static const List<String> requiredTablesV8 = requiredTablesV7;
+  static final Map<String, List<String>> requiredColumnsByTableV8 =
+      Map.unmodifiable(<String, List<String>>{
+        ...requiredColumnsByTableV7,
+        'tarot_readings': <String>[
+          'reading_instance_id',
+          'source_type',
+          'person_id',
+          'question_original_snapshot',
+          'question_display_text',
+          'deck_id',
+          'deck_name_snapshot',
+          'spread_id',
+          'spread_name_snapshot',
+          'expected_placement_count',
+          'reading_at_utc_us',
+          'reading_timezone_offset_min',
+          'created_at_utc_us',
+          'updated_at_utc_us',
+          'lifecycle_status',
+          'finished_at_utc_us',
+        ],
+      });
+
   /// Current backup-format-v1 physical inventory.
-  static const List<String> requiredTablesV1 = requiredTablesV7;
-  static const Map<String, List<String>> requiredColumnsByTableV1 =
-      requiredColumnsByTableV7;
+  static const List<String> requiredTablesV1 = requiredTablesV8;
+  static final Map<String, List<String>> requiredColumnsByTableV1 =
+      requiredColumnsByTableV8;
 
   static List<String> requiredTablesFor(int version) => switch (version) {
     legacySchemaVersion => requiredTablesV6,
-    schemaVersion => requiredTablesV7,
+    schemaVersionV7 => requiredTablesV7,
+    schemaVersion => requiredTablesV8,
     _ => const <String>[],
   };
 
   static Map<String, List<String>> requiredColumnsFor(int version) =>
       switch (version) {
         legacySchemaVersion => requiredColumnsByTableV6,
-        schemaVersion => requiredColumnsByTableV7,
+        schemaVersionV7 => requiredColumnsByTableV7,
+        schemaVersion => requiredColumnsByTableV8,
         _ => const <String, List<String>>{},
       };
 

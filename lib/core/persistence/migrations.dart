@@ -3,10 +3,9 @@ const int plannedInitialSchemaVersion = 1;
 
 /// Current global schema version.
 ///
-/// Version 7 adds persistent custom Person groups and memberships without
-/// changing the meaning of existing Person, Role, governance, or Tarot data.
-const int plannedCurrentSchemaVersion = 7;
+/// Version 8 adds one nullable canonical Person reference to Tarot readings.
+const int plannedCurrentSchemaVersion = 8;
 
-/// Supported upgrades remain truthful and add-only through schema version 7.
+/// Supported upgrades remain truthful and add-only through schema version 8.
 const String migrationImplementationStatus =
-    'add_only_6_to_7_with_4_and_5_chained_to_7_implemented';
+    'add_only_7_to_8_with_4_5_and_6_chained_to_8_implemented';

@@ -6,7 +6,7 @@ import 'package:ryn_universe_os_core/core/persistence/app_database.dart';
 
 void main() {
   test(
-    'Tarot schema persists no assets, identity, blobs, or external fields',
+    'Tarot schema persists only canonical Person ID and no display identity',
     () async {
       final database = RynAppDatabase(NativeDatabase.memory());
       addTearDown(database.close);
@@ -22,8 +22,14 @@ void main() {
           .map((row) => row.read<String>('sql').toLowerCase())
           .join('\n');
 
+      expect(schema.contains('person_id'), isTrue);
+
       for (final forbidden in <String>[
-        'person_id',
+        'display_name',
+        'nickname',
+        'relationship_summary',
+        'role_type',
+        'group_id',
         'member_id',
         'study_session_id',
         'phone',

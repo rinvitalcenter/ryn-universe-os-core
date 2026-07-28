@@ -133,7 +133,7 @@ final class TarotRecordSummaryAdapter implements RecordSummaryAdapter {
             ? snapshot.readingQuestionText
             : record.questionDisplayText,
         shortSummary: parts.join(' · '),
-        personId: null,
+        personId: record.personId,
         status: record.lifecycle == TarotReadingLifecycle.finished
             ? RecordDisplayStatus.finished
             : RecordDisplayStatus.continuing,

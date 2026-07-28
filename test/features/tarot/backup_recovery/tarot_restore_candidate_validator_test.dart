@@ -66,6 +66,108 @@ void main() {
     expect(result.snapshotSizeBytes, greaterThan(0));
   });
 
+  test('valid schema v7 candidate remains accepted for staging', () async {
+    fixture = await TarotBackupRecoveryFixture.create();
+    final package = await fixture.createRestoreCandidate(
+      schemaVersion: TarotBackupManifest.schemaVersionV7,
+    );
+
+    final result = await validator().validate(package.path);
+
+    expect(result.schemaVersion, TarotBackupManifest.schemaVersionV7);
+  });
+
+  test('v8 orphan Person link is rejected', () async {
+    final package = await candidate();
+    await _mutateSnapshot(package, (database) {
+      database.execute('PRAGMA foreign_keys = OFF');
+      database.execute(
+        "UPDATE tarot_readings SET person_id = 'person.missing'",
+      );
+    });
+    await fixture.refreshRestoreCandidateIntegrity(package);
+
+    await expectFailure(package, 'snapshot_invalid');
+  });
+
+  test('v8 missing Person FK is rejected', () async {
+    fixture = await TarotBackupRecoveryFixture.create(validReading: false);
+    final package = await fixture.createRestoreCandidate();
+    await _mutateSnapshot(package, (database) {
+      database.execute('DROP TABLE tarot_readings');
+      database.execute(
+        _tarotReadingsWithPersonFk('RESTRICT').replaceFirst(
+          ' REFERENCES persons(id) ON UPDATE NO ACTION ON DELETE RESTRICT',
+          '',
+        ),
+      );
+    });
+    await fixture.refreshRestoreCandidateIntegrity(package);
+
+    await expectFailure(package, 'snapshot_invalid');
+  });
+
+  test('v8 missing person_id column is rejected', () async {
+    fixture = await TarotBackupRecoveryFixture.create(validReading: false);
+    final package = await fixture.createRestoreCandidate();
+    await _mutateSnapshot(package, (database) {
+      database.execute('DROP TABLE tarot_readings');
+      database.execute(
+        _tarotReadingsWithPersonFk('RESTRICT').replaceFirst(
+          '  person_id TEXT NULL REFERENCES persons(id) ON UPDATE NO ACTION ON DELETE RESTRICT,\n',
+          '',
+        ),
+      );
+    });
+    await fixture.refreshRestoreCandidateIntegrity(package);
+
+    await expectFailure(package, 'snapshot_invalid');
+  });
+
+  for (final action in <String>['CASCADE', 'SET NULL']) {
+    test('v8 $action Person FK contract is rejected', () async {
+      fixture = await TarotBackupRecoveryFixture.create(validReading: false);
+      final package = await fixture.createRestoreCandidate();
+      await _mutateSnapshot(package, (database) {
+        database.execute('DROP TABLE tarot_readings');
+        database.execute(_tarotReadingsWithPersonFk(action));
+      });
+      await fixture.refreshRestoreCandidateIntegrity(package);
+
+      await expectFailure(package, 'snapshot_invalid');
+    });
+  }
+
+  for (final action in <String>['CASCADE', 'SET NULL']) {
+    test('v8 ON UPDATE $action Person FK contract is rejected', () async {
+      fixture = await TarotBackupRecoveryFixture.create(validReading: false);
+      final package = await fixture.createRestoreCandidate();
+      await _mutateSnapshot(package, (database) {
+        database.execute('DROP TABLE tarot_readings');
+        database.execute(
+          _tarotReadingsWithPersonFk('RESTRICT', updateAction: action),
+        );
+      });
+      await fixture.refreshRestoreCandidateIntegrity(package);
+
+      await expectFailure(package, 'snapshot_invalid');
+    });
+  }
+
+  test('v8 duplicate canonical Person FK is rejected', () async {
+    fixture = await TarotBackupRecoveryFixture.create(validReading: false);
+    final package = await fixture.createRestoreCandidate();
+    await _mutateSnapshot(package, (database) {
+      database.execute('DROP TABLE tarot_readings');
+      database.execute(
+        _tarotReadingsWithPersonFk('RESTRICT', duplicatePersonFk: true),
+      );
+    });
+    await fixture.refreshRestoreCandidateIntegrity(package);
+
+    await expectFailure(package, 'snapshot_invalid');
+  });
+
   test('missing manifest fails', () async {
     final package = await candidate();
     await File('${package.path}/manifest.json').delete();
@@ -285,3 +387,30 @@ Future<Map<String, List<int>>> _treeBytes(Directory root) async {
   }
   return result;
 }
+
+String _tarotReadingsWithPersonFk(
+  String action, {
+  String updateAction = 'NO ACTION',
+  bool duplicatePersonFk = false,
+}) =>
+    '''
+CREATE TABLE tarot_readings (
+  reading_instance_id TEXT NOT NULL PRIMARY KEY,
+  source_type TEXT NOT NULL,
+  person_id TEXT NULL REFERENCES persons(id) ON UPDATE $updateAction ON DELETE $action,
+  question_original_snapshot TEXT NOT NULL,
+  question_display_text TEXT NOT NULL,
+  deck_id TEXT NOT NULL,
+  deck_name_snapshot TEXT NOT NULL,
+  spread_id TEXT NOT NULL,
+  spread_name_snapshot TEXT NOT NULL,
+  expected_placement_count INTEGER NOT NULL,
+  reading_at_utc_us INTEGER NOT NULL,
+  reading_timezone_offset_min INTEGER NOT NULL,
+  created_at_utc_us INTEGER NOT NULL,
+  updated_at_utc_us INTEGER NOT NULL,
+  lifecycle_status TEXT NOT NULL,
+  finished_at_utc_us INTEGER NULL${duplicatePersonFk ? ',' : ''}
+  ${duplicatePersonFk ? 'FOREIGN KEY(person_id) REFERENCES persons(id) ON UPDATE NO ACTION ON DELETE RESTRICT' : ''}
+)
+''';

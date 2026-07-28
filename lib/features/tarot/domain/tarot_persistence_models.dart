@@ -9,9 +9,26 @@ final class CompletedTarotReadingPersistenceInput {
   CompletedTarotReadingPersistenceInput({
     required this.snapshot,
     required this.sourceType,
+    required String? personId,
     required this.readingTimezoneOffsetMinutes,
     this.interpretation,
-  }) {
+  }) : personId = personId?.trim() {
+    if ((sourceType == TarotReadingOrigin.selfDrawn && this.personId != null) ||
+        (sourceType == TarotReadingOrigin.manuallyRecorded &&
+            (this.personId == null || this.personId!.isEmpty))) {
+      throw ArgumentError.value(
+        personId,
+        'personId',
+        'must be null for self readings and non-empty for manual readings',
+      );
+    }
+    if (this.personId != null && this.personId!.length > 120) {
+      throw ArgumentError.value(
+        personId,
+        'personId',
+        'must be at most 120 chars',
+      );
+    }
     if (readingTimezoneOffsetMinutes < -840 ||
         readingTimezoneOffsetMinutes > 840) {
       throw ArgumentError.value(
@@ -33,6 +50,7 @@ final class CompletedTarotReadingPersistenceInput {
 
   final TarotReadingResultSnapshot snapshot;
   final TarotReadingOrigin sourceType;
+  final String? personId;
   final int readingTimezoneOffsetMinutes;
   final TarotInterpretationSessionDraft? interpretation;
 }
@@ -42,6 +60,7 @@ final class PersistedTarotReadingRecord {
     required this.snapshot,
     required this.questionDisplayText,
     required this.sourceType,
+    required this.personId,
     required this.lifecycle,
     required this.interpretation,
     required this.readingTimezoneOffsetMinutes,
@@ -53,6 +72,7 @@ final class PersistedTarotReadingRecord {
   final TarotReadingResultSnapshot snapshot;
   final String questionDisplayText;
   final TarotReadingOrigin sourceType;
+  final String? personId;
   final TarotReadingLifecycle lifecycle;
   final TarotInterpretationSessionDraft? interpretation;
   final int readingTimezoneOffsetMinutes;

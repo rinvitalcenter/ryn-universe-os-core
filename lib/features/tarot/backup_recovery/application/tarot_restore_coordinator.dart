@@ -136,7 +136,7 @@ final class TarotRestoreCoordinator {
     }
 
     final legacyCandidate =
-        candidate.schemaVersion == TarotBackupManifest.legacySchemaVersion;
+        candidate.schemaVersion < TarotBackupManifest.schemaVersion;
     if (legacyCandidate) {
       try {
         await resolvedPaths.requireSafeAncestry(stagingFile.path);
@@ -151,6 +151,7 @@ final class TarotRestoreCoordinator {
         await _migrateLegacyCandidate(
           sourceSnapshotPath: candidate.snapshotPath,
           stagedFile: stagingFile,
+          sourceSchemaVersion: candidate.schemaVersion,
         );
       } on Object {
         try {
@@ -299,14 +300,13 @@ final class TarotRestoreCoordinator {
   Future<void> _migrateLegacyCandidate({
     required String sourceSnapshotPath,
     required File stagedFile,
+    required int sourceSchemaVersion,
   }) async {
     final before = databaseInspector.inspectVerified(
       sourceSnapshotPath,
       policy: TarotDatabaseInspectionPolicy.immutableReadOnlyFrozenTarget,
       requireAcceptableSidecars: true,
-      acceptedSchemaVersions: const <int>{
-        TarotBackupManifest.legacySchemaVersion,
-      },
+      acceptedSchemaVersions: <int>{sourceSchemaVersion},
     );
     final database = RynAppDatabase(NativeDatabase(stagedFile));
     try {
@@ -319,13 +319,30 @@ final class TarotRestoreCoordinator {
       policy: TarotDatabaseInspectionPolicy.immutableReadOnlyFrozenTarget,
       requireAcceptableSidecars: true,
     );
-    for (final table in TarotBackupManifest.requiredTablesV6) {
+    for (final table in TarotBackupManifest.requiredTablesFor(
+      sourceSchemaVersion,
+    )) {
       if (after.tableRowCounts[table] != before.tableRowCounts[table]) {
         throw StateError('legacy migration changed table rows');
       }
     }
-    if ((after.tableRowCounts['person_groups'] ?? -1) != 0 ||
-        (after.tableRowCounts['person_group_memberships'] ?? -1) != 0) {
+    final databaseAfterMigration = RynAppDatabase(NativeDatabase(stagedFile));
+    try {
+      final personLinks = await databaseAfterMigration
+          .customSelect(
+            'SELECT count(*) AS total FROM tarot_readings '
+            'WHERE person_id IS NOT NULL',
+          )
+          .getSingle();
+      if (personLinks.read<int>('total') != 0) {
+        throw StateError('legacy migration fabricated Person links');
+      }
+    } finally {
+      await databaseAfterMigration.close();
+    }
+    if (sourceSchemaVersion == TarotBackupManifest.legacySchemaVersion &&
+        ((after.tableRowCounts['person_groups'] ?? -1) != 0 ||
+            (after.tableRowCounts['person_group_memberships'] ?? -1) != 0)) {
       throw StateError('legacy migration fabricated group rows');
     }
   }
