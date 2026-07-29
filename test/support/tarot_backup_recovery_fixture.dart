@@ -271,6 +271,10 @@ final class TarotBackupRecoveryFixture {
     await sourceFile.copy(snapshot.path);
     if (schemaVersion < TarotBackupManifest.schemaVersion) {
       final legacy = sqlite3.open(snapshot.path);
+      legacy.execute('DROP TABLE study_session_materials');
+      legacy.execute('DROP TABLE study_session_participants');
+      legacy.execute('DROP TABLE study_materials');
+      legacy.execute('DROP TABLE study_sessions');
       legacy.execute('ALTER TABLE tarot_readings DROP COLUMN person_id');
       if (schemaVersion == TarotBackupManifest.legacySchemaVersion) {
         legacy.execute('DROP TABLE person_group_memberships');

@@ -2422,7 +2422,7 @@ void main() {
     await _tapNav(tester, UserText.navStudy);
     await tester.pumpAndSettle();
     expect(find.text(UserText.studyWorkspaceTitle), findsAtLeastNWidgets(1));
-    expect(find.text('새 만남 시작'), findsOneWidget);
+    expect(find.byKey(const Key('study-operations-page')), findsOneWidget);
 
     await _tapNav(tester, UserText.navHome);
     await tester.pumpAndSettle();
@@ -3873,7 +3873,7 @@ void main() {
     },
   );
 
-  testWidgets('renders Study OS 2.0 shell without runtime persistence', (
+  testWidgets('renders Study operations shell without injected runtime', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const RynUniverseApp());
@@ -3882,41 +3882,9 @@ void main() {
     await _tapNav(tester, UserText.navStudy);
     await tester.pumpAndSettle();
 
-    expect(find.text(UserText.studyOsTitle), findsOneWidget);
-    expect(find.text(UserText.studyUserSubtitle), findsOneWidget);
-    expect(find.text(UserText.studyActionToday), findsOneWidget);
-    expect(find.text(UserText.studyActionAttendance), findsOneWidget);
-    expect(find.text(UserText.studyActionMaterials), findsOneWidget);
-    expect(find.text(UserText.studyActionJournal), findsOneWidget);
-    expect(find.text(UserText.studyActionReports), findsOneWidget);
-    expect(find.text(UserText.studyActionMembers), findsOneWidget);
-    expect(find.text(UserText.studyActionSessions), findsOneWidget);
-    expect(find.textContaining(UserText.studyEmptyRegistered), findsOneWidget);
-    expect(
-      find.textContaining(UserText.studyPickNeededItem),
-      findsAtLeastNWidgets(1),
-    );
-
-    final studyCards = find.byWidgetPredicate(
-      (widget) => widget.runtimeType.toString() == '_StudyUserActionCard',
-    );
-    expect(studyCards, findsWidgets);
-    final firstStudyCard = tester.getRect(studyCards.at(0));
-    final secondStudyCard = tester.getRect(studyCards.at(1));
-    expect((firstStudyCard.width - secondStudyCard.width).abs(), lessThan(0.1));
-    expect(firstStudyCard.height, lessThanOrEqualTo(150));
-
-    await tester.tap(find.text(UserText.studyActionAttendance).first);
-    await tester.pumpAndSettle();
-    expect(
-      find.text('${UserText.navStudy} > ${UserText.studyActionAttendance}'),
-      findsOneWidget,
-    );
-    expect(find.text(UserText.backToWorkspace), findsOneWidget);
-    expect(find.text(UserText.emptyItems), findsOneWidget);
-    await tester.tap(find.text(UserText.backToWorkspace));
-    await tester.pumpAndSettle();
-    expect(find.text(UserText.studyOsTitle), findsOneWidget);
+    expect(find.byKey(const Key('study-operations-page')), findsOneWidget);
+    expect(find.text('운영 공간을 준비하고 있습니다'), findsOneWidget);
+    expect(find.text('다시 확인'), findsOneWidget);
 
     const forbiddenStudyLabels = <String>[
       '화면 구성',
@@ -3968,17 +3936,11 @@ void main() {
     await _tapNav(tester, UserText.navStudy);
     await tester.pumpAndSettle();
 
-    expect(find.text(UserText.studyOsTitle), findsOneWidget);
-    expect(find.text(UserText.studyActionAttendance), findsOneWidget);
-    final studyCardColors = tester
-        .widgetList<Container>(find.byKey(const Key('study-user-action-card')))
-        .map((container) => container.decoration)
-        .whereType<BoxDecoration>()
-        .map((decoration) => decoration.color)
-        .whereType<Color>()
-        .toList();
-    expect(studyCardColors, isNotEmpty);
-    expect(studyCardColors.contains(Colors.white), isFalse);
+    final studySurface = tester.widget<Material>(
+      find.byKey(const Key('study-operations-page')),
+    );
+    expect(studySurface.color, isNot(equals(Colors.white)));
+    expect(find.text('운영 공간을 준비하고 있습니다'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

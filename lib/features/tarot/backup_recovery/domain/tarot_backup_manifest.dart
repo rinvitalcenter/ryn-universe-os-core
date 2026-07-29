@@ -31,8 +31,9 @@ final class TarotBackupManifest {
 
   static const int backupFormatVersion = 1;
   static const String applicationIdentity = 'RinVitalCenter/RynUniverseOS';
-  static const String contentScope = 'person_core_tarot_persistence_v0_3';
-  static const int schemaVersion = 8;
+  static const String contentScope = 'person_core_tarot_study_persistence_v0_4';
+  static const int schemaVersion = 9;
+  static const int schemaVersionV8 = 8;
   static const int schemaVersionV7 = 7;
   static const int legacySchemaVersion = 6;
   static const String schemaV5RestorePolicy =
@@ -348,15 +349,70 @@ final class TarotBackupManifest {
         ],
       });
 
+  static const List<String> requiredTablesV9 = <String>[
+    ...requiredTablesV8,
+    'study_sessions',
+    'study_session_participants',
+    'study_materials',
+    'study_session_materials',
+  ];
+
+  static final Map<String, List<String>> requiredColumnsByTableV9 =
+      Map.unmodifiable(<String, List<String>>{
+        ...requiredColumnsByTableV8,
+        'study_sessions': <String>[
+          'id',
+          'title',
+          'occurred_at_utc_us',
+          'timezone_offset_minutes',
+          'location',
+          'track',
+          'status',
+          'summary',
+          'operation_notes',
+          'learning_goal',
+          'covered_content',
+          'progress_status',
+          'next_steps',
+          'created_at_utc_us',
+          'updated_at_utc_us',
+        ],
+        'study_session_participants': <String>[
+          'session_id',
+          'person_id',
+          'attendance_status',
+          'note',
+          'learning_note',
+          'created_at_utc_us',
+          'updated_at_utc_us',
+        ],
+        'study_materials': <String>[
+          'id',
+          'title',
+          'type',
+          'url',
+          'storage_note',
+          'description',
+          'created_at_utc_us',
+          'updated_at_utc_us',
+        ],
+        'study_session_materials': <String>[
+          'session_id',
+          'material_id',
+          'created_at_utc_us',
+        ],
+      });
+
   /// Current backup-format-v1 physical inventory.
-  static const List<String> requiredTablesV1 = requiredTablesV8;
+  static const List<String> requiredTablesV1 = requiredTablesV9;
   static final Map<String, List<String>> requiredColumnsByTableV1 =
-      requiredColumnsByTableV8;
+      requiredColumnsByTableV9;
 
   static List<String> requiredTablesFor(int version) => switch (version) {
     legacySchemaVersion => requiredTablesV6,
     schemaVersionV7 => requiredTablesV7,
-    schemaVersion => requiredTablesV8,
+    schemaVersionV8 => requiredTablesV8,
+    schemaVersion => requiredTablesV9,
     _ => const <String>[],
   };
 
@@ -364,7 +420,8 @@ final class TarotBackupManifest {
       switch (version) {
         legacySchemaVersion => requiredColumnsByTableV6,
         schemaVersionV7 => requiredColumnsByTableV7,
-        schemaVersion => requiredColumnsByTableV8,
+        schemaVersionV8 => requiredColumnsByTableV8,
+        schemaVersion => requiredColumnsByTableV9,
         _ => const <String, List<String>>{},
       };
 

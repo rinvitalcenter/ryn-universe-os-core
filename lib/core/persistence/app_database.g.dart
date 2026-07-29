@@ -12144,6 +12144,2265 @@ class EncounterNotesCompanion extends UpdateCompanion<EncounterNoteRow> {
   }
 }
 
+class $StudySessionsTable extends StudySessions
+    with TableInfo<$StudySessionsTable, StudySessionRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StudySessionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 120,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 240,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _occurredAtUtcUsMeta = const VerificationMeta(
+    'occurredAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> occurredAtUtcUs = GeneratedColumn<int>(
+    'occurred_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _timezoneOffsetMinutesMeta =
+      const VerificationMeta('timezoneOffsetMinutes');
+  @override
+  late final GeneratedColumn<int> timezoneOffsetMinutes = GeneratedColumn<int>(
+    'timezone_offset_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _locationMeta = const VerificationMeta(
+    'location',
+  );
+  @override
+  late final GeneratedColumn<String> location = GeneratedColumn<String>(
+    'location',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 300,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _trackMeta = const VerificationMeta('track');
+  @override
+  late final GeneratedColumn<String> track = GeneratedColumn<String>(
+    'track',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 20,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 20,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _summaryMeta = const VerificationMeta(
+    'summary',
+  );
+  @override
+  late final GeneratedColumn<String> summary = GeneratedColumn<String>(
+    'summary',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 4000),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _operationNotesMeta = const VerificationMeta(
+    'operationNotes',
+  );
+  @override
+  late final GeneratedColumn<String> operationNotes = GeneratedColumn<String>(
+    'operation_notes',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 12000),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _learningGoalMeta = const VerificationMeta(
+    'learningGoal',
+  );
+  @override
+  late final GeneratedColumn<String> learningGoal = GeneratedColumn<String>(
+    'learning_goal',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 4000),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _coveredContentMeta = const VerificationMeta(
+    'coveredContent',
+  );
+  @override
+  late final GeneratedColumn<String> coveredContent = GeneratedColumn<String>(
+    'covered_content',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 8000),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _progressStatusMeta = const VerificationMeta(
+    'progressStatus',
+  );
+  @override
+  late final GeneratedColumn<String> progressStatus = GeneratedColumn<String>(
+    'progress_status',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 20,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('not_started'),
+  );
+  static const VerificationMeta _nextStepsMeta = const VerificationMeta(
+    'nextSteps',
+  );
+  @override
+  late final GeneratedColumn<String> nextSteps = GeneratedColumn<String>(
+    'next_steps',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 4000),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtUtcUsMeta = const VerificationMeta(
+    'createdAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> createdAtUtcUs = GeneratedColumn<int>(
+    'created_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtUtcUsMeta = const VerificationMeta(
+    'updatedAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAtUtcUs = GeneratedColumn<int>(
+    'updated_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    title,
+    occurredAtUtcUs,
+    timezoneOffsetMinutes,
+    location,
+    track,
+    status,
+    summary,
+    operationNotes,
+    learningGoal,
+    coveredContent,
+    progressStatus,
+    nextSteps,
+    createdAtUtcUs,
+    updatedAtUtcUs,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'study_sessions';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StudySessionRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('occurred_at_utc_us')) {
+      context.handle(
+        _occurredAtUtcUsMeta,
+        occurredAtUtcUs.isAcceptableOrUnknown(
+          data['occurred_at_utc_us']!,
+          _occurredAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_occurredAtUtcUsMeta);
+    }
+    if (data.containsKey('timezone_offset_minutes')) {
+      context.handle(
+        _timezoneOffsetMinutesMeta,
+        timezoneOffsetMinutes.isAcceptableOrUnknown(
+          data['timezone_offset_minutes']!,
+          _timezoneOffsetMinutesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_timezoneOffsetMinutesMeta);
+    }
+    if (data.containsKey('location')) {
+      context.handle(
+        _locationMeta,
+        location.isAcceptableOrUnknown(data['location']!, _locationMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_locationMeta);
+    }
+    if (data.containsKey('track')) {
+      context.handle(
+        _trackMeta,
+        track.isAcceptableOrUnknown(data['track']!, _trackMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_trackMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('summary')) {
+      context.handle(
+        _summaryMeta,
+        summary.isAcceptableOrUnknown(data['summary']!, _summaryMeta),
+      );
+    }
+    if (data.containsKey('operation_notes')) {
+      context.handle(
+        _operationNotesMeta,
+        operationNotes.isAcceptableOrUnknown(
+          data['operation_notes']!,
+          _operationNotesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('learning_goal')) {
+      context.handle(
+        _learningGoalMeta,
+        learningGoal.isAcceptableOrUnknown(
+          data['learning_goal']!,
+          _learningGoalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('covered_content')) {
+      context.handle(
+        _coveredContentMeta,
+        coveredContent.isAcceptableOrUnknown(
+          data['covered_content']!,
+          _coveredContentMeta,
+        ),
+      );
+    }
+    if (data.containsKey('progress_status')) {
+      context.handle(
+        _progressStatusMeta,
+        progressStatus.isAcceptableOrUnknown(
+          data['progress_status']!,
+          _progressStatusMeta,
+        ),
+      );
+    }
+    if (data.containsKey('next_steps')) {
+      context.handle(
+        _nextStepsMeta,
+        nextSteps.isAcceptableOrUnknown(data['next_steps']!, _nextStepsMeta),
+      );
+    }
+    if (data.containsKey('created_at_utc_us')) {
+      context.handle(
+        _createdAtUtcUsMeta,
+        createdAtUtcUs.isAcceptableOrUnknown(
+          data['created_at_utc_us']!,
+          _createdAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtUtcUsMeta);
+    }
+    if (data.containsKey('updated_at_utc_us')) {
+      context.handle(
+        _updatedAtUtcUsMeta,
+        updatedAtUtcUs.isAcceptableOrUnknown(
+          data['updated_at_utc_us']!,
+          _updatedAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtUtcUsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  StudySessionRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StudySessionRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      occurredAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}occurred_at_utc_us'],
+      )!,
+      timezoneOffsetMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}timezone_offset_minutes'],
+      )!,
+      location: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}location'],
+      )!,
+      track: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}track'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      summary: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}summary'],
+      ),
+      operationNotes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}operation_notes'],
+      ),
+      learningGoal: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}learning_goal'],
+      ),
+      coveredContent: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}covered_content'],
+      ),
+      progressStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}progress_status'],
+      )!,
+      nextSteps: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}next_steps'],
+      ),
+      createdAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at_utc_us'],
+      )!,
+      updatedAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at_utc_us'],
+      )!,
+    );
+  }
+
+  @override
+  $StudySessionsTable createAlias(String alias) {
+    return $StudySessionsTable(attachedDatabase, alias);
+  }
+}
+
+class StudySessionRow extends DataClass implements Insertable<StudySessionRow> {
+  final String id;
+  final String title;
+  final int occurredAtUtcUs;
+  final int timezoneOffsetMinutes;
+  final String location;
+  final String track;
+  final String status;
+  final String? summary;
+  final String? operationNotes;
+  final String? learningGoal;
+  final String? coveredContent;
+  final String progressStatus;
+  final String? nextSteps;
+  final int createdAtUtcUs;
+  final int updatedAtUtcUs;
+  const StudySessionRow({
+    required this.id,
+    required this.title,
+    required this.occurredAtUtcUs,
+    required this.timezoneOffsetMinutes,
+    required this.location,
+    required this.track,
+    required this.status,
+    this.summary,
+    this.operationNotes,
+    this.learningGoal,
+    this.coveredContent,
+    required this.progressStatus,
+    this.nextSteps,
+    required this.createdAtUtcUs,
+    required this.updatedAtUtcUs,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['title'] = Variable<String>(title);
+    map['occurred_at_utc_us'] = Variable<int>(occurredAtUtcUs);
+    map['timezone_offset_minutes'] = Variable<int>(timezoneOffsetMinutes);
+    map['location'] = Variable<String>(location);
+    map['track'] = Variable<String>(track);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || summary != null) {
+      map['summary'] = Variable<String>(summary);
+    }
+    if (!nullToAbsent || operationNotes != null) {
+      map['operation_notes'] = Variable<String>(operationNotes);
+    }
+    if (!nullToAbsent || learningGoal != null) {
+      map['learning_goal'] = Variable<String>(learningGoal);
+    }
+    if (!nullToAbsent || coveredContent != null) {
+      map['covered_content'] = Variable<String>(coveredContent);
+    }
+    map['progress_status'] = Variable<String>(progressStatus);
+    if (!nullToAbsent || nextSteps != null) {
+      map['next_steps'] = Variable<String>(nextSteps);
+    }
+    map['created_at_utc_us'] = Variable<int>(createdAtUtcUs);
+    map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs);
+    return map;
+  }
+
+  StudySessionsCompanion toCompanion(bool nullToAbsent) {
+    return StudySessionsCompanion(
+      id: Value(id),
+      title: Value(title),
+      occurredAtUtcUs: Value(occurredAtUtcUs),
+      timezoneOffsetMinutes: Value(timezoneOffsetMinutes),
+      location: Value(location),
+      track: Value(track),
+      status: Value(status),
+      summary: summary == null && nullToAbsent
+          ? const Value.absent()
+          : Value(summary),
+      operationNotes: operationNotes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(operationNotes),
+      learningGoal: learningGoal == null && nullToAbsent
+          ? const Value.absent()
+          : Value(learningGoal),
+      coveredContent: coveredContent == null && nullToAbsent
+          ? const Value.absent()
+          : Value(coveredContent),
+      progressStatus: Value(progressStatus),
+      nextSteps: nextSteps == null && nullToAbsent
+          ? const Value.absent()
+          : Value(nextSteps),
+      createdAtUtcUs: Value(createdAtUtcUs),
+      updatedAtUtcUs: Value(updatedAtUtcUs),
+    );
+  }
+
+  factory StudySessionRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StudySessionRow(
+      id: serializer.fromJson<String>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      occurredAtUtcUs: serializer.fromJson<int>(json['occurredAtUtcUs']),
+      timezoneOffsetMinutes: serializer.fromJson<int>(
+        json['timezoneOffsetMinutes'],
+      ),
+      location: serializer.fromJson<String>(json['location']),
+      track: serializer.fromJson<String>(json['track']),
+      status: serializer.fromJson<String>(json['status']),
+      summary: serializer.fromJson<String?>(json['summary']),
+      operationNotes: serializer.fromJson<String?>(json['operationNotes']),
+      learningGoal: serializer.fromJson<String?>(json['learningGoal']),
+      coveredContent: serializer.fromJson<String?>(json['coveredContent']),
+      progressStatus: serializer.fromJson<String>(json['progressStatus']),
+      nextSteps: serializer.fromJson<String?>(json['nextSteps']),
+      createdAtUtcUs: serializer.fromJson<int>(json['createdAtUtcUs']),
+      updatedAtUtcUs: serializer.fromJson<int>(json['updatedAtUtcUs']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'title': serializer.toJson<String>(title),
+      'occurredAtUtcUs': serializer.toJson<int>(occurredAtUtcUs),
+      'timezoneOffsetMinutes': serializer.toJson<int>(timezoneOffsetMinutes),
+      'location': serializer.toJson<String>(location),
+      'track': serializer.toJson<String>(track),
+      'status': serializer.toJson<String>(status),
+      'summary': serializer.toJson<String?>(summary),
+      'operationNotes': serializer.toJson<String?>(operationNotes),
+      'learningGoal': serializer.toJson<String?>(learningGoal),
+      'coveredContent': serializer.toJson<String?>(coveredContent),
+      'progressStatus': serializer.toJson<String>(progressStatus),
+      'nextSteps': serializer.toJson<String?>(nextSteps),
+      'createdAtUtcUs': serializer.toJson<int>(createdAtUtcUs),
+      'updatedAtUtcUs': serializer.toJson<int>(updatedAtUtcUs),
+    };
+  }
+
+  StudySessionRow copyWith({
+    String? id,
+    String? title,
+    int? occurredAtUtcUs,
+    int? timezoneOffsetMinutes,
+    String? location,
+    String? track,
+    String? status,
+    Value<String?> summary = const Value.absent(),
+    Value<String?> operationNotes = const Value.absent(),
+    Value<String?> learningGoal = const Value.absent(),
+    Value<String?> coveredContent = const Value.absent(),
+    String? progressStatus,
+    Value<String?> nextSteps = const Value.absent(),
+    int? createdAtUtcUs,
+    int? updatedAtUtcUs,
+  }) => StudySessionRow(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    occurredAtUtcUs: occurredAtUtcUs ?? this.occurredAtUtcUs,
+    timezoneOffsetMinutes: timezoneOffsetMinutes ?? this.timezoneOffsetMinutes,
+    location: location ?? this.location,
+    track: track ?? this.track,
+    status: status ?? this.status,
+    summary: summary.present ? summary.value : this.summary,
+    operationNotes: operationNotes.present
+        ? operationNotes.value
+        : this.operationNotes,
+    learningGoal: learningGoal.present ? learningGoal.value : this.learningGoal,
+    coveredContent: coveredContent.present
+        ? coveredContent.value
+        : this.coveredContent,
+    progressStatus: progressStatus ?? this.progressStatus,
+    nextSteps: nextSteps.present ? nextSteps.value : this.nextSteps,
+    createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+    updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+  );
+  StudySessionRow copyWithCompanion(StudySessionsCompanion data) {
+    return StudySessionRow(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      occurredAtUtcUs: data.occurredAtUtcUs.present
+          ? data.occurredAtUtcUs.value
+          : this.occurredAtUtcUs,
+      timezoneOffsetMinutes: data.timezoneOffsetMinutes.present
+          ? data.timezoneOffsetMinutes.value
+          : this.timezoneOffsetMinutes,
+      location: data.location.present ? data.location.value : this.location,
+      track: data.track.present ? data.track.value : this.track,
+      status: data.status.present ? data.status.value : this.status,
+      summary: data.summary.present ? data.summary.value : this.summary,
+      operationNotes: data.operationNotes.present
+          ? data.operationNotes.value
+          : this.operationNotes,
+      learningGoal: data.learningGoal.present
+          ? data.learningGoal.value
+          : this.learningGoal,
+      coveredContent: data.coveredContent.present
+          ? data.coveredContent.value
+          : this.coveredContent,
+      progressStatus: data.progressStatus.present
+          ? data.progressStatus.value
+          : this.progressStatus,
+      nextSteps: data.nextSteps.present ? data.nextSteps.value : this.nextSteps,
+      createdAtUtcUs: data.createdAtUtcUs.present
+          ? data.createdAtUtcUs.value
+          : this.createdAtUtcUs,
+      updatedAtUtcUs: data.updatedAtUtcUs.present
+          ? data.updatedAtUtcUs.value
+          : this.updatedAtUtcUs,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StudySessionRow(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('occurredAtUtcUs: $occurredAtUtcUs, ')
+          ..write('timezoneOffsetMinutes: $timezoneOffsetMinutes, ')
+          ..write('location: $location, ')
+          ..write('track: $track, ')
+          ..write('status: $status, ')
+          ..write('summary: $summary, ')
+          ..write('operationNotes: $operationNotes, ')
+          ..write('learningGoal: $learningGoal, ')
+          ..write('coveredContent: $coveredContent, ')
+          ..write('progressStatus: $progressStatus, ')
+          ..write('nextSteps: $nextSteps, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    title,
+    occurredAtUtcUs,
+    timezoneOffsetMinutes,
+    location,
+    track,
+    status,
+    summary,
+    operationNotes,
+    learningGoal,
+    coveredContent,
+    progressStatus,
+    nextSteps,
+    createdAtUtcUs,
+    updatedAtUtcUs,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StudySessionRow &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.occurredAtUtcUs == this.occurredAtUtcUs &&
+          other.timezoneOffsetMinutes == this.timezoneOffsetMinutes &&
+          other.location == this.location &&
+          other.track == this.track &&
+          other.status == this.status &&
+          other.summary == this.summary &&
+          other.operationNotes == this.operationNotes &&
+          other.learningGoal == this.learningGoal &&
+          other.coveredContent == this.coveredContent &&
+          other.progressStatus == this.progressStatus &&
+          other.nextSteps == this.nextSteps &&
+          other.createdAtUtcUs == this.createdAtUtcUs &&
+          other.updatedAtUtcUs == this.updatedAtUtcUs);
+}
+
+class StudySessionsCompanion extends UpdateCompanion<StudySessionRow> {
+  final Value<String> id;
+  final Value<String> title;
+  final Value<int> occurredAtUtcUs;
+  final Value<int> timezoneOffsetMinutes;
+  final Value<String> location;
+  final Value<String> track;
+  final Value<String> status;
+  final Value<String?> summary;
+  final Value<String?> operationNotes;
+  final Value<String?> learningGoal;
+  final Value<String?> coveredContent;
+  final Value<String> progressStatus;
+  final Value<String?> nextSteps;
+  final Value<int> createdAtUtcUs;
+  final Value<int> updatedAtUtcUs;
+  final Value<int> rowid;
+  const StudySessionsCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.occurredAtUtcUs = const Value.absent(),
+    this.timezoneOffsetMinutes = const Value.absent(),
+    this.location = const Value.absent(),
+    this.track = const Value.absent(),
+    this.status = const Value.absent(),
+    this.summary = const Value.absent(),
+    this.operationNotes = const Value.absent(),
+    this.learningGoal = const Value.absent(),
+    this.coveredContent = const Value.absent(),
+    this.progressStatus = const Value.absent(),
+    this.nextSteps = const Value.absent(),
+    this.createdAtUtcUs = const Value.absent(),
+    this.updatedAtUtcUs = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  StudySessionsCompanion.insert({
+    required String id,
+    required String title,
+    required int occurredAtUtcUs,
+    required int timezoneOffsetMinutes,
+    required String location,
+    required String track,
+    required String status,
+    this.summary = const Value.absent(),
+    this.operationNotes = const Value.absent(),
+    this.learningGoal = const Value.absent(),
+    this.coveredContent = const Value.absent(),
+    this.progressStatus = const Value.absent(),
+    this.nextSteps = const Value.absent(),
+    required int createdAtUtcUs,
+    required int updatedAtUtcUs,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       title = Value(title),
+       occurredAtUtcUs = Value(occurredAtUtcUs),
+       timezoneOffsetMinutes = Value(timezoneOffsetMinutes),
+       location = Value(location),
+       track = Value(track),
+       status = Value(status),
+       createdAtUtcUs = Value(createdAtUtcUs),
+       updatedAtUtcUs = Value(updatedAtUtcUs);
+  static Insertable<StudySessionRow> custom({
+    Expression<String>? id,
+    Expression<String>? title,
+    Expression<int>? occurredAtUtcUs,
+    Expression<int>? timezoneOffsetMinutes,
+    Expression<String>? location,
+    Expression<String>? track,
+    Expression<String>? status,
+    Expression<String>? summary,
+    Expression<String>? operationNotes,
+    Expression<String>? learningGoal,
+    Expression<String>? coveredContent,
+    Expression<String>? progressStatus,
+    Expression<String>? nextSteps,
+    Expression<int>? createdAtUtcUs,
+    Expression<int>? updatedAtUtcUs,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (occurredAtUtcUs != null) 'occurred_at_utc_us': occurredAtUtcUs,
+      if (timezoneOffsetMinutes != null)
+        'timezone_offset_minutes': timezoneOffsetMinutes,
+      if (location != null) 'location': location,
+      if (track != null) 'track': track,
+      if (status != null) 'status': status,
+      if (summary != null) 'summary': summary,
+      if (operationNotes != null) 'operation_notes': operationNotes,
+      if (learningGoal != null) 'learning_goal': learningGoal,
+      if (coveredContent != null) 'covered_content': coveredContent,
+      if (progressStatus != null) 'progress_status': progressStatus,
+      if (nextSteps != null) 'next_steps': nextSteps,
+      if (createdAtUtcUs != null) 'created_at_utc_us': createdAtUtcUs,
+      if (updatedAtUtcUs != null) 'updated_at_utc_us': updatedAtUtcUs,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  StudySessionsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? title,
+    Value<int>? occurredAtUtcUs,
+    Value<int>? timezoneOffsetMinutes,
+    Value<String>? location,
+    Value<String>? track,
+    Value<String>? status,
+    Value<String?>? summary,
+    Value<String?>? operationNotes,
+    Value<String?>? learningGoal,
+    Value<String?>? coveredContent,
+    Value<String>? progressStatus,
+    Value<String?>? nextSteps,
+    Value<int>? createdAtUtcUs,
+    Value<int>? updatedAtUtcUs,
+    Value<int>? rowid,
+  }) {
+    return StudySessionsCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      occurredAtUtcUs: occurredAtUtcUs ?? this.occurredAtUtcUs,
+      timezoneOffsetMinutes:
+          timezoneOffsetMinutes ?? this.timezoneOffsetMinutes,
+      location: location ?? this.location,
+      track: track ?? this.track,
+      status: status ?? this.status,
+      summary: summary ?? this.summary,
+      operationNotes: operationNotes ?? this.operationNotes,
+      learningGoal: learningGoal ?? this.learningGoal,
+      coveredContent: coveredContent ?? this.coveredContent,
+      progressStatus: progressStatus ?? this.progressStatus,
+      nextSteps: nextSteps ?? this.nextSteps,
+      createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+      updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (occurredAtUtcUs.present) {
+      map['occurred_at_utc_us'] = Variable<int>(occurredAtUtcUs.value);
+    }
+    if (timezoneOffsetMinutes.present) {
+      map['timezone_offset_minutes'] = Variable<int>(
+        timezoneOffsetMinutes.value,
+      );
+    }
+    if (location.present) {
+      map['location'] = Variable<String>(location.value);
+    }
+    if (track.present) {
+      map['track'] = Variable<String>(track.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (summary.present) {
+      map['summary'] = Variable<String>(summary.value);
+    }
+    if (operationNotes.present) {
+      map['operation_notes'] = Variable<String>(operationNotes.value);
+    }
+    if (learningGoal.present) {
+      map['learning_goal'] = Variable<String>(learningGoal.value);
+    }
+    if (coveredContent.present) {
+      map['covered_content'] = Variable<String>(coveredContent.value);
+    }
+    if (progressStatus.present) {
+      map['progress_status'] = Variable<String>(progressStatus.value);
+    }
+    if (nextSteps.present) {
+      map['next_steps'] = Variable<String>(nextSteps.value);
+    }
+    if (createdAtUtcUs.present) {
+      map['created_at_utc_us'] = Variable<int>(createdAtUtcUs.value);
+    }
+    if (updatedAtUtcUs.present) {
+      map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StudySessionsCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('occurredAtUtcUs: $occurredAtUtcUs, ')
+          ..write('timezoneOffsetMinutes: $timezoneOffsetMinutes, ')
+          ..write('location: $location, ')
+          ..write('track: $track, ')
+          ..write('status: $status, ')
+          ..write('summary: $summary, ')
+          ..write('operationNotes: $operationNotes, ')
+          ..write('learningGoal: $learningGoal, ')
+          ..write('coveredContent: $coveredContent, ')
+          ..write('progressStatus: $progressStatus, ')
+          ..write('nextSteps: $nextSteps, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $StudySessionParticipantsTable extends StudySessionParticipants
+    with TableInfo<$StudySessionParticipantsTable, StudySessionParticipantRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StudySessionParticipantsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES study_sessions (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _personIdMeta = const VerificationMeta(
+    'personId',
+  );
+  @override
+  late final GeneratedColumn<String> personId = GeneratedColumn<String>(
+    'person_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES persons (id) ON DELETE RESTRICT',
+    ),
+  );
+  static const VerificationMeta _attendanceStatusMeta = const VerificationMeta(
+    'attendanceStatus',
+  );
+  @override
+  late final GeneratedColumn<String> attendanceStatus = GeneratedColumn<String>(
+    'attendance_status',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 20,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('planned'),
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 1000),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _learningNoteMeta = const VerificationMeta(
+    'learningNote',
+  );
+  @override
+  late final GeneratedColumn<String> learningNote = GeneratedColumn<String>(
+    'learning_note',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 2000),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtUtcUsMeta = const VerificationMeta(
+    'createdAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> createdAtUtcUs = GeneratedColumn<int>(
+    'created_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtUtcUsMeta = const VerificationMeta(
+    'updatedAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAtUtcUs = GeneratedColumn<int>(
+    'updated_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    sessionId,
+    personId,
+    attendanceStatus,
+    note,
+    learningNote,
+    createdAtUtcUs,
+    updatedAtUtcUs,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'study_session_participants';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StudySessionParticipantRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('person_id')) {
+      context.handle(
+        _personIdMeta,
+        personId.isAcceptableOrUnknown(data['person_id']!, _personIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_personIdMeta);
+    }
+    if (data.containsKey('attendance_status')) {
+      context.handle(
+        _attendanceStatusMeta,
+        attendanceStatus.isAcceptableOrUnknown(
+          data['attendance_status']!,
+          _attendanceStatusMeta,
+        ),
+      );
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('learning_note')) {
+      context.handle(
+        _learningNoteMeta,
+        learningNote.isAcceptableOrUnknown(
+          data['learning_note']!,
+          _learningNoteMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at_utc_us')) {
+      context.handle(
+        _createdAtUtcUsMeta,
+        createdAtUtcUs.isAcceptableOrUnknown(
+          data['created_at_utc_us']!,
+          _createdAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtUtcUsMeta);
+    }
+    if (data.containsKey('updated_at_utc_us')) {
+      context.handle(
+        _updatedAtUtcUsMeta,
+        updatedAtUtcUs.isAcceptableOrUnknown(
+          data['updated_at_utc_us']!,
+          _updatedAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtUtcUsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {sessionId, personId};
+  @override
+  StudySessionParticipantRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StudySessionParticipantRow(
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_id'],
+      )!,
+      personId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}person_id'],
+      )!,
+      attendanceStatus: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}attendance_status'],
+      )!,
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      learningNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}learning_note'],
+      ),
+      createdAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at_utc_us'],
+      )!,
+      updatedAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at_utc_us'],
+      )!,
+    );
+  }
+
+  @override
+  $StudySessionParticipantsTable createAlias(String alias) {
+    return $StudySessionParticipantsTable(attachedDatabase, alias);
+  }
+}
+
+class StudySessionParticipantRow extends DataClass
+    implements Insertable<StudySessionParticipantRow> {
+  final String sessionId;
+  final String personId;
+  final String attendanceStatus;
+  final String? note;
+  final String? learningNote;
+  final int createdAtUtcUs;
+  final int updatedAtUtcUs;
+  const StudySessionParticipantRow({
+    required this.sessionId,
+    required this.personId,
+    required this.attendanceStatus,
+    this.note,
+    this.learningNote,
+    required this.createdAtUtcUs,
+    required this.updatedAtUtcUs,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['session_id'] = Variable<String>(sessionId);
+    map['person_id'] = Variable<String>(personId);
+    map['attendance_status'] = Variable<String>(attendanceStatus);
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    if (!nullToAbsent || learningNote != null) {
+      map['learning_note'] = Variable<String>(learningNote);
+    }
+    map['created_at_utc_us'] = Variable<int>(createdAtUtcUs);
+    map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs);
+    return map;
+  }
+
+  StudySessionParticipantsCompanion toCompanion(bool nullToAbsent) {
+    return StudySessionParticipantsCompanion(
+      sessionId: Value(sessionId),
+      personId: Value(personId),
+      attendanceStatus: Value(attendanceStatus),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      learningNote: learningNote == null && nullToAbsent
+          ? const Value.absent()
+          : Value(learningNote),
+      createdAtUtcUs: Value(createdAtUtcUs),
+      updatedAtUtcUs: Value(updatedAtUtcUs),
+    );
+  }
+
+  factory StudySessionParticipantRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StudySessionParticipantRow(
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      personId: serializer.fromJson<String>(json['personId']),
+      attendanceStatus: serializer.fromJson<String>(json['attendanceStatus']),
+      note: serializer.fromJson<String?>(json['note']),
+      learningNote: serializer.fromJson<String?>(json['learningNote']),
+      createdAtUtcUs: serializer.fromJson<int>(json['createdAtUtcUs']),
+      updatedAtUtcUs: serializer.fromJson<int>(json['updatedAtUtcUs']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'sessionId': serializer.toJson<String>(sessionId),
+      'personId': serializer.toJson<String>(personId),
+      'attendanceStatus': serializer.toJson<String>(attendanceStatus),
+      'note': serializer.toJson<String?>(note),
+      'learningNote': serializer.toJson<String?>(learningNote),
+      'createdAtUtcUs': serializer.toJson<int>(createdAtUtcUs),
+      'updatedAtUtcUs': serializer.toJson<int>(updatedAtUtcUs),
+    };
+  }
+
+  StudySessionParticipantRow copyWith({
+    String? sessionId,
+    String? personId,
+    String? attendanceStatus,
+    Value<String?> note = const Value.absent(),
+    Value<String?> learningNote = const Value.absent(),
+    int? createdAtUtcUs,
+    int? updatedAtUtcUs,
+  }) => StudySessionParticipantRow(
+    sessionId: sessionId ?? this.sessionId,
+    personId: personId ?? this.personId,
+    attendanceStatus: attendanceStatus ?? this.attendanceStatus,
+    note: note.present ? note.value : this.note,
+    learningNote: learningNote.present ? learningNote.value : this.learningNote,
+    createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+    updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+  );
+  StudySessionParticipantRow copyWithCompanion(
+    StudySessionParticipantsCompanion data,
+  ) {
+    return StudySessionParticipantRow(
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      personId: data.personId.present ? data.personId.value : this.personId,
+      attendanceStatus: data.attendanceStatus.present
+          ? data.attendanceStatus.value
+          : this.attendanceStatus,
+      note: data.note.present ? data.note.value : this.note,
+      learningNote: data.learningNote.present
+          ? data.learningNote.value
+          : this.learningNote,
+      createdAtUtcUs: data.createdAtUtcUs.present
+          ? data.createdAtUtcUs.value
+          : this.createdAtUtcUs,
+      updatedAtUtcUs: data.updatedAtUtcUs.present
+          ? data.updatedAtUtcUs.value
+          : this.updatedAtUtcUs,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StudySessionParticipantRow(')
+          ..write('sessionId: $sessionId, ')
+          ..write('personId: $personId, ')
+          ..write('attendanceStatus: $attendanceStatus, ')
+          ..write('note: $note, ')
+          ..write('learningNote: $learningNote, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    sessionId,
+    personId,
+    attendanceStatus,
+    note,
+    learningNote,
+    createdAtUtcUs,
+    updatedAtUtcUs,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StudySessionParticipantRow &&
+          other.sessionId == this.sessionId &&
+          other.personId == this.personId &&
+          other.attendanceStatus == this.attendanceStatus &&
+          other.note == this.note &&
+          other.learningNote == this.learningNote &&
+          other.createdAtUtcUs == this.createdAtUtcUs &&
+          other.updatedAtUtcUs == this.updatedAtUtcUs);
+}
+
+class StudySessionParticipantsCompanion
+    extends UpdateCompanion<StudySessionParticipantRow> {
+  final Value<String> sessionId;
+  final Value<String> personId;
+  final Value<String> attendanceStatus;
+  final Value<String?> note;
+  final Value<String?> learningNote;
+  final Value<int> createdAtUtcUs;
+  final Value<int> updatedAtUtcUs;
+  final Value<int> rowid;
+  const StudySessionParticipantsCompanion({
+    this.sessionId = const Value.absent(),
+    this.personId = const Value.absent(),
+    this.attendanceStatus = const Value.absent(),
+    this.note = const Value.absent(),
+    this.learningNote = const Value.absent(),
+    this.createdAtUtcUs = const Value.absent(),
+    this.updatedAtUtcUs = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  StudySessionParticipantsCompanion.insert({
+    required String sessionId,
+    required String personId,
+    this.attendanceStatus = const Value.absent(),
+    this.note = const Value.absent(),
+    this.learningNote = const Value.absent(),
+    required int createdAtUtcUs,
+    required int updatedAtUtcUs,
+    this.rowid = const Value.absent(),
+  }) : sessionId = Value(sessionId),
+       personId = Value(personId),
+       createdAtUtcUs = Value(createdAtUtcUs),
+       updatedAtUtcUs = Value(updatedAtUtcUs);
+  static Insertable<StudySessionParticipantRow> custom({
+    Expression<String>? sessionId,
+    Expression<String>? personId,
+    Expression<String>? attendanceStatus,
+    Expression<String>? note,
+    Expression<String>? learningNote,
+    Expression<int>? createdAtUtcUs,
+    Expression<int>? updatedAtUtcUs,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (sessionId != null) 'session_id': sessionId,
+      if (personId != null) 'person_id': personId,
+      if (attendanceStatus != null) 'attendance_status': attendanceStatus,
+      if (note != null) 'note': note,
+      if (learningNote != null) 'learning_note': learningNote,
+      if (createdAtUtcUs != null) 'created_at_utc_us': createdAtUtcUs,
+      if (updatedAtUtcUs != null) 'updated_at_utc_us': updatedAtUtcUs,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  StudySessionParticipantsCompanion copyWith({
+    Value<String>? sessionId,
+    Value<String>? personId,
+    Value<String>? attendanceStatus,
+    Value<String?>? note,
+    Value<String?>? learningNote,
+    Value<int>? createdAtUtcUs,
+    Value<int>? updatedAtUtcUs,
+    Value<int>? rowid,
+  }) {
+    return StudySessionParticipantsCompanion(
+      sessionId: sessionId ?? this.sessionId,
+      personId: personId ?? this.personId,
+      attendanceStatus: attendanceStatus ?? this.attendanceStatus,
+      note: note ?? this.note,
+      learningNote: learningNote ?? this.learningNote,
+      createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+      updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (personId.present) {
+      map['person_id'] = Variable<String>(personId.value);
+    }
+    if (attendanceStatus.present) {
+      map['attendance_status'] = Variable<String>(attendanceStatus.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (learningNote.present) {
+      map['learning_note'] = Variable<String>(learningNote.value);
+    }
+    if (createdAtUtcUs.present) {
+      map['created_at_utc_us'] = Variable<int>(createdAtUtcUs.value);
+    }
+    if (updatedAtUtcUs.present) {
+      map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StudySessionParticipantsCompanion(')
+          ..write('sessionId: $sessionId, ')
+          ..write('personId: $personId, ')
+          ..write('attendanceStatus: $attendanceStatus, ')
+          ..write('note: $note, ')
+          ..write('learningNote: $learningNote, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $StudyMaterialsTable extends StudyMaterials
+    with TableInfo<$StudyMaterialsTable, StudyMaterialRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StudyMaterialsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 120,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 240,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+    'type',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 30,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _urlMeta = const VerificationMeta('url');
+  @override
+  late final GeneratedColumn<String> url = GeneratedColumn<String>(
+    'url',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 2000),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _storageNoteMeta = const VerificationMeta(
+    'storageNote',
+  );
+  @override
+  late final GeneratedColumn<String> storageNote = GeneratedColumn<String>(
+    'storage_note',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 1000),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _descriptionMeta = const VerificationMeta(
+    'description',
+  );
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+    'description',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 4000),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtUtcUsMeta = const VerificationMeta(
+    'createdAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> createdAtUtcUs = GeneratedColumn<int>(
+    'created_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtUtcUsMeta = const VerificationMeta(
+    'updatedAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAtUtcUs = GeneratedColumn<int>(
+    'updated_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    title,
+    type,
+    url,
+    storageNote,
+    description,
+    createdAtUtcUs,
+    updatedAtUtcUs,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'study_materials';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StudyMaterialRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+        _typeMeta,
+        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_typeMeta);
+    }
+    if (data.containsKey('url')) {
+      context.handle(
+        _urlMeta,
+        url.isAcceptableOrUnknown(data['url']!, _urlMeta),
+      );
+    }
+    if (data.containsKey('storage_note')) {
+      context.handle(
+        _storageNoteMeta,
+        storageNote.isAcceptableOrUnknown(
+          data['storage_note']!,
+          _storageNoteMeta,
+        ),
+      );
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+        _descriptionMeta,
+        description.isAcceptableOrUnknown(
+          data['description']!,
+          _descriptionMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at_utc_us')) {
+      context.handle(
+        _createdAtUtcUsMeta,
+        createdAtUtcUs.isAcceptableOrUnknown(
+          data['created_at_utc_us']!,
+          _createdAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtUtcUsMeta);
+    }
+    if (data.containsKey('updated_at_utc_us')) {
+      context.handle(
+        _updatedAtUtcUsMeta,
+        updatedAtUtcUs.isAcceptableOrUnknown(
+          data['updated_at_utc_us']!,
+          _updatedAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtUtcUsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  StudyMaterialRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StudyMaterialRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}type'],
+      )!,
+      url: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}url'],
+      ),
+      storageNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}storage_note'],
+      ),
+      description: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}description'],
+      ),
+      createdAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at_utc_us'],
+      )!,
+      updatedAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at_utc_us'],
+      )!,
+    );
+  }
+
+  @override
+  $StudyMaterialsTable createAlias(String alias) {
+    return $StudyMaterialsTable(attachedDatabase, alias);
+  }
+}
+
+class StudyMaterialRow extends DataClass
+    implements Insertable<StudyMaterialRow> {
+  final String id;
+  final String title;
+  final String type;
+  final String? url;
+  final String? storageNote;
+  final String? description;
+  final int createdAtUtcUs;
+  final int updatedAtUtcUs;
+  const StudyMaterialRow({
+    required this.id,
+    required this.title,
+    required this.type,
+    this.url,
+    this.storageNote,
+    this.description,
+    required this.createdAtUtcUs,
+    required this.updatedAtUtcUs,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['title'] = Variable<String>(title);
+    map['type'] = Variable<String>(type);
+    if (!nullToAbsent || url != null) {
+      map['url'] = Variable<String>(url);
+    }
+    if (!nullToAbsent || storageNote != null) {
+      map['storage_note'] = Variable<String>(storageNote);
+    }
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
+    map['created_at_utc_us'] = Variable<int>(createdAtUtcUs);
+    map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs);
+    return map;
+  }
+
+  StudyMaterialsCompanion toCompanion(bool nullToAbsent) {
+    return StudyMaterialsCompanion(
+      id: Value(id),
+      title: Value(title),
+      type: Value(type),
+      url: url == null && nullToAbsent ? const Value.absent() : Value(url),
+      storageNote: storageNote == null && nullToAbsent
+          ? const Value.absent()
+          : Value(storageNote),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
+      createdAtUtcUs: Value(createdAtUtcUs),
+      updatedAtUtcUs: Value(updatedAtUtcUs),
+    );
+  }
+
+  factory StudyMaterialRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StudyMaterialRow(
+      id: serializer.fromJson<String>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      type: serializer.fromJson<String>(json['type']),
+      url: serializer.fromJson<String?>(json['url']),
+      storageNote: serializer.fromJson<String?>(json['storageNote']),
+      description: serializer.fromJson<String?>(json['description']),
+      createdAtUtcUs: serializer.fromJson<int>(json['createdAtUtcUs']),
+      updatedAtUtcUs: serializer.fromJson<int>(json['updatedAtUtcUs']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'title': serializer.toJson<String>(title),
+      'type': serializer.toJson<String>(type),
+      'url': serializer.toJson<String?>(url),
+      'storageNote': serializer.toJson<String?>(storageNote),
+      'description': serializer.toJson<String?>(description),
+      'createdAtUtcUs': serializer.toJson<int>(createdAtUtcUs),
+      'updatedAtUtcUs': serializer.toJson<int>(updatedAtUtcUs),
+    };
+  }
+
+  StudyMaterialRow copyWith({
+    String? id,
+    String? title,
+    String? type,
+    Value<String?> url = const Value.absent(),
+    Value<String?> storageNote = const Value.absent(),
+    Value<String?> description = const Value.absent(),
+    int? createdAtUtcUs,
+    int? updatedAtUtcUs,
+  }) => StudyMaterialRow(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    type: type ?? this.type,
+    url: url.present ? url.value : this.url,
+    storageNote: storageNote.present ? storageNote.value : this.storageNote,
+    description: description.present ? description.value : this.description,
+    createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+    updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+  );
+  StudyMaterialRow copyWithCompanion(StudyMaterialsCompanion data) {
+    return StudyMaterialRow(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      type: data.type.present ? data.type.value : this.type,
+      url: data.url.present ? data.url.value : this.url,
+      storageNote: data.storageNote.present
+          ? data.storageNote.value
+          : this.storageNote,
+      description: data.description.present
+          ? data.description.value
+          : this.description,
+      createdAtUtcUs: data.createdAtUtcUs.present
+          ? data.createdAtUtcUs.value
+          : this.createdAtUtcUs,
+      updatedAtUtcUs: data.updatedAtUtcUs.present
+          ? data.updatedAtUtcUs.value
+          : this.updatedAtUtcUs,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StudyMaterialRow(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('type: $type, ')
+          ..write('url: $url, ')
+          ..write('storageNote: $storageNote, ')
+          ..write('description: $description, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    title,
+    type,
+    url,
+    storageNote,
+    description,
+    createdAtUtcUs,
+    updatedAtUtcUs,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StudyMaterialRow &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.type == this.type &&
+          other.url == this.url &&
+          other.storageNote == this.storageNote &&
+          other.description == this.description &&
+          other.createdAtUtcUs == this.createdAtUtcUs &&
+          other.updatedAtUtcUs == this.updatedAtUtcUs);
+}
+
+class StudyMaterialsCompanion extends UpdateCompanion<StudyMaterialRow> {
+  final Value<String> id;
+  final Value<String> title;
+  final Value<String> type;
+  final Value<String?> url;
+  final Value<String?> storageNote;
+  final Value<String?> description;
+  final Value<int> createdAtUtcUs;
+  final Value<int> updatedAtUtcUs;
+  final Value<int> rowid;
+  const StudyMaterialsCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.type = const Value.absent(),
+    this.url = const Value.absent(),
+    this.storageNote = const Value.absent(),
+    this.description = const Value.absent(),
+    this.createdAtUtcUs = const Value.absent(),
+    this.updatedAtUtcUs = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  StudyMaterialsCompanion.insert({
+    required String id,
+    required String title,
+    required String type,
+    this.url = const Value.absent(),
+    this.storageNote = const Value.absent(),
+    this.description = const Value.absent(),
+    required int createdAtUtcUs,
+    required int updatedAtUtcUs,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       title = Value(title),
+       type = Value(type),
+       createdAtUtcUs = Value(createdAtUtcUs),
+       updatedAtUtcUs = Value(updatedAtUtcUs);
+  static Insertable<StudyMaterialRow> custom({
+    Expression<String>? id,
+    Expression<String>? title,
+    Expression<String>? type,
+    Expression<String>? url,
+    Expression<String>? storageNote,
+    Expression<String>? description,
+    Expression<int>? createdAtUtcUs,
+    Expression<int>? updatedAtUtcUs,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (type != null) 'type': type,
+      if (url != null) 'url': url,
+      if (storageNote != null) 'storage_note': storageNote,
+      if (description != null) 'description': description,
+      if (createdAtUtcUs != null) 'created_at_utc_us': createdAtUtcUs,
+      if (updatedAtUtcUs != null) 'updated_at_utc_us': updatedAtUtcUs,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  StudyMaterialsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? title,
+    Value<String>? type,
+    Value<String?>? url,
+    Value<String?>? storageNote,
+    Value<String?>? description,
+    Value<int>? createdAtUtcUs,
+    Value<int>? updatedAtUtcUs,
+    Value<int>? rowid,
+  }) {
+    return StudyMaterialsCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      type: type ?? this.type,
+      url: url ?? this.url,
+      storageNote: storageNote ?? this.storageNote,
+      description: description ?? this.description,
+      createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+      updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
+    if (url.present) {
+      map['url'] = Variable<String>(url.value);
+    }
+    if (storageNote.present) {
+      map['storage_note'] = Variable<String>(storageNote.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (createdAtUtcUs.present) {
+      map['created_at_utc_us'] = Variable<int>(createdAtUtcUs.value);
+    }
+    if (updatedAtUtcUs.present) {
+      map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StudyMaterialsCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('type: $type, ')
+          ..write('url: $url, ')
+          ..write('storageNote: $storageNote, ')
+          ..write('description: $description, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $StudySessionMaterialsTable extends StudySessionMaterials
+    with TableInfo<$StudySessionMaterialsTable, StudySessionMaterialRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StudySessionMaterialsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _sessionIdMeta = const VerificationMeta(
+    'sessionId',
+  );
+  @override
+  late final GeneratedColumn<String> sessionId = GeneratedColumn<String>(
+    'session_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES study_sessions (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _materialIdMeta = const VerificationMeta(
+    'materialId',
+  );
+  @override
+  late final GeneratedColumn<String> materialId = GeneratedColumn<String>(
+    'material_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES study_materials (id) ON DELETE RESTRICT',
+    ),
+  );
+  static const VerificationMeta _createdAtUtcUsMeta = const VerificationMeta(
+    'createdAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> createdAtUtcUs = GeneratedColumn<int>(
+    'created_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [sessionId, materialId, createdAtUtcUs];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'study_session_materials';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<StudySessionMaterialRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('session_id')) {
+      context.handle(
+        _sessionIdMeta,
+        sessionId.isAcceptableOrUnknown(data['session_id']!, _sessionIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sessionIdMeta);
+    }
+    if (data.containsKey('material_id')) {
+      context.handle(
+        _materialIdMeta,
+        materialId.isAcceptableOrUnknown(data['material_id']!, _materialIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_materialIdMeta);
+    }
+    if (data.containsKey('created_at_utc_us')) {
+      context.handle(
+        _createdAtUtcUsMeta,
+        createdAtUtcUs.isAcceptableOrUnknown(
+          data['created_at_utc_us']!,
+          _createdAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtUtcUsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {sessionId, materialId};
+  @override
+  StudySessionMaterialRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StudySessionMaterialRow(
+      sessionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_id'],
+      )!,
+      materialId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}material_id'],
+      )!,
+      createdAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at_utc_us'],
+      )!,
+    );
+  }
+
+  @override
+  $StudySessionMaterialsTable createAlias(String alias) {
+    return $StudySessionMaterialsTable(attachedDatabase, alias);
+  }
+}
+
+class StudySessionMaterialRow extends DataClass
+    implements Insertable<StudySessionMaterialRow> {
+  final String sessionId;
+  final String materialId;
+  final int createdAtUtcUs;
+  const StudySessionMaterialRow({
+    required this.sessionId,
+    required this.materialId,
+    required this.createdAtUtcUs,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['session_id'] = Variable<String>(sessionId);
+    map['material_id'] = Variable<String>(materialId);
+    map['created_at_utc_us'] = Variable<int>(createdAtUtcUs);
+    return map;
+  }
+
+  StudySessionMaterialsCompanion toCompanion(bool nullToAbsent) {
+    return StudySessionMaterialsCompanion(
+      sessionId: Value(sessionId),
+      materialId: Value(materialId),
+      createdAtUtcUs: Value(createdAtUtcUs),
+    );
+  }
+
+  factory StudySessionMaterialRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StudySessionMaterialRow(
+      sessionId: serializer.fromJson<String>(json['sessionId']),
+      materialId: serializer.fromJson<String>(json['materialId']),
+      createdAtUtcUs: serializer.fromJson<int>(json['createdAtUtcUs']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'sessionId': serializer.toJson<String>(sessionId),
+      'materialId': serializer.toJson<String>(materialId),
+      'createdAtUtcUs': serializer.toJson<int>(createdAtUtcUs),
+    };
+  }
+
+  StudySessionMaterialRow copyWith({
+    String? sessionId,
+    String? materialId,
+    int? createdAtUtcUs,
+  }) => StudySessionMaterialRow(
+    sessionId: sessionId ?? this.sessionId,
+    materialId: materialId ?? this.materialId,
+    createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+  );
+  StudySessionMaterialRow copyWithCompanion(
+    StudySessionMaterialsCompanion data,
+  ) {
+    return StudySessionMaterialRow(
+      sessionId: data.sessionId.present ? data.sessionId.value : this.sessionId,
+      materialId: data.materialId.present
+          ? data.materialId.value
+          : this.materialId,
+      createdAtUtcUs: data.createdAtUtcUs.present
+          ? data.createdAtUtcUs.value
+          : this.createdAtUtcUs,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StudySessionMaterialRow(')
+          ..write('sessionId: $sessionId, ')
+          ..write('materialId: $materialId, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(sessionId, materialId, createdAtUtcUs);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StudySessionMaterialRow &&
+          other.sessionId == this.sessionId &&
+          other.materialId == this.materialId &&
+          other.createdAtUtcUs == this.createdAtUtcUs);
+}
+
+class StudySessionMaterialsCompanion
+    extends UpdateCompanion<StudySessionMaterialRow> {
+  final Value<String> sessionId;
+  final Value<String> materialId;
+  final Value<int> createdAtUtcUs;
+  final Value<int> rowid;
+  const StudySessionMaterialsCompanion({
+    this.sessionId = const Value.absent(),
+    this.materialId = const Value.absent(),
+    this.createdAtUtcUs = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  StudySessionMaterialsCompanion.insert({
+    required String sessionId,
+    required String materialId,
+    required int createdAtUtcUs,
+    this.rowid = const Value.absent(),
+  }) : sessionId = Value(sessionId),
+       materialId = Value(materialId),
+       createdAtUtcUs = Value(createdAtUtcUs);
+  static Insertable<StudySessionMaterialRow> custom({
+    Expression<String>? sessionId,
+    Expression<String>? materialId,
+    Expression<int>? createdAtUtcUs,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (sessionId != null) 'session_id': sessionId,
+      if (materialId != null) 'material_id': materialId,
+      if (createdAtUtcUs != null) 'created_at_utc_us': createdAtUtcUs,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  StudySessionMaterialsCompanion copyWith({
+    Value<String>? sessionId,
+    Value<String>? materialId,
+    Value<int>? createdAtUtcUs,
+    Value<int>? rowid,
+  }) {
+    return StudySessionMaterialsCompanion(
+      sessionId: sessionId ?? this.sessionId,
+      materialId: materialId ?? this.materialId,
+      createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (sessionId.present) {
+      map['session_id'] = Variable<String>(sessionId.value);
+    }
+    if (materialId.present) {
+      map['material_id'] = Variable<String>(materialId.value);
+    }
+    if (createdAtUtcUs.present) {
+      map['created_at_utc_us'] = Variable<int>(createdAtUtcUs.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StudySessionMaterialsCompanion(')
+          ..write('sessionId: $sessionId, ')
+          ..write('materialId: $materialId, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RynAppDatabase extends GeneratedDatabase {
   _$RynAppDatabase(QueryExecutor e) : super(e);
   $RynAppDatabaseManager get managers => $RynAppDatabaseManager(this);
@@ -12176,6 +14435,12 @@ abstract class _$RynAppDatabase extends GeneratedDatabase {
       $PersonBirthProfilesTable(this);
   late final $EncountersTable encounters = $EncountersTable(this);
   late final $EncounterNotesTable encounterNotes = $EncounterNotesTable(this);
+  late final $StudySessionsTable studySessions = $StudySessionsTable(this);
+  late final $StudySessionParticipantsTable studySessionParticipants =
+      $StudySessionParticipantsTable(this);
+  late final $StudyMaterialsTable studyMaterials = $StudyMaterialsTable(this);
+  late final $StudySessionMaterialsTable studySessionMaterials =
+      $StudySessionMaterialsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -12200,6 +14465,10 @@ abstract class _$RynAppDatabase extends GeneratedDatabase {
     personBirthProfiles,
     encounters,
     encounterNotes,
+    studySessions,
+    studySessionParticipants,
+    studyMaterials,
+    studySessionMaterials,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -12276,6 +14545,22 @@ abstract class _$RynAppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('encounter_notes', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'study_sessions',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [
+        TableUpdate('study_session_participants', kind: UpdateKind.delete),
+      ],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'study_sessions',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('study_session_materials', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -14720,6 +17005,34 @@ final class $$PersonsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $StudySessionParticipantsTable,
+    List<StudySessionParticipantRow>
+  >
+  _studySessionParticipantsRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.studySessionParticipants,
+        aliasName: $_aliasNameGenerator(
+          db.persons.id,
+          db.studySessionParticipants.personId,
+        ),
+      );
+
+  $$StudySessionParticipantsTableProcessedTableManager
+  get studySessionParticipantsRefs {
+    final manager = $$StudySessionParticipantsTableTableManager(
+      $_db,
+      $_db.studySessionParticipants,
+    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _studySessionParticipantsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$PersonsTableFilterComposer
@@ -14944,6 +17257,33 @@ class $$PersonsTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> studySessionParticipantsRefs(
+    Expression<bool> Function($$StudySessionParticipantsTableFilterComposer f)
+    f,
+  ) {
+    final $$StudySessionParticipantsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.studySessionParticipants,
+          getReferencedColumn: (t) => t.personId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$StudySessionParticipantsTableFilterComposer(
+                $db: $db,
+                $table: $db.studySessionParticipants,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -15221,6 +17561,33 @@ class $$PersonsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> studySessionParticipantsRefs<T extends Object>(
+    Expression<T> Function($$StudySessionParticipantsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$StudySessionParticipantsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.studySessionParticipants,
+          getReferencedColumn: (t) => t.personId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$StudySessionParticipantsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.studySessionParticipants,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$PersonsTableTableManager
@@ -15244,6 +17611,7 @@ class $$PersonsTableTableManager
             bool relationshipsToPerson,
             bool personBirthProfilesRefs,
             bool encountersRefs,
+            bool studySessionParticipantsRefs,
           })
         > {
   $$PersonsTableTableManager(_$RynAppDatabase db, $PersonsTable table)
@@ -15318,6 +17686,7 @@ class $$PersonsTableTableManager
                 relationshipsToPerson = false,
                 personBirthProfilesRefs = false,
                 encountersRefs = false,
+                studySessionParticipantsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -15329,6 +17698,8 @@ class $$PersonsTableTableManager
                     if (relationshipsToPerson) db.personRelationships,
                     if (personBirthProfilesRefs) db.personBirthProfiles,
                     if (encountersRefs) db.encounters,
+                    if (studySessionParticipantsRefs)
+                      db.studySessionParticipants,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -15480,6 +17851,27 @@ class $$PersonsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (studySessionParticipantsRefs)
+                        await $_getPrefetchedData<
+                          PersonRow,
+                          $PersonsTable,
+                          StudySessionParticipantRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PersonsTableReferences
+                              ._studySessionParticipantsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PersonsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).studySessionParticipantsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.personId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -15508,6 +17900,7 @@ typedef $$PersonsTableProcessedTableManager =
         bool relationshipsToPerson,
         bool personBirthProfilesRefs,
         bool encountersRefs,
+        bool studySessionParticipantsRefs,
       })
     >;
 typedef $$TarotReadingsTableCreateCompanionBuilder =
@@ -20893,6 +23286,1929 @@ typedef $$EncounterNotesTableProcessedTableManager =
       EncounterNoteRow,
       PrefetchHooks Function({bool encounterId, bool supersedesNoteId})
     >;
+typedef $$StudySessionsTableCreateCompanionBuilder =
+    StudySessionsCompanion Function({
+      required String id,
+      required String title,
+      required int occurredAtUtcUs,
+      required int timezoneOffsetMinutes,
+      required String location,
+      required String track,
+      required String status,
+      Value<String?> summary,
+      Value<String?> operationNotes,
+      Value<String?> learningGoal,
+      Value<String?> coveredContent,
+      Value<String> progressStatus,
+      Value<String?> nextSteps,
+      required int createdAtUtcUs,
+      required int updatedAtUtcUs,
+      Value<int> rowid,
+    });
+typedef $$StudySessionsTableUpdateCompanionBuilder =
+    StudySessionsCompanion Function({
+      Value<String> id,
+      Value<String> title,
+      Value<int> occurredAtUtcUs,
+      Value<int> timezoneOffsetMinutes,
+      Value<String> location,
+      Value<String> track,
+      Value<String> status,
+      Value<String?> summary,
+      Value<String?> operationNotes,
+      Value<String?> learningGoal,
+      Value<String?> coveredContent,
+      Value<String> progressStatus,
+      Value<String?> nextSteps,
+      Value<int> createdAtUtcUs,
+      Value<int> updatedAtUtcUs,
+      Value<int> rowid,
+    });
+
+final class $$StudySessionsTableReferences
+    extends
+        BaseReferences<_$RynAppDatabase, $StudySessionsTable, StudySessionRow> {
+  $$StudySessionsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<
+    $StudySessionParticipantsTable,
+    List<StudySessionParticipantRow>
+  >
+  _studySessionParticipantsRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.studySessionParticipants,
+        aliasName: $_aliasNameGenerator(
+          db.studySessions.id,
+          db.studySessionParticipants.sessionId,
+        ),
+      );
+
+  $$StudySessionParticipantsTableProcessedTableManager
+  get studySessionParticipantsRefs {
+    final manager = $$StudySessionParticipantsTableTableManager(
+      $_db,
+      $_db.studySessionParticipants,
+    ).filter((f) => f.sessionId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _studySessionParticipantsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $StudySessionMaterialsTable,
+    List<StudySessionMaterialRow>
+  >
+  _studySessionMaterialsRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.studySessionMaterials,
+        aliasName: $_aliasNameGenerator(
+          db.studySessions.id,
+          db.studySessionMaterials.sessionId,
+        ),
+      );
+
+  $$StudySessionMaterialsTableProcessedTableManager
+  get studySessionMaterialsRefs {
+    final manager = $$StudySessionMaterialsTableTableManager(
+      $_db,
+      $_db.studySessionMaterials,
+    ).filter((f) => f.sessionId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _studySessionMaterialsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$StudySessionsTableFilterComposer
+    extends Composer<_$RynAppDatabase, $StudySessionsTable> {
+  $$StudySessionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get occurredAtUtcUs => $composableBuilder(
+    column: $table.occurredAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get timezoneOffsetMinutes => $composableBuilder(
+    column: $table.timezoneOffsetMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get location => $composableBuilder(
+    column: $table.location,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get track => $composableBuilder(
+    column: $table.track,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get summary => $composableBuilder(
+    column: $table.summary,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get operationNotes => $composableBuilder(
+    column: $table.operationNotes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get learningGoal => $composableBuilder(
+    column: $table.learningGoal,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get coveredContent => $composableBuilder(
+    column: $table.coveredContent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get progressStatus => $composableBuilder(
+    column: $table.progressStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nextSteps => $composableBuilder(
+    column: $table.nextSteps,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> studySessionParticipantsRefs(
+    Expression<bool> Function($$StudySessionParticipantsTableFilterComposer f)
+    f,
+  ) {
+    final $$StudySessionParticipantsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.studySessionParticipants,
+          getReferencedColumn: (t) => t.sessionId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$StudySessionParticipantsTableFilterComposer(
+                $db: $db,
+                $table: $db.studySessionParticipants,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<bool> studySessionMaterialsRefs(
+    Expression<bool> Function($$StudySessionMaterialsTableFilterComposer f) f,
+  ) {
+    final $$StudySessionMaterialsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.studySessionMaterials,
+          getReferencedColumn: (t) => t.sessionId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$StudySessionMaterialsTableFilterComposer(
+                $db: $db,
+                $table: $db.studySessionMaterials,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$StudySessionsTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $StudySessionsTable> {
+  $$StudySessionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get occurredAtUtcUs => $composableBuilder(
+    column: $table.occurredAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get timezoneOffsetMinutes => $composableBuilder(
+    column: $table.timezoneOffsetMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get location => $composableBuilder(
+    column: $table.location,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get track => $composableBuilder(
+    column: $table.track,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get summary => $composableBuilder(
+    column: $table.summary,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get operationNotes => $composableBuilder(
+    column: $table.operationNotes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get learningGoal => $composableBuilder(
+    column: $table.learningGoal,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get coveredContent => $composableBuilder(
+    column: $table.coveredContent,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get progressStatus => $composableBuilder(
+    column: $table.progressStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nextSteps => $composableBuilder(
+    column: $table.nextSteps,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$StudySessionsTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $StudySessionsTable> {
+  $$StudySessionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<int> get occurredAtUtcUs => $composableBuilder(
+    column: $table.occurredAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get timezoneOffsetMinutes => $composableBuilder(
+    column: $table.timezoneOffsetMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get location =>
+      $composableBuilder(column: $table.location, builder: (column) => column);
+
+  GeneratedColumn<String> get track =>
+      $composableBuilder(column: $table.track, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get summary =>
+      $composableBuilder(column: $table.summary, builder: (column) => column);
+
+  GeneratedColumn<String> get operationNotes => $composableBuilder(
+    column: $table.operationNotes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get learningGoal => $composableBuilder(
+    column: $table.learningGoal,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get coveredContent => $composableBuilder(
+    column: $table.coveredContent,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get progressStatus => $composableBuilder(
+    column: $table.progressStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nextSteps =>
+      $composableBuilder(column: $table.nextSteps, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => column,
+  );
+
+  Expression<T> studySessionParticipantsRefs<T extends Object>(
+    Expression<T> Function($$StudySessionParticipantsTableAnnotationComposer a)
+    f,
+  ) {
+    final $$StudySessionParticipantsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.studySessionParticipants,
+          getReferencedColumn: (t) => t.sessionId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$StudySessionParticipantsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.studySessionParticipants,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+
+  Expression<T> studySessionMaterialsRefs<T extends Object>(
+    Expression<T> Function($$StudySessionMaterialsTableAnnotationComposer a) f,
+  ) {
+    final $$StudySessionMaterialsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.studySessionMaterials,
+          getReferencedColumn: (t) => t.sessionId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$StudySessionMaterialsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.studySessionMaterials,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$StudySessionsTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $StudySessionsTable,
+          StudySessionRow,
+          $$StudySessionsTableFilterComposer,
+          $$StudySessionsTableOrderingComposer,
+          $$StudySessionsTableAnnotationComposer,
+          $$StudySessionsTableCreateCompanionBuilder,
+          $$StudySessionsTableUpdateCompanionBuilder,
+          (StudySessionRow, $$StudySessionsTableReferences),
+          StudySessionRow,
+          PrefetchHooks Function({
+            bool studySessionParticipantsRefs,
+            bool studySessionMaterialsRefs,
+          })
+        > {
+  $$StudySessionsTableTableManager(
+    _$RynAppDatabase db,
+    $StudySessionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$StudySessionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$StudySessionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$StudySessionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<int> occurredAtUtcUs = const Value.absent(),
+                Value<int> timezoneOffsetMinutes = const Value.absent(),
+                Value<String> location = const Value.absent(),
+                Value<String> track = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> summary = const Value.absent(),
+                Value<String?> operationNotes = const Value.absent(),
+                Value<String?> learningGoal = const Value.absent(),
+                Value<String?> coveredContent = const Value.absent(),
+                Value<String> progressStatus = const Value.absent(),
+                Value<String?> nextSteps = const Value.absent(),
+                Value<int> createdAtUtcUs = const Value.absent(),
+                Value<int> updatedAtUtcUs = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => StudySessionsCompanion(
+                id: id,
+                title: title,
+                occurredAtUtcUs: occurredAtUtcUs,
+                timezoneOffsetMinutes: timezoneOffsetMinutes,
+                location: location,
+                track: track,
+                status: status,
+                summary: summary,
+                operationNotes: operationNotes,
+                learningGoal: learningGoal,
+                coveredContent: coveredContent,
+                progressStatus: progressStatus,
+                nextSteps: nextSteps,
+                createdAtUtcUs: createdAtUtcUs,
+                updatedAtUtcUs: updatedAtUtcUs,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String title,
+                required int occurredAtUtcUs,
+                required int timezoneOffsetMinutes,
+                required String location,
+                required String track,
+                required String status,
+                Value<String?> summary = const Value.absent(),
+                Value<String?> operationNotes = const Value.absent(),
+                Value<String?> learningGoal = const Value.absent(),
+                Value<String?> coveredContent = const Value.absent(),
+                Value<String> progressStatus = const Value.absent(),
+                Value<String?> nextSteps = const Value.absent(),
+                required int createdAtUtcUs,
+                required int updatedAtUtcUs,
+                Value<int> rowid = const Value.absent(),
+              }) => StudySessionsCompanion.insert(
+                id: id,
+                title: title,
+                occurredAtUtcUs: occurredAtUtcUs,
+                timezoneOffsetMinutes: timezoneOffsetMinutes,
+                location: location,
+                track: track,
+                status: status,
+                summary: summary,
+                operationNotes: operationNotes,
+                learningGoal: learningGoal,
+                coveredContent: coveredContent,
+                progressStatus: progressStatus,
+                nextSteps: nextSteps,
+                createdAtUtcUs: createdAtUtcUs,
+                updatedAtUtcUs: updatedAtUtcUs,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$StudySessionsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                studySessionParticipantsRefs = false,
+                studySessionMaterialsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (studySessionParticipantsRefs)
+                      db.studySessionParticipants,
+                    if (studySessionMaterialsRefs) db.studySessionMaterials,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (studySessionParticipantsRefs)
+                        await $_getPrefetchedData<
+                          StudySessionRow,
+                          $StudySessionsTable,
+                          StudySessionParticipantRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$StudySessionsTableReferences
+                              ._studySessionParticipantsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$StudySessionsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).studySessionParticipantsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.sessionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (studySessionMaterialsRefs)
+                        await $_getPrefetchedData<
+                          StudySessionRow,
+                          $StudySessionsTable,
+                          StudySessionMaterialRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$StudySessionsTableReferences
+                              ._studySessionMaterialsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$StudySessionsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).studySessionMaterialsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.sessionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$StudySessionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $StudySessionsTable,
+      StudySessionRow,
+      $$StudySessionsTableFilterComposer,
+      $$StudySessionsTableOrderingComposer,
+      $$StudySessionsTableAnnotationComposer,
+      $$StudySessionsTableCreateCompanionBuilder,
+      $$StudySessionsTableUpdateCompanionBuilder,
+      (StudySessionRow, $$StudySessionsTableReferences),
+      StudySessionRow,
+      PrefetchHooks Function({
+        bool studySessionParticipantsRefs,
+        bool studySessionMaterialsRefs,
+      })
+    >;
+typedef $$StudySessionParticipantsTableCreateCompanionBuilder =
+    StudySessionParticipantsCompanion Function({
+      required String sessionId,
+      required String personId,
+      Value<String> attendanceStatus,
+      Value<String?> note,
+      Value<String?> learningNote,
+      required int createdAtUtcUs,
+      required int updatedAtUtcUs,
+      Value<int> rowid,
+    });
+typedef $$StudySessionParticipantsTableUpdateCompanionBuilder =
+    StudySessionParticipantsCompanion Function({
+      Value<String> sessionId,
+      Value<String> personId,
+      Value<String> attendanceStatus,
+      Value<String?> note,
+      Value<String?> learningNote,
+      Value<int> createdAtUtcUs,
+      Value<int> updatedAtUtcUs,
+      Value<int> rowid,
+    });
+
+final class $$StudySessionParticipantsTableReferences
+    extends
+        BaseReferences<
+          _$RynAppDatabase,
+          $StudySessionParticipantsTable,
+          StudySessionParticipantRow
+        > {
+  $$StudySessionParticipantsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $StudySessionsTable _sessionIdTable(_$RynAppDatabase db) =>
+      db.studySessions.createAlias(
+        $_aliasNameGenerator(
+          db.studySessionParticipants.sessionId,
+          db.studySessions.id,
+        ),
+      );
+
+  $$StudySessionsTableProcessedTableManager get sessionId {
+    final $_column = $_itemColumn<String>('session_id')!;
+
+    final manager = $$StudySessionsTableTableManager(
+      $_db,
+      $_db.studySessions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_sessionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PersonsTable _personIdTable(_$RynAppDatabase db) =>
+      db.persons.createAlias(
+        $_aliasNameGenerator(
+          db.studySessionParticipants.personId,
+          db.persons.id,
+        ),
+      );
+
+  $$PersonsTableProcessedTableManager get personId {
+    final $_column = $_itemColumn<String>('person_id')!;
+
+    final manager = $$PersonsTableTableManager(
+      $_db,
+      $_db.persons,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_personIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$StudySessionParticipantsTableFilterComposer
+    extends Composer<_$RynAppDatabase, $StudySessionParticipantsTable> {
+  $$StudySessionParticipantsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get attendanceStatus => $composableBuilder(
+    column: $table.attendanceStatus,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get learningNote => $composableBuilder(
+    column: $table.learningNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$StudySessionsTableFilterComposer get sessionId {
+    final $$StudySessionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sessionId,
+      referencedTable: $db.studySessions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StudySessionsTableFilterComposer(
+            $db: $db,
+            $table: $db.studySessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PersonsTableFilterComposer get personId {
+    final $$PersonsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.persons,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonsTableFilterComposer(
+            $db: $db,
+            $table: $db.persons,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$StudySessionParticipantsTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $StudySessionParticipantsTable> {
+  $$StudySessionParticipantsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get attendanceStatus => $composableBuilder(
+    column: $table.attendanceStatus,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get learningNote => $composableBuilder(
+    column: $table.learningNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$StudySessionsTableOrderingComposer get sessionId {
+    final $$StudySessionsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sessionId,
+      referencedTable: $db.studySessions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StudySessionsTableOrderingComposer(
+            $db: $db,
+            $table: $db.studySessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PersonsTableOrderingComposer get personId {
+    final $$PersonsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.persons,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonsTableOrderingComposer(
+            $db: $db,
+            $table: $db.persons,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$StudySessionParticipantsTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $StudySessionParticipantsTable> {
+  $$StudySessionParticipantsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get attendanceStatus => $composableBuilder(
+    column: $table.attendanceStatus,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<String> get learningNote => $composableBuilder(
+    column: $table.learningNote,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => column,
+  );
+
+  $$StudySessionsTableAnnotationComposer get sessionId {
+    final $$StudySessionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sessionId,
+      referencedTable: $db.studySessions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StudySessionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.studySessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PersonsTableAnnotationComposer get personId {
+    final $$PersonsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.persons,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.persons,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$StudySessionParticipantsTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $StudySessionParticipantsTable,
+          StudySessionParticipantRow,
+          $$StudySessionParticipantsTableFilterComposer,
+          $$StudySessionParticipantsTableOrderingComposer,
+          $$StudySessionParticipantsTableAnnotationComposer,
+          $$StudySessionParticipantsTableCreateCompanionBuilder,
+          $$StudySessionParticipantsTableUpdateCompanionBuilder,
+          (
+            StudySessionParticipantRow,
+            $$StudySessionParticipantsTableReferences,
+          ),
+          StudySessionParticipantRow,
+          PrefetchHooks Function({bool sessionId, bool personId})
+        > {
+  $$StudySessionParticipantsTableTableManager(
+    _$RynAppDatabase db,
+    $StudySessionParticipantsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$StudySessionParticipantsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$StudySessionParticipantsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$StudySessionParticipantsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> sessionId = const Value.absent(),
+                Value<String> personId = const Value.absent(),
+                Value<String> attendanceStatus = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<String?> learningNote = const Value.absent(),
+                Value<int> createdAtUtcUs = const Value.absent(),
+                Value<int> updatedAtUtcUs = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => StudySessionParticipantsCompanion(
+                sessionId: sessionId,
+                personId: personId,
+                attendanceStatus: attendanceStatus,
+                note: note,
+                learningNote: learningNote,
+                createdAtUtcUs: createdAtUtcUs,
+                updatedAtUtcUs: updatedAtUtcUs,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String sessionId,
+                required String personId,
+                Value<String> attendanceStatus = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<String?> learningNote = const Value.absent(),
+                required int createdAtUtcUs,
+                required int updatedAtUtcUs,
+                Value<int> rowid = const Value.absent(),
+              }) => StudySessionParticipantsCompanion.insert(
+                sessionId: sessionId,
+                personId: personId,
+                attendanceStatus: attendanceStatus,
+                note: note,
+                learningNote: learningNote,
+                createdAtUtcUs: createdAtUtcUs,
+                updatedAtUtcUs: updatedAtUtcUs,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$StudySessionParticipantsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({sessionId = false, personId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (sessionId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.sessionId,
+                                referencedTable:
+                                    $$StudySessionParticipantsTableReferences
+                                        ._sessionIdTable(db),
+                                referencedColumn:
+                                    $$StudySessionParticipantsTableReferences
+                                        ._sessionIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (personId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.personId,
+                                referencedTable:
+                                    $$StudySessionParticipantsTableReferences
+                                        ._personIdTable(db),
+                                referencedColumn:
+                                    $$StudySessionParticipantsTableReferences
+                                        ._personIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$StudySessionParticipantsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $StudySessionParticipantsTable,
+      StudySessionParticipantRow,
+      $$StudySessionParticipantsTableFilterComposer,
+      $$StudySessionParticipantsTableOrderingComposer,
+      $$StudySessionParticipantsTableAnnotationComposer,
+      $$StudySessionParticipantsTableCreateCompanionBuilder,
+      $$StudySessionParticipantsTableUpdateCompanionBuilder,
+      (StudySessionParticipantRow, $$StudySessionParticipantsTableReferences),
+      StudySessionParticipantRow,
+      PrefetchHooks Function({bool sessionId, bool personId})
+    >;
+typedef $$StudyMaterialsTableCreateCompanionBuilder =
+    StudyMaterialsCompanion Function({
+      required String id,
+      required String title,
+      required String type,
+      Value<String?> url,
+      Value<String?> storageNote,
+      Value<String?> description,
+      required int createdAtUtcUs,
+      required int updatedAtUtcUs,
+      Value<int> rowid,
+    });
+typedef $$StudyMaterialsTableUpdateCompanionBuilder =
+    StudyMaterialsCompanion Function({
+      Value<String> id,
+      Value<String> title,
+      Value<String> type,
+      Value<String?> url,
+      Value<String?> storageNote,
+      Value<String?> description,
+      Value<int> createdAtUtcUs,
+      Value<int> updatedAtUtcUs,
+      Value<int> rowid,
+    });
+
+final class $$StudyMaterialsTableReferences
+    extends
+        BaseReferences<
+          _$RynAppDatabase,
+          $StudyMaterialsTable,
+          StudyMaterialRow
+        > {
+  $$StudyMaterialsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<
+    $StudySessionMaterialsTable,
+    List<StudySessionMaterialRow>
+  >
+  _studySessionMaterialsRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.studySessionMaterials,
+        aliasName: $_aliasNameGenerator(
+          db.studyMaterials.id,
+          db.studySessionMaterials.materialId,
+        ),
+      );
+
+  $$StudySessionMaterialsTableProcessedTableManager
+  get studySessionMaterialsRefs {
+    final manager = $$StudySessionMaterialsTableTableManager(
+      $_db,
+      $_db.studySessionMaterials,
+    ).filter((f) => f.materialId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _studySessionMaterialsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$StudyMaterialsTableFilterComposer
+    extends Composer<_$RynAppDatabase, $StudyMaterialsTable> {
+  $$StudyMaterialsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get url => $composableBuilder(
+    column: $table.url,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get storageNote => $composableBuilder(
+    column: $table.storageNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> studySessionMaterialsRefs(
+    Expression<bool> Function($$StudySessionMaterialsTableFilterComposer f) f,
+  ) {
+    final $$StudySessionMaterialsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.studySessionMaterials,
+          getReferencedColumn: (t) => t.materialId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$StudySessionMaterialsTableFilterComposer(
+                $db: $db,
+                $table: $db.studySessionMaterials,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$StudyMaterialsTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $StudyMaterialsTable> {
+  $$StudyMaterialsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get url => $composableBuilder(
+    column: $table.url,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get storageNote => $composableBuilder(
+    column: $table.storageNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$StudyMaterialsTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $StudyMaterialsTable> {
+  $$StudyMaterialsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<String> get url =>
+      $composableBuilder(column: $table.url, builder: (column) => column);
+
+  GeneratedColumn<String> get storageNote => $composableBuilder(
+    column: $table.storageNote,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get description => $composableBuilder(
+    column: $table.description,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => column,
+  );
+
+  Expression<T> studySessionMaterialsRefs<T extends Object>(
+    Expression<T> Function($$StudySessionMaterialsTableAnnotationComposer a) f,
+  ) {
+    final $$StudySessionMaterialsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.studySessionMaterials,
+          getReferencedColumn: (t) => t.materialId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$StudySessionMaterialsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.studySessionMaterials,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$StudyMaterialsTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $StudyMaterialsTable,
+          StudyMaterialRow,
+          $$StudyMaterialsTableFilterComposer,
+          $$StudyMaterialsTableOrderingComposer,
+          $$StudyMaterialsTableAnnotationComposer,
+          $$StudyMaterialsTableCreateCompanionBuilder,
+          $$StudyMaterialsTableUpdateCompanionBuilder,
+          (StudyMaterialRow, $$StudyMaterialsTableReferences),
+          StudyMaterialRow,
+          PrefetchHooks Function({bool studySessionMaterialsRefs})
+        > {
+  $$StudyMaterialsTableTableManager(
+    _$RynAppDatabase db,
+    $StudyMaterialsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$StudyMaterialsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$StudyMaterialsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$StudyMaterialsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> type = const Value.absent(),
+                Value<String?> url = const Value.absent(),
+                Value<String?> storageNote = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                Value<int> createdAtUtcUs = const Value.absent(),
+                Value<int> updatedAtUtcUs = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => StudyMaterialsCompanion(
+                id: id,
+                title: title,
+                type: type,
+                url: url,
+                storageNote: storageNote,
+                description: description,
+                createdAtUtcUs: createdAtUtcUs,
+                updatedAtUtcUs: updatedAtUtcUs,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String title,
+                required String type,
+                Value<String?> url = const Value.absent(),
+                Value<String?> storageNote = const Value.absent(),
+                Value<String?> description = const Value.absent(),
+                required int createdAtUtcUs,
+                required int updatedAtUtcUs,
+                Value<int> rowid = const Value.absent(),
+              }) => StudyMaterialsCompanion.insert(
+                id: id,
+                title: title,
+                type: type,
+                url: url,
+                storageNote: storageNote,
+                description: description,
+                createdAtUtcUs: createdAtUtcUs,
+                updatedAtUtcUs: updatedAtUtcUs,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$StudyMaterialsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({studySessionMaterialsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (studySessionMaterialsRefs) db.studySessionMaterials,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (studySessionMaterialsRefs)
+                    await $_getPrefetchedData<
+                      StudyMaterialRow,
+                      $StudyMaterialsTable,
+                      StudySessionMaterialRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$StudyMaterialsTableReferences
+                          ._studySessionMaterialsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$StudyMaterialsTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).studySessionMaterialsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.materialId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$StudyMaterialsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $StudyMaterialsTable,
+      StudyMaterialRow,
+      $$StudyMaterialsTableFilterComposer,
+      $$StudyMaterialsTableOrderingComposer,
+      $$StudyMaterialsTableAnnotationComposer,
+      $$StudyMaterialsTableCreateCompanionBuilder,
+      $$StudyMaterialsTableUpdateCompanionBuilder,
+      (StudyMaterialRow, $$StudyMaterialsTableReferences),
+      StudyMaterialRow,
+      PrefetchHooks Function({bool studySessionMaterialsRefs})
+    >;
+typedef $$StudySessionMaterialsTableCreateCompanionBuilder =
+    StudySessionMaterialsCompanion Function({
+      required String sessionId,
+      required String materialId,
+      required int createdAtUtcUs,
+      Value<int> rowid,
+    });
+typedef $$StudySessionMaterialsTableUpdateCompanionBuilder =
+    StudySessionMaterialsCompanion Function({
+      Value<String> sessionId,
+      Value<String> materialId,
+      Value<int> createdAtUtcUs,
+      Value<int> rowid,
+    });
+
+final class $$StudySessionMaterialsTableReferences
+    extends
+        BaseReferences<
+          _$RynAppDatabase,
+          $StudySessionMaterialsTable,
+          StudySessionMaterialRow
+        > {
+  $$StudySessionMaterialsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $StudySessionsTable _sessionIdTable(_$RynAppDatabase db) =>
+      db.studySessions.createAlias(
+        $_aliasNameGenerator(
+          db.studySessionMaterials.sessionId,
+          db.studySessions.id,
+        ),
+      );
+
+  $$StudySessionsTableProcessedTableManager get sessionId {
+    final $_column = $_itemColumn<String>('session_id')!;
+
+    final manager = $$StudySessionsTableTableManager(
+      $_db,
+      $_db.studySessions,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_sessionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $StudyMaterialsTable _materialIdTable(_$RynAppDatabase db) =>
+      db.studyMaterials.createAlias(
+        $_aliasNameGenerator(
+          db.studySessionMaterials.materialId,
+          db.studyMaterials.id,
+        ),
+      );
+
+  $$StudyMaterialsTableProcessedTableManager get materialId {
+    final $_column = $_itemColumn<String>('material_id')!;
+
+    final manager = $$StudyMaterialsTableTableManager(
+      $_db,
+      $_db.studyMaterials,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_materialIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$StudySessionMaterialsTableFilterComposer
+    extends Composer<_$RynAppDatabase, $StudySessionMaterialsTable> {
+  $$StudySessionMaterialsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$StudySessionsTableFilterComposer get sessionId {
+    final $$StudySessionsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sessionId,
+      referencedTable: $db.studySessions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StudySessionsTableFilterComposer(
+            $db: $db,
+            $table: $db.studySessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StudyMaterialsTableFilterComposer get materialId {
+    final $$StudyMaterialsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.materialId,
+      referencedTable: $db.studyMaterials,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StudyMaterialsTableFilterComposer(
+            $db: $db,
+            $table: $db.studyMaterials,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$StudySessionMaterialsTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $StudySessionMaterialsTable> {
+  $$StudySessionMaterialsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$StudySessionsTableOrderingComposer get sessionId {
+    final $$StudySessionsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sessionId,
+      referencedTable: $db.studySessions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StudySessionsTableOrderingComposer(
+            $db: $db,
+            $table: $db.studySessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StudyMaterialsTableOrderingComposer get materialId {
+    final $$StudyMaterialsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.materialId,
+      referencedTable: $db.studyMaterials,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StudyMaterialsTableOrderingComposer(
+            $db: $db,
+            $table: $db.studyMaterials,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$StudySessionMaterialsTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $StudySessionMaterialsTable> {
+  $$StudySessionMaterialsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => column,
+  );
+
+  $$StudySessionsTableAnnotationComposer get sessionId {
+    final $$StudySessionsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sessionId,
+      referencedTable: $db.studySessions,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StudySessionsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.studySessions,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$StudyMaterialsTableAnnotationComposer get materialId {
+    final $$StudyMaterialsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.materialId,
+      referencedTable: $db.studyMaterials,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$StudyMaterialsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.studyMaterials,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$StudySessionMaterialsTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $StudySessionMaterialsTable,
+          StudySessionMaterialRow,
+          $$StudySessionMaterialsTableFilterComposer,
+          $$StudySessionMaterialsTableOrderingComposer,
+          $$StudySessionMaterialsTableAnnotationComposer,
+          $$StudySessionMaterialsTableCreateCompanionBuilder,
+          $$StudySessionMaterialsTableUpdateCompanionBuilder,
+          (StudySessionMaterialRow, $$StudySessionMaterialsTableReferences),
+          StudySessionMaterialRow,
+          PrefetchHooks Function({bool sessionId, bool materialId})
+        > {
+  $$StudySessionMaterialsTableTableManager(
+    _$RynAppDatabase db,
+    $StudySessionMaterialsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$StudySessionMaterialsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$StudySessionMaterialsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$StudySessionMaterialsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> sessionId = const Value.absent(),
+                Value<String> materialId = const Value.absent(),
+                Value<int> createdAtUtcUs = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => StudySessionMaterialsCompanion(
+                sessionId: sessionId,
+                materialId: materialId,
+                createdAtUtcUs: createdAtUtcUs,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String sessionId,
+                required String materialId,
+                required int createdAtUtcUs,
+                Value<int> rowid = const Value.absent(),
+              }) => StudySessionMaterialsCompanion.insert(
+                sessionId: sessionId,
+                materialId: materialId,
+                createdAtUtcUs: createdAtUtcUs,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$StudySessionMaterialsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({sessionId = false, materialId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (sessionId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.sessionId,
+                                referencedTable:
+                                    $$StudySessionMaterialsTableReferences
+                                        ._sessionIdTable(db),
+                                referencedColumn:
+                                    $$StudySessionMaterialsTableReferences
+                                        ._sessionIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (materialId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.materialId,
+                                referencedTable:
+                                    $$StudySessionMaterialsTableReferences
+                                        ._materialIdTable(db),
+                                referencedColumn:
+                                    $$StudySessionMaterialsTableReferences
+                                        ._materialIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$StudySessionMaterialsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $StudySessionMaterialsTable,
+      StudySessionMaterialRow,
+      $$StudySessionMaterialsTableFilterComposer,
+      $$StudySessionMaterialsTableOrderingComposer,
+      $$StudySessionMaterialsTableAnnotationComposer,
+      $$StudySessionMaterialsTableCreateCompanionBuilder,
+      $$StudySessionMaterialsTableUpdateCompanionBuilder,
+      (StudySessionMaterialRow, $$StudySessionMaterialsTableReferences),
+      StudySessionMaterialRow,
+      PrefetchHooks Function({bool sessionId, bool materialId})
+    >;
 
 class $RynAppDatabaseManager {
   final _$RynAppDatabase _db;
@@ -20938,4 +25254,15 @@ class $RynAppDatabaseManager {
       $$EncountersTableTableManager(_db, _db.encounters);
   $$EncounterNotesTableTableManager get encounterNotes =>
       $$EncounterNotesTableTableManager(_db, _db.encounterNotes);
+  $$StudySessionsTableTableManager get studySessions =>
+      $$StudySessionsTableTableManager(_db, _db.studySessions);
+  $$StudySessionParticipantsTableTableManager get studySessionParticipants =>
+      $$StudySessionParticipantsTableTableManager(
+        _db,
+        _db.studySessionParticipants,
+      );
+  $$StudyMaterialsTableTableManager get studyMaterials =>
+      $$StudyMaterialsTableTableManager(_db, _db.studyMaterials);
+  $$StudySessionMaterialsTableTableManager get studySessionMaterials =>
+      $$StudySessionMaterialsTableTableManager(_db, _db.studySessionMaterials);
 }

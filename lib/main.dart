@@ -1171,20 +1171,10 @@ class _ShellPageContent extends StatelessWidget {
           ]
         : _isStudy
         ? <Widget>[
-            Align(
-              alignment: Alignment.centerLeft,
-              child: FilledButton.icon(
-                onPressed: () => _openQuickStartSheet(
-                  context,
-                  target: '스터디 참여자',
-                  lens: '스터디 기록',
-                ),
-                icon: const Icon(Icons.add_rounded),
-                label: const Text('새 만남 시작'),
-              ),
+            StudyOsShell(
+              repository: runtimeServices?.studyOperations,
+              peopleRepository: runtimeServices?.people,
             ),
-            const SizedBox(height: 12),
-            const StudyOsShell(),
           ]
         : selectedLabel == UserText.navPeople
         ? <Widget>[
@@ -1256,15 +1246,6 @@ class _ShellPageContent extends StatelessWidget {
           ]
         : <Widget>[_BusinessAreaPage(label: selectedLabel)];
 
-    if (_isStudy) {
-      return SingleChildScrollView(
-        key: const Key('study-page-scroll'),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: body,
-        ),
-      );
-    }
     return SizedBox.expand(child: body.single);
   }
 }

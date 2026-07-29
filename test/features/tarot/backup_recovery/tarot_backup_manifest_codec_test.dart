@@ -35,11 +35,17 @@ void main() {
     }
   });
 
-  test('schema v6 v7 and v8 retain exact versioned inventories', () {
-    expect(TarotBackupManifest.schemaVersion, 8);
+  test('schema v6 through v9 retain exact versioned inventories', () {
+    expect(TarotBackupManifest.schemaVersion, 9);
     expect(TarotBackupManifest.requiredTablesFor(6), isNotEmpty);
     expect(TarotBackupManifest.requiredTablesFor(7), isNotEmpty);
     expect(TarotBackupManifest.requiredTablesFor(8), isNotEmpty);
+    expect(TarotBackupManifest.requiredTablesFor(9), containsAll(<String>{
+      'study_sessions',
+      'study_session_participants',
+      'study_materials',
+      'study_session_materials',
+    }));
     expect(
       TarotBackupManifest.requiredColumnsFor(6)['tarot_readings'],
       isNot(contains('person_id')),
@@ -52,7 +58,7 @@ void main() {
       TarotBackupManifest.requiredColumnsFor(8)['tarot_readings'],
       contains('person_id'),
     );
-    expect(TarotBackupManifest.requiredTablesFor(9), isEmpty);
+    expect(TarotBackupManifest.requiredTablesFor(10), isEmpty);
   });
 
   test('unknown and privacy-sensitive fields are rejected', () {

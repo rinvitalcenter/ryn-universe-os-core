@@ -7,7 +7,7 @@ import 'package:ryn_universe_os_core/core/persistence/migrations.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 void main() {
-  group('Tarot and Person schema preserved in v8', () {
+  group('Tarot and Person schema preserved in v9', () {
     late RynAppDatabase database;
 
     setUp(() {
@@ -19,10 +19,10 @@ void main() {
     });
 
     test(
-      'fresh database creates schema version 8 with canonical Person FK',
+      'fresh database creates schema version 9 with canonical Person FK',
       () async {
-        expect(database.schemaVersion, 8);
-        expect(plannedCurrentSchemaVersion, 8);
+        expect(database.schemaVersion, 9);
+        expect(plannedCurrentSchemaVersion, 9);
 
         final tables = await _tableNames(database);
         expect(
@@ -250,9 +250,9 @@ void main() {
     );
   });
 
-  group('Tarot and Person preserving add-only migration through v8', () {
+  group('Tarot and Person preserving add-only migration through v9', () {
     test(
-      'file-backed v6 to v8 preserves Person Role and adds nullable Person link',
+      'file-backed v6 to v9 preserves Person Role and adds nullable Person link',
       () async {
         final root = await Directory.systemTemp.createTemp('ryn-group-v6-v7-');
         addTearDown(() async {
@@ -285,7 +285,7 @@ void main() {
         expect(await _count(database, 'person_roles'), 1);
         expect(await _count(database, 'person_groups'), 0);
         expect(await _count(database, 'person_group_memberships'), 0);
-        expect(database.schemaVersion, 8);
+        expect(database.schemaVersion, 9);
         final personId = await database
             .customSelect(
               "SELECT person_id FROM tarot_readings WHERE reading_instance_id = 'missing'",
@@ -304,7 +304,7 @@ void main() {
     );
 
     test(
-      'preserves governance data, adds four tables, and fabricates no Tarot rows',
+      'preserves governance data, adds canonical tables, and fabricates no Tarot rows',
       () async {
         final database = RynAppDatabase(
           NativeDatabase.memory(setup: _createSyntheticVersion4Database),
@@ -336,8 +336,8 @@ void main() {
       },
     );
 
-    test('file-backed v7 to v8 preserves rows with null Person links', () async {
-      final root = await Directory.systemTemp.createTemp('ryn-tarot-v7-v8-');
+    test('file-backed v7 to v9 preserves rows with null Person links', () async {
+      final root = await Directory.systemTemp.createTemp('ryn-tarot-v7-v9-');
       addTearDown(() async {
         if (await root.exists()) await root.delete(recursive: true);
       });
@@ -363,7 +363,7 @@ void main() {
       final version = await database
           .customSelect('PRAGMA user_version')
           .getSingle();
-      expect(version.read<int>('user_version'), 8);
+      expect(version.read<int>('user_version'), 9);
       expect(
         await database.customSelect('PRAGMA foreign_key_check').get(),
         isEmpty,
@@ -436,7 +436,7 @@ void main() {
           NativeDatabase.memory(
             setup: (raw) {
               raw.execute(_version4AppSettingsSql);
-              raw.execute('PRAGMA user_version = 9');
+              raw.execute('PRAGMA user_version = 10');
             },
           ),
         );

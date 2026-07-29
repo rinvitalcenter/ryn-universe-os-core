@@ -1,6 +1,8 @@
 import '../../features/people/data/persistence/drift_person_core_repositories.dart';
 import '../../features/people/data/persistence/drift_person_group_repository.dart';
 import '../../features/people/domain/person_core_repositories.dart';
+import '../../features/study_os/data/persistence/drift_study_operations_repository.dart';
+import '../../features/study_os/domain/study_operations_repository.dart';
 import '../../features/tarot/data/persistence/drift_tarot_reading_repository.dart';
 import '../../features/tarot/data/persistence/tarot_reading_repository.dart';
 import '../persistence/app_database.dart';
@@ -18,7 +20,8 @@ final class RynRuntimeServices {
       personRelationships = DriftPersonRelationshipRepository(database),
       personBirthProfiles = DriftPersonBirthProfileRepository(database),
       encounters = DriftEncounterRepository(database),
-      encounterNotes = DriftEncounterNoteRepository(database);
+      encounterNotes = DriftEncounterNoteRepository(database),
+      studyOperations = DriftStudyOperationsRepository(database);
 
   final RynAppDatabase database;
   final TarotReadingRepository tarotReadings;
@@ -29,4 +32,5 @@ final class RynRuntimeServices {
   final PersonBirthProfileRepository personBirthProfiles;
   final EncounterRepository encounters;
   final EncounterNoteRepository encounterNotes;
+  final StudyOperationsRepository studyOperations;
 }

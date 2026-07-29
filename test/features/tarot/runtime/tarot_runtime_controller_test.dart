@@ -31,7 +31,7 @@ void main() {
     });
 
     test(
-      'first run creates one shared version-eight development database',
+      'first run creates one shared version-nine development database',
       () async {
         final controller = TarotRuntimeController.development(
           pathContract: paths,
@@ -53,7 +53,7 @@ void main() {
           development.databasePath,
           mode: OpenMode.readOnly,
         );
-        expect(check.userVersion, 8);
+        expect(check.userVersion, 9);
         check.close();
         await controller.close();
       },
@@ -387,8 +387,9 @@ void main() {
           updatedAt: DateTime.utc(2026, 1, 1),
         );
         expect(
-          (await controller.runtimeServices!.people.createPerson(person))
-              .isSuccess,
+          (await controller.runtimeServices!.people.createPerson(
+            person,
+          )).isSuccess,
           isTrue,
         );
         final self = syntheticInput(readingId: 'reading.synthetic.self');
@@ -410,8 +411,7 @@ void main() {
           await controller.completeManualReading(
             snapshot: manual.snapshot,
             personId: person.id,
-            readingTimezoneOffsetMinutes:
-                manual.readingTimezoneOffsetMinutes,
+            readingTimezoneOffsetMinutes: manual.readingTimezoneOffsetMinutes,
             interpretation: manual.interpretation,
           ),
           isTrue,
@@ -436,29 +436,37 @@ void main() {
       },
     );
 
-    test('manual save with missing Person fails with no partial reading', () async {
-      final controller = TarotRuntimeController.development(pathContract: paths);
-      await controller.bootstrap();
-      final manual = syntheticInput(
-        readingId: 'reading.synthetic.missing-person',
-        sourceType: TarotReadingOrigin.manuallyRecorded,
-        personId: 'person.synthetic.missing',
-        placementCount: 3,
-      );
-
-      expect(
-        await controller.completeManualReading(
-          snapshot: manual.snapshot,
+    test(
+      'manual save with missing Person fails with no partial reading',
+      () async {
+        final controller = TarotRuntimeController.development(
+          pathContract: paths,
+        );
+        await controller.bootstrap();
+        final manual = syntheticInput(
+          readingId: 'reading.synthetic.missing-person',
+          sourceType: TarotReadingOrigin.manuallyRecorded,
           personId: 'person.synthetic.missing',
-          readingTimezoneOffsetMinutes: manual.readingTimezoneOffsetMinutes,
-        ),
-        isFalse,
-      );
+          placementCount: 3,
+        );
 
-      expect(controller.recordFor(manual.snapshot.readingInstanceId), isNull);
-      expect(controller.snapshots, isEmpty);
-      expect(controller.failure?.userMessage, isNot(contains('person.synthetic')));
-      await controller.close();
-    });
+        expect(
+          await controller.completeManualReading(
+            snapshot: manual.snapshot,
+            personId: 'person.synthetic.missing',
+            readingTimezoneOffsetMinutes: manual.readingTimezoneOffsetMinutes,
+          ),
+          isFalse,
+        );
+
+        expect(controller.recordFor(manual.snapshot.readingInstanceId), isNull);
+        expect(controller.snapshots, isEmpty);
+        expect(
+          controller.failure?.userMessage,
+          isNot(contains('person.synthetic')),
+        );
+        await controller.close();
+      },
+    );
   });
 }

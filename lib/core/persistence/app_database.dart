@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../../features/people/data/persistence/person_tables.dart';
+import '../../features/study_os/data/persistence/study_operations_tables.dart';
 import '../../features/tarot/data/persistence/tarot_tables.dart';
 import 'database_connection.dart';
 import 'migrations.dart';
@@ -324,6 +325,10 @@ class ApprovalRecords extends Table {
     PersonBirthProfiles,
     Encounters,
     EncounterNotes,
+    StudySessions,
+    StudySessionParticipants,
+    StudyMaterials,
+    StudySessionMaterials,
   ],
 )
 final class RynAppDatabase extends _$RynAppDatabase {
@@ -347,10 +352,11 @@ final class RynAppDatabase extends _$RynAppDatabase {
     onCreate: (migrator) async {
       await migrator.createAll();
       await _ensurePersonCoreIndexes();
+      await _ensureStudyIndexes();
       await _ensureMainRuntimeState();
     },
     onUpgrade: (migrator, from, to) async {
-      if (to != 8 || (from < 4 || from > 7)) {
+      if (to != 9 || (from < 4 || from > 8)) {
         throw StateError('Unsupported database migration path: $from -> $to');
       }
       await transaction(() async {
@@ -372,10 +378,15 @@ final class RynAppDatabase extends _$RynAppDatabase {
           await migrator.createTable(personGroups);
           await migrator.createTable(personGroupMemberships);
         }
-        if (from != 4) {
+        if (from != 4 && from <= 7) {
           await migrator.addColumn(tarotReadings, tarotReadings.personId);
         }
+        await migrator.createTable(studySessions);
+        await migrator.createTable(studySessionParticipants);
+        await migrator.createTable(studyMaterials);
+        await migrator.createTable(studySessionMaterials);
         await _ensurePersonCoreIndexes();
+        await _ensureStudyIndexes();
         await _ensureMainRuntimeState();
       });
     },
@@ -412,6 +423,19 @@ final class RynAppDatabase extends _$RynAppDatabase {
       'CREATE INDEX IF NOT EXISTS encounters_person_occurred_idx ON encounters (person_id, occurred_at_utc_us DESC)',
       'CREATE INDEX IF NOT EXISTS encounters_person_follow_up_idx ON encounters (person_id, follow_up_at_utc_us)',
       'CREATE INDEX IF NOT EXISTS encounter_notes_encounter_recorded_idx ON encounter_notes (encounter_id, recorded_at_utc_us)',
+    ];
+    for (final statement in statements) {
+      await customStatement(statement);
+    }
+  }
+
+  Future<void> _ensureStudyIndexes() async {
+    const statements = <String>[
+      'CREATE INDEX IF NOT EXISTS study_sessions_occurred_idx ON study_sessions (occurred_at_utc_us DESC)',
+      'CREATE INDEX IF NOT EXISTS study_sessions_status_track_idx ON study_sessions (status, track, occurred_at_utc_us)',
+      'CREATE INDEX IF NOT EXISTS study_participants_person_idx ON study_session_participants (person_id, attendance_status, session_id)',
+      'CREATE INDEX IF NOT EXISTS study_materials_title_idx ON study_materials (title)',
+      'CREATE INDEX IF NOT EXISTS study_session_materials_material_idx ON study_session_materials (material_id, session_id)',
     ];
     for (final statement in statements) {
       await customStatement(statement);

@@ -143,7 +143,7 @@ void main() {
   }
 
   test(
-    'Person-only schema v8 backup validates and restores synthetic rows',
+    'Person-only schema v9 backup validates and restores synthetic rows',
     () async {
       final counts = await roundTrip(includePerson: true, includeTarot: false);
 
@@ -156,7 +156,7 @@ void main() {
         'readings': 0,
         'groups': 0,
         'memberships': 0,
-        'schema': 8,
+        'schema': 9,
         'linkedReadings': 0,
         'nullReadings': 0,
         'archivedPersons': 0,
@@ -164,7 +164,7 @@ void main() {
     },
   );
 
-  test('Tarot-only schema v8 backup restore remains compatible', () async {
+  test('Tarot-only schema v9 backup restore remains compatible', () async {
     final counts = await roundTrip(includePerson: false, includeTarot: true);
 
     expect(counts['persons'], 0);
@@ -172,7 +172,7 @@ void main() {
   });
 
   test(
-    'mixed Person and Tarot schema v8 backup restores both domains',
+    'mixed Person and Tarot schema v9 backup restores both domains',
     () async {
       final counts = await roundTrip(includePerson: true, includeTarot: true);
 
@@ -183,7 +183,7 @@ void main() {
   );
 
   test(
-    'exact v6 backup is migrated in isolation and restored as v8 with empty groups',
+    'exact v6 backup is migrated in isolation and restored as v9 with empty groups',
     () async {
       final counts = await roundTrip(
         includePerson: true,
@@ -191,7 +191,7 @@ void main() {
         candidateSchemaVersion: TarotBackupManifest.legacySchemaVersion,
       );
 
-      expect(counts['schema'], 8);
+      expect(counts['schema'], 9);
       expect(counts['persons'], 1);
       expect(counts['roles'], 1);
       expect(counts['readings'], 1);
@@ -200,7 +200,7 @@ void main() {
     },
   );
 
-  test('v8 round trip preserves linked manual null self and archive', () async {
+  test('v9 round trip preserves linked manual null self and archive', () async {
     final counts = await roundTrip(
       includePerson: true,
       includeTarot: true,
@@ -208,7 +208,7 @@ void main() {
       archivePerson: true,
     );
 
-    expect(counts['schema'], 8);
+    expect(counts['schema'], 9);
     expect(counts['readings'], 2);
     expect(counts['linkedReadings'], 1);
     expect(counts['nullReadings'], 1);
@@ -223,7 +223,7 @@ void main() {
       candidateSchemaVersion: TarotBackupManifest.schemaVersionV7,
     );
 
-    expect(counts['schema'], 8);
+    expect(counts['schema'], 9);
     expect(counts['groups'], 2);
     expect(counts['memberships'], 2);
   });

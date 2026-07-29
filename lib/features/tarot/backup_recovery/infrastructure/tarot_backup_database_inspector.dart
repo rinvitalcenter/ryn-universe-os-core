@@ -132,6 +132,18 @@ final class TarotBackupDatabaseInspector {
       final tarotPersonSchemaContractOk =
           hasTarotTables &&
           _inspectTarotPersonSchemaContract(database, schemaVersion);
+      final hasStudyTables = <String>[
+        'study_sessions',
+        'study_session_participants',
+        'study_materials',
+        'study_session_materials',
+      ].every(tableNames.contains);
+      final studySchemaContractOk =
+          schemaVersion < TarotBackupManifest.schemaVersion ||
+          (hasStudyTables && _inspectStudySchemaContract(database));
+      final studyInvariantsOk =
+          schemaVersion < TarotBackupManifest.schemaVersion ||
+          (hasStudyTables && _inspectStudyInvariants(database));
       final integrityCheckOk =
           database.select('PRAGMA integrity_check').length == 1 &&
           database.select('PRAGMA integrity_check').first.values.first == 'ok';
@@ -159,9 +171,15 @@ final class TarotBackupDatabaseInspector {
         unsupportedTableRowsZero: unsupportedRowsZero,
         integrityCheckOk: integrityCheckOk,
         foreignKeyCheckOk: foreignKeyCheckOk,
-        schemaContractOk: personSchemaContractOk && tarotPersonSchemaContractOk,
+        schemaContractOk:
+            personSchemaContractOk &&
+            tarotPersonSchemaContractOk &&
+            studySchemaContractOk,
         aggregateInvariantsOk:
-            tarotAggregate.valid && personCoreInvariantsOk && groupInvariantsOk,
+            tarotAggregate.valid &&
+            personCoreInvariantsOk &&
+            groupInvariantsOk &&
+            studyInvariantsOk,
         freelistCount: _scalar(database, 'PRAGMA freelist_count'),
         hasUnexpectedNonEmptySidecar: false,
       );
@@ -369,11 +387,65 @@ final class TarotBackupDatabaseInspector {
                   .toLowerCase(),
         )
         .toList(growable: false);
-    final expected = schemaVersion >= TarotBackupManifest.schemaVersion
+    final expected = schemaVersion >= TarotBackupManifest.schemaVersionV8
         ? const <String>{'person_id|persons|id|no action|restrict'}
         : const <String>{};
     return foreignKeys.length == expected.length &&
         _sameSet(foreignKeys.toSet(), expected);
+  }
+
+  bool _inspectStudySchemaContract(Database database) {
+    Set<String> foreignKeys(String table) => database
+        .select('PRAGMA foreign_key_list("$table")')
+        .map(
+          (row) =>
+              '${row['from']}|${row['table']}|${row['to']}|'
+                      '${row['on_update']}|${row['on_delete']}'
+                  .toLowerCase(),
+        )
+        .toSet();
+
+    return _sameSet(
+          foreignKeys('study_session_participants'),
+          const <String>{
+            'session_id|study_sessions|id|no action|cascade',
+            'person_id|persons|id|no action|restrict',
+          },
+        ) &&
+        _sameSet(
+          foreignKeys('study_session_materials'),
+          const <String>{
+            'session_id|study_sessions|id|no action|cascade',
+            'material_id|study_materials|id|no action|restrict',
+          },
+        );
+  }
+
+  bool _inspectStudyInvariants(Database database) {
+    final invalidEnums = _scalar(database, '''SELECT
+      (SELECT count(*) FROM study_sessions
+        WHERE track NOT IN ('tarot', 'saju', 'mixed')
+          OR status NOT IN ('planned', 'completed', 'cancelled')
+          OR progress_status NOT IN
+            ('not_started', 'in_progress', 'completed', 'deferred')) +
+      (SELECT count(*) FROM study_session_participants
+        WHERE attendance_status NOT IN
+          ('planned', 'attended', 'absent', 'late', 'cancelled')) +
+      (SELECT count(*) FROM study_materials
+        WHERE type NOT IN
+          ('handout', 'card_news', 'web_page', 'video', 'book', 'practice', 'other'))''');
+    final invalidValues = _scalar(database, '''SELECT
+      (SELECT count(*) FROM study_sessions
+        WHERE length(trim(id)) = 0 OR length(trim(title)) = 0
+          OR length(trim(location)) = 0
+          OR timezone_offset_minutes NOT BETWEEN -840 AND 840
+          OR updated_at_utc_us < created_at_utc_us) +
+      (SELECT count(*) FROM study_session_participants
+        WHERE updated_at_utc_us < created_at_utc_us) +
+      (SELECT count(*) FROM study_materials
+        WHERE length(trim(id)) = 0 OR length(trim(title)) = 0
+          OR updated_at_utc_us < created_at_utc_us)''');
+    return invalidEnums == 0 && invalidValues == 0;
   }
 
   bool _inspectPersonCore(Database database) {

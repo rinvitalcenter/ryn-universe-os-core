@@ -18,7 +18,7 @@ void main() {
     await fixture.dispose();
   });
 
-  test('inspector accepts schema 8 and valid structural aggregate', () async {
+  test('inspector accepts schema 9 and valid structural aggregate', () async {
     fixture = await TarotBackupRecoveryFixture.create();
 
     final evidence = inspector.inspect(
@@ -26,7 +26,7 @@ void main() {
       policy: TarotDatabaseInspectionPolicy.normalReadOnlySource,
     );
 
-    expect(evidence.schemaVersion, 8);
+    expect(evidence.schemaVersion, 9);
     expect(evidence.requiredTablesPresent, isTrue);
     expect(evidence.requiredColumnsPresent, isTrue);
     expect(evidence.integrityCheckOk, isTrue);

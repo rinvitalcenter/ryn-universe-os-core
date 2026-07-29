@@ -14,19 +14,19 @@ const personTables = <String>{
 
 void main() {
   test(
-    'fresh database creates schema version 8 and all Person Core tables',
+    'fresh database creates schema version 9 and all Person Core tables',
     () async {
       final database = RynAppDatabase(NativeDatabase.memory());
       addTearDown(database.close);
 
-      expect(database.schemaVersion, 8);
-      expect(plannedCurrentSchemaVersion, 8);
+      expect(database.schemaVersion, 9);
+      expect(plannedCurrentSchemaVersion, 9);
       expect(await _tableNames(database), containsAll(personTables));
     },
   );
 
   test(
-    'schema 5 to 8 preserves Tarot data and adds nullable Person link',
+    'schema 5 to 9 preserves Tarot data and adds nullable Person link',
     () async {
       final database = RynAppDatabase(
         NativeDatabase.memory(setup: _createSyntheticVersion5Database),
