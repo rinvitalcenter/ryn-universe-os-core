@@ -137,10 +137,11 @@ final class TarotRecordSummaryAdapter implements RecordSummaryAdapter {
         status: record.lifecycle == TarotReadingLifecycle.finished
             ? RecordDisplayStatus.finished
             : RecordDisplayStatus.continuing,
-        capabilities: const RecordCapabilities(
+        capabilities: RecordCapabilities(
           canPreview: true,
           canOpenFullDetail: true,
-          canShowOnHome: true,
+          canShowOnHome:
+              record.sourceType == TarotReadingOrigin.selfDrawn,
           canEdit: false,
         ),
         searchTerms: [

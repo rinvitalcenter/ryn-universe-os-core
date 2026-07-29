@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ryn_universe_os_core/features/people/domain/person_core_models.dart';
 import 'package:ryn_universe_os_core/features/records/application/record_hub_controller.dart';
+import 'package:ryn_universe_os_core/features/records/application/record_summary_adapter.dart';
 import 'package:ryn_universe_os_core/features/records/domain/record_summary.dart';
 import 'package:ryn_universe_os_core/features/records/presentation/records_hub_page.dart';
+import 'package:ryn_universe_os_core/features/tarot/data/tarot_spread_registry.dart';
+import 'package:ryn_universe_os_core/features/tarot/manual/application/manual_tarot_reading_controller.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_reading_result_snapshot.dart';
 
 void main() {
@@ -114,6 +118,162 @@ void main() {
     await tester.tap(find.text('셀프 타로 시작'));
     expect(started, isTrue);
   });
+
+  testWidgets(
+    'manual entry saves refreshes and selects canonical Records preview',
+    (tester) async {
+      final person = Person(
+        id: 'person-manual',
+        displayName: '합성 상담 대상',
+        status: PersonStatuses.active,
+        createdAt: DateTime(2026, 1, 1),
+        updatedAt: DateTime(2026, 1, 1),
+      );
+      final snapshots = <String, TarotReadingResultSnapshot>{};
+      final adapter = _MutableAdapter();
+      final hubController = RecordHubController(adapters: [adapter]);
+      late ManualTarotReadingController manualController;
+      await _pumpHub(
+        tester,
+        size: const Size(1600, 1000),
+        controller: hubController,
+        snapshots: snapshots,
+        peopleStream: Stream.value([person]),
+        createManualController: () {
+          manualController = ManualTarotReadingController(
+            clock: () => DateTime(2026, 7, 20, 18, 30),
+            readingIdFactory: () => 'manual-record-1',
+            saveCommand: (request) async {
+              snapshots[request.snapshot.readingInstanceId] = request.snapshot;
+              adapter.summaries = [
+                RecordSummary(
+                  key: RecordKey(
+                    moduleType: RecordModuleType.tarot,
+                    canonicalRecordId: request.snapshot.readingInstanceId,
+                  ),
+                  moduleType: RecordModuleType.tarot,
+                  recordType: RecordType.tarotManualReading,
+                  occurredAt: request.snapshot.readingAt,
+                  updatedAt: request.snapshot.readingAt,
+                  title: request.snapshot.readingQuestionText,
+                  shortSummary: 'RWS · 3카드 · 3장',
+                  personId: request.personId,
+                  status: RecordDisplayStatus.continuing,
+                  capabilities: const RecordCapabilities(
+                    canPreview: true,
+                    canOpenFullDetail: true,
+                    canShowOnHome: false,
+                  ),
+                  searchTerms: const ['RWS', '3카드'],
+                ),
+              ];
+              return true;
+            },
+          );
+          return manualController;
+        },
+      );
+
+      await tester.tap(find.byKey(const Key('records-start-manual-tarot')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('manual-tarot-recorder')), findsOneWidget);
+
+      manualController.selectPerson(person);
+      manualController.setQuestion('합성 수동 리딩 질문');
+      final cards = manualController.state.deck.cards;
+      for (
+        var index = 0;
+        index < TarotSpreadRegistry.threeCard.positions.length;
+        index++
+      ) {
+        manualController.selectCard(
+          TarotSpreadRegistry.threeCard.positions[index].id,
+          cards[index],
+        );
+      }
+      await tester.pump();
+      await tester.tap(find.byKey(const Key('manual-save')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('manual-tarot-recorder')), findsNothing);
+      expect(hubController.selectedKey?.canonicalRecordId, 'manual-record-1');
+      expect(
+        find.byKey(const Key('records-hub-selected-preview')),
+        findsOneWidget,
+      );
+      expect(find.text('합성 수동 리딩 질문'), findsWidgets);
+      expect(
+        find.byKey(const Key('records-preview-linked-person')),
+        findsOneWidget,
+      );
+      expect(find.text('대상 · 합성 상담 대상'), findsOneWidget);
+      expect(find.text('홈에 표시'), findsNothing);
+      expect(adapter.loadCount, 1);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('Person and exact date menus find linked manual record', (
+    tester,
+  ) async {
+    final person = Person(
+      id: 'person-filter',
+      displayName: '필터 합성 사용자',
+      status: PersonStatuses.active,
+      createdAt: DateTime(2026, 1, 1),
+      updatedAt: DateTime(2026, 1, 1),
+    );
+    final manual = RecordSummary(
+      key: const RecordKey(
+        moduleType: RecordModuleType.tarot,
+        canonicalRecordId: 'manual-filter-record',
+      ),
+      moduleType: RecordModuleType.tarot,
+      recordType: RecordType.tarotManualReading,
+      occurredAt: DateTime(2026, 6, 17, 19, 30),
+      updatedAt: DateTime(2026, 6, 17, 19, 30),
+      title: '필터로 찾을 기록',
+      shortSummary: 'RWS · 3카드 · 3장',
+      personId: person.id,
+      status: RecordDisplayStatus.continuing,
+      capabilities: const RecordCapabilities(
+        canPreview: true,
+        canOpenFullDetail: true,
+        canShowOnHome: false,
+      ),
+    );
+    await _pumpHub(
+      tester,
+      size: const Size(1600, 1000),
+      summaries: [manual],
+      snapshots: {
+        'manual-filter-record': _snapshot(
+          'manual-filter-record',
+          '필터로 찾을 기록',
+          DateTime(2026, 6, 17, 19, 30),
+        ),
+      },
+      peopleStream: Stream.value([person]),
+    );
+
+    await tester.tap(find.byKey(const Key('records-person-filter')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(person.displayName).last);
+    await tester.pump();
+    expect(
+      find.byKey(const ValueKey('record-row-manual-filter-record')),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.byKey(const Key('records-date-filter')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('2026.06.17').last);
+    await tester.pump();
+    expect(
+      find.byKey(const ValueKey('record-row-manual-filter-record')),
+      findsOneWidget,
+    );
+  });
 }
 
 Future<void> _pumpHub(
@@ -124,6 +284,9 @@ Future<void> _pumpHub(
   List<RecordSummary>? summaries,
   Map<String, TarotReadingResultSnapshot>? snapshots,
   VoidCallback? onStartSelfTarot,
+  RecordHubController? controller,
+  Stream<List<Person>>? peopleStream,
+  ManualTarotReadingController Function()? createManualController,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
@@ -134,8 +297,8 @@ Future<void> _pumpHub(
         'reading-1': _snapshot('reading-1', '첫 번째 질문', DateTime(2026, 7, 12)),
         'reading-2': _snapshot('reading-2', '두 번째 질문', DateTime(2026, 7, 11)),
       };
-  final controller = RecordHubController();
-  controller.replaceSummaries(
+  final hubController = controller ?? RecordHubController();
+  hubController.replaceSummaries(
     summaries ??
         fixtureSnapshots.values
             .map(
@@ -175,13 +338,15 @@ Future<void> _pumpHub(
         ),
         child: Scaffold(
           body: RecordsHubPage(
-            controller: controller,
+            controller: hubController,
             snapshotFor: (key) => fixtureSnapshots[key.canonicalRecordId],
             interpretationFor: (_) => null,
             activeReadingInstanceId: null,
             onOpenFullDetail: (_) {},
             onShowOnHome: (_) {},
             onStartSelfTarot: onStartSelfTarot ?? () {},
+            peopleStream: peopleStream,
+            createManualController: createManualController,
           ),
         ),
       ),
@@ -220,4 +385,18 @@ TarotReadingResultSnapshot _snapshot(
     expectedPlacementCount: placements.length,
     selectedDeckCardIds: placements.map((item) => item.cardId).toSet(),
   );
+}
+
+final class _MutableAdapter implements RecordSummaryAdapter {
+  List<RecordSummary> summaries = const [];
+  var loadCount = 0;
+
+  @override
+  RecordModuleType get moduleType => RecordModuleType.tarot;
+
+  @override
+  Future<List<RecordSummary>> loadSummaries() async {
+    loadCount++;
+    return summaries;
+  }
 }

@@ -12,6 +12,7 @@ import 'package:ryn_universe_os_core/core/layout/ryn_workspace_host.dart';
 import 'package:ryn_universe_os_core/core/text/user_text.dart';
 import 'package:ryn_universe_os_core/features/tarot/data/tarot_card_meaning_registry.dart';
 import 'package:ryn_universe_os_core/features/tarot/data/tarot_deck_registry.dart';
+import 'package:ryn_universe_os_core/features/tarot/data/tarot_spread_registry.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_card_definition.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_deck_definition.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_interpretation_session_draft.dart';
@@ -9492,8 +9493,8 @@ List<_TarotSpreadDefinition> _buildTarotSpreadRegistry() => [
     slots: _tarotSpreadFreeDrawSlots,
   ),
   const _TarotSpreadDefinition(
-    id: 'one_card',
-    label: UserText.tarotSpreadOne,
+    id: TarotSpreadRegistry.oneCardId,
+    label: TarotSpreadRegistry.oneCardName,
     family: _TarotSpreadFamily.freeLayout,
     subtype: 'single',
     positionMeaningMode: _TarotPositionMeaningMode.userDefined,
@@ -9508,8 +9509,8 @@ List<_TarotSpreadDefinition> _buildTarotSpreadRegistry() => [
     slots: _tarotSpreadTwoSlots,
   ),
   const _TarotSpreadDefinition(
-    id: 'three_card',
-    label: UserText.tarotSpreadThree,
+    id: TarotSpreadRegistry.threeCardId,
+    label: TarotSpreadRegistry.threeCardName,
     family: _TarotSpreadFamily.freeLayout,
     subtype: 'triptych',
     positionMeaningMode: _TarotPositionMeaningMode.userDefined,
@@ -9794,10 +9795,10 @@ double _freeDrawYRatio(int index, int count) {
 
 const _tarotSpreadOneSlots = [
   _TarotSlotSpec(
-    '핵심',
+    TarotSpreadRegistry.oneCardPositionName,
     0.5,
     0.52,
-    slotId: 'one_center',
+    slotId: TarotSpreadRegistry.oneCardPositionId,
     widthFactor: 1.10,
     heightFactor: 1.10,
     labelAnchor: _TarotSlotAnchor.bottom,
@@ -9823,24 +9824,24 @@ const _tarotSpreadTwoSlots = [
 
 const _tarotSpreadThreeSlots = [
   _TarotSlotSpec(
-    '과거',
+    TarotSpreadRegistry.threePastPositionName,
     0.18,
     0.52,
-    slotId: 'three_past',
+    slotId: TarotSpreadRegistry.threePastPositionId,
     labelAnchor: _TarotSlotAnchor.bottom,
   ),
   _TarotSlotSpec(
-    '현재',
+    TarotSpreadRegistry.threePresentPositionName,
     0.5,
     0.52,
-    slotId: 'three_present',
+    slotId: TarotSpreadRegistry.threePresentPositionId,
     labelAnchor: _TarotSlotAnchor.bottom,
   ),
   _TarotSlotSpec(
-    '미래',
+    TarotSpreadRegistry.threeFuturePositionName,
     0.82,
     0.52,
-    slotId: 'three_future',
+    slotId: TarotSpreadRegistry.threeFuturePositionId,
     labelAnchor: _TarotSlotAnchor.bottom,
   ),
 ];

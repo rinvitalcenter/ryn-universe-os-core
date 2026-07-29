@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 
 import '../../../core/formatters/korean_date_time_formatter.dart';
+import '../domain/record_summary.dart';
 import '../../tarot/models/tarot_interpretation_session_draft.dart';
 import '../../tarot/models/tarot_reading_result_snapshot.dart';
 import 'records_tarot_card.dart';
@@ -13,8 +14,11 @@ class TarotResultDetailPage extends StatelessWidget {
     required this.snapshot,
     required this.isActiveOnHome,
     required this.onBack,
-    required this.onShowOnHome,
     required this.onHideFromHome,
+    this.recordType,
+    this.linkedPersonDisplayName,
+    this.canShowOnHome = true,
+    this.onShowOnHome,
     this.interpretationDraft,
     this.questionDisplayText,
     super.key,
@@ -23,10 +27,24 @@ class TarotResultDetailPage extends StatelessWidget {
   final TarotReadingResultSnapshot snapshot;
   final TarotInterpretationSessionDraft? interpretationDraft;
   final String? questionDisplayText;
+  final RecordType? recordType;
+  final String? linkedPersonDisplayName;
+  final bool canShowOnHome;
   final bool isActiveOnHome;
   final VoidCallback onBack;
-  final VoidCallback onShowOnHome;
+  final VoidCallback? onShowOnHome;
   final VoidCallback onHideFromHome;
+
+  String get _recordTypeLabel => switch (recordType) {
+    RecordType.tarotManualReading => '수동 타로 기록',
+    RecordType.tarotSelfReading => '셀프 타로 저널',
+    _ => '타로 기록',
+  };
+
+  String get _linkedPersonLabel {
+    final displayName = linkedPersonDisplayName?.trim() ?? '';
+    return displayName.isEmpty ? '연결된 사람' : displayName;
+  }
 
   TarotInterpretationSessionDraft? get _matchingDraft =>
       interpretationDraft?.readingInstanceId == snapshot.readingInstanceId
@@ -58,13 +76,13 @@ class TarotResultDetailPage extends StatelessWidget {
                       icon: const Icon(Icons.arrow_back_rounded),
                       label: const Text('성장 기록으로 돌아가기'),
                     ),
-                    if (isActiveOnHome)
+                    if (canShowOnHome && isActiveOnHome)
                       TextButton.icon(
                         onPressed: onHideFromHome,
                         icon: const Icon(Icons.visibility_off_outlined),
                         label: const Text('홈에서 닫기'),
                       )
-                    else
+                    else if (canShowOnHome && onShowOnHome != null)
                       FilledButton.tonalIcon(
                         key: const Key('detail-show-on-home'),
                         onPressed: onShowOnHome,
@@ -75,7 +93,7 @@ class TarotResultDetailPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 28),
                 Text(
-                  '셀프 타로 저널',
+                  _recordTypeLabel,
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     color: colors.primary,
                     fontWeight: FontWeight.w800,
@@ -110,6 +128,12 @@ class TarotResultDetailPage extends StatelessWidget {
                       icon: Icons.layers_outlined,
                       label: '${snapshot.placements.length}장',
                     ),
+                    if (recordType == RecordType.tarotManualReading)
+                      _DetailMeta(
+                        key: const Key('tarot-detail-linked-person'),
+                        icon: Icons.person_outline,
+                        label: '대상 · $_linkedPersonLabel',
+                      ),
                   ],
                 ),
                 const SizedBox(height: 28),
@@ -534,7 +558,7 @@ class _TarotRecordInterpretationJournal extends StatelessWidget {
 }
 
 class _DetailMeta extends StatelessWidget {
-  const _DetailMeta({required this.icon, required this.label});
+  const _DetailMeta({required this.icon, required this.label, super.key});
 
   final IconData icon;
   final String label;

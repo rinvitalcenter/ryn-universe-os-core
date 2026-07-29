@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../../core/formatters/korean_date_time_formatter.dart';
+import '../../people/domain/person_core_models.dart';
+import '../../tarot/manual/application/manual_tarot_reading_controller.dart';
+import '../../tarot/manual/presentation/manual_tarot_reading_page.dart';
 import '../../tarot/models/tarot_interpretation_session_draft.dart';
 import '../../tarot/models/tarot_reading_result_snapshot.dart';
 import '../application/record_hub_controller.dart';
@@ -16,6 +21,8 @@ class RecordsHubPage extends StatefulWidget {
     required this.onOpenFullDetail,
     required this.onShowOnHome,
     required this.onStartSelfTarot,
+    this.peopleStream,
+    this.createManualController,
     super.key,
   });
 
@@ -27,6 +34,8 @@ class RecordsHubPage extends StatefulWidget {
   final ValueChanged<TarotReadingResultSnapshot> onOpenFullDetail;
   final ValueChanged<TarotReadingResultSnapshot> onShowOnHome;
   final VoidCallback onStartSelfTarot;
+  final Stream<List<Person>>? peopleStream;
+  final ManualTarotReadingController Function()? createManualController;
 
   @override
   State<RecordsHubPage> createState() => _RecordsHubPageState();
@@ -35,6 +44,9 @@ class RecordsHubPage extends StatefulWidget {
 class _RecordsHubPageState extends State<RecordsHubPage> {
   late final TextEditingController _searchController;
   RecordKey? _detailModeKey;
+  StreamSubscription<List<Person>>? _peopleSubscription;
+  List<Person> _people = const [];
+  ManualTarotReadingController? _manualController;
 
   @override
   void initState() {
@@ -42,16 +54,35 @@ class _RecordsHubPageState extends State<RecordsHubPage> {
     _searchController = TextEditingController(
       text: widget.controller.searchQuery,
     );
+    _subscribeToPeople();
+  }
+
+  @override
+  void didUpdateWidget(covariant RecordsHubPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!identical(oldWidget.peopleStream, widget.peopleStream)) {
+      _subscribeToPeople();
+    }
   }
 
   @override
   void dispose() {
+    _peopleSubscription?.cancel();
+    _manualController?.dispose();
     _searchController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final manual = _manualController;
+    if (manual != null) {
+      return ManualTarotReadingPage(
+        controller: manual,
+        onClose: _closeManualRecorder,
+        onSaved: _completeManualSave,
+      );
+    }
     return AnimatedBuilder(
       animation: widget.controller,
       builder: (context, _) {
@@ -327,6 +358,18 @@ class _RecordsHubPageState extends State<RecordsHubPage> {
               ),
             ],
           ),
+          if (widget.createManualController != null) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                key: const Key('records-start-manual-tarot'),
+                onPressed: _openManualRecorder,
+                icon: const Icon(Icons.note_add_outlined, size: 18),
+                label: const Text('수동 타로 기록'),
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           TextField(
             key: const Key('records-hub-search-field'),
@@ -374,6 +417,7 @@ class _RecordsHubPageState extends State<RecordsHubPage> {
                   value == 'tarot' ? RecordModuleType.tarot : null,
                 ),
               ),
+              if (widget.controller.hasCanonicalPersonLinks) _personMenu(),
               _dateMenu(),
               _filterMenu(
                 icon: Icons.flag_outlined,
@@ -408,15 +452,48 @@ class _RecordsHubPageState extends State<RecordsHubPage> {
   }
 
   Widget _dateMenu() {
-    final hasDate =
-        widget.controller.dateFrom != null || widget.controller.dateTo != null;
+    final from = widget.controller.dateFrom;
+    final to = widget.controller.dateTo;
+    final exactDay = from != null && to != null && _sameDay(from, to);
+    final dates = <DateTime>[];
+    for (final summary in widget.controller.allSummaries) {
+      final day = DateTime(
+        summary.occurredAt.year,
+        summary.occurredAt.month,
+        summary.occurredAt.day,
+      );
+      if (!dates.any((item) => _sameDay(item, day))) dates.add(day);
+    }
+    dates.sort((left, right) => right.compareTo(left));
+    final entries = <String, String>{
+      'all': '전체 기간',
+      '30': '최근 30일',
+      for (final day in dates)
+        _dateKey(
+          day,
+        ): '${day.year}.${day.month.toString().padLeft(2, '0')}.${day.day.toString().padLeft(2, '0')}',
+    };
     return _filterMenu(
+      key: const Key('records-date-filter'),
       icon: Icons.calendar_today_outlined,
-      label: hasDate ? '최근 30일' : '전체 기간',
-      entries: const {'all': '전체 기간', '30': '최근 30일'},
+      label: exactDay
+          ? entries[_dateKey(from)]!
+          : from != null || to != null
+          ? '최근 30일'
+          : '전체 기간',
+      entries: entries,
       onSelected: (value) {
-        if (value != '30' || widget.controller.allSummaries.isEmpty) {
+        if (value == 'all' || widget.controller.allSummaries.isEmpty) {
           widget.controller.updateDateRange(null, null);
+          return;
+        }
+        if (value != '30') {
+          final parts = value.split('-').map(int.parse).toList(growable: false);
+          final day = DateTime(parts[0], parts[1], parts[2]);
+          widget.controller.updateDateRange(
+            day,
+            DateTime(day.year, day.month, day.day, 23, 59, 59, 999),
+          );
           return;
         }
         final latest = widget.controller.allSummaries
@@ -430,13 +507,49 @@ class _RecordsHubPageState extends State<RecordsHubPage> {
     );
   }
 
+  Widget _personMenu() {
+    final linkedIds = widget.controller.allSummaries
+        .map((summary) => summary.personId)
+        .whereType<String>()
+        .toSet();
+    final people =
+        _people
+            .where((person) => linkedIds.contains(person.id))
+            .toList(growable: false)
+          ..sort(
+            (left, right) => left.displayName.compareTo(right.displayName),
+          );
+    Person? selected;
+    for (final person in people) {
+      if (person.id == widget.controller.personFilter) {
+        selected = person;
+        break;
+      }
+    }
+    return _filterMenu(
+      key: const Key('records-person-filter'),
+      icon: Icons.person_outline,
+      label:
+          selected?.displayName ??
+          (widget.controller.personFilter == null ? '모든 사람' : '연결된 사람'),
+      entries: {
+        'all': '모든 사람',
+        for (final person in people) person.id: person.displayName,
+      },
+      onSelected: (value) =>
+          widget.controller.updatePersonFilter(value == 'all' ? null : value),
+    );
+  }
+
   Widget _filterMenu({
+    Key? key,
     required IconData icon,
     required String label,
     required Map<String, String> entries,
     required ValueChanged<String> onSelected,
   }) {
     return PopupMenuButton<String>(
+      key: key,
       onSelected: onSelected,
       itemBuilder: (_) => [
         for (final entry in entries.entries)
@@ -635,6 +748,10 @@ class _RecordsHubPageState extends State<RecordsHubPage> {
                   summary.shortSummary,
                   style: TextStyle(color: _palette.muted),
                 ),
+                if (summary.recordType == RecordType.tarotManualReading) ...[
+                  const SizedBox(height: 10),
+                  _linkedPersonMeta(summary),
+                ],
                 const SizedBox(height: 22),
                 RecordsTarotSpreadPreview(snapshot: snapshot),
                 const SizedBox(height: 22),
@@ -665,6 +782,35 @@ class _RecordsHubPageState extends State<RecordsHubPage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _linkedPersonMeta(RecordSummary summary) {
+    final personId = summary.personId;
+    String? displayName;
+    for (final person in _people) {
+      if (person.id == personId) {
+        displayName = person.displayName.trim();
+        break;
+      }
+    }
+    final visibleName = displayName == null || displayName.isEmpty
+        ? '연결된 사람'
+        : displayName;
+    return Row(
+      key: const Key('records-preview-linked-person'),
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.person_outline, size: 16, color: _palette.muted),
+        const SizedBox(width: 6),
+        Text(
+          '대상 · $visibleName',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: _palette.muted,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
     );
   }
 
@@ -811,6 +957,46 @@ class _RecordsHubPageState extends State<RecordsHubPage> {
     ),
   );
 
+  void _subscribeToPeople() {
+    unawaited(_peopleSubscription?.cancel());
+    _peopleSubscription = widget.peopleStream?.listen((people) {
+      if (!mounted) return;
+      _people = List.unmodifiable(people);
+      _manualController?.setPeople(_people);
+      setState(() {});
+    });
+  }
+
+  void _openManualRecorder() {
+    final factory = widget.createManualController;
+    if (factory == null || _manualController != null) return;
+    final controller = factory();
+    controller.setPeople(_people);
+    setState(() => _manualController = controller);
+  }
+
+  void _closeManualRecorder() {
+    final controller = _manualController;
+    if (controller == null) return;
+    setState(() => _manualController = null);
+    controller.dispose();
+  }
+
+  Future<void> _completeManualSave(String readingId) async {
+    await widget.controller.refresh();
+    if (!mounted) return;
+    final key = RecordKey(
+      moduleType: RecordModuleType.tarot,
+      canonicalRecordId: readingId,
+    );
+    if (widget.controller.summaryFor(key) == null) return;
+    _searchController.clear();
+    widget.controller.clearFilters();
+    widget.controller.select(key);
+    _detailModeKey = null;
+    _closeManualRecorder();
+  }
+
   void _clearFilters() {
     _searchController.clear();
     widget.controller.clearFilters();
@@ -840,6 +1026,9 @@ class _RecordsHubPageState extends State<RecordsHubPage> {
       left.year == right.year &&
       left.month == right.month &&
       left.day == right.day;
+
+  static String _dateKey(DateTime value) =>
+      '${value.year.toString().padLeft(4, '0')}-${value.month.toString().padLeft(2, '0')}-${value.day.toString().padLeft(2, '0')}';
 }
 
 class _PaneSurface extends StatelessWidget {

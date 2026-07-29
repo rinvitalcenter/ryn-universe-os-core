@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ryn_universe_os_core/core/persistence/runtime_data_profile.dart';
+import 'package:ryn_universe_os_core/features/people/domain/person_core_models.dart';
 import 'package:ryn_universe_os_core/features/tarot/application/tarot_runtime_controller.dart';
+import 'package:ryn_universe_os_core/features/tarot/domain/tarot_persistence_models.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_interpretation_session_draft.dart';
 import 'package:sqlite3/sqlite3.dart';
 
@@ -367,6 +369,95 @@ void main() {
         controller.snapshots.single.readingQuestionText,
         syntheticQuestionA,
       );
+      await controller.close();
+    });
+
+    test(
+      'manual save persists canonical Person and preserves active self Home ID',
+      () async {
+        final controller = TarotRuntimeController.development(
+          pathContract: paths,
+        );
+        await controller.bootstrap();
+        final person = Person(
+          id: 'person.synthetic.manual',
+          displayName: 'SYNTHETIC_MANUAL_PERSON',
+          status: PersonStatuses.active,
+          createdAt: DateTime.utc(2026, 1, 1),
+          updatedAt: DateTime.utc(2026, 1, 1),
+        );
+        expect(
+          (await controller.runtimeServices!.people.createPerson(person))
+              .isSuccess,
+          isTrue,
+        );
+        final self = syntheticInput(readingId: 'reading.synthetic.self');
+        expect(
+          await controller.completeSelfReading(
+            snapshot: self.snapshot,
+            readingTimezoneOffsetMinutes: self.readingTimezoneOffsetMinutes,
+          ),
+          isTrue,
+        );
+        final manual = syntheticInput(
+          readingId: 'reading.synthetic.manual',
+          sourceType: TarotReadingOrigin.manuallyRecorded,
+          personId: person.id,
+          placementCount: 3,
+        );
+
+        expect(
+          await controller.completeManualReading(
+            snapshot: manual.snapshot,
+            personId: person.id,
+            readingTimezoneOffsetMinutes:
+                manual.readingTimezoneOffsetMinutes,
+            interpretation: manual.interpretation,
+          ),
+          isTrue,
+        );
+
+        final record = controller.recordFor('reading.synthetic.manual')!;
+        expect(record.sourceType, TarotReadingOrigin.manuallyRecorded);
+        expect(record.personId, person.id);
+        expect(
+          controller.activeReadingInstanceId,
+          self.snapshot.readingInstanceId,
+        );
+        expect(
+          await controller.featureReading('reading.synthetic.manual'),
+          isFalse,
+        );
+        expect(
+          controller.activeReadingInstanceId,
+          self.snapshot.readingInstanceId,
+        );
+        await controller.close();
+      },
+    );
+
+    test('manual save with missing Person fails with no partial reading', () async {
+      final controller = TarotRuntimeController.development(pathContract: paths);
+      await controller.bootstrap();
+      final manual = syntheticInput(
+        readingId: 'reading.synthetic.missing-person',
+        sourceType: TarotReadingOrigin.manuallyRecorded,
+        personId: 'person.synthetic.missing',
+        placementCount: 3,
+      );
+
+      expect(
+        await controller.completeManualReading(
+          snapshot: manual.snapshot,
+          personId: 'person.synthetic.missing',
+          readingTimezoneOffsetMinutes: manual.readingTimezoneOffsetMinutes,
+        ),
+        isFalse,
+      );
+
+      expect(controller.recordFor(manual.snapshot.readingInstanceId), isNull);
+      expect(controller.snapshots, isEmpty);
+      expect(controller.failure?.userMessage, isNot(contains('person.synthetic')));
       await controller.close();
     });
   });

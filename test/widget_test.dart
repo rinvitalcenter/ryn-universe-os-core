@@ -1004,6 +1004,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('tarot-result-detail-page')), findsOneWidget);
     expect(find.byKey(const Key('records-hub-three-region')), findsNothing);
+    expect(find.text('셀프 타로 저널'), findsOneWidget);
+    expect(find.text('수동 타로 기록'), findsNothing);
+    expect(find.byKey(const Key('detail-show-on-home')), findsNothing);
 
     await tester.tap(find.byKey(const Key('tarot-result-detail-back')));
     await tester.pumpAndSettle();
@@ -1025,6 +1028,9 @@ void main() {
     await tester.tap(find.text('전체 기록 열기'));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('tarot-result-detail-page')), findsOneWidget);
+    expect(find.text('셀프 타로 저널'), findsOneWidget);
+    expect(find.text('수동 타로 기록'), findsNothing);
+    expect(find.byKey(const Key('detail-show-on-home')), findsOneWidget);
     await tester.tap(find.byKey(const Key('detail-show-on-home')));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('home-actual-result-hero')), findsOneWidget);
@@ -4008,6 +4014,9 @@ void main() {
       final source = File(
         'lib/features/tarot/tarot_spread_shell.dart',
       ).readAsStringSync();
+      final spreadRegistrySource = File(
+        'lib/features/tarot/data/tarot_spread_registry.dart',
+      ).readAsStringSync();
       final registrySource = File(
         'lib/features/tarot/data/tarot_deck_registry.dart',
       ).readAsStringSync();
@@ -4058,14 +4067,39 @@ void main() {
         expect(source, contains("label: '$label'"), reason: label);
       }
       for (final id in expectedIds) {
+        if (id == 'one_card' || id == 'three_card') continue;
         expect(source, contains("id: '$id'"), reason: id);
       }
+      final sharedCanonicalIds = <String, String>{
+        'oneCardId': 'one_card',
+        'threeCardId': 'three_card',
+        'oneCardPositionId': 'one_center',
+        'threePastPositionId': 'three_past',
+        'threePresentPositionId': 'three_present',
+        'threeFuturePositionId': 'three_future',
+      };
+      for (final entry in sharedCanonicalIds.entries) {
+        expect(
+          spreadRegistrySource,
+          contains("static const ${entry.key} = '${entry.value}';"),
+          reason: 'registry must own ${entry.value}',
+        );
+        expect(
+          source,
+          contains('TarotSpreadRegistry.${entry.key}'),
+          reason: 'shell must consume ${entry.key}',
+        );
+      }
+      expect(source, isNot(contains("id: 'one_card'")));
+      expect(source, isNot(contains("id: 'three_card'")));
+      expect(source, isNot(contains("slotId: 'one_center'")));
+      expect(source, isNot(contains("slotId: 'three_past'")));
+      expect(source, isNot(contains("slotId: 'three_present'")));
+      expect(source, isNot(contains("slotId: 'three_future'")));
       expect(source, contains('id: \'free_draw\''));
       for (final id in <String>[
         'free_draw',
-        'one_card',
         'two_card',
-        'three_card',
         'four_card',
         'five_card',
         'seven_card',
@@ -4185,13 +4219,18 @@ void main() {
       expect(source, isNot(contains('관계 리딩')));
       expect(source, isNot(contains('문제-원인-해결')));
       expect(source, isNot(contains('history')));
-      expect(source, contains("id: 'one_card',"));
+      expect(source, contains('id: TarotSpreadRegistry.oneCardId,'));
       expect(source, contains('family: _TarotSpreadFamily.freeLayout'));
       expect(source, contains("id: 'celtic_cross',"));
       expect(source, contains('family: _TarotSpreadFamily.fixedMeaning'));
 
       String definitionBlock(String id) {
-        final start = source.indexOf("id: '$id'");
+        final idToken = switch (id) {
+          'one_card' => 'id: TarotSpreadRegistry.oneCardId',
+          'three_card' => 'id: TarotSpreadRegistry.threeCardId',
+          _ => "id: '$id'",
+        };
+        final start = source.indexOf(idToken);
         expect(start, isNonNegative, reason: id);
         final next = source.indexOf(
           '  const _TarotSpreadDefinition(',
@@ -4265,7 +4304,10 @@ void main() {
         'three_present',
         'four_3',
       ]) {
-        final slotStart = source.indexOf("slotId: '$slotId'");
+        final slotToken = slotId == 'three_present'
+            ? 'slotId: TarotSpreadRegistry.threePresentPositionId'
+            : "slotId: '$slotId'";
+        final slotStart = source.indexOf(slotToken);
         expect(slotStart, isNonNegative, reason: slotId);
         final slotEnd = source.indexOf('),', slotStart);
         final slotBlock = source.substring(slotStart, slotEnd);

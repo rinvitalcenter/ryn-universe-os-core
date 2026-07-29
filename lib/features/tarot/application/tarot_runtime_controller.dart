@@ -221,6 +221,42 @@ final class TarotRuntimeController extends ChangeNotifier {
     return true;
   }
 
+  Future<bool> completeManualReading({
+    required TarotReadingResultSnapshot snapshot,
+    required String personId,
+    required int readingTimezoneOffsetMinutes,
+    TarotInterpretationSessionDraft? interpretation,
+  }) async {
+    final repository = _runtimeServices?.tarotReadings;
+    if (repository == null) return _writeUnavailable();
+    final result = await repository.createCompletedReading(
+      CompletedTarotReadingPersistenceInput(
+        snapshot: snapshot,
+        sourceType: TarotReadingOrigin.manuallyRecorded,
+        personId: personId,
+        readingTimezoneOffsetMinutes: readingTimezoneOffsetMinutes,
+        interpretation: interpretation,
+      ),
+    );
+    if (result.isFailure) {
+      final error = result.error!;
+      if (error.code == RepositoryErrorCode.validationFailed ||
+          error.code == RepositoryErrorCode.notFound) {
+        _failure = TarotRuntimeFailure(
+          category: TarotRuntimeFailureCategory.writeFailed,
+          userMessage:
+              '선택한 사람 기록을 연결할 수 없습니다. 사람 상태를 확인한 뒤 다시 시도해 주세요.',
+          technicalCode: error.code.name,
+        );
+        notifyListeners();
+        return false;
+      }
+      return _captureRepositoryWriteFailure(error);
+    }
+    await _reload();
+    return true;
+  }
+
   void retainDraft(TarotInterpretationSessionDraft draft) {
     _drafts[draft.readingInstanceId] = draft;
     final saved = _lastSavedDrafts[draft.readingInstanceId];
@@ -280,6 +316,15 @@ final class TarotRuntimeController extends ChangeNotifier {
     if (repository == null) return _writeUnavailable();
     final record = recordFor(readingInstanceId);
     if (record == null) return _writeUnavailable();
+    if (record.sourceType != TarotReadingOrigin.selfDrawn) {
+      _failure = const TarotRuntimeFailure(
+        category: TarotRuntimeFailureCategory.writeFailed,
+        userMessage: '수동 기록은 Home의 현재 셀프 리딩으로 표시할 수 없습니다.',
+        technicalCode: 'manual_reading_cannot_be_featured',
+      );
+      notifyListeners();
+      return false;
+    }
     final result = record.lifecycle == TarotReadingLifecycle.finished
         ? await repository.reactivateAndFeatureReading(readingInstanceId)
         : await repository.activateHomeReading(readingInstanceId);

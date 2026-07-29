@@ -99,6 +99,7 @@ void main() {
       expect(projection.snapshot, same(snapshot));
       expect(summary.personId, 'person.synthetic.001');
       expect(summary.capabilities.canEdit, isFalse);
+      expect(summary.capabilities.canShowOnHome, isFalse);
     },
   );
 }

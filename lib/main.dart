@@ -35,6 +35,7 @@ import 'features/tarot/application/tarot_runtime_controller.dart';
 import 'features/tarot/backup_recovery/application/tarot_backup_restore_action_controller.dart';
 import 'features/tarot/backup_recovery/application/tarot_restore_startup_recovery_coordinator.dart';
 import 'features/tarot/backup_recovery/infrastructure/tarot_restore_candidate_validator.dart';
+import 'features/tarot/manual/application/manual_tarot_reading_controller.dart';
 import 'features/tarot/models/tarot_interpretation_session_draft.dart';
 import 'features/tarot/models/tarot_reading_result_snapshot.dart';
 import 'features/tarot/tarot_person_entry_selector.dart';
@@ -743,6 +744,19 @@ class _CoreOsShellState extends State<CoreOsShell> {
     );
   }
 
+  Future<bool> _persistManualTarotReading(
+    ManualTarotReadingSaveRequest request,
+  ) async {
+    final controller = widget.runtimeController;
+    if (controller == null) return false;
+    return controller.completeManualReading(
+      snapshot: request.snapshot,
+      personId: request.personId,
+      readingTimezoneOffsetMinutes: request.readingTimezoneOffsetMinutes,
+      interpretation: request.interpretation,
+    );
+  }
+
   Future<bool> _saveTarotInterpretation(
     TarotInterpretationSessionDraft draft,
   ) async {
@@ -847,6 +861,9 @@ class _CoreOsShellState extends State<CoreOsShell> {
                   onTarotResultCompleted: _receiveTarotResult,
                   onTarotDraftChanged: _retainTarotDraft,
                   onPersistCompletedTarotReading: _persistCompletedTarotReading,
+                  onSaveManualTarot: widget.runtimeController == null
+                      ? null
+                      : _persistManualTarotReading,
                   onSaveTarotInterpretation: _saveTarotInterpretation,
                   tarotDraftLookup: _lookupTarotDraft,
                   onOpenTarotResultDetail: _openTarotResultDetail,
@@ -906,6 +923,7 @@ class _RouteAwareWorkspaceCanvas extends StatelessWidget {
     required this.onTarotResultCompleted,
     required this.onTarotDraftChanged,
     required this.onPersistCompletedTarotReading,
+    required this.onSaveManualTarot,
     required this.onSaveTarotInterpretation,
     required this.tarotDraftLookup,
     required this.onOpenTarotResultDetail,
@@ -931,6 +949,7 @@ class _RouteAwareWorkspaceCanvas extends StatelessWidget {
   final ValueChanged<TarotReadingResultSnapshot> onTarotResultCompleted;
   final ValueChanged<TarotInterpretationSessionDraft> onTarotDraftChanged;
   final PersistCompletedTarotReading onPersistCompletedTarotReading;
+  final ManualTarotSaveCommand? onSaveManualTarot;
   final SaveTarotInterpretation onSaveTarotInterpretation;
   final TarotInterpretationSessionDraft? Function(String) tarotDraftLookup;
   final ValueChanged<TarotReadingResultSnapshot> onOpenTarotResultDetail;
@@ -970,6 +989,7 @@ class _RouteAwareWorkspaceCanvas extends StatelessWidget {
         onTarotResultCompleted: onTarotResultCompleted,
         onTarotDraftChanged: onTarotDraftChanged,
         onPersistCompletedTarotReading: onPersistCompletedTarotReading,
+        onSaveManualTarot: onSaveManualTarot,
         onSaveTarotInterpretation: onSaveTarotInterpretation,
         tarotDraftLookup: tarotDraftLookup,
         onOpenTarotResultDetail: onOpenTarotResultDetail,
@@ -1000,6 +1020,7 @@ class _ShellPageContent extends StatelessWidget {
     required this.onTarotResultCompleted,
     required this.onTarotDraftChanged,
     required this.onPersistCompletedTarotReading,
+    required this.onSaveManualTarot,
     required this.onSaveTarotInterpretation,
     required this.tarotDraftLookup,
     required this.onOpenTarotResultDetail,
@@ -1025,6 +1046,7 @@ class _ShellPageContent extends StatelessWidget {
   final ValueChanged<TarotReadingResultSnapshot> onTarotResultCompleted;
   final ValueChanged<TarotInterpretationSessionDraft> onTarotDraftChanged;
   final PersistCompletedTarotReading onPersistCompletedTarotReading;
+  final ManualTarotSaveCommand? onSaveManualTarot;
   final SaveTarotInterpretation onSaveTarotInterpretation;
   final TarotInterpretationSessionDraft? Function(String) tarotDraftLookup;
   final ValueChanged<TarotReadingResultSnapshot> onOpenTarotResultDetail;
@@ -1060,6 +1082,62 @@ class _ShellPageContent extends StatelessWidget {
       ..showSnackBar(
         const SnackBar(content: Text('이번 리딩은 현재 실행의 성장 기록에서 다시 볼 수 있습니다.')),
       );
+  }
+
+  RecordSummary? _selectedTarotSummary(TarotReadingResultSnapshot snapshot) =>
+      recordHubController.summaryFor(
+        RecordKey(
+          moduleType: RecordModuleType.tarot,
+          canonicalRecordId: snapshot.readingInstanceId,
+        ),
+      );
+
+  Widget _tarotResultDetail(
+    BuildContext context,
+    TarotReadingResultSnapshot snapshot,
+  ) {
+    final summary = _selectedTarotSummary(snapshot);
+    final recordType = summary?.recordType;
+    final personId = summary?.personId;
+    final isActive = snapshot.readingInstanceId == activeTarotResultId;
+    final canShowOnHome = summary?.capabilities.canShowOnHome ?? isActive;
+
+    Widget detail({String? linkedPersonDisplayName}) => TarotResultDetailPage(
+      snapshot: snapshot,
+      recordType: recordType,
+      linkedPersonDisplayName: linkedPersonDisplayName,
+      canShowOnHome: canShowOnHome,
+      questionDisplayText: questionDisplayTextFor(snapshot.readingInstanceId),
+      interpretationDraft: tarotDraftLookup(snapshot.readingInstanceId),
+      isActiveOnHome: isActive,
+      onBack: onCloseTarotResultDetail,
+      onShowOnHome: canShowOnHome
+          ? () => onShowTarotResultOnHome(snapshot)
+          : null,
+      onHideFromHome: () => _hideFromHome(context),
+    );
+
+    final peopleStream = runtimeServices?.people.watchPeople(
+      includeArchived: true,
+    );
+    if (recordType != RecordType.tarotManualReading ||
+        personId == null ||
+        peopleStream == null) {
+      return detail();
+    }
+    return StreamBuilder<List<Person>>(
+      stream: peopleStream,
+      builder: (context, peopleSnapshot) {
+        String? displayName;
+        for (final person in peopleSnapshot.data ?? const <Person>[]) {
+          if (person.id == personId) {
+            displayName = person.displayName;
+            break;
+          }
+        }
+        return detail(linkedPersonDisplayName: displayName);
+      },
+    );
   }
 
   @override
@@ -1127,22 +1205,7 @@ class _ShellPageContent extends StatelessWidget {
         : selectedLabel == UserText.navRecord
         ? <Widget>[
             if (selectedTarotDetail != null)
-              TarotResultDetailPage(
-                snapshot: selectedTarotDetail!,
-                questionDisplayText: questionDisplayTextFor(
-                  selectedTarotDetail!.readingInstanceId,
-                ),
-                interpretationDraft: tarotDraftLookup(
-                  selectedTarotDetail!.readingInstanceId,
-                ),
-                isActiveOnHome:
-                    selectedTarotDetail!.readingInstanceId ==
-                    activeTarotResultId,
-                onBack: onCloseTarotResultDetail,
-                onShowOnHome: () =>
-                    onShowTarotResultOnHome(selectedTarotDetail!),
-                onHideFromHome: () => _hideFromHome(context),
-              )
+              _tarotResultDetail(context, selectedTarotDetail!)
             else
               RecordsHubPage(
                 controller: recordHubController,
@@ -1163,6 +1226,14 @@ class _ShellPageContent extends StatelessWidget {
                 onOpenFullDetail: onOpenTarotResultDetail,
                 onShowOnHome: onShowTarotResultOnHome,
                 onStartSelfTarot: () => onNavSelected(UserText.navReading),
+                peopleStream: runtimeServices?.people.watchPeople(
+                  includeArchived: true,
+                ),
+                createManualController: onSaveManualTarot == null
+                    ? null
+                    : () => ManualTarotReadingController(
+                        saveCommand: onSaveManualTarot!,
+                      ),
               ),
           ]
         : selectedLabel == UserText.navReading
