@@ -28,9 +28,11 @@ void main() {
       final version = await services.database
           .customSelect('PRAGMA user_version')
           .getSingle();
-      expect(version.read<int>('user_version'), 9);
+      expect(version.read<int>('user_version'), 10);
       expect(services.tarotReadings, isNotNull);
       expect(services.studyOperations, isNotNull);
+      expect(services.qigongBlog, isNotNull);
+      expect(services.qigongMedia, isNotNull);
       expect(services.people, isNotNull);
       expect(services.personRoles, isNotNull);
       expect(services.personRelationships, isNotNull);

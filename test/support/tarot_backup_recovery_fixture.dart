@@ -271,11 +271,22 @@ final class TarotBackupRecoveryFixture {
     await sourceFile.copy(snapshot.path);
     if (schemaVersion < TarotBackupManifest.schemaVersion) {
       final legacy = sqlite3.open(snapshot.path);
-      legacy.execute('DROP TABLE study_session_materials');
-      legacy.execute('DROP TABLE study_session_participants');
-      legacy.execute('DROP TABLE study_materials');
-      legacy.execute('DROP TABLE study_sessions');
-      legacy.execute('ALTER TABLE tarot_readings DROP COLUMN person_id');
+      legacy.execute('DROP TABLE qigong_publications');
+      legacy.execute('DROP TABLE qigong_post_tags');
+      legacy.execute('DROP TABLE qigong_tags');
+      legacy.execute('DROP TABLE qigong_post_media');
+      legacy.execute('DROP TABLE qigong_post_blocks');
+      legacy.execute('DROP TABLE qigong_posts');
+      legacy.execute('DROP TABLE qigong_media_assets');
+      if (schemaVersion < TarotBackupManifest.schemaVersionV9) {
+        legacy.execute('DROP TABLE study_session_materials');
+        legacy.execute('DROP TABLE study_session_participants');
+        legacy.execute('DROP TABLE study_materials');
+        legacy.execute('DROP TABLE study_sessions');
+      }
+      if (schemaVersion < TarotBackupManifest.schemaVersionV8) {
+        legacy.execute('ALTER TABLE tarot_readings DROP COLUMN person_id');
+      }
       if (schemaVersion == TarotBackupManifest.legacySchemaVersion) {
         legacy.execute('DROP TABLE person_group_memberships');
         legacy.execute('DROP TABLE person_groups');

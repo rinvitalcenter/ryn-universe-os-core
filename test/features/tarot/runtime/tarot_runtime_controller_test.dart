@@ -31,7 +31,7 @@ void main() {
     });
 
     test(
-      'first run creates one shared version-nine development database',
+      'first run creates one shared version-ten development database',
       () async {
         final controller = TarotRuntimeController.development(
           pathContract: paths,
@@ -53,7 +53,7 @@ void main() {
           development.databasePath,
           mode: OpenMode.readOnly,
         );
-        expect(check.userVersion, 9);
+        expect(check.userVersion, 10);
         check.close();
         await controller.close();
       },

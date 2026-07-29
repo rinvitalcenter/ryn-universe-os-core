@@ -26,7 +26,7 @@ void main() {
       policy: TarotDatabaseInspectionPolicy.normalReadOnlySource,
     );
 
-    expect(evidence.schemaVersion, 9);
+    expect(evidence.schemaVersion, 10);
     expect(evidence.requiredTablesPresent, isTrue);
     expect(evidence.requiredColumnsPresent, isTrue);
     expect(evidence.integrityCheckOk, isTrue);

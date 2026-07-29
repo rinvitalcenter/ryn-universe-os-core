@@ -31,8 +31,10 @@ final class TarotBackupManifest {
 
   static const int backupFormatVersion = 1;
   static const String applicationIdentity = 'RinVitalCenter/RynUniverseOS';
-  static const String contentScope = 'person_core_tarot_study_persistence_v0_4';
-  static const int schemaVersion = 9;
+  static const String contentScope =
+      'person_core_tarot_study_qigong_persistence_v0_5';
+  static const int schemaVersion = 10;
+  static const int schemaVersionV9 = 9;
   static const int schemaVersionV8 = 8;
   static const int schemaVersionV7 = 7;
   static const int legacySchemaVersion = 6;
@@ -403,16 +405,93 @@ final class TarotBackupManifest {
         ],
       });
 
+  static const List<String> requiredTablesV10 = <String>[
+    ...requiredTablesV9,
+    'qigong_media_assets',
+    'qigong_posts',
+    'qigong_post_blocks',
+    'qigong_post_media',
+    'qigong_tags',
+    'qigong_post_tags',
+    'qigong_publications',
+  ];
+
+  static final Map<String, List<String>> requiredColumnsByTableV10 =
+      Map.unmodifiable(<String, List<String>>{
+        ...requiredColumnsByTableV9,
+        'qigong_media_assets': <String>[
+          'id',
+          'sha256',
+          'managed_relative_path',
+          'original_file_name',
+          'mime_type',
+          'byte_size',
+          'caption',
+          'alt_text',
+          'width',
+          'height',
+          'created_at_utc_us',
+        ],
+        'qigong_posts': <String>[
+          'id',
+          'title',
+          'status',
+          'practice_day_number',
+          'occurred_at_utc_us',
+          'duration_minutes',
+          'location',
+          'excerpt',
+          'raw_memo',
+          'personal_draft',
+          'ai_working_draft',
+          'image_prompt',
+          'prompt_history_json',
+          'keywords_json',
+          'cover_media_id',
+          'created_at_utc_us',
+          'updated_at_utc_us',
+          'archived_at_utc_us',
+        ],
+        'qigong_post_blocks': <String>[
+          'id',
+          'post_id',
+          'block_order',
+          'type',
+          'text_content',
+          'gallery_columns',
+        ],
+        'qigong_post_media': <String>[
+          'id',
+          'post_id',
+          'block_id',
+          'media_id',
+          'media_order',
+          'is_cover',
+        ],
+        'qigong_tags': <String>['id', 'name', 'normalized_name'],
+        'qigong_post_tags': <String>['post_id', 'tag_id'],
+        'qigong_publications': <String>[
+          'post_id',
+          'platform',
+          'status',
+          'external_title',
+          'external_url',
+          'published_at_utc_us',
+          'platform_note',
+        ],
+      });
+
   /// Current backup-format-v1 physical inventory.
-  static const List<String> requiredTablesV1 = requiredTablesV9;
+  static const List<String> requiredTablesV1 = requiredTablesV10;
   static final Map<String, List<String>> requiredColumnsByTableV1 =
-      requiredColumnsByTableV9;
+      requiredColumnsByTableV10;
 
   static List<String> requiredTablesFor(int version) => switch (version) {
     legacySchemaVersion => requiredTablesV6,
     schemaVersionV7 => requiredTablesV7,
     schemaVersionV8 => requiredTablesV8,
-    schemaVersion => requiredTablesV9,
+    schemaVersionV9 => requiredTablesV9,
+    schemaVersion => requiredTablesV10,
     _ => const <String>[],
   };
 
@@ -421,7 +500,8 @@ final class TarotBackupManifest {
         legacySchemaVersion => requiredColumnsByTableV6,
         schemaVersionV7 => requiredColumnsByTableV7,
         schemaVersionV8 => requiredColumnsByTableV8,
-        schemaVersion => requiredColumnsByTableV9,
+        schemaVersionV9 => requiredColumnsByTableV9,
+        schemaVersion => requiredColumnsByTableV10,
         _ => const <String, List<String>>{},
       };
 

@@ -173,7 +173,10 @@ final class TarotRuntimeController extends ChangeNotifier {
       final database = await RynAppDatabase.openDevelopment(
         resolvedPath: resolvedPath,
       );
-      _runtimeServices = RynRuntimeServices(database);
+      _runtimeServices = RynRuntimeServices(
+        database,
+        profileRootPath: resolvedPath.profileRootPath,
+      );
       await database.customSelect('PRAGMA user_version').getSingle();
       await _reload();
     } on _UnsupportedRuntimeSchema {
@@ -244,8 +247,7 @@ final class TarotRuntimeController extends ChangeNotifier {
           error.code == RepositoryErrorCode.notFound) {
         _failure = TarotRuntimeFailure(
           category: TarotRuntimeFailureCategory.writeFailed,
-          userMessage:
-              '선택한 사람 기록을 연결할 수 없습니다. 사람 상태를 확인한 뒤 다시 시도해 주세요.',
+          userMessage: '선택한 사람 기록을 연결할 수 없습니다. 사람 상태를 확인한 뒤 다시 시도해 주세요.',
           technicalCode: error.code.name,
         );
         notifyListeners();
@@ -375,7 +377,10 @@ final class TarotRuntimeController extends ChangeNotifier {
     final database = await RynAppDatabase.openDevelopment(
       resolvedPath: resolvedPath,
     );
-    _runtimeServices = RynRuntimeServices(database);
+    _runtimeServices = RynRuntimeServices(
+      database,
+      profileRootPath: resolvedPath.profileRootPath,
+    );
   }
 
   Future<void> _validateBasicRestoreRead() async {

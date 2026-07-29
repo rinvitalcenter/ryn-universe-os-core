@@ -139,11 +139,26 @@ final class TarotBackupDatabaseInspector {
         'study_session_materials',
       ].every(tableNames.contains);
       final studySchemaContractOk =
-          schemaVersion < TarotBackupManifest.schemaVersion ||
+          schemaVersion < TarotBackupManifest.schemaVersionV9 ||
           (hasStudyTables && _inspectStudySchemaContract(database));
       final studyInvariantsOk =
-          schemaVersion < TarotBackupManifest.schemaVersion ||
+          schemaVersion < TarotBackupManifest.schemaVersionV9 ||
           (hasStudyTables && _inspectStudyInvariants(database));
+      final hasQigongTables = <String>[
+        'qigong_posts',
+        'qigong_post_blocks',
+        'qigong_media_assets',
+        'qigong_post_media',
+        'qigong_tags',
+        'qigong_post_tags',
+        'qigong_publications',
+      ].every(tableNames.contains);
+      final qigongSchemaContractOk =
+          schemaVersion < TarotBackupManifest.schemaVersion ||
+          (hasQigongTables && _inspectQigongSchemaContract(database));
+      final qigongInvariantsOk =
+          schemaVersion < TarotBackupManifest.schemaVersion ||
+          (hasQigongTables && _inspectQigongInvariants(database));
       final integrityCheckOk =
           database.select('PRAGMA integrity_check').length == 1 &&
           database.select('PRAGMA integrity_check').first.values.first == 'ok';
@@ -174,12 +189,14 @@ final class TarotBackupDatabaseInspector {
         schemaContractOk:
             personSchemaContractOk &&
             tarotPersonSchemaContractOk &&
-            studySchemaContractOk,
+            studySchemaContractOk &&
+            qigongSchemaContractOk,
         aggregateInvariantsOk:
             tarotAggregate.valid &&
             personCoreInvariantsOk &&
             groupInvariantsOk &&
-            studyInvariantsOk,
+            studyInvariantsOk &&
+            qigongInvariantsOk,
         freelistCount: _scalar(database, 'PRAGMA freelist_count'),
         hasUnexpectedNonEmptySidecar: false,
       );
@@ -314,7 +331,8 @@ final class TarotBackupDatabaseInspector {
           ON r.reading_instance_id = i.reading_instance_id
         WHERE r.reading_instance_id IS NULL''',
     );
-    final orphanPersonLinks = schemaVersion >= TarotBackupManifest.schemaVersion
+    final orphanPersonLinks =
+        schemaVersion >= TarotBackupManifest.schemaVersionV8
         ? _scalar(database, '''SELECT count(*) FROM tarot_readings r
               LEFT JOIN persons p ON p.id = r.person_id
               WHERE r.person_id IS NOT NULL AND p.id IS NULL''')
@@ -405,24 +423,20 @@ final class TarotBackupDatabaseInspector {
         )
         .toSet();
 
-    return _sameSet(
-          foreignKeys('study_session_participants'),
-          const <String>{
-            'session_id|study_sessions|id|no action|cascade',
-            'person_id|persons|id|no action|restrict',
-          },
-        ) &&
-        _sameSet(
-          foreignKeys('study_session_materials'),
-          const <String>{
-            'session_id|study_sessions|id|no action|cascade',
-            'material_id|study_materials|id|no action|restrict',
-          },
-        );
+    return _sameSet(foreignKeys('study_session_participants'), const <String>{
+          'session_id|study_sessions|id|no action|cascade',
+          'person_id|persons|id|no action|restrict',
+        }) &&
+        _sameSet(foreignKeys('study_session_materials'), const <String>{
+          'session_id|study_sessions|id|no action|cascade',
+          'material_id|study_materials|id|no action|restrict',
+        });
   }
 
   bool _inspectStudyInvariants(Database database) {
-    final invalidEnums = _scalar(database, '''SELECT
+    final invalidEnums = _scalar(
+      database,
+      '''SELECT
       (SELECT count(*) FROM study_sessions
         WHERE track NOT IN ('tarot', 'saju', 'mixed')
           OR status NOT IN ('planned', 'completed', 'cancelled')
@@ -433,7 +447,8 @@ final class TarotBackupDatabaseInspector {
           ('planned', 'attended', 'absent', 'late', 'cancelled')) +
       (SELECT count(*) FROM study_materials
         WHERE type NOT IN
-          ('handout', 'card_news', 'web_page', 'video', 'book', 'practice', 'other'))''');
+          ('handout', 'card_news', 'web_page', 'video', 'book', 'practice', 'other'))''',
+    );
     final invalidValues = _scalar(database, '''SELECT
       (SELECT count(*) FROM study_sessions
         WHERE length(trim(id)) = 0 OR length(trim(title)) = 0
@@ -446,6 +461,87 @@ final class TarotBackupDatabaseInspector {
         WHERE length(trim(id)) = 0 OR length(trim(title)) = 0
           OR updated_at_utc_us < created_at_utc_us)''');
     return invalidEnums == 0 && invalidValues == 0;
+  }
+
+  bool _inspectQigongSchemaContract(Database database) {
+    Set<String> foreignKeys(String table) => database
+        .select('PRAGMA foreign_key_list("$table")')
+        .map(
+          (row) =>
+              '${row['from']}|${row['table']}|${row['to']}|'
+                      '${row['on_update']}|${row['on_delete']}'
+                  .toLowerCase(),
+        )
+        .toSet();
+
+    return _sameSet(foreignKeys('qigong_posts'), const <String>{
+          'cover_media_id|qigong_media_assets|id|no action|restrict',
+        }) &&
+        _sameSet(foreignKeys('qigong_post_blocks'), const <String>{
+          'post_id|qigong_posts|id|no action|cascade',
+        }) &&
+        _sameSet(foreignKeys('qigong_post_media'), const <String>{
+          'post_id|qigong_posts|id|no action|cascade',
+          'block_id|qigong_post_blocks|id|no action|cascade',
+          'media_id|qigong_media_assets|id|no action|restrict',
+        }) &&
+        _sameSet(foreignKeys('qigong_post_tags'), const <String>{
+          'post_id|qigong_posts|id|no action|cascade',
+          'tag_id|qigong_tags|id|no action|restrict',
+        }) &&
+        _sameSet(foreignKeys('qigong_publications'), const <String>{
+          'post_id|qigong_posts|id|no action|cascade',
+        });
+  }
+
+  bool _inspectQigongInvariants(Database database) {
+    final invalidEnums = _scalar(database, '''SELECT
+      (SELECT count(*) FROM qigong_posts
+        WHERE status NOT IN ('quickNote', 'drafting', 'final', 'archived')) +
+      (SELECT count(*) FROM qigong_post_blocks
+        WHERE type NOT IN ('paragraph', 'heading', 'subheading', 'quote',
+          'divider', 'spacer', 'singleImage', 'imageGallery', 'imageCaption')) +
+      (SELECT count(*) FROM qigong_publications
+        WHERE platform NOT IN ('naverCafeQigongDoga',
+          'daumCafeQigongVillage', 'naverBlogMyeongrinLab')
+          OR status NOT IN
+            ('notPublished', 'preparing', 'published', 'needsUpdate'))''');
+    final invalidValues = _scalar(database, '''SELECT
+      (SELECT count(*) FROM qigong_posts
+        WHERE length(trim(id)) = 0 OR length(trim(title)) = 0
+          OR updated_at_utc_us < created_at_utc_us) +
+      (SELECT count(*) FROM qigong_post_blocks
+        WHERE block_order < 0 OR gallery_columns NOT BETWEEN 1 AND 4) +
+      (SELECT count(*) FROM qigong_media_assets
+        WHERE length(sha256) != 64 OR sha256 GLOB '*[^0-9a-f]*'
+          OR managed_relative_path NOT LIKE 'qigong_media/%'
+          OR managed_relative_path LIKE '%..%'
+          OR byte_size < 0)''');
+    final invalidBlockOwnership = _scalar(database, '''SELECT count(*)
+      FROM qigong_post_media pm
+      JOIN qigong_post_blocks b ON b.id = pm.block_id
+      WHERE pm.block_id IS NOT NULL AND b.post_id != pm.post_id''');
+    final invalidCover = _scalar(database, '''SELECT
+      (SELECT count(*) FROM qigong_posts p
+        WHERE p.cover_media_id IS NOT NULL AND NOT EXISTS (
+          SELECT 1 FROM qigong_post_media pm
+          WHERE pm.post_id = p.id AND pm.media_id = p.cover_media_id
+            AND pm.is_cover = 1 AND pm.block_id IS NULL)) +
+      (SELECT count(*) FROM qigong_post_media pm
+        JOIN qigong_posts p ON p.id = pm.post_id
+        WHERE pm.is_cover = 1 AND
+          (pm.block_id IS NOT NULL OR p.cover_media_id != pm.media_id))''');
+    final invalidOrder = _scalar(database, '''SELECT count(*) FROM (
+      SELECT post_id FROM qigong_post_blocks
+      GROUP BY post_id HAVING min(block_order) != 0
+        OR max(block_order) != count(*) - 1
+        OR count(DISTINCT block_order) != count(*)
+    )''');
+    return invalidEnums == 0 &&
+        invalidValues == 0 &&
+        invalidBlockOwnership == 0 &&
+        invalidCover == 0 &&
+        invalidOrder == 0;
   }
 
   bool _inspectPersonCore(Database database) {

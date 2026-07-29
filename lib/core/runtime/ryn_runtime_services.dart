@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import '../../features/people/data/persistence/drift_person_core_repositories.dart';
 import '../../features/people/data/persistence/drift_person_group_repository.dart';
 import '../../features/people/domain/person_core_repositories.dart';
+import '../../features/qigong_blog/data/persistence/drift_qigong_blog_repository.dart';
+import '../../features/qigong_blog/domain/qigong_blog_repository.dart';
+import '../../features/qigong_blog/infrastructure/qigong_managed_media_store.dart';
 import '../../features/study_os/data/persistence/drift_study_operations_repository.dart';
 import '../../features/study_os/domain/study_operations_repository.dart';
 import '../../features/tarot/data/persistence/drift_tarot_reading_repository.dart';
@@ -12,7 +17,7 @@ import '../persistence/app_database.dart';
 /// Feature controllers receive repositories from this seam and must not open a
 /// second SQLite connection for the same runtime profile.
 final class RynRuntimeServices {
-  RynRuntimeServices(this.database)
+  RynRuntimeServices(this.database, {String? profileRootPath})
     : tarotReadings = DriftTarotReadingRepository(database),
       people = DriftPersonRepository(database),
       personRoles = DriftPersonRoleRepository(database),
@@ -21,6 +26,10 @@ final class RynRuntimeServices {
       personBirthProfiles = DriftPersonBirthProfileRepository(database),
       encounters = DriftEncounterRepository(database),
       encounterNotes = DriftEncounterNoteRepository(database),
+      qigongBlog = DriftQigongBlogRepository(database),
+      qigongMedia = profileRootPath == null
+          ? null
+          : QigongManagedMediaStore(profileRoot: Directory(profileRootPath)),
       studyOperations = DriftStudyOperationsRepository(database);
 
   final RynAppDatabase database;
@@ -32,5 +41,7 @@ final class RynRuntimeServices {
   final PersonBirthProfileRepository personBirthProfiles;
   final EncounterRepository encounters;
   final EncounterNoteRepository encounterNotes;
+  final QigongBlogRepository qigongBlog;
+  final QigongManagedMediaStore? qigongMedia;
   final StudyOperationsRepository studyOperations;
 }

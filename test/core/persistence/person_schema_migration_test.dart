@@ -14,13 +14,13 @@ const personTables = <String>{
 
 void main() {
   test(
-    'fresh database creates schema version 9 and all Person Core tables',
+    'fresh database creates schema version 10 and all Person Core tables',
     () async {
       final database = RynAppDatabase(NativeDatabase.memory());
       addTearDown(database.close);
 
-      expect(database.schemaVersion, 9);
-      expect(plannedCurrentSchemaVersion, 9);
+      expect(database.schemaVersion, 10);
+      expect(plannedCurrentSchemaVersion, 10);
       expect(await _tableNames(database), containsAll(personTables));
     },
   );

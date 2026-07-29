@@ -19,10 +19,10 @@ void main() {
     });
 
     test(
-      'fresh database creates schema version 9 with canonical Person FK',
+      'fresh database creates schema version 10 with canonical Person FK',
       () async {
-        expect(database.schemaVersion, 9);
-        expect(plannedCurrentSchemaVersion, 9);
+        expect(database.schemaVersion, 10);
+        expect(plannedCurrentSchemaVersion, 10);
 
         final tables = await _tableNames(database);
         expect(
@@ -285,7 +285,7 @@ void main() {
         expect(await _count(database, 'person_roles'), 1);
         expect(await _count(database, 'person_groups'), 0);
         expect(await _count(database, 'person_group_memberships'), 0);
-        expect(database.schemaVersion, 9);
+        expect(database.schemaVersion, 10);
         final personId = await database
             .customSelect(
               "SELECT person_id FROM tarot_readings WHERE reading_instance_id = 'missing'",
@@ -336,7 +336,7 @@ void main() {
       },
     );
 
-    test('file-backed v7 to v9 preserves rows with null Person links', () async {
+    test('file-backed v7 to v10 preserves rows with null Person links', () async {
       final root = await Directory.systemTemp.createTemp('ryn-tarot-v7-v9-');
       addTearDown(() async {
         if (await root.exists()) await root.delete(recursive: true);
@@ -349,6 +349,17 @@ void main() {
       await database.close();
 
       final raw = sqlite3.open(file.path);
+      raw.execute('DROP TABLE qigong_publications');
+      raw.execute('DROP TABLE qigong_post_tags');
+      raw.execute('DROP TABLE qigong_tags');
+      raw.execute('DROP TABLE qigong_post_media');
+      raw.execute('DROP TABLE qigong_post_blocks');
+      raw.execute('DROP TABLE qigong_posts');
+      raw.execute('DROP TABLE qigong_media_assets');
+      raw.execute('DROP TABLE study_session_materials');
+      raw.execute('DROP TABLE study_session_participants');
+      raw.execute('DROP TABLE study_materials');
+      raw.execute('DROP TABLE study_sessions');
       raw.execute('ALTER TABLE tarot_readings DROP COLUMN person_id');
       raw.userVersion = 7;
       raw.close();
@@ -363,7 +374,7 @@ void main() {
       final version = await database
           .customSelect('PRAGMA user_version')
           .getSingle();
-      expect(version.read<int>('user_version'), 9);
+      expect(version.read<int>('user_version'), 10);
       expect(
         await database.customSelect('PRAGMA foreign_key_check').get(),
         isEmpty,
@@ -436,7 +447,7 @@ void main() {
           NativeDatabase.memory(
             setup: (raw) {
               raw.execute(_version4AppSettingsSql);
-              raw.execute('PRAGMA user_version = 10');
+              raw.execute('PRAGMA user_version = 11');
             },
           ),
         );

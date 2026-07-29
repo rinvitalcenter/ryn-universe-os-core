@@ -3859,10 +3859,14 @@ void main() {
 
       await _tapNav(tester, UserText.navPractice);
       await tester.pumpAndSettle();
-      expect(find.text(UserText.practiceQigong), findsOneWidget);
-      expect(find.text(UserText.practiceYoga), findsOneWidget);
-      expect(find.text(UserText.practiceMeditation), findsOneWidget);
-      expect(find.text(UserText.practiceJournal), findsOneWidget);
+      expect(
+        find.text('수련 작업실을 열 수 없습니다. 실행 데이터 상태를 확인해 주세요.'),
+        findsOneWidget,
+      );
+      expect(find.text(UserText.practiceQigong), findsNothing);
+      expect(find.text(UserText.practiceYoga), findsNothing);
+      expect(find.text(UserText.practiceMeditation), findsNothing);
+      expect(find.text(UserText.practiceJournal), findsNothing);
 
       await _tapNav(tester, UserText.navContent);
       await tester.pumpAndSettle();

@@ -143,7 +143,7 @@ void main() {
   }
 
   test(
-    'Person-only schema v9 backup validates and restores synthetic rows',
+    'Person-only schema v10 backup validates and restores synthetic rows',
     () async {
       final counts = await roundTrip(includePerson: true, includeTarot: false);
 
@@ -156,7 +156,7 @@ void main() {
         'readings': 0,
         'groups': 0,
         'memberships': 0,
-        'schema': 9,
+        'schema': 10,
         'linkedReadings': 0,
         'nullReadings': 0,
         'archivedPersons': 0,
@@ -183,7 +183,7 @@ void main() {
   );
 
   test(
-    'exact v6 backup is migrated in isolation and restored as v9 with empty groups',
+    'exact v6 backup is migrated in isolation and restored as v10 with empty groups',
     () async {
       final counts = await roundTrip(
         includePerson: true,
@@ -191,7 +191,7 @@ void main() {
         candidateSchemaVersion: TarotBackupManifest.legacySchemaVersion,
       );
 
-      expect(counts['schema'], 9);
+      expect(counts['schema'], 10);
       expect(counts['persons'], 1);
       expect(counts['roles'], 1);
       expect(counts['readings'], 1);
@@ -200,7 +200,7 @@ void main() {
     },
   );
 
-  test('v9 round trip preserves linked manual null self and archive', () async {
+  test('v10 round trip preserves linked manual null self and archive', () async {
     final counts = await roundTrip(
       includePerson: true,
       includeTarot: true,
@@ -208,7 +208,7 @@ void main() {
       archivePerson: true,
     );
 
-    expect(counts['schema'], 9);
+    expect(counts['schema'], 10);
     expect(counts['readings'], 2);
     expect(counts['linkedReadings'], 1);
     expect(counts['nullReadings'], 1);
@@ -223,7 +223,7 @@ void main() {
       candidateSchemaVersion: TarotBackupManifest.schemaVersionV7,
     );
 
-    expect(counts['schema'], 9);
+    expect(counts['schema'], 10);
     expect(counts['groups'], 2);
     expect(counts['memberships'], 2);
   });

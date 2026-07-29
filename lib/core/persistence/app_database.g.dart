@@ -14403,6 +14403,3573 @@ class StudySessionMaterialsCompanion
   }
 }
 
+class $QigongMediaAssetsTable extends QigongMediaAssets
+    with TableInfo<$QigongMediaAssetsTable, QigongMediaAssetRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $QigongMediaAssetsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sha256Meta = const VerificationMeta('sha256');
+  @override
+  late final GeneratedColumn<String> sha256 = GeneratedColumn<String>(
+    'sha256',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 64,
+      maxTextLength: 64,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _managedRelativePathMeta =
+      const VerificationMeta('managedRelativePath');
+  @override
+  late final GeneratedColumn<String> managedRelativePath =
+      GeneratedColumn<String>(
+        'managed_relative_path',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+        defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+      );
+  static const VerificationMeta _originalFileNameMeta = const VerificationMeta(
+    'originalFileName',
+  );
+  @override
+  late final GeneratedColumn<String> originalFileName = GeneratedColumn<String>(
+    'original_file_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mimeTypeMeta = const VerificationMeta(
+    'mimeType',
+  );
+  @override
+  late final GeneratedColumn<String> mimeType = GeneratedColumn<String>(
+    'mime_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _byteSizeMeta = const VerificationMeta(
+    'byteSize',
+  );
+  @override
+  late final GeneratedColumn<int> byteSize = GeneratedColumn<int>(
+    'byte_size',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (byte_size >= 0)',
+  );
+  static const VerificationMeta _captionMeta = const VerificationMeta(
+    'caption',
+  );
+  @override
+  late final GeneratedColumn<String> caption = GeneratedColumn<String>(
+    'caption',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _altTextMeta = const VerificationMeta(
+    'altText',
+  );
+  @override
+  late final GeneratedColumn<String> altText = GeneratedColumn<String>(
+    'alt_text',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _widthMeta = const VerificationMeta('width');
+  @override
+  late final GeneratedColumn<int> width = GeneratedColumn<int>(
+    'width',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _heightMeta = const VerificationMeta('height');
+  @override
+  late final GeneratedColumn<int> height = GeneratedColumn<int>(
+    'height',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtUtcUsMeta = const VerificationMeta(
+    'createdAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> createdAtUtcUs = GeneratedColumn<int>(
+    'created_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    sha256,
+    managedRelativePath,
+    originalFileName,
+    mimeType,
+    byteSize,
+    caption,
+    altText,
+    width,
+    height,
+    createdAtUtcUs,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'qigong_media_assets';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<QigongMediaAssetRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('sha256')) {
+      context.handle(
+        _sha256Meta,
+        sha256.isAcceptableOrUnknown(data['sha256']!, _sha256Meta),
+      );
+    } else if (isInserting) {
+      context.missing(_sha256Meta);
+    }
+    if (data.containsKey('managed_relative_path')) {
+      context.handle(
+        _managedRelativePathMeta,
+        managedRelativePath.isAcceptableOrUnknown(
+          data['managed_relative_path']!,
+          _managedRelativePathMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_managedRelativePathMeta);
+    }
+    if (data.containsKey('original_file_name')) {
+      context.handle(
+        _originalFileNameMeta,
+        originalFileName.isAcceptableOrUnknown(
+          data['original_file_name']!,
+          _originalFileNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_originalFileNameMeta);
+    }
+    if (data.containsKey('mime_type')) {
+      context.handle(
+        _mimeTypeMeta,
+        mimeType.isAcceptableOrUnknown(data['mime_type']!, _mimeTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mimeTypeMeta);
+    }
+    if (data.containsKey('byte_size')) {
+      context.handle(
+        _byteSizeMeta,
+        byteSize.isAcceptableOrUnknown(data['byte_size']!, _byteSizeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_byteSizeMeta);
+    }
+    if (data.containsKey('caption')) {
+      context.handle(
+        _captionMeta,
+        caption.isAcceptableOrUnknown(data['caption']!, _captionMeta),
+      );
+    }
+    if (data.containsKey('alt_text')) {
+      context.handle(
+        _altTextMeta,
+        altText.isAcceptableOrUnknown(data['alt_text']!, _altTextMeta),
+      );
+    }
+    if (data.containsKey('width')) {
+      context.handle(
+        _widthMeta,
+        width.isAcceptableOrUnknown(data['width']!, _widthMeta),
+      );
+    }
+    if (data.containsKey('height')) {
+      context.handle(
+        _heightMeta,
+        height.isAcceptableOrUnknown(data['height']!, _heightMeta),
+      );
+    }
+    if (data.containsKey('created_at_utc_us')) {
+      context.handle(
+        _createdAtUtcUsMeta,
+        createdAtUtcUs.isAcceptableOrUnknown(
+          data['created_at_utc_us']!,
+          _createdAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtUtcUsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  QigongMediaAssetRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return QigongMediaAssetRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      sha256: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}sha256'],
+      )!,
+      managedRelativePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}managed_relative_path'],
+      )!,
+      originalFileName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}original_file_name'],
+      )!,
+      mimeType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mime_type'],
+      )!,
+      byteSize: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}byte_size'],
+      )!,
+      caption: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}caption'],
+      )!,
+      altText: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}alt_text'],
+      )!,
+      width: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}width'],
+      ),
+      height: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}height'],
+      ),
+      createdAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at_utc_us'],
+      )!,
+    );
+  }
+
+  @override
+  $QigongMediaAssetsTable createAlias(String alias) {
+    return $QigongMediaAssetsTable(attachedDatabase, alias);
+  }
+}
+
+class QigongMediaAssetRow extends DataClass
+    implements Insertable<QigongMediaAssetRow> {
+  final String id;
+  final String sha256;
+  final String managedRelativePath;
+  final String originalFileName;
+  final String mimeType;
+  final int byteSize;
+  final String caption;
+  final String altText;
+  final int? width;
+  final int? height;
+  final int createdAtUtcUs;
+  const QigongMediaAssetRow({
+    required this.id,
+    required this.sha256,
+    required this.managedRelativePath,
+    required this.originalFileName,
+    required this.mimeType,
+    required this.byteSize,
+    required this.caption,
+    required this.altText,
+    this.width,
+    this.height,
+    required this.createdAtUtcUs,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['sha256'] = Variable<String>(sha256);
+    map['managed_relative_path'] = Variable<String>(managedRelativePath);
+    map['original_file_name'] = Variable<String>(originalFileName);
+    map['mime_type'] = Variable<String>(mimeType);
+    map['byte_size'] = Variable<int>(byteSize);
+    map['caption'] = Variable<String>(caption);
+    map['alt_text'] = Variable<String>(altText);
+    if (!nullToAbsent || width != null) {
+      map['width'] = Variable<int>(width);
+    }
+    if (!nullToAbsent || height != null) {
+      map['height'] = Variable<int>(height);
+    }
+    map['created_at_utc_us'] = Variable<int>(createdAtUtcUs);
+    return map;
+  }
+
+  QigongMediaAssetsCompanion toCompanion(bool nullToAbsent) {
+    return QigongMediaAssetsCompanion(
+      id: Value(id),
+      sha256: Value(sha256),
+      managedRelativePath: Value(managedRelativePath),
+      originalFileName: Value(originalFileName),
+      mimeType: Value(mimeType),
+      byteSize: Value(byteSize),
+      caption: Value(caption),
+      altText: Value(altText),
+      width: width == null && nullToAbsent
+          ? const Value.absent()
+          : Value(width),
+      height: height == null && nullToAbsent
+          ? const Value.absent()
+          : Value(height),
+      createdAtUtcUs: Value(createdAtUtcUs),
+    );
+  }
+
+  factory QigongMediaAssetRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return QigongMediaAssetRow(
+      id: serializer.fromJson<String>(json['id']),
+      sha256: serializer.fromJson<String>(json['sha256']),
+      managedRelativePath: serializer.fromJson<String>(
+        json['managedRelativePath'],
+      ),
+      originalFileName: serializer.fromJson<String>(json['originalFileName']),
+      mimeType: serializer.fromJson<String>(json['mimeType']),
+      byteSize: serializer.fromJson<int>(json['byteSize']),
+      caption: serializer.fromJson<String>(json['caption']),
+      altText: serializer.fromJson<String>(json['altText']),
+      width: serializer.fromJson<int?>(json['width']),
+      height: serializer.fromJson<int?>(json['height']),
+      createdAtUtcUs: serializer.fromJson<int>(json['createdAtUtcUs']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'sha256': serializer.toJson<String>(sha256),
+      'managedRelativePath': serializer.toJson<String>(managedRelativePath),
+      'originalFileName': serializer.toJson<String>(originalFileName),
+      'mimeType': serializer.toJson<String>(mimeType),
+      'byteSize': serializer.toJson<int>(byteSize),
+      'caption': serializer.toJson<String>(caption),
+      'altText': serializer.toJson<String>(altText),
+      'width': serializer.toJson<int?>(width),
+      'height': serializer.toJson<int?>(height),
+      'createdAtUtcUs': serializer.toJson<int>(createdAtUtcUs),
+    };
+  }
+
+  QigongMediaAssetRow copyWith({
+    String? id,
+    String? sha256,
+    String? managedRelativePath,
+    String? originalFileName,
+    String? mimeType,
+    int? byteSize,
+    String? caption,
+    String? altText,
+    Value<int?> width = const Value.absent(),
+    Value<int?> height = const Value.absent(),
+    int? createdAtUtcUs,
+  }) => QigongMediaAssetRow(
+    id: id ?? this.id,
+    sha256: sha256 ?? this.sha256,
+    managedRelativePath: managedRelativePath ?? this.managedRelativePath,
+    originalFileName: originalFileName ?? this.originalFileName,
+    mimeType: mimeType ?? this.mimeType,
+    byteSize: byteSize ?? this.byteSize,
+    caption: caption ?? this.caption,
+    altText: altText ?? this.altText,
+    width: width.present ? width.value : this.width,
+    height: height.present ? height.value : this.height,
+    createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+  );
+  QigongMediaAssetRow copyWithCompanion(QigongMediaAssetsCompanion data) {
+    return QigongMediaAssetRow(
+      id: data.id.present ? data.id.value : this.id,
+      sha256: data.sha256.present ? data.sha256.value : this.sha256,
+      managedRelativePath: data.managedRelativePath.present
+          ? data.managedRelativePath.value
+          : this.managedRelativePath,
+      originalFileName: data.originalFileName.present
+          ? data.originalFileName.value
+          : this.originalFileName,
+      mimeType: data.mimeType.present ? data.mimeType.value : this.mimeType,
+      byteSize: data.byteSize.present ? data.byteSize.value : this.byteSize,
+      caption: data.caption.present ? data.caption.value : this.caption,
+      altText: data.altText.present ? data.altText.value : this.altText,
+      width: data.width.present ? data.width.value : this.width,
+      height: data.height.present ? data.height.value : this.height,
+      createdAtUtcUs: data.createdAtUtcUs.present
+          ? data.createdAtUtcUs.value
+          : this.createdAtUtcUs,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QigongMediaAssetRow(')
+          ..write('id: $id, ')
+          ..write('sha256: $sha256, ')
+          ..write('managedRelativePath: $managedRelativePath, ')
+          ..write('originalFileName: $originalFileName, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('byteSize: $byteSize, ')
+          ..write('caption: $caption, ')
+          ..write('altText: $altText, ')
+          ..write('width: $width, ')
+          ..write('height: $height, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    sha256,
+    managedRelativePath,
+    originalFileName,
+    mimeType,
+    byteSize,
+    caption,
+    altText,
+    width,
+    height,
+    createdAtUtcUs,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is QigongMediaAssetRow &&
+          other.id == this.id &&
+          other.sha256 == this.sha256 &&
+          other.managedRelativePath == this.managedRelativePath &&
+          other.originalFileName == this.originalFileName &&
+          other.mimeType == this.mimeType &&
+          other.byteSize == this.byteSize &&
+          other.caption == this.caption &&
+          other.altText == this.altText &&
+          other.width == this.width &&
+          other.height == this.height &&
+          other.createdAtUtcUs == this.createdAtUtcUs);
+}
+
+class QigongMediaAssetsCompanion extends UpdateCompanion<QigongMediaAssetRow> {
+  final Value<String> id;
+  final Value<String> sha256;
+  final Value<String> managedRelativePath;
+  final Value<String> originalFileName;
+  final Value<String> mimeType;
+  final Value<int> byteSize;
+  final Value<String> caption;
+  final Value<String> altText;
+  final Value<int?> width;
+  final Value<int?> height;
+  final Value<int> createdAtUtcUs;
+  final Value<int> rowid;
+  const QigongMediaAssetsCompanion({
+    this.id = const Value.absent(),
+    this.sha256 = const Value.absent(),
+    this.managedRelativePath = const Value.absent(),
+    this.originalFileName = const Value.absent(),
+    this.mimeType = const Value.absent(),
+    this.byteSize = const Value.absent(),
+    this.caption = const Value.absent(),
+    this.altText = const Value.absent(),
+    this.width = const Value.absent(),
+    this.height = const Value.absent(),
+    this.createdAtUtcUs = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  QigongMediaAssetsCompanion.insert({
+    required String id,
+    required String sha256,
+    required String managedRelativePath,
+    required String originalFileName,
+    required String mimeType,
+    required int byteSize,
+    this.caption = const Value.absent(),
+    this.altText = const Value.absent(),
+    this.width = const Value.absent(),
+    this.height = const Value.absent(),
+    required int createdAtUtcUs,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       sha256 = Value(sha256),
+       managedRelativePath = Value(managedRelativePath),
+       originalFileName = Value(originalFileName),
+       mimeType = Value(mimeType),
+       byteSize = Value(byteSize),
+       createdAtUtcUs = Value(createdAtUtcUs);
+  static Insertable<QigongMediaAssetRow> custom({
+    Expression<String>? id,
+    Expression<String>? sha256,
+    Expression<String>? managedRelativePath,
+    Expression<String>? originalFileName,
+    Expression<String>? mimeType,
+    Expression<int>? byteSize,
+    Expression<String>? caption,
+    Expression<String>? altText,
+    Expression<int>? width,
+    Expression<int>? height,
+    Expression<int>? createdAtUtcUs,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (sha256 != null) 'sha256': sha256,
+      if (managedRelativePath != null)
+        'managed_relative_path': managedRelativePath,
+      if (originalFileName != null) 'original_file_name': originalFileName,
+      if (mimeType != null) 'mime_type': mimeType,
+      if (byteSize != null) 'byte_size': byteSize,
+      if (caption != null) 'caption': caption,
+      if (altText != null) 'alt_text': altText,
+      if (width != null) 'width': width,
+      if (height != null) 'height': height,
+      if (createdAtUtcUs != null) 'created_at_utc_us': createdAtUtcUs,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  QigongMediaAssetsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? sha256,
+    Value<String>? managedRelativePath,
+    Value<String>? originalFileName,
+    Value<String>? mimeType,
+    Value<int>? byteSize,
+    Value<String>? caption,
+    Value<String>? altText,
+    Value<int?>? width,
+    Value<int?>? height,
+    Value<int>? createdAtUtcUs,
+    Value<int>? rowid,
+  }) {
+    return QigongMediaAssetsCompanion(
+      id: id ?? this.id,
+      sha256: sha256 ?? this.sha256,
+      managedRelativePath: managedRelativePath ?? this.managedRelativePath,
+      originalFileName: originalFileName ?? this.originalFileName,
+      mimeType: mimeType ?? this.mimeType,
+      byteSize: byteSize ?? this.byteSize,
+      caption: caption ?? this.caption,
+      altText: altText ?? this.altText,
+      width: width ?? this.width,
+      height: height ?? this.height,
+      createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (sha256.present) {
+      map['sha256'] = Variable<String>(sha256.value);
+    }
+    if (managedRelativePath.present) {
+      map['managed_relative_path'] = Variable<String>(
+        managedRelativePath.value,
+      );
+    }
+    if (originalFileName.present) {
+      map['original_file_name'] = Variable<String>(originalFileName.value);
+    }
+    if (mimeType.present) {
+      map['mime_type'] = Variable<String>(mimeType.value);
+    }
+    if (byteSize.present) {
+      map['byte_size'] = Variable<int>(byteSize.value);
+    }
+    if (caption.present) {
+      map['caption'] = Variable<String>(caption.value);
+    }
+    if (altText.present) {
+      map['alt_text'] = Variable<String>(altText.value);
+    }
+    if (width.present) {
+      map['width'] = Variable<int>(width.value);
+    }
+    if (height.present) {
+      map['height'] = Variable<int>(height.value);
+    }
+    if (createdAtUtcUs.present) {
+      map['created_at_utc_us'] = Variable<int>(createdAtUtcUs.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QigongMediaAssetsCompanion(')
+          ..write('id: $id, ')
+          ..write('sha256: $sha256, ')
+          ..write('managedRelativePath: $managedRelativePath, ')
+          ..write('originalFileName: $originalFileName, ')
+          ..write('mimeType: $mimeType, ')
+          ..write('byteSize: $byteSize, ')
+          ..write('caption: $caption, ')
+          ..write('altText: $altText, ')
+          ..write('width: $width, ')
+          ..write('height: $height, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $QigongPostsTable extends QigongPosts
+    with TableInfo<$QigongPostsTable, QigongPostRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $QigongPostsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (status IN (\'quickNote\',\'drafting\',\'final\',\'archived\'))',
+  );
+  static const VerificationMeta _practiceDayNumberMeta = const VerificationMeta(
+    'practiceDayNumber',
+  );
+  @override
+  late final GeneratedColumn<int> practiceDayNumber = GeneratedColumn<int>(
+    'practice_day_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _occurredAtUtcUsMeta = const VerificationMeta(
+    'occurredAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> occurredAtUtcUs = GeneratedColumn<int>(
+    'occurred_at_utc_us',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _durationMinutesMeta = const VerificationMeta(
+    'durationMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> durationMinutes = GeneratedColumn<int>(
+    'duration_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _locationMeta = const VerificationMeta(
+    'location',
+  );
+  @override
+  late final GeneratedColumn<String> location = GeneratedColumn<String>(
+    'location',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _excerptMeta = const VerificationMeta(
+    'excerpt',
+  );
+  @override
+  late final GeneratedColumn<String> excerpt = GeneratedColumn<String>(
+    'excerpt',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _rawMemoMeta = const VerificationMeta(
+    'rawMemo',
+  );
+  @override
+  late final GeneratedColumn<String> rawMemo = GeneratedColumn<String>(
+    'raw_memo',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _personalDraftMeta = const VerificationMeta(
+    'personalDraft',
+  );
+  @override
+  late final GeneratedColumn<String> personalDraft = GeneratedColumn<String>(
+    'personal_draft',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _aiWorkingDraftMeta = const VerificationMeta(
+    'aiWorkingDraft',
+  );
+  @override
+  late final GeneratedColumn<String> aiWorkingDraft = GeneratedColumn<String>(
+    'ai_working_draft',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _imagePromptMeta = const VerificationMeta(
+    'imagePrompt',
+  );
+  @override
+  late final GeneratedColumn<String> imagePrompt = GeneratedColumn<String>(
+    'image_prompt',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _promptHistoryJsonMeta = const VerificationMeta(
+    'promptHistoryJson',
+  );
+  @override
+  late final GeneratedColumn<String> promptHistoryJson =
+      GeneratedColumn<String>(
+        'prompt_history_json',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: const Constant('[]'),
+      );
+  static const VerificationMeta _keywordsJsonMeta = const VerificationMeta(
+    'keywordsJson',
+  );
+  @override
+  late final GeneratedColumn<String> keywordsJson = GeneratedColumn<String>(
+    'keywords_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('[]'),
+  );
+  static const VerificationMeta _coverMediaIdMeta = const VerificationMeta(
+    'coverMediaId',
+  );
+  @override
+  late final GeneratedColumn<String> coverMediaId = GeneratedColumn<String>(
+    'cover_media_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES qigong_media_assets (id) ON DELETE RESTRICT',
+    ),
+  );
+  static const VerificationMeta _createdAtUtcUsMeta = const VerificationMeta(
+    'createdAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> createdAtUtcUs = GeneratedColumn<int>(
+    'created_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtUtcUsMeta = const VerificationMeta(
+    'updatedAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAtUtcUs = GeneratedColumn<int>(
+    'updated_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _archivedAtUtcUsMeta = const VerificationMeta(
+    'archivedAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> archivedAtUtcUs = GeneratedColumn<int>(
+    'archived_at_utc_us',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    title,
+    status,
+    practiceDayNumber,
+    occurredAtUtcUs,
+    durationMinutes,
+    location,
+    excerpt,
+    rawMemo,
+    personalDraft,
+    aiWorkingDraft,
+    imagePrompt,
+    promptHistoryJson,
+    keywordsJson,
+    coverMediaId,
+    createdAtUtcUs,
+    updatedAtUtcUs,
+    archivedAtUtcUs,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'qigong_posts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<QigongPostRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('practice_day_number')) {
+      context.handle(
+        _practiceDayNumberMeta,
+        practiceDayNumber.isAcceptableOrUnknown(
+          data['practice_day_number']!,
+          _practiceDayNumberMeta,
+        ),
+      );
+    }
+    if (data.containsKey('occurred_at_utc_us')) {
+      context.handle(
+        _occurredAtUtcUsMeta,
+        occurredAtUtcUs.isAcceptableOrUnknown(
+          data['occurred_at_utc_us']!,
+          _occurredAtUtcUsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('duration_minutes')) {
+      context.handle(
+        _durationMinutesMeta,
+        durationMinutes.isAcceptableOrUnknown(
+          data['duration_minutes']!,
+          _durationMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('location')) {
+      context.handle(
+        _locationMeta,
+        location.isAcceptableOrUnknown(data['location']!, _locationMeta),
+      );
+    }
+    if (data.containsKey('excerpt')) {
+      context.handle(
+        _excerptMeta,
+        excerpt.isAcceptableOrUnknown(data['excerpt']!, _excerptMeta),
+      );
+    }
+    if (data.containsKey('raw_memo')) {
+      context.handle(
+        _rawMemoMeta,
+        rawMemo.isAcceptableOrUnknown(data['raw_memo']!, _rawMemoMeta),
+      );
+    }
+    if (data.containsKey('personal_draft')) {
+      context.handle(
+        _personalDraftMeta,
+        personalDraft.isAcceptableOrUnknown(
+          data['personal_draft']!,
+          _personalDraftMeta,
+        ),
+      );
+    }
+    if (data.containsKey('ai_working_draft')) {
+      context.handle(
+        _aiWorkingDraftMeta,
+        aiWorkingDraft.isAcceptableOrUnknown(
+          data['ai_working_draft']!,
+          _aiWorkingDraftMeta,
+        ),
+      );
+    }
+    if (data.containsKey('image_prompt')) {
+      context.handle(
+        _imagePromptMeta,
+        imagePrompt.isAcceptableOrUnknown(
+          data['image_prompt']!,
+          _imagePromptMeta,
+        ),
+      );
+    }
+    if (data.containsKey('prompt_history_json')) {
+      context.handle(
+        _promptHistoryJsonMeta,
+        promptHistoryJson.isAcceptableOrUnknown(
+          data['prompt_history_json']!,
+          _promptHistoryJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('keywords_json')) {
+      context.handle(
+        _keywordsJsonMeta,
+        keywordsJson.isAcceptableOrUnknown(
+          data['keywords_json']!,
+          _keywordsJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('cover_media_id')) {
+      context.handle(
+        _coverMediaIdMeta,
+        coverMediaId.isAcceptableOrUnknown(
+          data['cover_media_id']!,
+          _coverMediaIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('created_at_utc_us')) {
+      context.handle(
+        _createdAtUtcUsMeta,
+        createdAtUtcUs.isAcceptableOrUnknown(
+          data['created_at_utc_us']!,
+          _createdAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtUtcUsMeta);
+    }
+    if (data.containsKey('updated_at_utc_us')) {
+      context.handle(
+        _updatedAtUtcUsMeta,
+        updatedAtUtcUs.isAcceptableOrUnknown(
+          data['updated_at_utc_us']!,
+          _updatedAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtUtcUsMeta);
+    }
+    if (data.containsKey('archived_at_utc_us')) {
+      context.handle(
+        _archivedAtUtcUsMeta,
+        archivedAtUtcUs.isAcceptableOrUnknown(
+          data['archived_at_utc_us']!,
+          _archivedAtUtcUsMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  QigongPostRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return QigongPostRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      practiceDayNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}practice_day_number'],
+      ),
+      occurredAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}occurred_at_utc_us'],
+      ),
+      durationMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}duration_minutes'],
+      ),
+      location: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}location'],
+      ),
+      excerpt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}excerpt'],
+      ),
+      rawMemo: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}raw_memo'],
+      )!,
+      personalDraft: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}personal_draft'],
+      )!,
+      aiWorkingDraft: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ai_working_draft'],
+      )!,
+      imagePrompt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}image_prompt'],
+      )!,
+      promptHistoryJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}prompt_history_json'],
+      )!,
+      keywordsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}keywords_json'],
+      )!,
+      coverMediaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cover_media_id'],
+      ),
+      createdAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at_utc_us'],
+      )!,
+      updatedAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at_utc_us'],
+      )!,
+      archivedAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}archived_at_utc_us'],
+      ),
+    );
+  }
+
+  @override
+  $QigongPostsTable createAlias(String alias) {
+    return $QigongPostsTable(attachedDatabase, alias);
+  }
+}
+
+class QigongPostRow extends DataClass implements Insertable<QigongPostRow> {
+  final String id;
+  final String title;
+  final String status;
+  final int? practiceDayNumber;
+  final int? occurredAtUtcUs;
+  final int? durationMinutes;
+  final String? location;
+  final String? excerpt;
+  final String rawMemo;
+  final String personalDraft;
+  final String aiWorkingDraft;
+  final String imagePrompt;
+  final String promptHistoryJson;
+  final String keywordsJson;
+  final String? coverMediaId;
+  final int createdAtUtcUs;
+  final int updatedAtUtcUs;
+  final int? archivedAtUtcUs;
+  const QigongPostRow({
+    required this.id,
+    required this.title,
+    required this.status,
+    this.practiceDayNumber,
+    this.occurredAtUtcUs,
+    this.durationMinutes,
+    this.location,
+    this.excerpt,
+    required this.rawMemo,
+    required this.personalDraft,
+    required this.aiWorkingDraft,
+    required this.imagePrompt,
+    required this.promptHistoryJson,
+    required this.keywordsJson,
+    this.coverMediaId,
+    required this.createdAtUtcUs,
+    required this.updatedAtUtcUs,
+    this.archivedAtUtcUs,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['title'] = Variable<String>(title);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || practiceDayNumber != null) {
+      map['practice_day_number'] = Variable<int>(practiceDayNumber);
+    }
+    if (!nullToAbsent || occurredAtUtcUs != null) {
+      map['occurred_at_utc_us'] = Variable<int>(occurredAtUtcUs);
+    }
+    if (!nullToAbsent || durationMinutes != null) {
+      map['duration_minutes'] = Variable<int>(durationMinutes);
+    }
+    if (!nullToAbsent || location != null) {
+      map['location'] = Variable<String>(location);
+    }
+    if (!nullToAbsent || excerpt != null) {
+      map['excerpt'] = Variable<String>(excerpt);
+    }
+    map['raw_memo'] = Variable<String>(rawMemo);
+    map['personal_draft'] = Variable<String>(personalDraft);
+    map['ai_working_draft'] = Variable<String>(aiWorkingDraft);
+    map['image_prompt'] = Variable<String>(imagePrompt);
+    map['prompt_history_json'] = Variable<String>(promptHistoryJson);
+    map['keywords_json'] = Variable<String>(keywordsJson);
+    if (!nullToAbsent || coverMediaId != null) {
+      map['cover_media_id'] = Variable<String>(coverMediaId);
+    }
+    map['created_at_utc_us'] = Variable<int>(createdAtUtcUs);
+    map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs);
+    if (!nullToAbsent || archivedAtUtcUs != null) {
+      map['archived_at_utc_us'] = Variable<int>(archivedAtUtcUs);
+    }
+    return map;
+  }
+
+  QigongPostsCompanion toCompanion(bool nullToAbsent) {
+    return QigongPostsCompanion(
+      id: Value(id),
+      title: Value(title),
+      status: Value(status),
+      practiceDayNumber: practiceDayNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(practiceDayNumber),
+      occurredAtUtcUs: occurredAtUtcUs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(occurredAtUtcUs),
+      durationMinutes: durationMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(durationMinutes),
+      location: location == null && nullToAbsent
+          ? const Value.absent()
+          : Value(location),
+      excerpt: excerpt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(excerpt),
+      rawMemo: Value(rawMemo),
+      personalDraft: Value(personalDraft),
+      aiWorkingDraft: Value(aiWorkingDraft),
+      imagePrompt: Value(imagePrompt),
+      promptHistoryJson: Value(promptHistoryJson),
+      keywordsJson: Value(keywordsJson),
+      coverMediaId: coverMediaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(coverMediaId),
+      createdAtUtcUs: Value(createdAtUtcUs),
+      updatedAtUtcUs: Value(updatedAtUtcUs),
+      archivedAtUtcUs: archivedAtUtcUs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(archivedAtUtcUs),
+    );
+  }
+
+  factory QigongPostRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return QigongPostRow(
+      id: serializer.fromJson<String>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      status: serializer.fromJson<String>(json['status']),
+      practiceDayNumber: serializer.fromJson<int?>(json['practiceDayNumber']),
+      occurredAtUtcUs: serializer.fromJson<int?>(json['occurredAtUtcUs']),
+      durationMinutes: serializer.fromJson<int?>(json['durationMinutes']),
+      location: serializer.fromJson<String?>(json['location']),
+      excerpt: serializer.fromJson<String?>(json['excerpt']),
+      rawMemo: serializer.fromJson<String>(json['rawMemo']),
+      personalDraft: serializer.fromJson<String>(json['personalDraft']),
+      aiWorkingDraft: serializer.fromJson<String>(json['aiWorkingDraft']),
+      imagePrompt: serializer.fromJson<String>(json['imagePrompt']),
+      promptHistoryJson: serializer.fromJson<String>(json['promptHistoryJson']),
+      keywordsJson: serializer.fromJson<String>(json['keywordsJson']),
+      coverMediaId: serializer.fromJson<String?>(json['coverMediaId']),
+      createdAtUtcUs: serializer.fromJson<int>(json['createdAtUtcUs']),
+      updatedAtUtcUs: serializer.fromJson<int>(json['updatedAtUtcUs']),
+      archivedAtUtcUs: serializer.fromJson<int?>(json['archivedAtUtcUs']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'title': serializer.toJson<String>(title),
+      'status': serializer.toJson<String>(status),
+      'practiceDayNumber': serializer.toJson<int?>(practiceDayNumber),
+      'occurredAtUtcUs': serializer.toJson<int?>(occurredAtUtcUs),
+      'durationMinutes': serializer.toJson<int?>(durationMinutes),
+      'location': serializer.toJson<String?>(location),
+      'excerpt': serializer.toJson<String?>(excerpt),
+      'rawMemo': serializer.toJson<String>(rawMemo),
+      'personalDraft': serializer.toJson<String>(personalDraft),
+      'aiWorkingDraft': serializer.toJson<String>(aiWorkingDraft),
+      'imagePrompt': serializer.toJson<String>(imagePrompt),
+      'promptHistoryJson': serializer.toJson<String>(promptHistoryJson),
+      'keywordsJson': serializer.toJson<String>(keywordsJson),
+      'coverMediaId': serializer.toJson<String?>(coverMediaId),
+      'createdAtUtcUs': serializer.toJson<int>(createdAtUtcUs),
+      'updatedAtUtcUs': serializer.toJson<int>(updatedAtUtcUs),
+      'archivedAtUtcUs': serializer.toJson<int?>(archivedAtUtcUs),
+    };
+  }
+
+  QigongPostRow copyWith({
+    String? id,
+    String? title,
+    String? status,
+    Value<int?> practiceDayNumber = const Value.absent(),
+    Value<int?> occurredAtUtcUs = const Value.absent(),
+    Value<int?> durationMinutes = const Value.absent(),
+    Value<String?> location = const Value.absent(),
+    Value<String?> excerpt = const Value.absent(),
+    String? rawMemo,
+    String? personalDraft,
+    String? aiWorkingDraft,
+    String? imagePrompt,
+    String? promptHistoryJson,
+    String? keywordsJson,
+    Value<String?> coverMediaId = const Value.absent(),
+    int? createdAtUtcUs,
+    int? updatedAtUtcUs,
+    Value<int?> archivedAtUtcUs = const Value.absent(),
+  }) => QigongPostRow(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    status: status ?? this.status,
+    practiceDayNumber: practiceDayNumber.present
+        ? practiceDayNumber.value
+        : this.practiceDayNumber,
+    occurredAtUtcUs: occurredAtUtcUs.present
+        ? occurredAtUtcUs.value
+        : this.occurredAtUtcUs,
+    durationMinutes: durationMinutes.present
+        ? durationMinutes.value
+        : this.durationMinutes,
+    location: location.present ? location.value : this.location,
+    excerpt: excerpt.present ? excerpt.value : this.excerpt,
+    rawMemo: rawMemo ?? this.rawMemo,
+    personalDraft: personalDraft ?? this.personalDraft,
+    aiWorkingDraft: aiWorkingDraft ?? this.aiWorkingDraft,
+    imagePrompt: imagePrompt ?? this.imagePrompt,
+    promptHistoryJson: promptHistoryJson ?? this.promptHistoryJson,
+    keywordsJson: keywordsJson ?? this.keywordsJson,
+    coverMediaId: coverMediaId.present ? coverMediaId.value : this.coverMediaId,
+    createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+    updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+    archivedAtUtcUs: archivedAtUtcUs.present
+        ? archivedAtUtcUs.value
+        : this.archivedAtUtcUs,
+  );
+  QigongPostRow copyWithCompanion(QigongPostsCompanion data) {
+    return QigongPostRow(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      status: data.status.present ? data.status.value : this.status,
+      practiceDayNumber: data.practiceDayNumber.present
+          ? data.practiceDayNumber.value
+          : this.practiceDayNumber,
+      occurredAtUtcUs: data.occurredAtUtcUs.present
+          ? data.occurredAtUtcUs.value
+          : this.occurredAtUtcUs,
+      durationMinutes: data.durationMinutes.present
+          ? data.durationMinutes.value
+          : this.durationMinutes,
+      location: data.location.present ? data.location.value : this.location,
+      excerpt: data.excerpt.present ? data.excerpt.value : this.excerpt,
+      rawMemo: data.rawMemo.present ? data.rawMemo.value : this.rawMemo,
+      personalDraft: data.personalDraft.present
+          ? data.personalDraft.value
+          : this.personalDraft,
+      aiWorkingDraft: data.aiWorkingDraft.present
+          ? data.aiWorkingDraft.value
+          : this.aiWorkingDraft,
+      imagePrompt: data.imagePrompt.present
+          ? data.imagePrompt.value
+          : this.imagePrompt,
+      promptHistoryJson: data.promptHistoryJson.present
+          ? data.promptHistoryJson.value
+          : this.promptHistoryJson,
+      keywordsJson: data.keywordsJson.present
+          ? data.keywordsJson.value
+          : this.keywordsJson,
+      coverMediaId: data.coverMediaId.present
+          ? data.coverMediaId.value
+          : this.coverMediaId,
+      createdAtUtcUs: data.createdAtUtcUs.present
+          ? data.createdAtUtcUs.value
+          : this.createdAtUtcUs,
+      updatedAtUtcUs: data.updatedAtUtcUs.present
+          ? data.updatedAtUtcUs.value
+          : this.updatedAtUtcUs,
+      archivedAtUtcUs: data.archivedAtUtcUs.present
+          ? data.archivedAtUtcUs.value
+          : this.archivedAtUtcUs,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QigongPostRow(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('status: $status, ')
+          ..write('practiceDayNumber: $practiceDayNumber, ')
+          ..write('occurredAtUtcUs: $occurredAtUtcUs, ')
+          ..write('durationMinutes: $durationMinutes, ')
+          ..write('location: $location, ')
+          ..write('excerpt: $excerpt, ')
+          ..write('rawMemo: $rawMemo, ')
+          ..write('personalDraft: $personalDraft, ')
+          ..write('aiWorkingDraft: $aiWorkingDraft, ')
+          ..write('imagePrompt: $imagePrompt, ')
+          ..write('promptHistoryJson: $promptHistoryJson, ')
+          ..write('keywordsJson: $keywordsJson, ')
+          ..write('coverMediaId: $coverMediaId, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs, ')
+          ..write('archivedAtUtcUs: $archivedAtUtcUs')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    title,
+    status,
+    practiceDayNumber,
+    occurredAtUtcUs,
+    durationMinutes,
+    location,
+    excerpt,
+    rawMemo,
+    personalDraft,
+    aiWorkingDraft,
+    imagePrompt,
+    promptHistoryJson,
+    keywordsJson,
+    coverMediaId,
+    createdAtUtcUs,
+    updatedAtUtcUs,
+    archivedAtUtcUs,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is QigongPostRow &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.status == this.status &&
+          other.practiceDayNumber == this.practiceDayNumber &&
+          other.occurredAtUtcUs == this.occurredAtUtcUs &&
+          other.durationMinutes == this.durationMinutes &&
+          other.location == this.location &&
+          other.excerpt == this.excerpt &&
+          other.rawMemo == this.rawMemo &&
+          other.personalDraft == this.personalDraft &&
+          other.aiWorkingDraft == this.aiWorkingDraft &&
+          other.imagePrompt == this.imagePrompt &&
+          other.promptHistoryJson == this.promptHistoryJson &&
+          other.keywordsJson == this.keywordsJson &&
+          other.coverMediaId == this.coverMediaId &&
+          other.createdAtUtcUs == this.createdAtUtcUs &&
+          other.updatedAtUtcUs == this.updatedAtUtcUs &&
+          other.archivedAtUtcUs == this.archivedAtUtcUs);
+}
+
+class QigongPostsCompanion extends UpdateCompanion<QigongPostRow> {
+  final Value<String> id;
+  final Value<String> title;
+  final Value<String> status;
+  final Value<int?> practiceDayNumber;
+  final Value<int?> occurredAtUtcUs;
+  final Value<int?> durationMinutes;
+  final Value<String?> location;
+  final Value<String?> excerpt;
+  final Value<String> rawMemo;
+  final Value<String> personalDraft;
+  final Value<String> aiWorkingDraft;
+  final Value<String> imagePrompt;
+  final Value<String> promptHistoryJson;
+  final Value<String> keywordsJson;
+  final Value<String?> coverMediaId;
+  final Value<int> createdAtUtcUs;
+  final Value<int> updatedAtUtcUs;
+  final Value<int?> archivedAtUtcUs;
+  final Value<int> rowid;
+  const QigongPostsCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.status = const Value.absent(),
+    this.practiceDayNumber = const Value.absent(),
+    this.occurredAtUtcUs = const Value.absent(),
+    this.durationMinutes = const Value.absent(),
+    this.location = const Value.absent(),
+    this.excerpt = const Value.absent(),
+    this.rawMemo = const Value.absent(),
+    this.personalDraft = const Value.absent(),
+    this.aiWorkingDraft = const Value.absent(),
+    this.imagePrompt = const Value.absent(),
+    this.promptHistoryJson = const Value.absent(),
+    this.keywordsJson = const Value.absent(),
+    this.coverMediaId = const Value.absent(),
+    this.createdAtUtcUs = const Value.absent(),
+    this.updatedAtUtcUs = const Value.absent(),
+    this.archivedAtUtcUs = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  QigongPostsCompanion.insert({
+    required String id,
+    required String title,
+    required String status,
+    this.practiceDayNumber = const Value.absent(),
+    this.occurredAtUtcUs = const Value.absent(),
+    this.durationMinutes = const Value.absent(),
+    this.location = const Value.absent(),
+    this.excerpt = const Value.absent(),
+    this.rawMemo = const Value.absent(),
+    this.personalDraft = const Value.absent(),
+    this.aiWorkingDraft = const Value.absent(),
+    this.imagePrompt = const Value.absent(),
+    this.promptHistoryJson = const Value.absent(),
+    this.keywordsJson = const Value.absent(),
+    this.coverMediaId = const Value.absent(),
+    required int createdAtUtcUs,
+    required int updatedAtUtcUs,
+    this.archivedAtUtcUs = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       title = Value(title),
+       status = Value(status),
+       createdAtUtcUs = Value(createdAtUtcUs),
+       updatedAtUtcUs = Value(updatedAtUtcUs);
+  static Insertable<QigongPostRow> custom({
+    Expression<String>? id,
+    Expression<String>? title,
+    Expression<String>? status,
+    Expression<int>? practiceDayNumber,
+    Expression<int>? occurredAtUtcUs,
+    Expression<int>? durationMinutes,
+    Expression<String>? location,
+    Expression<String>? excerpt,
+    Expression<String>? rawMemo,
+    Expression<String>? personalDraft,
+    Expression<String>? aiWorkingDraft,
+    Expression<String>? imagePrompt,
+    Expression<String>? promptHistoryJson,
+    Expression<String>? keywordsJson,
+    Expression<String>? coverMediaId,
+    Expression<int>? createdAtUtcUs,
+    Expression<int>? updatedAtUtcUs,
+    Expression<int>? archivedAtUtcUs,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (status != null) 'status': status,
+      if (practiceDayNumber != null) 'practice_day_number': practiceDayNumber,
+      if (occurredAtUtcUs != null) 'occurred_at_utc_us': occurredAtUtcUs,
+      if (durationMinutes != null) 'duration_minutes': durationMinutes,
+      if (location != null) 'location': location,
+      if (excerpt != null) 'excerpt': excerpt,
+      if (rawMemo != null) 'raw_memo': rawMemo,
+      if (personalDraft != null) 'personal_draft': personalDraft,
+      if (aiWorkingDraft != null) 'ai_working_draft': aiWorkingDraft,
+      if (imagePrompt != null) 'image_prompt': imagePrompt,
+      if (promptHistoryJson != null) 'prompt_history_json': promptHistoryJson,
+      if (keywordsJson != null) 'keywords_json': keywordsJson,
+      if (coverMediaId != null) 'cover_media_id': coverMediaId,
+      if (createdAtUtcUs != null) 'created_at_utc_us': createdAtUtcUs,
+      if (updatedAtUtcUs != null) 'updated_at_utc_us': updatedAtUtcUs,
+      if (archivedAtUtcUs != null) 'archived_at_utc_us': archivedAtUtcUs,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  QigongPostsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? title,
+    Value<String>? status,
+    Value<int?>? practiceDayNumber,
+    Value<int?>? occurredAtUtcUs,
+    Value<int?>? durationMinutes,
+    Value<String?>? location,
+    Value<String?>? excerpt,
+    Value<String>? rawMemo,
+    Value<String>? personalDraft,
+    Value<String>? aiWorkingDraft,
+    Value<String>? imagePrompt,
+    Value<String>? promptHistoryJson,
+    Value<String>? keywordsJson,
+    Value<String?>? coverMediaId,
+    Value<int>? createdAtUtcUs,
+    Value<int>? updatedAtUtcUs,
+    Value<int?>? archivedAtUtcUs,
+    Value<int>? rowid,
+  }) {
+    return QigongPostsCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      status: status ?? this.status,
+      practiceDayNumber: practiceDayNumber ?? this.practiceDayNumber,
+      occurredAtUtcUs: occurredAtUtcUs ?? this.occurredAtUtcUs,
+      durationMinutes: durationMinutes ?? this.durationMinutes,
+      location: location ?? this.location,
+      excerpt: excerpt ?? this.excerpt,
+      rawMemo: rawMemo ?? this.rawMemo,
+      personalDraft: personalDraft ?? this.personalDraft,
+      aiWorkingDraft: aiWorkingDraft ?? this.aiWorkingDraft,
+      imagePrompt: imagePrompt ?? this.imagePrompt,
+      promptHistoryJson: promptHistoryJson ?? this.promptHistoryJson,
+      keywordsJson: keywordsJson ?? this.keywordsJson,
+      coverMediaId: coverMediaId ?? this.coverMediaId,
+      createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+      updatedAtUtcUs: updatedAtUtcUs ?? this.updatedAtUtcUs,
+      archivedAtUtcUs: archivedAtUtcUs ?? this.archivedAtUtcUs,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (practiceDayNumber.present) {
+      map['practice_day_number'] = Variable<int>(practiceDayNumber.value);
+    }
+    if (occurredAtUtcUs.present) {
+      map['occurred_at_utc_us'] = Variable<int>(occurredAtUtcUs.value);
+    }
+    if (durationMinutes.present) {
+      map['duration_minutes'] = Variable<int>(durationMinutes.value);
+    }
+    if (location.present) {
+      map['location'] = Variable<String>(location.value);
+    }
+    if (excerpt.present) {
+      map['excerpt'] = Variable<String>(excerpt.value);
+    }
+    if (rawMemo.present) {
+      map['raw_memo'] = Variable<String>(rawMemo.value);
+    }
+    if (personalDraft.present) {
+      map['personal_draft'] = Variable<String>(personalDraft.value);
+    }
+    if (aiWorkingDraft.present) {
+      map['ai_working_draft'] = Variable<String>(aiWorkingDraft.value);
+    }
+    if (imagePrompt.present) {
+      map['image_prompt'] = Variable<String>(imagePrompt.value);
+    }
+    if (promptHistoryJson.present) {
+      map['prompt_history_json'] = Variable<String>(promptHistoryJson.value);
+    }
+    if (keywordsJson.present) {
+      map['keywords_json'] = Variable<String>(keywordsJson.value);
+    }
+    if (coverMediaId.present) {
+      map['cover_media_id'] = Variable<String>(coverMediaId.value);
+    }
+    if (createdAtUtcUs.present) {
+      map['created_at_utc_us'] = Variable<int>(createdAtUtcUs.value);
+    }
+    if (updatedAtUtcUs.present) {
+      map['updated_at_utc_us'] = Variable<int>(updatedAtUtcUs.value);
+    }
+    if (archivedAtUtcUs.present) {
+      map['archived_at_utc_us'] = Variable<int>(archivedAtUtcUs.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QigongPostsCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('status: $status, ')
+          ..write('practiceDayNumber: $practiceDayNumber, ')
+          ..write('occurredAtUtcUs: $occurredAtUtcUs, ')
+          ..write('durationMinutes: $durationMinutes, ')
+          ..write('location: $location, ')
+          ..write('excerpt: $excerpt, ')
+          ..write('rawMemo: $rawMemo, ')
+          ..write('personalDraft: $personalDraft, ')
+          ..write('aiWorkingDraft: $aiWorkingDraft, ')
+          ..write('imagePrompt: $imagePrompt, ')
+          ..write('promptHistoryJson: $promptHistoryJson, ')
+          ..write('keywordsJson: $keywordsJson, ')
+          ..write('coverMediaId: $coverMediaId, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('updatedAtUtcUs: $updatedAtUtcUs, ')
+          ..write('archivedAtUtcUs: $archivedAtUtcUs, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $QigongPostBlocksTable extends QigongPostBlocks
+    with TableInfo<$QigongPostBlocksTable, QigongPostBlockRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $QigongPostBlocksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _postIdMeta = const VerificationMeta('postId');
+  @override
+  late final GeneratedColumn<String> postId = GeneratedColumn<String>(
+    'post_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES qigong_posts (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _blockOrderMeta = const VerificationMeta(
+    'blockOrder',
+  );
+  @override
+  late final GeneratedColumn<int> blockOrder = GeneratedColumn<int>(
+    'block_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    $customConstraints: 'NOT NULL CHECK (block_order >= 0)',
+  );
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<String> type = GeneratedColumn<String>(
+    'type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (type IN (\'paragraph\',\'heading\',\'subheading\',\'quote\',\'divider\',\'spacer\',\'singleImage\',\'imageGallery\',\'imageCaption\'))',
+  );
+  static const VerificationMeta _textContentMeta = const VerificationMeta(
+    'textContent',
+  );
+  @override
+  late final GeneratedColumn<String> textContent = GeneratedColumn<String>(
+    'text_content',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _galleryColumnsMeta = const VerificationMeta(
+    'galleryColumns',
+  );
+  @override
+  late final GeneratedColumn<int> galleryColumns = GeneratedColumn<int>(
+    'gallery_columns',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    $customConstraints:
+        'NOT NULL DEFAULT 1 CHECK (gallery_columns BETWEEN 1 AND 4)',
+    defaultValue: const CustomExpression('1'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    postId,
+    blockOrder,
+    type,
+    textContent,
+    galleryColumns,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'qigong_post_blocks';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<QigongPostBlockRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('post_id')) {
+      context.handle(
+        _postIdMeta,
+        postId.isAcceptableOrUnknown(data['post_id']!, _postIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_postIdMeta);
+    }
+    if (data.containsKey('block_order')) {
+      context.handle(
+        _blockOrderMeta,
+        blockOrder.isAcceptableOrUnknown(data['block_order']!, _blockOrderMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_blockOrderMeta);
+    }
+    if (data.containsKey('type')) {
+      context.handle(
+        _typeMeta,
+        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_typeMeta);
+    }
+    if (data.containsKey('text_content')) {
+      context.handle(
+        _textContentMeta,
+        textContent.isAcceptableOrUnknown(
+          data['text_content']!,
+          _textContentMeta,
+        ),
+      );
+    }
+    if (data.containsKey('gallery_columns')) {
+      context.handle(
+        _galleryColumnsMeta,
+        galleryColumns.isAcceptableOrUnknown(
+          data['gallery_columns']!,
+          _galleryColumnsMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {postId, blockOrder},
+  ];
+  @override
+  QigongPostBlockRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return QigongPostBlockRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      postId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_id'],
+      )!,
+      blockOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}block_order'],
+      )!,
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}type'],
+      )!,
+      textContent: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}text_content'],
+      )!,
+      galleryColumns: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}gallery_columns'],
+      )!,
+    );
+  }
+
+  @override
+  $QigongPostBlocksTable createAlias(String alias) {
+    return $QigongPostBlocksTable(attachedDatabase, alias);
+  }
+}
+
+class QigongPostBlockRow extends DataClass
+    implements Insertable<QigongPostBlockRow> {
+  final String id;
+  final String postId;
+  final int blockOrder;
+  final String type;
+  final String textContent;
+  final int galleryColumns;
+  const QigongPostBlockRow({
+    required this.id,
+    required this.postId,
+    required this.blockOrder,
+    required this.type,
+    required this.textContent,
+    required this.galleryColumns,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['post_id'] = Variable<String>(postId);
+    map['block_order'] = Variable<int>(blockOrder);
+    map['type'] = Variable<String>(type);
+    map['text_content'] = Variable<String>(textContent);
+    map['gallery_columns'] = Variable<int>(galleryColumns);
+    return map;
+  }
+
+  QigongPostBlocksCompanion toCompanion(bool nullToAbsent) {
+    return QigongPostBlocksCompanion(
+      id: Value(id),
+      postId: Value(postId),
+      blockOrder: Value(blockOrder),
+      type: Value(type),
+      textContent: Value(textContent),
+      galleryColumns: Value(galleryColumns),
+    );
+  }
+
+  factory QigongPostBlockRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return QigongPostBlockRow(
+      id: serializer.fromJson<String>(json['id']),
+      postId: serializer.fromJson<String>(json['postId']),
+      blockOrder: serializer.fromJson<int>(json['blockOrder']),
+      type: serializer.fromJson<String>(json['type']),
+      textContent: serializer.fromJson<String>(json['textContent']),
+      galleryColumns: serializer.fromJson<int>(json['galleryColumns']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'postId': serializer.toJson<String>(postId),
+      'blockOrder': serializer.toJson<int>(blockOrder),
+      'type': serializer.toJson<String>(type),
+      'textContent': serializer.toJson<String>(textContent),
+      'galleryColumns': serializer.toJson<int>(galleryColumns),
+    };
+  }
+
+  QigongPostBlockRow copyWith({
+    String? id,
+    String? postId,
+    int? blockOrder,
+    String? type,
+    String? textContent,
+    int? galleryColumns,
+  }) => QigongPostBlockRow(
+    id: id ?? this.id,
+    postId: postId ?? this.postId,
+    blockOrder: blockOrder ?? this.blockOrder,
+    type: type ?? this.type,
+    textContent: textContent ?? this.textContent,
+    galleryColumns: galleryColumns ?? this.galleryColumns,
+  );
+  QigongPostBlockRow copyWithCompanion(QigongPostBlocksCompanion data) {
+    return QigongPostBlockRow(
+      id: data.id.present ? data.id.value : this.id,
+      postId: data.postId.present ? data.postId.value : this.postId,
+      blockOrder: data.blockOrder.present
+          ? data.blockOrder.value
+          : this.blockOrder,
+      type: data.type.present ? data.type.value : this.type,
+      textContent: data.textContent.present
+          ? data.textContent.value
+          : this.textContent,
+      galleryColumns: data.galleryColumns.present
+          ? data.galleryColumns.value
+          : this.galleryColumns,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QigongPostBlockRow(')
+          ..write('id: $id, ')
+          ..write('postId: $postId, ')
+          ..write('blockOrder: $blockOrder, ')
+          ..write('type: $type, ')
+          ..write('textContent: $textContent, ')
+          ..write('galleryColumns: $galleryColumns')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, postId, blockOrder, type, textContent, galleryColumns);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is QigongPostBlockRow &&
+          other.id == this.id &&
+          other.postId == this.postId &&
+          other.blockOrder == this.blockOrder &&
+          other.type == this.type &&
+          other.textContent == this.textContent &&
+          other.galleryColumns == this.galleryColumns);
+}
+
+class QigongPostBlocksCompanion extends UpdateCompanion<QigongPostBlockRow> {
+  final Value<String> id;
+  final Value<String> postId;
+  final Value<int> blockOrder;
+  final Value<String> type;
+  final Value<String> textContent;
+  final Value<int> galleryColumns;
+  final Value<int> rowid;
+  const QigongPostBlocksCompanion({
+    this.id = const Value.absent(),
+    this.postId = const Value.absent(),
+    this.blockOrder = const Value.absent(),
+    this.type = const Value.absent(),
+    this.textContent = const Value.absent(),
+    this.galleryColumns = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  QigongPostBlocksCompanion.insert({
+    required String id,
+    required String postId,
+    required int blockOrder,
+    required String type,
+    this.textContent = const Value.absent(),
+    this.galleryColumns = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       postId = Value(postId),
+       blockOrder = Value(blockOrder),
+       type = Value(type);
+  static Insertable<QigongPostBlockRow> custom({
+    Expression<String>? id,
+    Expression<String>? postId,
+    Expression<int>? blockOrder,
+    Expression<String>? type,
+    Expression<String>? textContent,
+    Expression<int>? galleryColumns,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (postId != null) 'post_id': postId,
+      if (blockOrder != null) 'block_order': blockOrder,
+      if (type != null) 'type': type,
+      if (textContent != null) 'text_content': textContent,
+      if (galleryColumns != null) 'gallery_columns': galleryColumns,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  QigongPostBlocksCompanion copyWith({
+    Value<String>? id,
+    Value<String>? postId,
+    Value<int>? blockOrder,
+    Value<String>? type,
+    Value<String>? textContent,
+    Value<int>? galleryColumns,
+    Value<int>? rowid,
+  }) {
+    return QigongPostBlocksCompanion(
+      id: id ?? this.id,
+      postId: postId ?? this.postId,
+      blockOrder: blockOrder ?? this.blockOrder,
+      type: type ?? this.type,
+      textContent: textContent ?? this.textContent,
+      galleryColumns: galleryColumns ?? this.galleryColumns,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (postId.present) {
+      map['post_id'] = Variable<String>(postId.value);
+    }
+    if (blockOrder.present) {
+      map['block_order'] = Variable<int>(blockOrder.value);
+    }
+    if (type.present) {
+      map['type'] = Variable<String>(type.value);
+    }
+    if (textContent.present) {
+      map['text_content'] = Variable<String>(textContent.value);
+    }
+    if (galleryColumns.present) {
+      map['gallery_columns'] = Variable<int>(galleryColumns.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QigongPostBlocksCompanion(')
+          ..write('id: $id, ')
+          ..write('postId: $postId, ')
+          ..write('blockOrder: $blockOrder, ')
+          ..write('type: $type, ')
+          ..write('textContent: $textContent, ')
+          ..write('galleryColumns: $galleryColumns, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $QigongPostMediaTable extends QigongPostMedia
+    with TableInfo<$QigongPostMediaTable, QigongPostMediaRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $QigongPostMediaTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _postIdMeta = const VerificationMeta('postId');
+  @override
+  late final GeneratedColumn<String> postId = GeneratedColumn<String>(
+    'post_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES qigong_posts (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _blockIdMeta = const VerificationMeta(
+    'blockId',
+  );
+  @override
+  late final GeneratedColumn<String> blockId = GeneratedColumn<String>(
+    'block_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES qigong_post_blocks (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _mediaIdMeta = const VerificationMeta(
+    'mediaId',
+  );
+  @override
+  late final GeneratedColumn<String> mediaId = GeneratedColumn<String>(
+    'media_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES qigong_media_assets (id) ON DELETE RESTRICT',
+    ),
+  );
+  static const VerificationMeta _mediaOrderMeta = const VerificationMeta(
+    'mediaOrder',
+  );
+  @override
+  late final GeneratedColumn<int> mediaOrder = GeneratedColumn<int>(
+    'media_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isCoverMeta = const VerificationMeta(
+    'isCover',
+  );
+  @override
+  late final GeneratedColumn<bool> isCover = GeneratedColumn<bool>(
+    'is_cover',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_cover" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    postId,
+    blockId,
+    mediaId,
+    mediaOrder,
+    isCover,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'qigong_post_media';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<QigongPostMediaRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('post_id')) {
+      context.handle(
+        _postIdMeta,
+        postId.isAcceptableOrUnknown(data['post_id']!, _postIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_postIdMeta);
+    }
+    if (data.containsKey('block_id')) {
+      context.handle(
+        _blockIdMeta,
+        blockId.isAcceptableOrUnknown(data['block_id']!, _blockIdMeta),
+      );
+    }
+    if (data.containsKey('media_id')) {
+      context.handle(
+        _mediaIdMeta,
+        mediaId.isAcceptableOrUnknown(data['media_id']!, _mediaIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mediaIdMeta);
+    }
+    if (data.containsKey('media_order')) {
+      context.handle(
+        _mediaOrderMeta,
+        mediaOrder.isAcceptableOrUnknown(data['media_order']!, _mediaOrderMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_mediaOrderMeta);
+    }
+    if (data.containsKey('is_cover')) {
+      context.handle(
+        _isCoverMeta,
+        isCover.isAcceptableOrUnknown(data['is_cover']!, _isCoverMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  QigongPostMediaRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return QigongPostMediaRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      postId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_id'],
+      )!,
+      blockId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}block_id'],
+      ),
+      mediaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}media_id'],
+      )!,
+      mediaOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}media_order'],
+      )!,
+      isCover: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_cover'],
+      )!,
+    );
+  }
+
+  @override
+  $QigongPostMediaTable createAlias(String alias) {
+    return $QigongPostMediaTable(attachedDatabase, alias);
+  }
+}
+
+class QigongPostMediaRow extends DataClass
+    implements Insertable<QigongPostMediaRow> {
+  final String id;
+  final String postId;
+  final String? blockId;
+  final String mediaId;
+  final int mediaOrder;
+  final bool isCover;
+  const QigongPostMediaRow({
+    required this.id,
+    required this.postId,
+    this.blockId,
+    required this.mediaId,
+    required this.mediaOrder,
+    required this.isCover,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['post_id'] = Variable<String>(postId);
+    if (!nullToAbsent || blockId != null) {
+      map['block_id'] = Variable<String>(blockId);
+    }
+    map['media_id'] = Variable<String>(mediaId);
+    map['media_order'] = Variable<int>(mediaOrder);
+    map['is_cover'] = Variable<bool>(isCover);
+    return map;
+  }
+
+  QigongPostMediaCompanion toCompanion(bool nullToAbsent) {
+    return QigongPostMediaCompanion(
+      id: Value(id),
+      postId: Value(postId),
+      blockId: blockId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(blockId),
+      mediaId: Value(mediaId),
+      mediaOrder: Value(mediaOrder),
+      isCover: Value(isCover),
+    );
+  }
+
+  factory QigongPostMediaRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return QigongPostMediaRow(
+      id: serializer.fromJson<String>(json['id']),
+      postId: serializer.fromJson<String>(json['postId']),
+      blockId: serializer.fromJson<String?>(json['blockId']),
+      mediaId: serializer.fromJson<String>(json['mediaId']),
+      mediaOrder: serializer.fromJson<int>(json['mediaOrder']),
+      isCover: serializer.fromJson<bool>(json['isCover']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'postId': serializer.toJson<String>(postId),
+      'blockId': serializer.toJson<String?>(blockId),
+      'mediaId': serializer.toJson<String>(mediaId),
+      'mediaOrder': serializer.toJson<int>(mediaOrder),
+      'isCover': serializer.toJson<bool>(isCover),
+    };
+  }
+
+  QigongPostMediaRow copyWith({
+    String? id,
+    String? postId,
+    Value<String?> blockId = const Value.absent(),
+    String? mediaId,
+    int? mediaOrder,
+    bool? isCover,
+  }) => QigongPostMediaRow(
+    id: id ?? this.id,
+    postId: postId ?? this.postId,
+    blockId: blockId.present ? blockId.value : this.blockId,
+    mediaId: mediaId ?? this.mediaId,
+    mediaOrder: mediaOrder ?? this.mediaOrder,
+    isCover: isCover ?? this.isCover,
+  );
+  QigongPostMediaRow copyWithCompanion(QigongPostMediaCompanion data) {
+    return QigongPostMediaRow(
+      id: data.id.present ? data.id.value : this.id,
+      postId: data.postId.present ? data.postId.value : this.postId,
+      blockId: data.blockId.present ? data.blockId.value : this.blockId,
+      mediaId: data.mediaId.present ? data.mediaId.value : this.mediaId,
+      mediaOrder: data.mediaOrder.present
+          ? data.mediaOrder.value
+          : this.mediaOrder,
+      isCover: data.isCover.present ? data.isCover.value : this.isCover,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QigongPostMediaRow(')
+          ..write('id: $id, ')
+          ..write('postId: $postId, ')
+          ..write('blockId: $blockId, ')
+          ..write('mediaId: $mediaId, ')
+          ..write('mediaOrder: $mediaOrder, ')
+          ..write('isCover: $isCover')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, postId, blockId, mediaId, mediaOrder, isCover);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is QigongPostMediaRow &&
+          other.id == this.id &&
+          other.postId == this.postId &&
+          other.blockId == this.blockId &&
+          other.mediaId == this.mediaId &&
+          other.mediaOrder == this.mediaOrder &&
+          other.isCover == this.isCover);
+}
+
+class QigongPostMediaCompanion extends UpdateCompanion<QigongPostMediaRow> {
+  final Value<String> id;
+  final Value<String> postId;
+  final Value<String?> blockId;
+  final Value<String> mediaId;
+  final Value<int> mediaOrder;
+  final Value<bool> isCover;
+  final Value<int> rowid;
+  const QigongPostMediaCompanion({
+    this.id = const Value.absent(),
+    this.postId = const Value.absent(),
+    this.blockId = const Value.absent(),
+    this.mediaId = const Value.absent(),
+    this.mediaOrder = const Value.absent(),
+    this.isCover = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  QigongPostMediaCompanion.insert({
+    required String id,
+    required String postId,
+    this.blockId = const Value.absent(),
+    required String mediaId,
+    required int mediaOrder,
+    this.isCover = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       postId = Value(postId),
+       mediaId = Value(mediaId),
+       mediaOrder = Value(mediaOrder);
+  static Insertable<QigongPostMediaRow> custom({
+    Expression<String>? id,
+    Expression<String>? postId,
+    Expression<String>? blockId,
+    Expression<String>? mediaId,
+    Expression<int>? mediaOrder,
+    Expression<bool>? isCover,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (postId != null) 'post_id': postId,
+      if (blockId != null) 'block_id': blockId,
+      if (mediaId != null) 'media_id': mediaId,
+      if (mediaOrder != null) 'media_order': mediaOrder,
+      if (isCover != null) 'is_cover': isCover,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  QigongPostMediaCompanion copyWith({
+    Value<String>? id,
+    Value<String>? postId,
+    Value<String?>? blockId,
+    Value<String>? mediaId,
+    Value<int>? mediaOrder,
+    Value<bool>? isCover,
+    Value<int>? rowid,
+  }) {
+    return QigongPostMediaCompanion(
+      id: id ?? this.id,
+      postId: postId ?? this.postId,
+      blockId: blockId ?? this.blockId,
+      mediaId: mediaId ?? this.mediaId,
+      mediaOrder: mediaOrder ?? this.mediaOrder,
+      isCover: isCover ?? this.isCover,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (postId.present) {
+      map['post_id'] = Variable<String>(postId.value);
+    }
+    if (blockId.present) {
+      map['block_id'] = Variable<String>(blockId.value);
+    }
+    if (mediaId.present) {
+      map['media_id'] = Variable<String>(mediaId.value);
+    }
+    if (mediaOrder.present) {
+      map['media_order'] = Variable<int>(mediaOrder.value);
+    }
+    if (isCover.present) {
+      map['is_cover'] = Variable<bool>(isCover.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QigongPostMediaCompanion(')
+          ..write('id: $id, ')
+          ..write('postId: $postId, ')
+          ..write('blockId: $blockId, ')
+          ..write('mediaId: $mediaId, ')
+          ..write('mediaOrder: $mediaOrder, ')
+          ..write('isCover: $isCover, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $QigongTagsTable extends QigongTags
+    with TableInfo<$QigongTagsTable, QigongTagRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $QigongTagsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _normalizedNameMeta = const VerificationMeta(
+    'normalizedName',
+  );
+  @override
+  late final GeneratedColumn<String> normalizedName = GeneratedColumn<String>(
+    'normalized_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, normalizedName];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'qigong_tags';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<QigongTagRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('normalized_name')) {
+      context.handle(
+        _normalizedNameMeta,
+        normalizedName.isAcceptableOrUnknown(
+          data['normalized_name']!,
+          _normalizedNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_normalizedNameMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  QigongTagRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return QigongTagRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      normalizedName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}normalized_name'],
+      )!,
+    );
+  }
+
+  @override
+  $QigongTagsTable createAlias(String alias) {
+    return $QigongTagsTable(attachedDatabase, alias);
+  }
+}
+
+class QigongTagRow extends DataClass implements Insertable<QigongTagRow> {
+  final String id;
+  final String name;
+  final String normalizedName;
+  const QigongTagRow({
+    required this.id,
+    required this.name,
+    required this.normalizedName,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['normalized_name'] = Variable<String>(normalizedName);
+    return map;
+  }
+
+  QigongTagsCompanion toCompanion(bool nullToAbsent) {
+    return QigongTagsCompanion(
+      id: Value(id),
+      name: Value(name),
+      normalizedName: Value(normalizedName),
+    );
+  }
+
+  factory QigongTagRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return QigongTagRow(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      normalizedName: serializer.fromJson<String>(json['normalizedName']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'normalizedName': serializer.toJson<String>(normalizedName),
+    };
+  }
+
+  QigongTagRow copyWith({String? id, String? name, String? normalizedName}) =>
+      QigongTagRow(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        normalizedName: normalizedName ?? this.normalizedName,
+      );
+  QigongTagRow copyWithCompanion(QigongTagsCompanion data) {
+    return QigongTagRow(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      normalizedName: data.normalizedName.present
+          ? data.normalizedName.value
+          : this.normalizedName,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QigongTagRow(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('normalizedName: $normalizedName')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, normalizedName);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is QigongTagRow &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.normalizedName == this.normalizedName);
+}
+
+class QigongTagsCompanion extends UpdateCompanion<QigongTagRow> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<String> normalizedName;
+  final Value<int> rowid;
+  const QigongTagsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.normalizedName = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  QigongTagsCompanion.insert({
+    required String id,
+    required String name,
+    required String normalizedName,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       normalizedName = Value(normalizedName);
+  static Insertable<QigongTagRow> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<String>? normalizedName,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (normalizedName != null) 'normalized_name': normalizedName,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  QigongTagsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<String>? normalizedName,
+    Value<int>? rowid,
+  }) {
+    return QigongTagsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      normalizedName: normalizedName ?? this.normalizedName,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (normalizedName.present) {
+      map['normalized_name'] = Variable<String>(normalizedName.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QigongTagsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('normalizedName: $normalizedName, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $QigongPostTagsTable extends QigongPostTags
+    with TableInfo<$QigongPostTagsTable, QigongPostTagRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $QigongPostTagsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _postIdMeta = const VerificationMeta('postId');
+  @override
+  late final GeneratedColumn<String> postId = GeneratedColumn<String>(
+    'post_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES qigong_posts (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _tagIdMeta = const VerificationMeta('tagId');
+  @override
+  late final GeneratedColumn<String> tagId = GeneratedColumn<String>(
+    'tag_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES qigong_tags (id) ON DELETE RESTRICT',
+    ),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [postId, tagId];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'qigong_post_tags';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<QigongPostTagRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('post_id')) {
+      context.handle(
+        _postIdMeta,
+        postId.isAcceptableOrUnknown(data['post_id']!, _postIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_postIdMeta);
+    }
+    if (data.containsKey('tag_id')) {
+      context.handle(
+        _tagIdMeta,
+        tagId.isAcceptableOrUnknown(data['tag_id']!, _tagIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_tagIdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {postId, tagId};
+  @override
+  QigongPostTagRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return QigongPostTagRow(
+      postId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_id'],
+      )!,
+      tagId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}tag_id'],
+      )!,
+    );
+  }
+
+  @override
+  $QigongPostTagsTable createAlias(String alias) {
+    return $QigongPostTagsTable(attachedDatabase, alias);
+  }
+}
+
+class QigongPostTagRow extends DataClass
+    implements Insertable<QigongPostTagRow> {
+  final String postId;
+  final String tagId;
+  const QigongPostTagRow({required this.postId, required this.tagId});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['post_id'] = Variable<String>(postId);
+    map['tag_id'] = Variable<String>(tagId);
+    return map;
+  }
+
+  QigongPostTagsCompanion toCompanion(bool nullToAbsent) {
+    return QigongPostTagsCompanion(postId: Value(postId), tagId: Value(tagId));
+  }
+
+  factory QigongPostTagRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return QigongPostTagRow(
+      postId: serializer.fromJson<String>(json['postId']),
+      tagId: serializer.fromJson<String>(json['tagId']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'postId': serializer.toJson<String>(postId),
+      'tagId': serializer.toJson<String>(tagId),
+    };
+  }
+
+  QigongPostTagRow copyWith({String? postId, String? tagId}) =>
+      QigongPostTagRow(
+        postId: postId ?? this.postId,
+        tagId: tagId ?? this.tagId,
+      );
+  QigongPostTagRow copyWithCompanion(QigongPostTagsCompanion data) {
+    return QigongPostTagRow(
+      postId: data.postId.present ? data.postId.value : this.postId,
+      tagId: data.tagId.present ? data.tagId.value : this.tagId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QigongPostTagRow(')
+          ..write('postId: $postId, ')
+          ..write('tagId: $tagId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(postId, tagId);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is QigongPostTagRow &&
+          other.postId == this.postId &&
+          other.tagId == this.tagId);
+}
+
+class QigongPostTagsCompanion extends UpdateCompanion<QigongPostTagRow> {
+  final Value<String> postId;
+  final Value<String> tagId;
+  final Value<int> rowid;
+  const QigongPostTagsCompanion({
+    this.postId = const Value.absent(),
+    this.tagId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  QigongPostTagsCompanion.insert({
+    required String postId,
+    required String tagId,
+    this.rowid = const Value.absent(),
+  }) : postId = Value(postId),
+       tagId = Value(tagId);
+  static Insertable<QigongPostTagRow> custom({
+    Expression<String>? postId,
+    Expression<String>? tagId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (postId != null) 'post_id': postId,
+      if (tagId != null) 'tag_id': tagId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  QigongPostTagsCompanion copyWith({
+    Value<String>? postId,
+    Value<String>? tagId,
+    Value<int>? rowid,
+  }) {
+    return QigongPostTagsCompanion(
+      postId: postId ?? this.postId,
+      tagId: tagId ?? this.tagId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (postId.present) {
+      map['post_id'] = Variable<String>(postId.value);
+    }
+    if (tagId.present) {
+      map['tag_id'] = Variable<String>(tagId.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QigongPostTagsCompanion(')
+          ..write('postId: $postId, ')
+          ..write('tagId: $tagId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $QigongPublicationsTable extends QigongPublications
+    with TableInfo<$QigongPublicationsTable, QigongPublicationRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $QigongPublicationsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _postIdMeta = const VerificationMeta('postId');
+  @override
+  late final GeneratedColumn<String> postId = GeneratedColumn<String>(
+    'post_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES qigong_posts (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _platformMeta = const VerificationMeta(
+    'platform',
+  );
+  @override
+  late final GeneratedColumn<String> platform = GeneratedColumn<String>(
+    'platform',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (platform IN (\'naverCafeQigongDoga\',\'daumCafeQigongVillage\',\'naverBlogMyeongrinLab\'))',
+  );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    $customConstraints:
+        'NOT NULL CHECK (status IN (\'notPublished\',\'preparing\',\'published\',\'needsUpdate\'))',
+  );
+  static const VerificationMeta _externalTitleMeta = const VerificationMeta(
+    'externalTitle',
+  );
+  @override
+  late final GeneratedColumn<String> externalTitle = GeneratedColumn<String>(
+    'external_title',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _externalUrlMeta = const VerificationMeta(
+    'externalUrl',
+  );
+  @override
+  late final GeneratedColumn<String> externalUrl = GeneratedColumn<String>(
+    'external_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _publishedAtUtcUsMeta = const VerificationMeta(
+    'publishedAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> publishedAtUtcUs = GeneratedColumn<int>(
+    'published_at_utc_us',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _platformNoteMeta = const VerificationMeta(
+    'platformNote',
+  );
+  @override
+  late final GeneratedColumn<String> platformNote = GeneratedColumn<String>(
+    'platform_note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    postId,
+    platform,
+    status,
+    externalTitle,
+    externalUrl,
+    publishedAtUtcUs,
+    platformNote,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'qigong_publications';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<QigongPublicationRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('post_id')) {
+      context.handle(
+        _postIdMeta,
+        postId.isAcceptableOrUnknown(data['post_id']!, _postIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_postIdMeta);
+    }
+    if (data.containsKey('platform')) {
+      context.handle(
+        _platformMeta,
+        platform.isAcceptableOrUnknown(data['platform']!, _platformMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_platformMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('external_title')) {
+      context.handle(
+        _externalTitleMeta,
+        externalTitle.isAcceptableOrUnknown(
+          data['external_title']!,
+          _externalTitleMeta,
+        ),
+      );
+    }
+    if (data.containsKey('external_url')) {
+      context.handle(
+        _externalUrlMeta,
+        externalUrl.isAcceptableOrUnknown(
+          data['external_url']!,
+          _externalUrlMeta,
+        ),
+      );
+    }
+    if (data.containsKey('published_at_utc_us')) {
+      context.handle(
+        _publishedAtUtcUsMeta,
+        publishedAtUtcUs.isAcceptableOrUnknown(
+          data['published_at_utc_us']!,
+          _publishedAtUtcUsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('platform_note')) {
+      context.handle(
+        _platformNoteMeta,
+        platformNote.isAcceptableOrUnknown(
+          data['platform_note']!,
+          _platformNoteMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {postId, platform};
+  @override
+  QigongPublicationRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return QigongPublicationRow(
+      postId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}post_id'],
+      )!,
+      platform: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}platform'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      externalTitle: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}external_title'],
+      ),
+      externalUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}external_url'],
+      ),
+      publishedAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}published_at_utc_us'],
+      ),
+      platformNote: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}platform_note'],
+      ),
+    );
+  }
+
+  @override
+  $QigongPublicationsTable createAlias(String alias) {
+    return $QigongPublicationsTable(attachedDatabase, alias);
+  }
+}
+
+class QigongPublicationRow extends DataClass
+    implements Insertable<QigongPublicationRow> {
+  final String postId;
+  final String platform;
+  final String status;
+  final String? externalTitle;
+  final String? externalUrl;
+  final int? publishedAtUtcUs;
+  final String? platformNote;
+  const QigongPublicationRow({
+    required this.postId,
+    required this.platform,
+    required this.status,
+    this.externalTitle,
+    this.externalUrl,
+    this.publishedAtUtcUs,
+    this.platformNote,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['post_id'] = Variable<String>(postId);
+    map['platform'] = Variable<String>(platform);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || externalTitle != null) {
+      map['external_title'] = Variable<String>(externalTitle);
+    }
+    if (!nullToAbsent || externalUrl != null) {
+      map['external_url'] = Variable<String>(externalUrl);
+    }
+    if (!nullToAbsent || publishedAtUtcUs != null) {
+      map['published_at_utc_us'] = Variable<int>(publishedAtUtcUs);
+    }
+    if (!nullToAbsent || platformNote != null) {
+      map['platform_note'] = Variable<String>(platformNote);
+    }
+    return map;
+  }
+
+  QigongPublicationsCompanion toCompanion(bool nullToAbsent) {
+    return QigongPublicationsCompanion(
+      postId: Value(postId),
+      platform: Value(platform),
+      status: Value(status),
+      externalTitle: externalTitle == null && nullToAbsent
+          ? const Value.absent()
+          : Value(externalTitle),
+      externalUrl: externalUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(externalUrl),
+      publishedAtUtcUs: publishedAtUtcUs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(publishedAtUtcUs),
+      platformNote: platformNote == null && nullToAbsent
+          ? const Value.absent()
+          : Value(platformNote),
+    );
+  }
+
+  factory QigongPublicationRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return QigongPublicationRow(
+      postId: serializer.fromJson<String>(json['postId']),
+      platform: serializer.fromJson<String>(json['platform']),
+      status: serializer.fromJson<String>(json['status']),
+      externalTitle: serializer.fromJson<String?>(json['externalTitle']),
+      externalUrl: serializer.fromJson<String?>(json['externalUrl']),
+      publishedAtUtcUs: serializer.fromJson<int?>(json['publishedAtUtcUs']),
+      platformNote: serializer.fromJson<String?>(json['platformNote']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'postId': serializer.toJson<String>(postId),
+      'platform': serializer.toJson<String>(platform),
+      'status': serializer.toJson<String>(status),
+      'externalTitle': serializer.toJson<String?>(externalTitle),
+      'externalUrl': serializer.toJson<String?>(externalUrl),
+      'publishedAtUtcUs': serializer.toJson<int?>(publishedAtUtcUs),
+      'platformNote': serializer.toJson<String?>(platformNote),
+    };
+  }
+
+  QigongPublicationRow copyWith({
+    String? postId,
+    String? platform,
+    String? status,
+    Value<String?> externalTitle = const Value.absent(),
+    Value<String?> externalUrl = const Value.absent(),
+    Value<int?> publishedAtUtcUs = const Value.absent(),
+    Value<String?> platformNote = const Value.absent(),
+  }) => QigongPublicationRow(
+    postId: postId ?? this.postId,
+    platform: platform ?? this.platform,
+    status: status ?? this.status,
+    externalTitle: externalTitle.present
+        ? externalTitle.value
+        : this.externalTitle,
+    externalUrl: externalUrl.present ? externalUrl.value : this.externalUrl,
+    publishedAtUtcUs: publishedAtUtcUs.present
+        ? publishedAtUtcUs.value
+        : this.publishedAtUtcUs,
+    platformNote: platformNote.present ? platformNote.value : this.platformNote,
+  );
+  QigongPublicationRow copyWithCompanion(QigongPublicationsCompanion data) {
+    return QigongPublicationRow(
+      postId: data.postId.present ? data.postId.value : this.postId,
+      platform: data.platform.present ? data.platform.value : this.platform,
+      status: data.status.present ? data.status.value : this.status,
+      externalTitle: data.externalTitle.present
+          ? data.externalTitle.value
+          : this.externalTitle,
+      externalUrl: data.externalUrl.present
+          ? data.externalUrl.value
+          : this.externalUrl,
+      publishedAtUtcUs: data.publishedAtUtcUs.present
+          ? data.publishedAtUtcUs.value
+          : this.publishedAtUtcUs,
+      platformNote: data.platformNote.present
+          ? data.platformNote.value
+          : this.platformNote,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QigongPublicationRow(')
+          ..write('postId: $postId, ')
+          ..write('platform: $platform, ')
+          ..write('status: $status, ')
+          ..write('externalTitle: $externalTitle, ')
+          ..write('externalUrl: $externalUrl, ')
+          ..write('publishedAtUtcUs: $publishedAtUtcUs, ')
+          ..write('platformNote: $platformNote')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    postId,
+    platform,
+    status,
+    externalTitle,
+    externalUrl,
+    publishedAtUtcUs,
+    platformNote,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is QigongPublicationRow &&
+          other.postId == this.postId &&
+          other.platform == this.platform &&
+          other.status == this.status &&
+          other.externalTitle == this.externalTitle &&
+          other.externalUrl == this.externalUrl &&
+          other.publishedAtUtcUs == this.publishedAtUtcUs &&
+          other.platformNote == this.platformNote);
+}
+
+class QigongPublicationsCompanion
+    extends UpdateCompanion<QigongPublicationRow> {
+  final Value<String> postId;
+  final Value<String> platform;
+  final Value<String> status;
+  final Value<String?> externalTitle;
+  final Value<String?> externalUrl;
+  final Value<int?> publishedAtUtcUs;
+  final Value<String?> platformNote;
+  final Value<int> rowid;
+  const QigongPublicationsCompanion({
+    this.postId = const Value.absent(),
+    this.platform = const Value.absent(),
+    this.status = const Value.absent(),
+    this.externalTitle = const Value.absent(),
+    this.externalUrl = const Value.absent(),
+    this.publishedAtUtcUs = const Value.absent(),
+    this.platformNote = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  QigongPublicationsCompanion.insert({
+    required String postId,
+    required String platform,
+    required String status,
+    this.externalTitle = const Value.absent(),
+    this.externalUrl = const Value.absent(),
+    this.publishedAtUtcUs = const Value.absent(),
+    this.platformNote = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : postId = Value(postId),
+       platform = Value(platform),
+       status = Value(status);
+  static Insertable<QigongPublicationRow> custom({
+    Expression<String>? postId,
+    Expression<String>? platform,
+    Expression<String>? status,
+    Expression<String>? externalTitle,
+    Expression<String>? externalUrl,
+    Expression<int>? publishedAtUtcUs,
+    Expression<String>? platformNote,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (postId != null) 'post_id': postId,
+      if (platform != null) 'platform': platform,
+      if (status != null) 'status': status,
+      if (externalTitle != null) 'external_title': externalTitle,
+      if (externalUrl != null) 'external_url': externalUrl,
+      if (publishedAtUtcUs != null) 'published_at_utc_us': publishedAtUtcUs,
+      if (platformNote != null) 'platform_note': platformNote,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  QigongPublicationsCompanion copyWith({
+    Value<String>? postId,
+    Value<String>? platform,
+    Value<String>? status,
+    Value<String?>? externalTitle,
+    Value<String?>? externalUrl,
+    Value<int?>? publishedAtUtcUs,
+    Value<String?>? platformNote,
+    Value<int>? rowid,
+  }) {
+    return QigongPublicationsCompanion(
+      postId: postId ?? this.postId,
+      platform: platform ?? this.platform,
+      status: status ?? this.status,
+      externalTitle: externalTitle ?? this.externalTitle,
+      externalUrl: externalUrl ?? this.externalUrl,
+      publishedAtUtcUs: publishedAtUtcUs ?? this.publishedAtUtcUs,
+      platformNote: platformNote ?? this.platformNote,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (postId.present) {
+      map['post_id'] = Variable<String>(postId.value);
+    }
+    if (platform.present) {
+      map['platform'] = Variable<String>(platform.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (externalTitle.present) {
+      map['external_title'] = Variable<String>(externalTitle.value);
+    }
+    if (externalUrl.present) {
+      map['external_url'] = Variable<String>(externalUrl.value);
+    }
+    if (publishedAtUtcUs.present) {
+      map['published_at_utc_us'] = Variable<int>(publishedAtUtcUs.value);
+    }
+    if (platformNote.present) {
+      map['platform_note'] = Variable<String>(platformNote.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QigongPublicationsCompanion(')
+          ..write('postId: $postId, ')
+          ..write('platform: $platform, ')
+          ..write('status: $status, ')
+          ..write('externalTitle: $externalTitle, ')
+          ..write('externalUrl: $externalUrl, ')
+          ..write('publishedAtUtcUs: $publishedAtUtcUs, ')
+          ..write('platformNote: $platformNote, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RynAppDatabase extends GeneratedDatabase {
   _$RynAppDatabase(QueryExecutor e) : super(e);
   $RynAppDatabaseManager get managers => $RynAppDatabaseManager(this);
@@ -14441,6 +18008,19 @@ abstract class _$RynAppDatabase extends GeneratedDatabase {
   late final $StudyMaterialsTable studyMaterials = $StudyMaterialsTable(this);
   late final $StudySessionMaterialsTable studySessionMaterials =
       $StudySessionMaterialsTable(this);
+  late final $QigongMediaAssetsTable qigongMediaAssets =
+      $QigongMediaAssetsTable(this);
+  late final $QigongPostsTable qigongPosts = $QigongPostsTable(this);
+  late final $QigongPostBlocksTable qigongPostBlocks = $QigongPostBlocksTable(
+    this,
+  );
+  late final $QigongPostMediaTable qigongPostMedia = $QigongPostMediaTable(
+    this,
+  );
+  late final $QigongTagsTable qigongTags = $QigongTagsTable(this);
+  late final $QigongPostTagsTable qigongPostTags = $QigongPostTagsTable(this);
+  late final $QigongPublicationsTable qigongPublications =
+      $QigongPublicationsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -14469,6 +18049,13 @@ abstract class _$RynAppDatabase extends GeneratedDatabase {
     studySessionParticipants,
     studyMaterials,
     studySessionMaterials,
+    qigongMediaAssets,
+    qigongPosts,
+    qigongPostBlocks,
+    qigongPostMedia,
+    qigongTags,
+    qigongPostTags,
+    qigongPublications,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -14561,6 +18148,41 @@ abstract class _$RynAppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('study_session_materials', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'qigong_posts',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('qigong_post_blocks', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'qigong_posts',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('qigong_post_media', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'qigong_post_blocks',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('qigong_post_media', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'qigong_posts',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('qigong_post_tags', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'qigong_posts',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('qigong_publications', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -25209,6 +28831,3561 @@ typedef $$StudySessionMaterialsTableProcessedTableManager =
       StudySessionMaterialRow,
       PrefetchHooks Function({bool sessionId, bool materialId})
     >;
+typedef $$QigongMediaAssetsTableCreateCompanionBuilder =
+    QigongMediaAssetsCompanion Function({
+      required String id,
+      required String sha256,
+      required String managedRelativePath,
+      required String originalFileName,
+      required String mimeType,
+      required int byteSize,
+      Value<String> caption,
+      Value<String> altText,
+      Value<int?> width,
+      Value<int?> height,
+      required int createdAtUtcUs,
+      Value<int> rowid,
+    });
+typedef $$QigongMediaAssetsTableUpdateCompanionBuilder =
+    QigongMediaAssetsCompanion Function({
+      Value<String> id,
+      Value<String> sha256,
+      Value<String> managedRelativePath,
+      Value<String> originalFileName,
+      Value<String> mimeType,
+      Value<int> byteSize,
+      Value<String> caption,
+      Value<String> altText,
+      Value<int?> width,
+      Value<int?> height,
+      Value<int> createdAtUtcUs,
+      Value<int> rowid,
+    });
+
+final class $$QigongMediaAssetsTableReferences
+    extends
+        BaseReferences<
+          _$RynAppDatabase,
+          $QigongMediaAssetsTable,
+          QigongMediaAssetRow
+        > {
+  $$QigongMediaAssetsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<$QigongPostsTable, List<QigongPostRow>>
+  _qigongPostsRefsTable(_$RynAppDatabase db) => MultiTypedResultKey.fromTable(
+    db.qigongPosts,
+    aliasName: $_aliasNameGenerator(
+      db.qigongMediaAssets.id,
+      db.qigongPosts.coverMediaId,
+    ),
+  );
+
+  $$QigongPostsTableProcessedTableManager get qigongPostsRefs {
+    final manager = $$QigongPostsTableTableManager(
+      $_db,
+      $_db.qigongPosts,
+    ).filter((f) => f.coverMediaId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_qigongPostsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$QigongPostMediaTable, List<QigongPostMediaRow>>
+  _qigongPostMediaRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.qigongPostMedia,
+        aliasName: $_aliasNameGenerator(
+          db.qigongMediaAssets.id,
+          db.qigongPostMedia.mediaId,
+        ),
+      );
+
+  $$QigongPostMediaTableProcessedTableManager get qigongPostMediaRefs {
+    final manager = $$QigongPostMediaTableTableManager(
+      $_db,
+      $_db.qigongPostMedia,
+    ).filter((f) => f.mediaId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _qigongPostMediaRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$QigongMediaAssetsTableFilterComposer
+    extends Composer<_$RynAppDatabase, $QigongMediaAssetsTable> {
+  $$QigongMediaAssetsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sha256 => $composableBuilder(
+    column: $table.sha256,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get managedRelativePath => $composableBuilder(
+    column: $table.managedRelativePath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get originalFileName => $composableBuilder(
+    column: $table.originalFileName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mimeType => $composableBuilder(
+    column: $table.mimeType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get byteSize => $composableBuilder(
+    column: $table.byteSize,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get caption => $composableBuilder(
+    column: $table.caption,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get altText => $composableBuilder(
+    column: $table.altText,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get width => $composableBuilder(
+    column: $table.width,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get height => $composableBuilder(
+    column: $table.height,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> qigongPostsRefs(
+    Expression<bool> Function($$QigongPostsTableFilterComposer f) f,
+  ) {
+    final $$QigongPostsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.qigongPosts,
+      getReferencedColumn: (t) => t.coverMediaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostsTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongPosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> qigongPostMediaRefs(
+    Expression<bool> Function($$QigongPostMediaTableFilterComposer f) f,
+  ) {
+    final $$QigongPostMediaTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.qigongPostMedia,
+      getReferencedColumn: (t) => t.mediaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostMediaTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongPostMedia,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$QigongMediaAssetsTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $QigongMediaAssetsTable> {
+  $$QigongMediaAssetsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sha256 => $composableBuilder(
+    column: $table.sha256,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get managedRelativePath => $composableBuilder(
+    column: $table.managedRelativePath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get originalFileName => $composableBuilder(
+    column: $table.originalFileName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mimeType => $composableBuilder(
+    column: $table.mimeType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get byteSize => $composableBuilder(
+    column: $table.byteSize,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get caption => $composableBuilder(
+    column: $table.caption,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get altText => $composableBuilder(
+    column: $table.altText,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get width => $composableBuilder(
+    column: $table.width,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get height => $composableBuilder(
+    column: $table.height,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$QigongMediaAssetsTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $QigongMediaAssetsTable> {
+  $$QigongMediaAssetsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get sha256 =>
+      $composableBuilder(column: $table.sha256, builder: (column) => column);
+
+  GeneratedColumn<String> get managedRelativePath => $composableBuilder(
+    column: $table.managedRelativePath,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get originalFileName => $composableBuilder(
+    column: $table.originalFileName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get mimeType =>
+      $composableBuilder(column: $table.mimeType, builder: (column) => column);
+
+  GeneratedColumn<int> get byteSize =>
+      $composableBuilder(column: $table.byteSize, builder: (column) => column);
+
+  GeneratedColumn<String> get caption =>
+      $composableBuilder(column: $table.caption, builder: (column) => column);
+
+  GeneratedColumn<String> get altText =>
+      $composableBuilder(column: $table.altText, builder: (column) => column);
+
+  GeneratedColumn<int> get width =>
+      $composableBuilder(column: $table.width, builder: (column) => column);
+
+  GeneratedColumn<int> get height =>
+      $composableBuilder(column: $table.height, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => column,
+  );
+
+  Expression<T> qigongPostsRefs<T extends Object>(
+    Expression<T> Function($$QigongPostsTableAnnotationComposer a) f,
+  ) {
+    final $$QigongPostsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.qigongPosts,
+      getReferencedColumn: (t) => t.coverMediaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.qigongPosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> qigongPostMediaRefs<T extends Object>(
+    Expression<T> Function($$QigongPostMediaTableAnnotationComposer a) f,
+  ) {
+    final $$QigongPostMediaTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.qigongPostMedia,
+      getReferencedColumn: (t) => t.mediaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostMediaTableAnnotationComposer(
+            $db: $db,
+            $table: $db.qigongPostMedia,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$QigongMediaAssetsTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $QigongMediaAssetsTable,
+          QigongMediaAssetRow,
+          $$QigongMediaAssetsTableFilterComposer,
+          $$QigongMediaAssetsTableOrderingComposer,
+          $$QigongMediaAssetsTableAnnotationComposer,
+          $$QigongMediaAssetsTableCreateCompanionBuilder,
+          $$QigongMediaAssetsTableUpdateCompanionBuilder,
+          (QigongMediaAssetRow, $$QigongMediaAssetsTableReferences),
+          QigongMediaAssetRow,
+          PrefetchHooks Function({
+            bool qigongPostsRefs,
+            bool qigongPostMediaRefs,
+          })
+        > {
+  $$QigongMediaAssetsTableTableManager(
+    _$RynAppDatabase db,
+    $QigongMediaAssetsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$QigongMediaAssetsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$QigongMediaAssetsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$QigongMediaAssetsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> sha256 = const Value.absent(),
+                Value<String> managedRelativePath = const Value.absent(),
+                Value<String> originalFileName = const Value.absent(),
+                Value<String> mimeType = const Value.absent(),
+                Value<int> byteSize = const Value.absent(),
+                Value<String> caption = const Value.absent(),
+                Value<String> altText = const Value.absent(),
+                Value<int?> width = const Value.absent(),
+                Value<int?> height = const Value.absent(),
+                Value<int> createdAtUtcUs = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => QigongMediaAssetsCompanion(
+                id: id,
+                sha256: sha256,
+                managedRelativePath: managedRelativePath,
+                originalFileName: originalFileName,
+                mimeType: mimeType,
+                byteSize: byteSize,
+                caption: caption,
+                altText: altText,
+                width: width,
+                height: height,
+                createdAtUtcUs: createdAtUtcUs,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String sha256,
+                required String managedRelativePath,
+                required String originalFileName,
+                required String mimeType,
+                required int byteSize,
+                Value<String> caption = const Value.absent(),
+                Value<String> altText = const Value.absent(),
+                Value<int?> width = const Value.absent(),
+                Value<int?> height = const Value.absent(),
+                required int createdAtUtcUs,
+                Value<int> rowid = const Value.absent(),
+              }) => QigongMediaAssetsCompanion.insert(
+                id: id,
+                sha256: sha256,
+                managedRelativePath: managedRelativePath,
+                originalFileName: originalFileName,
+                mimeType: mimeType,
+                byteSize: byteSize,
+                caption: caption,
+                altText: altText,
+                width: width,
+                height: height,
+                createdAtUtcUs: createdAtUtcUs,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$QigongMediaAssetsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({qigongPostsRefs = false, qigongPostMediaRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (qigongPostsRefs) db.qigongPosts,
+                    if (qigongPostMediaRefs) db.qigongPostMedia,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (qigongPostsRefs)
+                        await $_getPrefetchedData<
+                          QigongMediaAssetRow,
+                          $QigongMediaAssetsTable,
+                          QigongPostRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$QigongMediaAssetsTableReferences
+                              ._qigongPostsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$QigongMediaAssetsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).qigongPostsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.coverMediaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (qigongPostMediaRefs)
+                        await $_getPrefetchedData<
+                          QigongMediaAssetRow,
+                          $QigongMediaAssetsTable,
+                          QigongPostMediaRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$QigongMediaAssetsTableReferences
+                              ._qigongPostMediaRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$QigongMediaAssetsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).qigongPostMediaRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.mediaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$QigongMediaAssetsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $QigongMediaAssetsTable,
+      QigongMediaAssetRow,
+      $$QigongMediaAssetsTableFilterComposer,
+      $$QigongMediaAssetsTableOrderingComposer,
+      $$QigongMediaAssetsTableAnnotationComposer,
+      $$QigongMediaAssetsTableCreateCompanionBuilder,
+      $$QigongMediaAssetsTableUpdateCompanionBuilder,
+      (QigongMediaAssetRow, $$QigongMediaAssetsTableReferences),
+      QigongMediaAssetRow,
+      PrefetchHooks Function({bool qigongPostsRefs, bool qigongPostMediaRefs})
+    >;
+typedef $$QigongPostsTableCreateCompanionBuilder =
+    QigongPostsCompanion Function({
+      required String id,
+      required String title,
+      required String status,
+      Value<int?> practiceDayNumber,
+      Value<int?> occurredAtUtcUs,
+      Value<int?> durationMinutes,
+      Value<String?> location,
+      Value<String?> excerpt,
+      Value<String> rawMemo,
+      Value<String> personalDraft,
+      Value<String> aiWorkingDraft,
+      Value<String> imagePrompt,
+      Value<String> promptHistoryJson,
+      Value<String> keywordsJson,
+      Value<String?> coverMediaId,
+      required int createdAtUtcUs,
+      required int updatedAtUtcUs,
+      Value<int?> archivedAtUtcUs,
+      Value<int> rowid,
+    });
+typedef $$QigongPostsTableUpdateCompanionBuilder =
+    QigongPostsCompanion Function({
+      Value<String> id,
+      Value<String> title,
+      Value<String> status,
+      Value<int?> practiceDayNumber,
+      Value<int?> occurredAtUtcUs,
+      Value<int?> durationMinutes,
+      Value<String?> location,
+      Value<String?> excerpt,
+      Value<String> rawMemo,
+      Value<String> personalDraft,
+      Value<String> aiWorkingDraft,
+      Value<String> imagePrompt,
+      Value<String> promptHistoryJson,
+      Value<String> keywordsJson,
+      Value<String?> coverMediaId,
+      Value<int> createdAtUtcUs,
+      Value<int> updatedAtUtcUs,
+      Value<int?> archivedAtUtcUs,
+      Value<int> rowid,
+    });
+
+final class $$QigongPostsTableReferences
+    extends BaseReferences<_$RynAppDatabase, $QigongPostsTable, QigongPostRow> {
+  $$QigongPostsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $QigongMediaAssetsTable _coverMediaIdTable(_$RynAppDatabase db) =>
+      db.qigongMediaAssets.createAlias(
+        $_aliasNameGenerator(
+          db.qigongPosts.coverMediaId,
+          db.qigongMediaAssets.id,
+        ),
+      );
+
+  $$QigongMediaAssetsTableProcessedTableManager? get coverMediaId {
+    final $_column = $_itemColumn<String>('cover_media_id');
+    if ($_column == null) return null;
+    final manager = $$QigongMediaAssetsTableTableManager(
+      $_db,
+      $_db.qigongMediaAssets,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_coverMediaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$QigongPostBlocksTable, List<QigongPostBlockRow>>
+  _qigongPostBlocksRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.qigongPostBlocks,
+        aliasName: $_aliasNameGenerator(
+          db.qigongPosts.id,
+          db.qigongPostBlocks.postId,
+        ),
+      );
+
+  $$QigongPostBlocksTableProcessedTableManager get qigongPostBlocksRefs {
+    final manager = $$QigongPostBlocksTableTableManager(
+      $_db,
+      $_db.qigongPostBlocks,
+    ).filter((f) => f.postId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _qigongPostBlocksRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$QigongPostMediaTable, List<QigongPostMediaRow>>
+  _qigongPostMediaRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.qigongPostMedia,
+        aliasName: $_aliasNameGenerator(
+          db.qigongPosts.id,
+          db.qigongPostMedia.postId,
+        ),
+      );
+
+  $$QigongPostMediaTableProcessedTableManager get qigongPostMediaRefs {
+    final manager = $$QigongPostMediaTableTableManager(
+      $_db,
+      $_db.qigongPostMedia,
+    ).filter((f) => f.postId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _qigongPostMediaRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$QigongPostTagsTable, List<QigongPostTagRow>>
+  _qigongPostTagsRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.qigongPostTags,
+        aliasName: $_aliasNameGenerator(
+          db.qigongPosts.id,
+          db.qigongPostTags.postId,
+        ),
+      );
+
+  $$QigongPostTagsTableProcessedTableManager get qigongPostTagsRefs {
+    final manager = $$QigongPostTagsTableTableManager(
+      $_db,
+      $_db.qigongPostTags,
+    ).filter((f) => f.postId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_qigongPostTagsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $QigongPublicationsTable,
+    List<QigongPublicationRow>
+  >
+  _qigongPublicationsRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.qigongPublications,
+        aliasName: $_aliasNameGenerator(
+          db.qigongPosts.id,
+          db.qigongPublications.postId,
+        ),
+      );
+
+  $$QigongPublicationsTableProcessedTableManager get qigongPublicationsRefs {
+    final manager = $$QigongPublicationsTableTableManager(
+      $_db,
+      $_db.qigongPublications,
+    ).filter((f) => f.postId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _qigongPublicationsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$QigongPostsTableFilterComposer
+    extends Composer<_$RynAppDatabase, $QigongPostsTable> {
+  $$QigongPostsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get practiceDayNumber => $composableBuilder(
+    column: $table.practiceDayNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get occurredAtUtcUs => $composableBuilder(
+    column: $table.occurredAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get durationMinutes => $composableBuilder(
+    column: $table.durationMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get location => $composableBuilder(
+    column: $table.location,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get excerpt => $composableBuilder(
+    column: $table.excerpt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rawMemo => $composableBuilder(
+    column: $table.rawMemo,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get personalDraft => $composableBuilder(
+    column: $table.personalDraft,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get aiWorkingDraft => $composableBuilder(
+    column: $table.aiWorkingDraft,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get imagePrompt => $composableBuilder(
+    column: $table.imagePrompt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get promptHistoryJson => $composableBuilder(
+    column: $table.promptHistoryJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get keywordsJson => $composableBuilder(
+    column: $table.keywordsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get archivedAtUtcUs => $composableBuilder(
+    column: $table.archivedAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$QigongMediaAssetsTableFilterComposer get coverMediaId {
+    final $$QigongMediaAssetsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.coverMediaId,
+      referencedTable: $db.qigongMediaAssets,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongMediaAssetsTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongMediaAssets,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> qigongPostBlocksRefs(
+    Expression<bool> Function($$QigongPostBlocksTableFilterComposer f) f,
+  ) {
+    final $$QigongPostBlocksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.qigongPostBlocks,
+      getReferencedColumn: (t) => t.postId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostBlocksTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongPostBlocks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> qigongPostMediaRefs(
+    Expression<bool> Function($$QigongPostMediaTableFilterComposer f) f,
+  ) {
+    final $$QigongPostMediaTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.qigongPostMedia,
+      getReferencedColumn: (t) => t.postId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostMediaTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongPostMedia,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> qigongPostTagsRefs(
+    Expression<bool> Function($$QigongPostTagsTableFilterComposer f) f,
+  ) {
+    final $$QigongPostTagsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.qigongPostTags,
+      getReferencedColumn: (t) => t.postId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostTagsTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongPostTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> qigongPublicationsRefs(
+    Expression<bool> Function($$QigongPublicationsTableFilterComposer f) f,
+  ) {
+    final $$QigongPublicationsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.qigongPublications,
+      getReferencedColumn: (t) => t.postId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPublicationsTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongPublications,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$QigongPostsTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $QigongPostsTable> {
+  $$QigongPostsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get practiceDayNumber => $composableBuilder(
+    column: $table.practiceDayNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get occurredAtUtcUs => $composableBuilder(
+    column: $table.occurredAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get durationMinutes => $composableBuilder(
+    column: $table.durationMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get location => $composableBuilder(
+    column: $table.location,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get excerpt => $composableBuilder(
+    column: $table.excerpt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get rawMemo => $composableBuilder(
+    column: $table.rawMemo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get personalDraft => $composableBuilder(
+    column: $table.personalDraft,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get aiWorkingDraft => $composableBuilder(
+    column: $table.aiWorkingDraft,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get imagePrompt => $composableBuilder(
+    column: $table.imagePrompt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get promptHistoryJson => $composableBuilder(
+    column: $table.promptHistoryJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get keywordsJson => $composableBuilder(
+    column: $table.keywordsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get archivedAtUtcUs => $composableBuilder(
+    column: $table.archivedAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$QigongMediaAssetsTableOrderingComposer get coverMediaId {
+    final $$QigongMediaAssetsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.coverMediaId,
+      referencedTable: $db.qigongMediaAssets,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongMediaAssetsTableOrderingComposer(
+            $db: $db,
+            $table: $db.qigongMediaAssets,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$QigongPostsTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $QigongPostsTable> {
+  $$QigongPostsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<int> get practiceDayNumber => $composableBuilder(
+    column: $table.practiceDayNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get occurredAtUtcUs => $composableBuilder(
+    column: $table.occurredAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get durationMinutes => $composableBuilder(
+    column: $table.durationMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get location =>
+      $composableBuilder(column: $table.location, builder: (column) => column);
+
+  GeneratedColumn<String> get excerpt =>
+      $composableBuilder(column: $table.excerpt, builder: (column) => column);
+
+  GeneratedColumn<String> get rawMemo =>
+      $composableBuilder(column: $table.rawMemo, builder: (column) => column);
+
+  GeneratedColumn<String> get personalDraft => $composableBuilder(
+    column: $table.personalDraft,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get aiWorkingDraft => $composableBuilder(
+    column: $table.aiWorkingDraft,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get imagePrompt => $composableBuilder(
+    column: $table.imagePrompt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get promptHistoryJson => $composableBuilder(
+    column: $table.promptHistoryJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get keywordsJson => $composableBuilder(
+    column: $table.keywordsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get updatedAtUtcUs => $composableBuilder(
+    column: $table.updatedAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get archivedAtUtcUs => $composableBuilder(
+    column: $table.archivedAtUtcUs,
+    builder: (column) => column,
+  );
+
+  $$QigongMediaAssetsTableAnnotationComposer get coverMediaId {
+    final $$QigongMediaAssetsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.coverMediaId,
+          referencedTable: $db.qigongMediaAssets,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$QigongMediaAssetsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.qigongMediaAssets,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+
+  Expression<T> qigongPostBlocksRefs<T extends Object>(
+    Expression<T> Function($$QigongPostBlocksTableAnnotationComposer a) f,
+  ) {
+    final $$QigongPostBlocksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.qigongPostBlocks,
+      getReferencedColumn: (t) => t.postId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostBlocksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.qigongPostBlocks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> qigongPostMediaRefs<T extends Object>(
+    Expression<T> Function($$QigongPostMediaTableAnnotationComposer a) f,
+  ) {
+    final $$QigongPostMediaTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.qigongPostMedia,
+      getReferencedColumn: (t) => t.postId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostMediaTableAnnotationComposer(
+            $db: $db,
+            $table: $db.qigongPostMedia,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> qigongPostTagsRefs<T extends Object>(
+    Expression<T> Function($$QigongPostTagsTableAnnotationComposer a) f,
+  ) {
+    final $$QigongPostTagsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.qigongPostTags,
+      getReferencedColumn: (t) => t.postId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostTagsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.qigongPostTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> qigongPublicationsRefs<T extends Object>(
+    Expression<T> Function($$QigongPublicationsTableAnnotationComposer a) f,
+  ) {
+    final $$QigongPublicationsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.qigongPublications,
+          getReferencedColumn: (t) => t.postId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$QigongPublicationsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.qigongPublications,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
+}
+
+class $$QigongPostsTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $QigongPostsTable,
+          QigongPostRow,
+          $$QigongPostsTableFilterComposer,
+          $$QigongPostsTableOrderingComposer,
+          $$QigongPostsTableAnnotationComposer,
+          $$QigongPostsTableCreateCompanionBuilder,
+          $$QigongPostsTableUpdateCompanionBuilder,
+          (QigongPostRow, $$QigongPostsTableReferences),
+          QigongPostRow,
+          PrefetchHooks Function({
+            bool coverMediaId,
+            bool qigongPostBlocksRefs,
+            bool qigongPostMediaRefs,
+            bool qigongPostTagsRefs,
+            bool qigongPublicationsRefs,
+          })
+        > {
+  $$QigongPostsTableTableManager(_$RynAppDatabase db, $QigongPostsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$QigongPostsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$QigongPostsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$QigongPostsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<int?> practiceDayNumber = const Value.absent(),
+                Value<int?> occurredAtUtcUs = const Value.absent(),
+                Value<int?> durationMinutes = const Value.absent(),
+                Value<String?> location = const Value.absent(),
+                Value<String?> excerpt = const Value.absent(),
+                Value<String> rawMemo = const Value.absent(),
+                Value<String> personalDraft = const Value.absent(),
+                Value<String> aiWorkingDraft = const Value.absent(),
+                Value<String> imagePrompt = const Value.absent(),
+                Value<String> promptHistoryJson = const Value.absent(),
+                Value<String> keywordsJson = const Value.absent(),
+                Value<String?> coverMediaId = const Value.absent(),
+                Value<int> createdAtUtcUs = const Value.absent(),
+                Value<int> updatedAtUtcUs = const Value.absent(),
+                Value<int?> archivedAtUtcUs = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => QigongPostsCompanion(
+                id: id,
+                title: title,
+                status: status,
+                practiceDayNumber: practiceDayNumber,
+                occurredAtUtcUs: occurredAtUtcUs,
+                durationMinutes: durationMinutes,
+                location: location,
+                excerpt: excerpt,
+                rawMemo: rawMemo,
+                personalDraft: personalDraft,
+                aiWorkingDraft: aiWorkingDraft,
+                imagePrompt: imagePrompt,
+                promptHistoryJson: promptHistoryJson,
+                keywordsJson: keywordsJson,
+                coverMediaId: coverMediaId,
+                createdAtUtcUs: createdAtUtcUs,
+                updatedAtUtcUs: updatedAtUtcUs,
+                archivedAtUtcUs: archivedAtUtcUs,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String title,
+                required String status,
+                Value<int?> practiceDayNumber = const Value.absent(),
+                Value<int?> occurredAtUtcUs = const Value.absent(),
+                Value<int?> durationMinutes = const Value.absent(),
+                Value<String?> location = const Value.absent(),
+                Value<String?> excerpt = const Value.absent(),
+                Value<String> rawMemo = const Value.absent(),
+                Value<String> personalDraft = const Value.absent(),
+                Value<String> aiWorkingDraft = const Value.absent(),
+                Value<String> imagePrompt = const Value.absent(),
+                Value<String> promptHistoryJson = const Value.absent(),
+                Value<String> keywordsJson = const Value.absent(),
+                Value<String?> coverMediaId = const Value.absent(),
+                required int createdAtUtcUs,
+                required int updatedAtUtcUs,
+                Value<int?> archivedAtUtcUs = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => QigongPostsCompanion.insert(
+                id: id,
+                title: title,
+                status: status,
+                practiceDayNumber: practiceDayNumber,
+                occurredAtUtcUs: occurredAtUtcUs,
+                durationMinutes: durationMinutes,
+                location: location,
+                excerpt: excerpt,
+                rawMemo: rawMemo,
+                personalDraft: personalDraft,
+                aiWorkingDraft: aiWorkingDraft,
+                imagePrompt: imagePrompt,
+                promptHistoryJson: promptHistoryJson,
+                keywordsJson: keywordsJson,
+                coverMediaId: coverMediaId,
+                createdAtUtcUs: createdAtUtcUs,
+                updatedAtUtcUs: updatedAtUtcUs,
+                archivedAtUtcUs: archivedAtUtcUs,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$QigongPostsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                coverMediaId = false,
+                qigongPostBlocksRefs = false,
+                qigongPostMediaRefs = false,
+                qigongPostTagsRefs = false,
+                qigongPublicationsRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (qigongPostBlocksRefs) db.qigongPostBlocks,
+                    if (qigongPostMediaRefs) db.qigongPostMedia,
+                    if (qigongPostTagsRefs) db.qigongPostTags,
+                    if (qigongPublicationsRefs) db.qigongPublications,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (coverMediaId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.coverMediaId,
+                                    referencedTable:
+                                        $$QigongPostsTableReferences
+                                            ._coverMediaIdTable(db),
+                                    referencedColumn:
+                                        $$QigongPostsTableReferences
+                                            ._coverMediaIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (qigongPostBlocksRefs)
+                        await $_getPrefetchedData<
+                          QigongPostRow,
+                          $QigongPostsTable,
+                          QigongPostBlockRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$QigongPostsTableReferences
+                              ._qigongPostBlocksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$QigongPostsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).qigongPostBlocksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.postId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (qigongPostMediaRefs)
+                        await $_getPrefetchedData<
+                          QigongPostRow,
+                          $QigongPostsTable,
+                          QigongPostMediaRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$QigongPostsTableReferences
+                              ._qigongPostMediaRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$QigongPostsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).qigongPostMediaRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.postId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (qigongPostTagsRefs)
+                        await $_getPrefetchedData<
+                          QigongPostRow,
+                          $QigongPostsTable,
+                          QigongPostTagRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$QigongPostsTableReferences
+                              ._qigongPostTagsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$QigongPostsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).qigongPostTagsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.postId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (qigongPublicationsRefs)
+                        await $_getPrefetchedData<
+                          QigongPostRow,
+                          $QigongPostsTable,
+                          QigongPublicationRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$QigongPostsTableReferences
+                              ._qigongPublicationsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$QigongPostsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).qigongPublicationsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.postId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$QigongPostsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $QigongPostsTable,
+      QigongPostRow,
+      $$QigongPostsTableFilterComposer,
+      $$QigongPostsTableOrderingComposer,
+      $$QigongPostsTableAnnotationComposer,
+      $$QigongPostsTableCreateCompanionBuilder,
+      $$QigongPostsTableUpdateCompanionBuilder,
+      (QigongPostRow, $$QigongPostsTableReferences),
+      QigongPostRow,
+      PrefetchHooks Function({
+        bool coverMediaId,
+        bool qigongPostBlocksRefs,
+        bool qigongPostMediaRefs,
+        bool qigongPostTagsRefs,
+        bool qigongPublicationsRefs,
+      })
+    >;
+typedef $$QigongPostBlocksTableCreateCompanionBuilder =
+    QigongPostBlocksCompanion Function({
+      required String id,
+      required String postId,
+      required int blockOrder,
+      required String type,
+      Value<String> textContent,
+      Value<int> galleryColumns,
+      Value<int> rowid,
+    });
+typedef $$QigongPostBlocksTableUpdateCompanionBuilder =
+    QigongPostBlocksCompanion Function({
+      Value<String> id,
+      Value<String> postId,
+      Value<int> blockOrder,
+      Value<String> type,
+      Value<String> textContent,
+      Value<int> galleryColumns,
+      Value<int> rowid,
+    });
+
+final class $$QigongPostBlocksTableReferences
+    extends
+        BaseReferences<
+          _$RynAppDatabase,
+          $QigongPostBlocksTable,
+          QigongPostBlockRow
+        > {
+  $$QigongPostBlocksTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $QigongPostsTable _postIdTable(_$RynAppDatabase db) =>
+      db.qigongPosts.createAlias(
+        $_aliasNameGenerator(db.qigongPostBlocks.postId, db.qigongPosts.id),
+      );
+
+  $$QigongPostsTableProcessedTableManager get postId {
+    final $_column = $_itemColumn<String>('post_id')!;
+
+    final manager = $$QigongPostsTableTableManager(
+      $_db,
+      $_db.qigongPosts,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_postIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$QigongPostMediaTable, List<QigongPostMediaRow>>
+  _qigongPostMediaRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.qigongPostMedia,
+        aliasName: $_aliasNameGenerator(
+          db.qigongPostBlocks.id,
+          db.qigongPostMedia.blockId,
+        ),
+      );
+
+  $$QigongPostMediaTableProcessedTableManager get qigongPostMediaRefs {
+    final manager = $$QigongPostMediaTableTableManager(
+      $_db,
+      $_db.qigongPostMedia,
+    ).filter((f) => f.blockId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _qigongPostMediaRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$QigongPostBlocksTableFilterComposer
+    extends Composer<_$RynAppDatabase, $QigongPostBlocksTable> {
+  $$QigongPostBlocksTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get blockOrder => $composableBuilder(
+    column: $table.blockOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get textContent => $composableBuilder(
+    column: $table.textContent,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get galleryColumns => $composableBuilder(
+    column: $table.galleryColumns,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$QigongPostsTableFilterComposer get postId {
+    final $$QigongPostsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.postId,
+      referencedTable: $db.qigongPosts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostsTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongPosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> qigongPostMediaRefs(
+    Expression<bool> Function($$QigongPostMediaTableFilterComposer f) f,
+  ) {
+    final $$QigongPostMediaTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.qigongPostMedia,
+      getReferencedColumn: (t) => t.blockId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostMediaTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongPostMedia,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$QigongPostBlocksTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $QigongPostBlocksTable> {
+  $$QigongPostBlocksTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get blockOrder => $composableBuilder(
+    column: $table.blockOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get type => $composableBuilder(
+    column: $table.type,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get textContent => $composableBuilder(
+    column: $table.textContent,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get galleryColumns => $composableBuilder(
+    column: $table.galleryColumns,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$QigongPostsTableOrderingComposer get postId {
+    final $$QigongPostsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.postId,
+      referencedTable: $db.qigongPosts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostsTableOrderingComposer(
+            $db: $db,
+            $table: $db.qigongPosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$QigongPostBlocksTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $QigongPostBlocksTable> {
+  $$QigongPostBlocksTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get blockOrder => $composableBuilder(
+    column: $table.blockOrder,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<String> get textContent => $composableBuilder(
+    column: $table.textContent,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get galleryColumns => $composableBuilder(
+    column: $table.galleryColumns,
+    builder: (column) => column,
+  );
+
+  $$QigongPostsTableAnnotationComposer get postId {
+    final $$QigongPostsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.postId,
+      referencedTable: $db.qigongPosts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.qigongPosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> qigongPostMediaRefs<T extends Object>(
+    Expression<T> Function($$QigongPostMediaTableAnnotationComposer a) f,
+  ) {
+    final $$QigongPostMediaTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.qigongPostMedia,
+      getReferencedColumn: (t) => t.blockId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostMediaTableAnnotationComposer(
+            $db: $db,
+            $table: $db.qigongPostMedia,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$QigongPostBlocksTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $QigongPostBlocksTable,
+          QigongPostBlockRow,
+          $$QigongPostBlocksTableFilterComposer,
+          $$QigongPostBlocksTableOrderingComposer,
+          $$QigongPostBlocksTableAnnotationComposer,
+          $$QigongPostBlocksTableCreateCompanionBuilder,
+          $$QigongPostBlocksTableUpdateCompanionBuilder,
+          (QigongPostBlockRow, $$QigongPostBlocksTableReferences),
+          QigongPostBlockRow,
+          PrefetchHooks Function({bool postId, bool qigongPostMediaRefs})
+        > {
+  $$QigongPostBlocksTableTableManager(
+    _$RynAppDatabase db,
+    $QigongPostBlocksTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$QigongPostBlocksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$QigongPostBlocksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$QigongPostBlocksTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> postId = const Value.absent(),
+                Value<int> blockOrder = const Value.absent(),
+                Value<String> type = const Value.absent(),
+                Value<String> textContent = const Value.absent(),
+                Value<int> galleryColumns = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => QigongPostBlocksCompanion(
+                id: id,
+                postId: postId,
+                blockOrder: blockOrder,
+                type: type,
+                textContent: textContent,
+                galleryColumns: galleryColumns,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String postId,
+                required int blockOrder,
+                required String type,
+                Value<String> textContent = const Value.absent(),
+                Value<int> galleryColumns = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => QigongPostBlocksCompanion.insert(
+                id: id,
+                postId: postId,
+                blockOrder: blockOrder,
+                type: type,
+                textContent: textContent,
+                galleryColumns: galleryColumns,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$QigongPostBlocksTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({postId = false, qigongPostMediaRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (qigongPostMediaRefs) db.qigongPostMedia,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (postId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.postId,
+                                    referencedTable:
+                                        $$QigongPostBlocksTableReferences
+                                            ._postIdTable(db),
+                                    referencedColumn:
+                                        $$QigongPostBlocksTableReferences
+                                            ._postIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (qigongPostMediaRefs)
+                        await $_getPrefetchedData<
+                          QigongPostBlockRow,
+                          $QigongPostBlocksTable,
+                          QigongPostMediaRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$QigongPostBlocksTableReferences
+                              ._qigongPostMediaRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$QigongPostBlocksTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).qigongPostMediaRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.blockId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$QigongPostBlocksTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $QigongPostBlocksTable,
+      QigongPostBlockRow,
+      $$QigongPostBlocksTableFilterComposer,
+      $$QigongPostBlocksTableOrderingComposer,
+      $$QigongPostBlocksTableAnnotationComposer,
+      $$QigongPostBlocksTableCreateCompanionBuilder,
+      $$QigongPostBlocksTableUpdateCompanionBuilder,
+      (QigongPostBlockRow, $$QigongPostBlocksTableReferences),
+      QigongPostBlockRow,
+      PrefetchHooks Function({bool postId, bool qigongPostMediaRefs})
+    >;
+typedef $$QigongPostMediaTableCreateCompanionBuilder =
+    QigongPostMediaCompanion Function({
+      required String id,
+      required String postId,
+      Value<String?> blockId,
+      required String mediaId,
+      required int mediaOrder,
+      Value<bool> isCover,
+      Value<int> rowid,
+    });
+typedef $$QigongPostMediaTableUpdateCompanionBuilder =
+    QigongPostMediaCompanion Function({
+      Value<String> id,
+      Value<String> postId,
+      Value<String?> blockId,
+      Value<String> mediaId,
+      Value<int> mediaOrder,
+      Value<bool> isCover,
+      Value<int> rowid,
+    });
+
+final class $$QigongPostMediaTableReferences
+    extends
+        BaseReferences<
+          _$RynAppDatabase,
+          $QigongPostMediaTable,
+          QigongPostMediaRow
+        > {
+  $$QigongPostMediaTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $QigongPostsTable _postIdTable(_$RynAppDatabase db) =>
+      db.qigongPosts.createAlias(
+        $_aliasNameGenerator(db.qigongPostMedia.postId, db.qigongPosts.id),
+      );
+
+  $$QigongPostsTableProcessedTableManager get postId {
+    final $_column = $_itemColumn<String>('post_id')!;
+
+    final manager = $$QigongPostsTableTableManager(
+      $_db,
+      $_db.qigongPosts,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_postIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $QigongPostBlocksTable _blockIdTable(_$RynAppDatabase db) =>
+      db.qigongPostBlocks.createAlias(
+        $_aliasNameGenerator(
+          db.qigongPostMedia.blockId,
+          db.qigongPostBlocks.id,
+        ),
+      );
+
+  $$QigongPostBlocksTableProcessedTableManager? get blockId {
+    final $_column = $_itemColumn<String>('block_id');
+    if ($_column == null) return null;
+    final manager = $$QigongPostBlocksTableTableManager(
+      $_db,
+      $_db.qigongPostBlocks,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_blockIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $QigongMediaAssetsTable _mediaIdTable(_$RynAppDatabase db) =>
+      db.qigongMediaAssets.createAlias(
+        $_aliasNameGenerator(
+          db.qigongPostMedia.mediaId,
+          db.qigongMediaAssets.id,
+        ),
+      );
+
+  $$QigongMediaAssetsTableProcessedTableManager get mediaId {
+    final $_column = $_itemColumn<String>('media_id')!;
+
+    final manager = $$QigongMediaAssetsTableTableManager(
+      $_db,
+      $_db.qigongMediaAssets,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_mediaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$QigongPostMediaTableFilterComposer
+    extends Composer<_$RynAppDatabase, $QigongPostMediaTable> {
+  $$QigongPostMediaTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get mediaOrder => $composableBuilder(
+    column: $table.mediaOrder,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isCover => $composableBuilder(
+    column: $table.isCover,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$QigongPostsTableFilterComposer get postId {
+    final $$QigongPostsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.postId,
+      referencedTable: $db.qigongPosts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostsTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongPosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$QigongPostBlocksTableFilterComposer get blockId {
+    final $$QigongPostBlocksTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.blockId,
+      referencedTable: $db.qigongPostBlocks,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostBlocksTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongPostBlocks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$QigongMediaAssetsTableFilterComposer get mediaId {
+    final $$QigongMediaAssetsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.mediaId,
+      referencedTable: $db.qigongMediaAssets,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongMediaAssetsTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongMediaAssets,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$QigongPostMediaTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $QigongPostMediaTable> {
+  $$QigongPostMediaTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get mediaOrder => $composableBuilder(
+    column: $table.mediaOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isCover => $composableBuilder(
+    column: $table.isCover,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$QigongPostsTableOrderingComposer get postId {
+    final $$QigongPostsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.postId,
+      referencedTable: $db.qigongPosts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostsTableOrderingComposer(
+            $db: $db,
+            $table: $db.qigongPosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$QigongPostBlocksTableOrderingComposer get blockId {
+    final $$QigongPostBlocksTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.blockId,
+      referencedTable: $db.qigongPostBlocks,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostBlocksTableOrderingComposer(
+            $db: $db,
+            $table: $db.qigongPostBlocks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$QigongMediaAssetsTableOrderingComposer get mediaId {
+    final $$QigongMediaAssetsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.mediaId,
+      referencedTable: $db.qigongMediaAssets,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongMediaAssetsTableOrderingComposer(
+            $db: $db,
+            $table: $db.qigongMediaAssets,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$QigongPostMediaTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $QigongPostMediaTable> {
+  $$QigongPostMediaTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get mediaOrder => $composableBuilder(
+    column: $table.mediaOrder,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isCover =>
+      $composableBuilder(column: $table.isCover, builder: (column) => column);
+
+  $$QigongPostsTableAnnotationComposer get postId {
+    final $$QigongPostsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.postId,
+      referencedTable: $db.qigongPosts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.qigongPosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$QigongPostBlocksTableAnnotationComposer get blockId {
+    final $$QigongPostBlocksTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.blockId,
+      referencedTable: $db.qigongPostBlocks,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostBlocksTableAnnotationComposer(
+            $db: $db,
+            $table: $db.qigongPostBlocks,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$QigongMediaAssetsTableAnnotationComposer get mediaId {
+    final $$QigongMediaAssetsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.mediaId,
+          referencedTable: $db.qigongMediaAssets,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$QigongMediaAssetsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.qigongMediaAssets,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$QigongPostMediaTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $QigongPostMediaTable,
+          QigongPostMediaRow,
+          $$QigongPostMediaTableFilterComposer,
+          $$QigongPostMediaTableOrderingComposer,
+          $$QigongPostMediaTableAnnotationComposer,
+          $$QigongPostMediaTableCreateCompanionBuilder,
+          $$QigongPostMediaTableUpdateCompanionBuilder,
+          (QigongPostMediaRow, $$QigongPostMediaTableReferences),
+          QigongPostMediaRow,
+          PrefetchHooks Function({bool postId, bool blockId, bool mediaId})
+        > {
+  $$QigongPostMediaTableTableManager(
+    _$RynAppDatabase db,
+    $QigongPostMediaTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$QigongPostMediaTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$QigongPostMediaTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$QigongPostMediaTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> postId = const Value.absent(),
+                Value<String?> blockId = const Value.absent(),
+                Value<String> mediaId = const Value.absent(),
+                Value<int> mediaOrder = const Value.absent(),
+                Value<bool> isCover = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => QigongPostMediaCompanion(
+                id: id,
+                postId: postId,
+                blockId: blockId,
+                mediaId: mediaId,
+                mediaOrder: mediaOrder,
+                isCover: isCover,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String postId,
+                Value<String?> blockId = const Value.absent(),
+                required String mediaId,
+                required int mediaOrder,
+                Value<bool> isCover = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => QigongPostMediaCompanion.insert(
+                id: id,
+                postId: postId,
+                blockId: blockId,
+                mediaId: mediaId,
+                mediaOrder: mediaOrder,
+                isCover: isCover,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$QigongPostMediaTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({postId = false, blockId = false, mediaId = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (postId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.postId,
+                                    referencedTable:
+                                        $$QigongPostMediaTableReferences
+                                            ._postIdTable(db),
+                                    referencedColumn:
+                                        $$QigongPostMediaTableReferences
+                                            ._postIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (blockId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.blockId,
+                                    referencedTable:
+                                        $$QigongPostMediaTableReferences
+                                            ._blockIdTable(db),
+                                    referencedColumn:
+                                        $$QigongPostMediaTableReferences
+                                            ._blockIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (mediaId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.mediaId,
+                                    referencedTable:
+                                        $$QigongPostMediaTableReferences
+                                            ._mediaIdTable(db),
+                                    referencedColumn:
+                                        $$QigongPostMediaTableReferences
+                                            ._mediaIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$QigongPostMediaTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $QigongPostMediaTable,
+      QigongPostMediaRow,
+      $$QigongPostMediaTableFilterComposer,
+      $$QigongPostMediaTableOrderingComposer,
+      $$QigongPostMediaTableAnnotationComposer,
+      $$QigongPostMediaTableCreateCompanionBuilder,
+      $$QigongPostMediaTableUpdateCompanionBuilder,
+      (QigongPostMediaRow, $$QigongPostMediaTableReferences),
+      QigongPostMediaRow,
+      PrefetchHooks Function({bool postId, bool blockId, bool mediaId})
+    >;
+typedef $$QigongTagsTableCreateCompanionBuilder =
+    QigongTagsCompanion Function({
+      required String id,
+      required String name,
+      required String normalizedName,
+      Value<int> rowid,
+    });
+typedef $$QigongTagsTableUpdateCompanionBuilder =
+    QigongTagsCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<String> normalizedName,
+      Value<int> rowid,
+    });
+
+final class $$QigongTagsTableReferences
+    extends BaseReferences<_$RynAppDatabase, $QigongTagsTable, QigongTagRow> {
+  $$QigongTagsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$QigongPostTagsTable, List<QigongPostTagRow>>
+  _qigongPostTagsRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.qigongPostTags,
+        aliasName: $_aliasNameGenerator(
+          db.qigongTags.id,
+          db.qigongPostTags.tagId,
+        ),
+      );
+
+  $$QigongPostTagsTableProcessedTableManager get qigongPostTagsRefs {
+    final manager = $$QigongPostTagsTableTableManager(
+      $_db,
+      $_db.qigongPostTags,
+    ).filter((f) => f.tagId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_qigongPostTagsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$QigongTagsTableFilterComposer
+    extends Composer<_$RynAppDatabase, $QigongTagsTable> {
+  $$QigongTagsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get normalizedName => $composableBuilder(
+    column: $table.normalizedName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> qigongPostTagsRefs(
+    Expression<bool> Function($$QigongPostTagsTableFilterComposer f) f,
+  ) {
+    final $$QigongPostTagsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.qigongPostTags,
+      getReferencedColumn: (t) => t.tagId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostTagsTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongPostTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$QigongTagsTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $QigongTagsTable> {
+  $$QigongTagsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get normalizedName => $composableBuilder(
+    column: $table.normalizedName,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$QigongTagsTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $QigongTagsTable> {
+  $$QigongTagsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<String> get normalizedName => $composableBuilder(
+    column: $table.normalizedName,
+    builder: (column) => column,
+  );
+
+  Expression<T> qigongPostTagsRefs<T extends Object>(
+    Expression<T> Function($$QigongPostTagsTableAnnotationComposer a) f,
+  ) {
+    final $$QigongPostTagsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.qigongPostTags,
+      getReferencedColumn: (t) => t.tagId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostTagsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.qigongPostTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$QigongTagsTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $QigongTagsTable,
+          QigongTagRow,
+          $$QigongTagsTableFilterComposer,
+          $$QigongTagsTableOrderingComposer,
+          $$QigongTagsTableAnnotationComposer,
+          $$QigongTagsTableCreateCompanionBuilder,
+          $$QigongTagsTableUpdateCompanionBuilder,
+          (QigongTagRow, $$QigongTagsTableReferences),
+          QigongTagRow,
+          PrefetchHooks Function({bool qigongPostTagsRefs})
+        > {
+  $$QigongTagsTableTableManager(_$RynAppDatabase db, $QigongTagsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$QigongTagsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$QigongTagsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$QigongTagsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<String> normalizedName = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => QigongTagsCompanion(
+                id: id,
+                name: name,
+                normalizedName: normalizedName,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                required String normalizedName,
+                Value<int> rowid = const Value.absent(),
+              }) => QigongTagsCompanion.insert(
+                id: id,
+                name: name,
+                normalizedName: normalizedName,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$QigongTagsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({qigongPostTagsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (qigongPostTagsRefs) db.qigongPostTags,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (qigongPostTagsRefs)
+                    await $_getPrefetchedData<
+                      QigongTagRow,
+                      $QigongTagsTable,
+                      QigongPostTagRow
+                    >(
+                      currentTable: table,
+                      referencedTable: $$QigongTagsTableReferences
+                          ._qigongPostTagsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$QigongTagsTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).qigongPostTagsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.tagId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$QigongTagsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $QigongTagsTable,
+      QigongTagRow,
+      $$QigongTagsTableFilterComposer,
+      $$QigongTagsTableOrderingComposer,
+      $$QigongTagsTableAnnotationComposer,
+      $$QigongTagsTableCreateCompanionBuilder,
+      $$QigongTagsTableUpdateCompanionBuilder,
+      (QigongTagRow, $$QigongTagsTableReferences),
+      QigongTagRow,
+      PrefetchHooks Function({bool qigongPostTagsRefs})
+    >;
+typedef $$QigongPostTagsTableCreateCompanionBuilder =
+    QigongPostTagsCompanion Function({
+      required String postId,
+      required String tagId,
+      Value<int> rowid,
+    });
+typedef $$QigongPostTagsTableUpdateCompanionBuilder =
+    QigongPostTagsCompanion Function({
+      Value<String> postId,
+      Value<String> tagId,
+      Value<int> rowid,
+    });
+
+final class $$QigongPostTagsTableReferences
+    extends
+        BaseReferences<
+          _$RynAppDatabase,
+          $QigongPostTagsTable,
+          QigongPostTagRow
+        > {
+  $$QigongPostTagsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $QigongPostsTable _postIdTable(_$RynAppDatabase db) =>
+      db.qigongPosts.createAlias(
+        $_aliasNameGenerator(db.qigongPostTags.postId, db.qigongPosts.id),
+      );
+
+  $$QigongPostsTableProcessedTableManager get postId {
+    final $_column = $_itemColumn<String>('post_id')!;
+
+    final manager = $$QigongPostsTableTableManager(
+      $_db,
+      $_db.qigongPosts,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_postIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $QigongTagsTable _tagIdTable(_$RynAppDatabase db) =>
+      db.qigongTags.createAlias(
+        $_aliasNameGenerator(db.qigongPostTags.tagId, db.qigongTags.id),
+      );
+
+  $$QigongTagsTableProcessedTableManager get tagId {
+    final $_column = $_itemColumn<String>('tag_id')!;
+
+    final manager = $$QigongTagsTableTableManager(
+      $_db,
+      $_db.qigongTags,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_tagIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$QigongPostTagsTableFilterComposer
+    extends Composer<_$RynAppDatabase, $QigongPostTagsTable> {
+  $$QigongPostTagsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  $$QigongPostsTableFilterComposer get postId {
+    final $$QigongPostsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.postId,
+      referencedTable: $db.qigongPosts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostsTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongPosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$QigongTagsTableFilterComposer get tagId {
+    final $$QigongTagsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tagId,
+      referencedTable: $db.qigongTags,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongTagsTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$QigongPostTagsTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $QigongPostTagsTable> {
+  $$QigongPostTagsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  $$QigongPostsTableOrderingComposer get postId {
+    final $$QigongPostsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.postId,
+      referencedTable: $db.qigongPosts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostsTableOrderingComposer(
+            $db: $db,
+            $table: $db.qigongPosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$QigongTagsTableOrderingComposer get tagId {
+    final $$QigongTagsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tagId,
+      referencedTable: $db.qigongTags,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongTagsTableOrderingComposer(
+            $db: $db,
+            $table: $db.qigongTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$QigongPostTagsTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $QigongPostTagsTable> {
+  $$QigongPostTagsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  $$QigongPostsTableAnnotationComposer get postId {
+    final $$QigongPostsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.postId,
+      referencedTable: $db.qigongPosts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.qigongPosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$QigongTagsTableAnnotationComposer get tagId {
+    final $$QigongTagsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.tagId,
+      referencedTable: $db.qigongTags,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongTagsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.qigongTags,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$QigongPostTagsTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $QigongPostTagsTable,
+          QigongPostTagRow,
+          $$QigongPostTagsTableFilterComposer,
+          $$QigongPostTagsTableOrderingComposer,
+          $$QigongPostTagsTableAnnotationComposer,
+          $$QigongPostTagsTableCreateCompanionBuilder,
+          $$QigongPostTagsTableUpdateCompanionBuilder,
+          (QigongPostTagRow, $$QigongPostTagsTableReferences),
+          QigongPostTagRow,
+          PrefetchHooks Function({bool postId, bool tagId})
+        > {
+  $$QigongPostTagsTableTableManager(
+    _$RynAppDatabase db,
+    $QigongPostTagsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$QigongPostTagsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$QigongPostTagsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$QigongPostTagsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> postId = const Value.absent(),
+                Value<String> tagId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => QigongPostTagsCompanion(
+                postId: postId,
+                tagId: tagId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String postId,
+                required String tagId,
+                Value<int> rowid = const Value.absent(),
+              }) => QigongPostTagsCompanion.insert(
+                postId: postId,
+                tagId: tagId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$QigongPostTagsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({postId = false, tagId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (postId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.postId,
+                                referencedTable: $$QigongPostTagsTableReferences
+                                    ._postIdTable(db),
+                                referencedColumn:
+                                    $$QigongPostTagsTableReferences
+                                        ._postIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+                    if (tagId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.tagId,
+                                referencedTable: $$QigongPostTagsTableReferences
+                                    ._tagIdTable(db),
+                                referencedColumn:
+                                    $$QigongPostTagsTableReferences
+                                        ._tagIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$QigongPostTagsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $QigongPostTagsTable,
+      QigongPostTagRow,
+      $$QigongPostTagsTableFilterComposer,
+      $$QigongPostTagsTableOrderingComposer,
+      $$QigongPostTagsTableAnnotationComposer,
+      $$QigongPostTagsTableCreateCompanionBuilder,
+      $$QigongPostTagsTableUpdateCompanionBuilder,
+      (QigongPostTagRow, $$QigongPostTagsTableReferences),
+      QigongPostTagRow,
+      PrefetchHooks Function({bool postId, bool tagId})
+    >;
+typedef $$QigongPublicationsTableCreateCompanionBuilder =
+    QigongPublicationsCompanion Function({
+      required String postId,
+      required String platform,
+      required String status,
+      Value<String?> externalTitle,
+      Value<String?> externalUrl,
+      Value<int?> publishedAtUtcUs,
+      Value<String?> platformNote,
+      Value<int> rowid,
+    });
+typedef $$QigongPublicationsTableUpdateCompanionBuilder =
+    QigongPublicationsCompanion Function({
+      Value<String> postId,
+      Value<String> platform,
+      Value<String> status,
+      Value<String?> externalTitle,
+      Value<String?> externalUrl,
+      Value<int?> publishedAtUtcUs,
+      Value<String?> platformNote,
+      Value<int> rowid,
+    });
+
+final class $$QigongPublicationsTableReferences
+    extends
+        BaseReferences<
+          _$RynAppDatabase,
+          $QigongPublicationsTable,
+          QigongPublicationRow
+        > {
+  $$QigongPublicationsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $QigongPostsTable _postIdTable(_$RynAppDatabase db) =>
+      db.qigongPosts.createAlias(
+        $_aliasNameGenerator(db.qigongPublications.postId, db.qigongPosts.id),
+      );
+
+  $$QigongPostsTableProcessedTableManager get postId {
+    final $_column = $_itemColumn<String>('post_id')!;
+
+    final manager = $$QigongPostsTableTableManager(
+      $_db,
+      $_db.qigongPosts,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_postIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$QigongPublicationsTableFilterComposer
+    extends Composer<_$RynAppDatabase, $QigongPublicationsTable> {
+  $$QigongPublicationsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get platform => $composableBuilder(
+    column: $table.platform,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get externalTitle => $composableBuilder(
+    column: $table.externalTitle,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get externalUrl => $composableBuilder(
+    column: $table.externalUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get publishedAtUtcUs => $composableBuilder(
+    column: $table.publishedAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get platformNote => $composableBuilder(
+    column: $table.platformNote,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$QigongPostsTableFilterComposer get postId {
+    final $$QigongPostsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.postId,
+      referencedTable: $db.qigongPosts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostsTableFilterComposer(
+            $db: $db,
+            $table: $db.qigongPosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$QigongPublicationsTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $QigongPublicationsTable> {
+  $$QigongPublicationsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get platform => $composableBuilder(
+    column: $table.platform,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get externalTitle => $composableBuilder(
+    column: $table.externalTitle,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get externalUrl => $composableBuilder(
+    column: $table.externalUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get publishedAtUtcUs => $composableBuilder(
+    column: $table.publishedAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get platformNote => $composableBuilder(
+    column: $table.platformNote,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$QigongPostsTableOrderingComposer get postId {
+    final $$QigongPostsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.postId,
+      referencedTable: $db.qigongPosts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostsTableOrderingComposer(
+            $db: $db,
+            $table: $db.qigongPosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$QigongPublicationsTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $QigongPublicationsTable> {
+  $$QigongPublicationsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get platform =>
+      $composableBuilder(column: $table.platform, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get externalTitle => $composableBuilder(
+    column: $table.externalTitle,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get externalUrl => $composableBuilder(
+    column: $table.externalUrl,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get publishedAtUtcUs => $composableBuilder(
+    column: $table.publishedAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get platformNote => $composableBuilder(
+    column: $table.platformNote,
+    builder: (column) => column,
+  );
+
+  $$QigongPostsTableAnnotationComposer get postId {
+    final $$QigongPostsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.postId,
+      referencedTable: $db.qigongPosts,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QigongPostsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.qigongPosts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$QigongPublicationsTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $QigongPublicationsTable,
+          QigongPublicationRow,
+          $$QigongPublicationsTableFilterComposer,
+          $$QigongPublicationsTableOrderingComposer,
+          $$QigongPublicationsTableAnnotationComposer,
+          $$QigongPublicationsTableCreateCompanionBuilder,
+          $$QigongPublicationsTableUpdateCompanionBuilder,
+          (QigongPublicationRow, $$QigongPublicationsTableReferences),
+          QigongPublicationRow,
+          PrefetchHooks Function({bool postId})
+        > {
+  $$QigongPublicationsTableTableManager(
+    _$RynAppDatabase db,
+    $QigongPublicationsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$QigongPublicationsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$QigongPublicationsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$QigongPublicationsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> postId = const Value.absent(),
+                Value<String> platform = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> externalTitle = const Value.absent(),
+                Value<String?> externalUrl = const Value.absent(),
+                Value<int?> publishedAtUtcUs = const Value.absent(),
+                Value<String?> platformNote = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => QigongPublicationsCompanion(
+                postId: postId,
+                platform: platform,
+                status: status,
+                externalTitle: externalTitle,
+                externalUrl: externalUrl,
+                publishedAtUtcUs: publishedAtUtcUs,
+                platformNote: platformNote,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String postId,
+                required String platform,
+                required String status,
+                Value<String?> externalTitle = const Value.absent(),
+                Value<String?> externalUrl = const Value.absent(),
+                Value<int?> publishedAtUtcUs = const Value.absent(),
+                Value<String?> platformNote = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => QigongPublicationsCompanion.insert(
+                postId: postId,
+                platform: platform,
+                status: status,
+                externalTitle: externalTitle,
+                externalUrl: externalUrl,
+                publishedAtUtcUs: publishedAtUtcUs,
+                platformNote: platformNote,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$QigongPublicationsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({postId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (postId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.postId,
+                                referencedTable:
+                                    $$QigongPublicationsTableReferences
+                                        ._postIdTable(db),
+                                referencedColumn:
+                                    $$QigongPublicationsTableReferences
+                                        ._postIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$QigongPublicationsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $QigongPublicationsTable,
+      QigongPublicationRow,
+      $$QigongPublicationsTableFilterComposer,
+      $$QigongPublicationsTableOrderingComposer,
+      $$QigongPublicationsTableAnnotationComposer,
+      $$QigongPublicationsTableCreateCompanionBuilder,
+      $$QigongPublicationsTableUpdateCompanionBuilder,
+      (QigongPublicationRow, $$QigongPublicationsTableReferences),
+      QigongPublicationRow,
+      PrefetchHooks Function({bool postId})
+    >;
 
 class $RynAppDatabaseManager {
   final _$RynAppDatabase _db;
@@ -25265,4 +32442,18 @@ class $RynAppDatabaseManager {
       $$StudyMaterialsTableTableManager(_db, _db.studyMaterials);
   $$StudySessionMaterialsTableTableManager get studySessionMaterials =>
       $$StudySessionMaterialsTableTableManager(_db, _db.studySessionMaterials);
+  $$QigongMediaAssetsTableTableManager get qigongMediaAssets =>
+      $$QigongMediaAssetsTableTableManager(_db, _db.qigongMediaAssets);
+  $$QigongPostsTableTableManager get qigongPosts =>
+      $$QigongPostsTableTableManager(_db, _db.qigongPosts);
+  $$QigongPostBlocksTableTableManager get qigongPostBlocks =>
+      $$QigongPostBlocksTableTableManager(_db, _db.qigongPostBlocks);
+  $$QigongPostMediaTableTableManager get qigongPostMedia =>
+      $$QigongPostMediaTableTableManager(_db, _db.qigongPostMedia);
+  $$QigongTagsTableTableManager get qigongTags =>
+      $$QigongTagsTableTableManager(_db, _db.qigongTags);
+  $$QigongPostTagsTableTableManager get qigongPostTags =>
+      $$QigongPostTagsTableTableManager(_db, _db.qigongPostTags);
+  $$QigongPublicationsTableTableManager get qigongPublications =>
+      $$QigongPublicationsTableTableManager(_db, _db.qigongPublications);
 }

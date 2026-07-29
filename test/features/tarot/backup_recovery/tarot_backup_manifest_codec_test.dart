@@ -35,17 +35,20 @@ void main() {
     }
   });
 
-  test('schema v6 through v9 retain exact versioned inventories', () {
-    expect(TarotBackupManifest.schemaVersion, 9);
+  test('schema v6 through v10 retain exact versioned inventories', () {
+    expect(TarotBackupManifest.schemaVersion, 10);
     expect(TarotBackupManifest.requiredTablesFor(6), isNotEmpty);
     expect(TarotBackupManifest.requiredTablesFor(7), isNotEmpty);
     expect(TarotBackupManifest.requiredTablesFor(8), isNotEmpty);
-    expect(TarotBackupManifest.requiredTablesFor(9), containsAll(<String>{
-      'study_sessions',
-      'study_session_participants',
-      'study_materials',
-      'study_session_materials',
-    }));
+    expect(
+      TarotBackupManifest.requiredTablesFor(9),
+      containsAll(<String>{
+        'study_sessions',
+        'study_session_participants',
+        'study_materials',
+        'study_session_materials',
+      }),
+    );
     expect(
       TarotBackupManifest.requiredColumnsFor(6)['tarot_readings'],
       isNot(contains('person_id')),
@@ -58,7 +61,19 @@ void main() {
       TarotBackupManifest.requiredColumnsFor(8)['tarot_readings'],
       contains('person_id'),
     );
-    expect(TarotBackupManifest.requiredTablesFor(10), isEmpty);
+    expect(
+      TarotBackupManifest.requiredTablesFor(10),
+      containsAll(<String>{
+        'qigong_posts',
+        'qigong_post_blocks',
+        'qigong_media_assets',
+        'qigong_post_media',
+        'qigong_tags',
+        'qigong_post_tags',
+        'qigong_publications',
+      }),
+    );
+    expect(TarotBackupManifest.requiredTablesFor(11), isEmpty);
   });
 
   test('unknown and privacy-sensitive fields are rejected', () {

@@ -30,6 +30,7 @@ import 'features/records/domain/record_summary.dart';
 import 'features/records/models/session_tarot_results.dart';
 import 'features/records/presentation/records_hub_page.dart';
 import 'features/records/presentation/tarot_result_detail_page.dart';
+import 'features/qigong_blog/presentation/qigong_blog_shell.dart';
 import 'features/study_os/study_os_shell.dart';
 import 'features/tarot/application/tarot_runtime_controller.dart';
 import 'features/tarot/backup_recovery/application/tarot_backup_restore_action_controller.dart';
@@ -1057,6 +1058,7 @@ class _ShellPageContent extends StatelessWidget {
 
   bool get _isHome => selectedLabel == UserText.navHome;
   bool get _isStudy => selectedLabel == UserText.navStudy;
+  bool get _isPractice => selectedLabel == UserText.navPractice;
 
   void _openQuickStartSheet(
     BuildContext context, {
@@ -1174,6 +1176,13 @@ class _ShellPageContent extends StatelessWidget {
             StudyOsShell(
               repository: runtimeServices?.studyOperations,
               peopleRepository: runtimeServices?.people,
+            ),
+          ]
+        : _isPractice
+        ? <Widget>[
+            QigongBlogShell(
+              repository: runtimeServices?.qigongBlog,
+              mediaStore: runtimeServices?.qigongMedia,
             ),
           ]
         : selectedLabel == UserText.navPeople
