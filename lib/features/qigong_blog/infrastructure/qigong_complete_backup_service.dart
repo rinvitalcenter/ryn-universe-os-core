@@ -5,6 +5,7 @@ import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart';
 
 import '../../../core/backup_recovery/sha256_digest_service.dart';
+import '../application/qigong_complete_restore_coordinator.dart';
 import '../../tarot/backup_recovery/domain/tarot_backup_manifest.dart';
 import '../../tarot/backup_recovery/infrastructure/tarot_backup_database_inspector.dart';
 import '../../tarot/backup_recovery/infrastructure/tarot_backup_path_contract.dart';
@@ -53,6 +54,18 @@ final class QigongCompleteBackupService {
   final TarotBackupDatabaseInspector databaseInspector;
   final TarotSqliteOnlineBackupService onlineBackupService;
 
+  Directory get liveMediaDirectory =>
+      Directory(p.join(profileRoot.path, 'qigong_media'));
+
+  File packageDatabaseFile(Directory package) =>
+      File(p.joinAll([package.path, ...p.posix.split(_databaseRelativePath)]));
+
+  File stagedDatabaseFile(Directory stagedRoot) =>
+      File(p.join(stagedRoot.path, p.basename(sourceDatabaseFile.path)));
+
+  Future<String> packageIdentitySha256(Directory package) =>
+      digestService.digestFile(File(p.join(package.path, _manifestFilename)));
+
   Future<Directory> createBackup({
     required DateTime createdAtUtc,
     required String operationId,
@@ -90,15 +103,14 @@ final class QigongCompleteBackupService {
       final mediaEntries = await _databaseMediaEntries(snapshot);
       for (final entry in mediaEntries) {
         final source = _resolveProfileRelative(entry.relativePath);
-        if (!await source.exists()) {
-          throw const QigongBackupException('managed_media_missing');
-        }
+        await _requireRegularFile(source, missingCode: 'managed_media_missing');
         final actualHash = await digestService.digestFile(source);
         if (actualHash != entry.sha256) {
           throw const QigongBackupException('managed_media_hash_mismatch');
         }
         final target = _packageMediaFile(partialDirectory, entry.relativePath);
         await target.parent.create(recursive: true);
+        await _requireSafeNewFile(target);
         await source.copy(target.path);
         if (await digestService.digestFile(target) != entry.sha256) {
           throw const QigongBackupException('media_copy_hash_mismatch');
@@ -134,6 +146,12 @@ final class QigongCompleteBackupService {
     } on QigongBackupException {
       await _deleteIfExists(partialDirectory);
       rethrow;
+    } on TarotBackupInspectionException {
+      await _deleteIfExists(partialDirectory);
+      throw const QigongBackupException('source_database_invalid');
+    } on TarotSqliteBackupException {
+      await _deleteIfExists(partialDirectory);
+      throw const QigongBackupException('safety_snapshot_failed');
     } on Object {
       await _deleteIfExists(partialDirectory);
       throw const QigongBackupException('backup_creation_failed');
@@ -145,10 +163,9 @@ final class QigongCompleteBackupService {
       if (!await package.exists()) {
         throw const QigongBackupException('package_missing');
       }
+      await _resolvedPaths().requireSafeBackupDirectChild(package.path);
       final manifestFile = File(p.join(package.path, _manifestFilename));
-      if (!await manifestFile.exists()) {
-        throw const QigongBackupException('manifest_missing');
-      }
+      await _requireRegularFile(manifestFile, missingCode: 'manifest_missing');
       final raw = await manifestFile.readAsString();
       final decoded = jsonDecode(raw);
       if (decoded is! Map<String, dynamic> || jsonEncode(decoded) != raw) {
@@ -167,9 +184,10 @@ final class QigongCompleteBackupService {
       final snapshot = File(
         p.joinAll([package.path, ...p.posix.split(_databaseRelativePath)]),
       );
-      if (!await snapshot.exists()) {
-        throw const QigongBackupException('database_payload_missing');
-      }
+      await _requireRegularFile(
+        snapshot,
+        missingCode: 'database_payload_missing',
+      );
       final expectedDatabaseHash = manifest['databaseSha256'];
       if (expectedDatabaseHash is! String ||
           await digestService.digestFile(snapshot) != expectedDatabaseHash) {
@@ -190,9 +208,7 @@ final class QigongCompleteBackupService {
       }
       for (final entry in manifestEntries) {
         final file = _packageMediaFile(package, entry.relativePath);
-        if (!await file.exists()) {
-          throw const QigongBackupException('media_payload_missing');
-        }
+        await _requireRegularFile(file, missingCode: 'media_payload_missing');
         if (await file.length() != entry.sizeBytes ||
             await digestService.digestFile(file) != entry.sha256) {
           throw const QigongBackupException('media_hash_mismatch');
@@ -201,9 +217,9 @@ final class QigongCompleteBackupService {
       final checksum = File(
         p.joinAll([package.path, ...p.posix.split(_checksumRelativePath)]),
       );
-      if (!await checksum.exists() ||
-          await checksum.readAsString() !=
-              _checksumText(expectedDatabaseHash, manifestEntries)) {
+      await _requireRegularFile(checksum, missingCode: 'checksum_missing');
+      if (await checksum.readAsString() !=
+          _checksumText(expectedDatabaseHash, manifestEntries)) {
         throw const QigongBackupException('checksum_contract_mismatch');
       }
       await _requireExactFiles(package, manifestEntries);
@@ -219,89 +235,163 @@ final class QigongCompleteBackupService {
     }
   }
 
-  Future<void> restoreBackup(Directory package) async {
+  Future<void> stageValidatedBackup({
+    required Directory package,
+    required Directory stagedRoot,
+  }) async {
     await validateBackup(package);
-    for (final suffix in <String>['-wal', '-shm', '-journal']) {
-      if (await File('${sourceDatabaseFile.path}$suffix').exists()) {
-        throw const QigongBackupException('live_database_sidecar_present');
-      }
-    }
-    final token = DateTime.now().toUtc().microsecondsSinceEpoch.toString();
-    final stageRoot = Directory(
-      p.join(profileRoot.path, '.qigong-restore-stage-$token'),
-    );
-    final rollbackDatabase = File('${sourceDatabaseFile.path}.rollback-$token');
-    final liveMedia = Directory(p.join(profileRoot.path, 'qigong_media'));
-    final rollbackMedia = Directory('${liveMedia.path}.rollback-$token');
-    var databaseMoved = false;
-    var mediaMoved = false;
     try {
-      await stageRoot.create();
-      final stageDatabase = File(
-        p.join(stageRoot.path, p.basename(sourceDatabaseFile.path)),
+      if (await stagedRoot.exists()) {
+        throw const QigongBackupException('restore_stage_collision');
+      }
+      await stagedRoot.create(recursive: true);
+      await _resolvedPaths().requireSafeAncestry(stagedRoot.path);
+      final stageDatabase = stagedDatabaseFile(stagedRoot);
+      final packageDatabase = packageDatabaseFile(package);
+      await _requireRegularFile(
+        packageDatabase,
+        missingCode: 'database_payload_missing',
       );
-      final packageDatabase = File(
-        p.joinAll([package.path, ...p.posix.split(_databaseRelativePath)]),
-      );
-      await packageDatabase.copy(stageDatabase.path);
+      await _requireSafeNewFile(stageDatabase);
+      await _copyFileFlushed(packageDatabase, stageDatabase);
       final entries = await _databaseMediaEntries(packageDatabase);
       for (final entry in entries) {
         final source = _packageMediaFile(package, entry.relativePath);
         final target = File(
-          p.joinAll([stageRoot.path, ...p.posix.split(entry.relativePath)]),
+          p.joinAll([stagedRoot.path, ...p.posix.split(entry.relativePath)]),
         );
         await target.parent.create(recursive: true);
-        await source.copy(target.path);
-        if (await digestService.digestFile(target) != entry.sha256) {
-          throw const QigongBackupException('restore_stage_hash_mismatch');
-        }
+        await _requireRegularFile(source, missingCode: 'media_payload_missing');
+        await _requireSafeNewFile(target);
+        await _copyFileFlushed(source, target);
       }
-      if (await sourceDatabaseFile.exists()) {
-        await sourceDatabaseFile.rename(rollbackDatabase.path);
-        databaseMoved = true;
+      await Directory(
+        p.join(stagedRoot.path, 'qigong_media'),
+      ).create(recursive: true);
+      await validateDatabaseMediaPair(
+        databaseFile: stageDatabase,
+        pairRoot: stagedRoot,
+      );
+    } on QigongBackupException {
+      await _deleteIfExists(stagedRoot);
+      rethrow;
+    } on Object {
+      await _deleteIfExists(stagedRoot);
+      throw const QigongBackupException('restore_stage_failed');
+    }
+  }
+
+  Future<QigongBackupEvidence> validateDatabaseMediaPair({
+    required File databaseFile,
+    required Directory pairRoot,
+  }) async {
+    try {
+      await _requireRegularFile(
+        databaseFile,
+        missingCode: 'database_payload_missing',
+      );
+      final evidence = databaseInspector.inspectVerified(databaseFile.path);
+      if (evidence.schemaVersion != TarotBackupManifest.schemaVersion) {
+        throw const QigongBackupException('unsupported_schema_version');
       }
-      if (await liveMedia.exists()) {
-        await liveMedia.rename(rollbackMedia.path);
-        mediaMoved = true;
-      }
-      await stageDatabase.rename(sourceDatabaseFile.path);
-      final stagedMedia = Directory(p.join(stageRoot.path, 'qigong_media'));
-      if (await stagedMedia.exists()) await stagedMedia.rename(liveMedia.path);
-      databaseInspector.inspectVerified(sourceDatabaseFile.path);
+      final entries = await _databaseMediaEntries(databaseFile);
+      final expectedFiles = <String>{
+        for (final entry in entries) entry.relativePath,
+      };
       for (final entry in entries) {
-        final restored = _resolveProfileRelative(entry.relativePath);
-        if (!await restored.exists() ||
-            await digestService.digestFile(restored) != entry.sha256) {
-          throw const QigongBackupException(
-            'restored_media_verification_failed',
-          );
+        final file = _resolveRootRelative(pairRoot, entry.relativePath);
+        await _requireRegularFile(file, missingCode: 'managed_media_missing');
+        if (await file.length() != entry.sizeBytes ||
+            await digestService.digestFile(file) != entry.sha256) {
+          throw const QigongBackupException('managed_media_hash_mismatch');
         }
       }
-      if (await rollbackDatabase.exists()) {
-        await rollbackDatabase.delete();
-      }
-      if (await rollbackMedia.exists()) {
-        await rollbackMedia.delete(recursive: true);
-      }
-      await _deleteIfExists(stageRoot);
-    } on Object catch (error) {
-      try {
-        if (await sourceDatabaseFile.exists()) {
-          await sourceDatabaseFile.delete();
+      final mediaRoot = Directory(p.join(pairRoot.path, 'qigong_media'));
+      final actualFiles = <String>{};
+      if (await mediaRoot.exists()) {
+        await for (final entity in mediaRoot.list(
+          recursive: true,
+          followLinks: false,
+        )) {
+          if (entity is Link) {
+            throw const QigongBackupException('managed_media_link_forbidden');
+          }
+          if (entity is File) {
+            actualFiles.add(
+              p
+                  .relative(entity.path, from: pairRoot.path)
+                  .replaceAll('\\', '/'),
+            );
+          }
         }
-        if (databaseMoved && await rollbackDatabase.exists()) {
-          await rollbackDatabase.rename(sourceDatabaseFile.path);
-        }
-        if (await liveMedia.exists()) await liveMedia.delete(recursive: true);
-        if (mediaMoved && await rollbackMedia.exists()) {
-          await rollbackMedia.rename(liveMedia.path);
-        }
-        await _deleteIfExists(stageRoot);
-      } on Object {
-        throw const QigongBackupException('restore_rollback_failed');
       }
-      if (error is QigongBackupException) rethrow;
-      throw const QigongBackupException('restore_failed');
+      if (!_sameStrings(
+        expectedFiles.toList()..sort(),
+        actualFiles.toList()..sort(),
+      )) {
+        throw const QigongBackupException('managed_media_inventory_mismatch');
+      }
+      return QigongBackupEvidence(
+        schemaVersion: evidence.schemaVersion,
+        mediaCount: entries.length,
+        databaseSha256: await digestService.digestFile(databaseFile),
+      );
+    } on QigongBackupException {
+      rethrow;
+    } on Object {
+      throw const QigongBackupException('database_media_validation_failed');
+    }
+  }
+
+  Future<void> requireSafeRestorePath(String path) async {
+    try {
+      await _resolvedPaths().requireSafeAncestry(path);
+    } on Object {
+      throw const QigongBackupException('unsafe_restore_path');
+    }
+  }
+
+  Future<void> _requireRegularFile(
+    File file, {
+    required String missingCode,
+  }) async {
+    await requireSafeRestorePath(file.path);
+    final type = FileSystemEntity.typeSync(file.path, followLinks: false);
+    if (type == FileSystemEntityType.notFound) {
+      throw QigongBackupException(missingCode);
+    }
+    if (type != FileSystemEntityType.file) {
+      throw const QigongBackupException('unsafe_media_file_entity');
+    }
+  }
+
+  Future<void> _requireSafeNewFile(File file) async {
+    await requireSafeRestorePath(file.path);
+    if (FileSystemEntity.typeSync(file.path, followLinks: false) !=
+        FileSystemEntityType.notFound) {
+      throw const QigongBackupException('unsafe_destination_collision');
+    }
+  }
+
+  @Deprecated('Use QigongCompleteRestoreCoordinator for durable restore.')
+  Future<void> restoreBackup(Directory package) async {
+    await validateBackup(package);
+    final identity = await packageIdentitySha256(package);
+    final result =
+        await QigongCompleteRestoreCoordinator(
+          backupService: this,
+          clock: () => DateTime.now().toUtc(),
+          safetyOperationIdGenerator: () => identity.substring(8, 16),
+          allowRawRollbackFallback: true,
+        ).restore(
+          candidatePackage: package,
+          operationId: identity.substring(0, 8),
+          lifecycle: _OfflineQigongRestoreLifecycle(sourceDatabaseFile),
+        );
+    if (result.status != QigongCompleteRestoreStatus.succeeded) {
+      throw QigongBackupException(
+        result.failureCode ?? 'complete_restore_failed',
+      );
     }
   }
 
@@ -360,6 +450,9 @@ final class QigongCompleteBackupService {
       throw const QigongBackupException('media_manifest_invalid');
     }
     final entries = source.map(_MediaEntry.fromJson).toList(growable: false);
+    for (final entry in entries) {
+      _validateMediaRelativePath(entry.relativePath);
+    }
     final ids = entries.map((entry) => entry.id).toList();
     final sortedIds = [...ids]..sort();
     if (ids.toSet().length != ids.length || !_sameStrings(ids, sortedIds)) {
@@ -373,6 +466,11 @@ final class QigongCompleteBackupService {
     return File(p.joinAll([profileRoot.path, ...p.posix.split(relativePath)]));
   }
 
+  File _resolveRootRelative(Directory root, String relativePath) {
+    _validateMediaRelativePath(relativePath);
+    return File(p.joinAll([root.path, ...p.posix.split(relativePath)]));
+  }
+
   File _packageMediaFile(Directory package, String relativePath) {
     _validateMediaRelativePath(relativePath);
     return File(
@@ -381,9 +479,15 @@ final class QigongCompleteBackupService {
   }
 
   void _validateMediaRelativePath(String path) {
-    if (p.posix.isAbsolute(path) ||
+    final components = path.split('/');
+    if (path.isEmpty ||
+        path.contains(r'\') ||
+        path.contains(':') ||
+        path.contains('\u0000') ||
+        p.posix.isAbsolute(path) ||
+        p.posix.normalize(path) != path ||
         !p.posix.isWithin('qigong_media', path) ||
-        p.posix.split(path).any((part) => part == '..' || part == '.')) {
+        components.any((part) => part.isEmpty || part == '..' || part == '.')) {
       throw const QigongBackupException('unsafe_media_relative_path');
     }
   }
@@ -505,4 +609,55 @@ String _timestamp(DateTime value) =>
 
 Future<void> _deleteIfExists(Directory directory) async {
   if (await directory.exists()) await directory.delete(recursive: true);
+}
+
+Future<void> _copyFileFlushed(File source, File target) async {
+  final input = await source.open();
+  final output = await target.open(mode: FileMode.write);
+  try {
+    while (true) {
+      final bytes = await input.read(1024 * 1024);
+      if (bytes.isEmpty) break;
+      await output.writeFrom(bytes);
+    }
+    await output.flush();
+  } finally {
+    await input.close();
+    await output.close();
+  }
+}
+
+final class _OfflineQigongRestoreLifecycle
+    implements QigongCompleteRestoreRuntimeLifecycle {
+  const _OfflineQigongRestoreLifecycle(this.databaseFile);
+
+  final File databaseFile;
+
+  @override
+  Future<void> enterMaintenance() async {}
+
+  @override
+  Future<void> close() async {}
+
+  @override
+  Future<void> reopen() async {}
+
+  @override
+  Future<void> validateBasicRead() async {
+    final database = sqlite3.open(databaseFile.path, mode: OpenMode.readOnly);
+    try {
+      if (database.userVersion != 10 ||
+          database.select('SELECT 1').single.values.single != 1) {
+        throw const QigongBackupException('database_validation_failed');
+      }
+    } finally {
+      database.close();
+    }
+  }
+
+  @override
+  Future<void> rehydrate() async {}
+
+  @override
+  Future<void> leaveMaintenance() async {}
 }

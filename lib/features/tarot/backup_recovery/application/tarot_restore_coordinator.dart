@@ -153,14 +153,16 @@ final class TarotRestoreCoordinator {
           stagedFile: stagingFile,
           sourceSchemaVersion: candidate.schemaVersion,
         );
-      } on Object {
+      } on Object catch (error) {
         try {
           if (stagingFile.existsSync()) await stagingFile.delete();
         } on Object {
           // No live database mutation occurred. Leave evidence fail-closed.
         }
         return TarotRestoreOperationResult.failedBeforeMutation(
-          failureCode: 'candidate_migration_failed',
+          failureCode: error is _CandidateMigrationInvariantException
+              ? 'candidate_migration_invariant_failed'
+              : 'candidate_migration_failed',
           safetyBackupPackagePath: safetyPath,
         );
       }
@@ -323,27 +325,50 @@ final class TarotRestoreCoordinator {
       sourceSchemaVersion,
     )) {
       if (after.tableRowCounts[table] != before.tableRowCounts[table]) {
-        throw StateError('legacy migration changed table rows');
+        throw const _CandidateMigrationInvariantException();
       }
     }
-    final databaseAfterMigration = RynAppDatabase(NativeDatabase(stagedFile));
-    try {
-      final personLinks = await databaseAfterMigration
-          .customSelect(
-            'SELECT count(*) AS total FROM tarot_readings '
-            'WHERE person_id IS NOT NULL',
-          )
-          .getSingle();
-      if (personLinks.read<int>('total') != 0) {
-        throw StateError('legacy migration fabricated Person links');
+    if (sourceSchemaVersion < TarotBackupManifest.schemaVersionV8) {
+      final databaseAfterMigration = RynAppDatabase(NativeDatabase(stagedFile));
+      try {
+        final personLinks = await databaseAfterMigration
+            .customSelect(
+              'SELECT count(*) AS total FROM tarot_readings '
+              'WHERE person_id IS NOT NULL',
+            )
+            .getSingle();
+        if (personLinks.read<int>('total') != 0) {
+          throw const _CandidateMigrationInvariantException();
+        }
+      } finally {
+        await databaseAfterMigration.close();
       }
-    } finally {
-      await databaseAfterMigration.close();
     }
-    if (sourceSchemaVersion == TarotBackupManifest.legacySchemaVersion &&
-        ((after.tableRowCounts['person_groups'] ?? -1) != 0 ||
-            (after.tableRowCounts['person_group_memberships'] ?? -1) != 0)) {
-      throw StateError('legacy migration fabricated group rows');
+    final tablesRequiredEmpty = <String>[
+      if (sourceSchemaVersion < TarotBackupManifest.schemaVersionV7) ...const [
+        'person_groups',
+        'person_group_memberships',
+      ],
+      if (sourceSchemaVersion < TarotBackupManifest.schemaVersionV9) ...const [
+        'study_sessions',
+        'study_session_participants',
+        'study_materials',
+        'study_session_materials',
+      ],
+      if (sourceSchemaVersion < TarotBackupManifest.schemaVersion) ...const [
+        'qigong_media_assets',
+        'qigong_posts',
+        'qigong_post_blocks',
+        'qigong_post_media',
+        'qigong_tags',
+        'qigong_post_tags',
+        'qigong_publications',
+      ],
+    ];
+    for (final table in tablesRequiredEmpty) {
+      if ((after.tableRowCounts[table] ?? -1) != 0) {
+        throw const _CandidateMigrationInvariantException();
+      }
     }
   }
 
@@ -538,6 +563,10 @@ final class _PreservedFile {
 
   final File original;
   final File preserved;
+}
+
+final class _CandidateMigrationInvariantException implements Exception {
+  const _CandidateMigrationInvariantException();
 }
 
 Future<void> _copyFileFlushed(File source, File target) async {

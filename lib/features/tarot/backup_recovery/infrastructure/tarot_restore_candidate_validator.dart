@@ -100,8 +100,16 @@ final class TarotRestoreCandidateValidator {
     late final TarotBackupManifest manifest;
     try {
       manifest = manifestCodec.decode(await manifestFile.readAsBytes());
-    } on FormatException {
-      throw const TarotRestoreCandidateValidationException('manifest_invalid');
+    } on FormatException catch (error) {
+      final code = switch (error.message) {
+        'manifest_scope_mismatch' => 'manifest_scope_mismatch',
+        'unsupported_schema_version' => 'unsupported_schema_version',
+        'unsupported_future_schema' => 'unsupported_future_schema',
+        'unsupported_backup_format' => 'unsupported_backup_format',
+        'manifest_not_canonical' => 'manifest_not_canonical',
+        _ => 'manifest_invalid',
+      };
+      throw TarotRestoreCandidateValidationException(code);
     }
     final packageTimestamp = nameMatch.group(1)!;
     if (_packageTimestamp(manifest.createdAtUtc) != packageTimestamp) {
@@ -133,13 +141,15 @@ final class TarotRestoreCandidateValidator {
         snapshotPath,
         policy: TarotDatabaseInspectionPolicy.immutableReadOnlyFrozenTarget,
         requireAcceptableSidecars: true,
-        acceptedSchemaVersions: const <int>{
-          TarotBackupManifest.legacySchemaVersion,
-          TarotBackupManifest.schemaVersionV7,
-          TarotBackupManifest.schemaVersion,
-        },
+        acceptedSchemaVersions:
+            TarotBackupManifest.supportedRestoreSchemaVersions,
       );
-    } on TarotBackupInspectionException {
+    } on TarotBackupInspectionException catch (error) {
+      if (error.code == 'schema_version_mismatch') {
+        throw const TarotRestoreCandidateValidationException(
+          'manifest_database_schema_mismatch',
+        );
+      }
       throw const TarotRestoreCandidateValidationException('snapshot_invalid');
     }
     if (evidence.schemaVersion != manifest.payloadSchemaVersion ||
@@ -157,6 +167,11 @@ final class TarotRestoreCandidateValidator {
         evidence.freelistCount != 0 ||
         evidence.hasUnexpectedNonEmptySidecar) {
       throw const TarotRestoreCandidateValidationException('snapshot_invalid');
+    }
+    if ((evidence.tableRowCounts['qigong_media_assets'] ?? 0) > 0) {
+      throw const TarotRestoreCandidateValidationException(
+        'qigong_complete_backup_required',
+      );
     }
 
     return TarotRestoreCandidate(

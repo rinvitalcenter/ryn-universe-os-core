@@ -38,6 +38,13 @@ final class TarotBackupManifest {
   static const int schemaVersionV8 = 8;
   static const int schemaVersionV7 = 7;
   static const int legacySchemaVersion = 6;
+  static const Set<int> supportedRestoreSchemaVersions = <int>{
+    legacySchemaVersion,
+    schemaVersionV7,
+    schemaVersionV8,
+    schemaVersionV9,
+    schemaVersion,
+  };
   static const String schemaV5RestorePolicy =
       'restore_with_schema_v5_application_then_reopen_to_migrate';
   static const String databasePayloadFilename =
@@ -504,6 +511,9 @@ final class TarotBackupManifest {
         schemaVersion => requiredColumnsByTableV10,
         _ => const <String, List<String>>{},
       };
+
+  static String? contentScopeFor(int version) =>
+      supportedRestoreSchemaVersions.contains(version) ? contentScope : null;
 
   final String applicationVersion;
   final String sourceRuntimeMode;

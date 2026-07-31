@@ -8,6 +8,8 @@ import '../../../core/persistence/migrations.dart';
 import '../../../core/persistence/runtime_data_profile.dart';
 import '../../../core/repositories/repository_result.dart';
 import '../../../core/runtime/ryn_runtime_services.dart';
+import '../../qigong_blog/application/qigong_complete_restore_coordinator.dart';
+import '../../qigong_blog/application/qigong_complete_restore_startup_recovery_coordinator.dart';
 import '../../records/models/session_tarot_results.dart';
 import '../backup_recovery/application/tarot_restore_coordinator.dart';
 import '../backup_recovery/application/tarot_restore_startup_recovery_coordinator.dart';
@@ -37,6 +39,8 @@ enum TarotRuntimeFailureCategory {
 
 enum TarotDraftSaveStatus { clean, dirty, saving, saved, failed }
 
+typedef TarotRuntimeQuiesceBarrier = Future<void> Function();
+
 final class TarotRuntimeFailure {
   const TarotRuntimeFailure({
     required this.category,
@@ -61,6 +65,8 @@ final class TarotRuntimeController extends ChangeNotifier {
     RynRuntimeDataPathContract? pathContract,
     RynRuntimeDataMode? runtimeDataMode,
     this.startupRecoveryCoordinator,
+    this.qigongStartupRecoveryCoordinator,
+    this.restoreQuiesceBarrier,
   }) : _pathContract = pathContract ?? RynRuntimeDataPathContract(),
        _runtimeDataMode =
            runtimeDataMode ?? RynRuntimeDataModeContract.fromEnvironment();
@@ -76,7 +82,9 @@ final class TarotRuntimeController extends ChangeNotifier {
          Directory.systemTemp,
        ),
        _runtimeDataMode = RynRuntimeDataMode.standardDevelopment,
-       startupRecoveryCoordinator = null {
+       startupRecoveryCoordinator = null,
+       qigongStartupRecoveryCoordinator = null,
+       restoreQuiesceBarrier = null {
     _startupStatus = status;
     if (status == TarotRuntimeStartupStatus.recoveryRequired) {
       _failure = const TarotRuntimeFailure(
@@ -96,6 +104,9 @@ final class TarotRuntimeController extends ChangeNotifier {
   final RynRuntimeDataPathContract _pathContract;
   final RynRuntimeDataMode _runtimeDataMode;
   final TarotRestoreStartupRecoveryCoordinator? startupRecoveryCoordinator;
+  final QigongCompleteRestoreStartupRecoveryCoordinator?
+  qigongStartupRecoveryCoordinator;
+  final TarotRuntimeQuiesceBarrier? restoreQuiesceBarrier;
   final SessionTarotResults _sessionResults = SessionTarotResults();
   final Map<String, TarotInterpretationSessionDraft> _drafts = {};
   final Map<String, TarotInterpretationSessionDraft> _lastSavedDrafts = {};
@@ -108,6 +119,8 @@ final class TarotRuntimeController extends ChangeNotifier {
   TarotRuntimeFailure? _failure;
   String? _databasePath;
   TarotRestoreStartupRecoveryResult? _startupRecoveryResult;
+  QigongCompleteRestoreStartupRecoveryResult? _qigongStartupRecoveryResult;
+  bool _restoreMaintenanceBusy = false;
   bool _closed = false;
 
   TarotRuntimeStartupStatus get startupStatus => _startupStatus;
@@ -116,6 +129,9 @@ final class TarotRuntimeController extends ChangeNotifier {
   RynRuntimeDataMode get runtimeDataMode => _runtimeDataMode;
   TarotRestoreStartupRecoveryResult? get startupRecoveryResult =>
       _startupRecoveryResult;
+  QigongCompleteRestoreStartupRecoveryResult? get qigongStartupRecoveryResult =>
+      _qigongStartupRecoveryResult;
+  bool get restoreMaintenanceBusy => _restoreMaintenanceBusy;
   bool get isClosed => _closed;
   RynRuntimeServices? get runtimeServices => _runtimeServices;
   SessionTarotResults get sessionResults => _sessionResults;
@@ -147,6 +163,7 @@ final class TarotRuntimeController extends ChangeNotifier {
     _startupStatus = TarotRuntimeStartupStatus.initializing;
     _failure = null;
     _startupRecoveryResult = null;
+    _qigongStartupRecoveryResult = null;
     _records = const [];
     _drafts.clear();
     _lastSavedDrafts.clear();
@@ -161,6 +178,14 @@ final class TarotRuntimeController extends ChangeNotifier {
       );
       _databasePath = resolvedPath.databasePath;
       await _recoverInterruptedRestore(resolvedPath);
+      if (_qigongStartupRecoveryResult?.requiresManualRecovery ?? false) {
+        _setStartupFailure(
+          TarotRuntimeFailureCategory.loadFailed,
+          _qigongStartupRecoveryResult!.failureCode ??
+              'startup_qigong_restore_recovery_required',
+        );
+        return;
+      }
       if (_startupRecoveryResult?.requiresManualRecovery ?? false) {
         _setStartupFailure(
           TarotRuntimeFailureCategory.loadFailed,
@@ -208,6 +233,7 @@ final class TarotRuntimeController extends ChangeNotifier {
     required int readingTimezoneOffsetMinutes,
     TarotInterpretationSessionDraft? interpretation,
   }) async {
+    if (_restoreMaintenanceBusy) return _restoreBusy();
     final repository = _runtimeServices?.tarotReadings;
     if (repository == null) return _writeUnavailable();
     final result = await repository.createCompletedReading(
@@ -230,6 +256,7 @@ final class TarotRuntimeController extends ChangeNotifier {
     required int readingTimezoneOffsetMinutes,
     TarotInterpretationSessionDraft? interpretation,
   }) async {
+    if (_restoreMaintenanceBusy) return _restoreBusy();
     final repository = _runtimeServices?.tarotReadings;
     if (repository == null) return _writeUnavailable();
     final result = await repository.createCompletedReading(
@@ -270,6 +297,7 @@ final class TarotRuntimeController extends ChangeNotifier {
   }
 
   Future<bool> saveInterpretation(String readingInstanceId) async {
+    if (_restoreMaintenanceBusy) return _restoreBusy();
     final repository = _runtimeServices?.tarotReadings;
     final draft = _drafts[readingInstanceId];
     if (repository == null || draft == null) return _writeUnavailable();
@@ -305,6 +333,7 @@ final class TarotRuntimeController extends ChangeNotifier {
   }
 
   Future<bool> hideActiveFromHome() async {
+    if (_restoreMaintenanceBusy) return _restoreBusy();
     final repository = _runtimeServices?.tarotReadings;
     if (repository == null) return _writeUnavailable();
     final result = await repository.hideActiveHomeReading();
@@ -314,6 +343,7 @@ final class TarotRuntimeController extends ChangeNotifier {
   }
 
   Future<bool> featureReading(String readingInstanceId) async {
+    if (_restoreMaintenanceBusy) return _restoreBusy();
     final repository = _runtimeServices?.tarotReadings;
     if (repository == null) return _writeUnavailable();
     final record = recordFor(readingInstanceId);
@@ -346,6 +376,17 @@ final class TarotRuntimeController extends ChangeNotifier {
     return _RuntimeRestoreLifecycle(this, resolvedPath);
   }
 
+  QigongCompleteRestoreRuntimeLifecycle syntheticQigongRestoreLifecycle(
+    RynResolvedDatabasePath resolvedPath,
+  ) {
+    if (_runtimeDataMode != RynRuntimeDataMode.tarotBackupRecoveryQa ||
+        !resolvedPath.isSyntheticOnly ||
+        resolvedPath.databasePath != _databasePath) {
+      throw StateError('restore lifecycle is unavailable outside synthetic QA');
+    }
+    return _QigongRuntimeRestoreLifecycle(this, resolvedPath);
+  }
+
   Future<void> close() async {
     await _closeDatabase();
     _closed = true;
@@ -354,12 +395,19 @@ final class TarotRuntimeController extends ChangeNotifier {
   Future<void> _recoverInterruptedRestore(
     RynResolvedDatabasePath resolvedPath,
   ) async {
-    final coordinator = startupRecoveryCoordinator;
-    if (coordinator == null ||
-        _runtimeDataMode != RynRuntimeDataMode.tarotBackupRecoveryQa ||
+    if (_runtimeDataMode != RynRuntimeDataMode.tarotBackupRecoveryQa ||
         !Directory(resolvedPath.runtimeDirectoryPath).existsSync()) {
       return;
     }
+    final qigongCoordinator = qigongStartupRecoveryCoordinator;
+    if (qigongCoordinator != null) {
+      _qigongStartupRecoveryResult = await qigongCoordinator.recoverIfNeeded();
+      if (_qigongStartupRecoveryResult?.requiresManualRecovery ?? false) {
+        return;
+      }
+    }
+    final coordinator = startupRecoveryCoordinator;
+    if (coordinator == null) return;
     final recoveryPaths = TarotBackupPathContract(
       sourceRootPath: resolvedPath.runtimeDirectoryPath,
       backupRootPath: resolvedPath.backupOutputDirectoryPath,
@@ -512,14 +560,59 @@ final class TarotRuntimeController extends ChangeNotifier {
     return false;
   }
 
+  bool _restoreBusy() {
+    _failure = const TarotRuntimeFailure(
+      category: TarotRuntimeFailureCategory.writeFailed,
+      userMessage: '복구 작업이 끝난 뒤 다시 시도해 주세요.',
+      technicalCode: 'restore_maintenance_busy',
+    );
+    notifyListeners();
+    return false;
+  }
+
+  Future<void> _enterRestoreMaintenance() async {
+    if (_restoreMaintenanceBusy) throw StateError('restore already active');
+    _restoreMaintenanceBusy = true;
+    notifyListeners();
+  }
+
+  Future<void> _leaveRestoreMaintenance() async {
+    _restoreMaintenanceBusy = false;
+    notifyListeners();
+  }
+
+  Future<void> _closeForQigongRestore() async {
+    final database = _runtimeServices?.database;
+    _runtimeServices = null;
+    notifyListeners();
+    final barrier = restoreQuiesceBarrier;
+    if (barrier == null) {
+      await Future<void>.delayed(Duration.zero);
+    } else {
+      await barrier();
+    }
+    await _closeDatabaseInstance(database);
+  }
+
+  Future<void> _reopenForQigongRestore(
+    RynResolvedDatabasePath resolvedPath,
+  ) async {
+    await _reopenForRestore(resolvedPath);
+    notifyListeners();
+  }
+
   Future<void> _closeDatabase() async {
+    final database = _runtimeServices?.database;
+    _runtimeServices = null;
+    await _closeDatabaseInstance(database);
+  }
+
+  Future<void> _closeDatabaseInstance(RynAppDatabase? database) async {
     final closing = _databaseCloseFuture;
     if (closing != null) {
       await closing;
       return;
     }
-    final database = _runtimeServices?.database;
-    _runtimeServices = null;
     if (database == null) return;
     final closeFuture = database.close();
     _databaseCloseFuture = closeFuture;
@@ -547,4 +640,30 @@ final class _RuntimeRestoreLifecycle implements TarotRestoreRuntimeLifecycle {
 
   @override
   Future<void> validateBasicRead() => controller._validateBasicRestoreRead();
+}
+
+final class _QigongRuntimeRestoreLifecycle
+    implements QigongCompleteRestoreRuntimeLifecycle {
+  const _QigongRuntimeRestoreLifecycle(this.controller, this.resolvedPath);
+
+  final TarotRuntimeController controller;
+  final RynResolvedDatabasePath resolvedPath;
+
+  @override
+  Future<void> enterMaintenance() => controller._enterRestoreMaintenance();
+
+  @override
+  Future<void> close() => controller._closeForQigongRestore();
+
+  @override
+  Future<void> reopen() => controller._reopenForQigongRestore(resolvedPath);
+
+  @override
+  Future<void> validateBasicRead() => controller._validateBasicRestoreRead();
+
+  @override
+  Future<void> rehydrate() => controller._reload();
+
+  @override
+  Future<void> leaveMaintenance() => controller._leaveRestoreMaintenance();
 }

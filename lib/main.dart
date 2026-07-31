@@ -30,6 +30,8 @@ import 'features/records/domain/record_summary.dart';
 import 'features/records/models/session_tarot_results.dart';
 import 'features/records/presentation/records_hub_page.dart';
 import 'features/records/presentation/tarot_result_detail_page.dart';
+import 'features/qigong_blog/application/qigong_complete_restore_startup_recovery_coordinator.dart';
+import 'features/qigong_blog/infrastructure/qigong_complete_backup_service.dart';
 import 'features/qigong_blog/presentation/qigong_blog_shell.dart';
 import 'features/study_os/study_os_shell.dart';
 import 'features/tarot/application/tarot_runtime_controller.dart';
@@ -87,10 +89,31 @@ _RuntimeComposition _createRuntimeComposition() {
   final pathContract = RynRuntimeDataPathContract.forApplicationSupportRoot(
     root,
   );
+  final resolvedPath = pathContract.resolveMode(
+    RynRuntimeDataMode.tarotBackupRecoveryQa,
+  );
   final validator = TarotRestoreCandidateValidator();
   final runtime = TarotRuntimeController.development(
     pathContract: pathContract,
     runtimeDataMode: RynRuntimeDataMode.tarotBackupRecoveryQa,
+    restoreQuiesceBarrier: () async {
+      if (WidgetsBinding.instance.hasScheduledFrame) {
+        await WidgetsBinding.instance.endOfFrame;
+      }
+    },
+    qigongStartupRecoveryCoordinator:
+        QigongCompleteRestoreStartupRecoveryCoordinator(
+          backupService: QigongCompleteBackupService(
+            profileRoot: Directory(resolvedPath.profileRootPath),
+            sourceDatabaseFile: File(resolvedPath.databasePath),
+            backupRoot: Directory(
+              p.join(
+                p.dirname(resolvedPath.profileRootPath),
+                '${p.basename(resolvedPath.profileRootPath)}-qigong-backups',
+              ),
+            ),
+          ),
+        ),
     startupRecoveryCoordinator: TarotRestoreStartupRecoveryCoordinator(
       candidateValidator: validator,
     ),

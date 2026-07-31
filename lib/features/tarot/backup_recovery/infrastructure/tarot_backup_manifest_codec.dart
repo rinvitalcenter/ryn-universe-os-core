@@ -42,12 +42,27 @@ final class TarotBackupManifestCodec {
       throw const FormatException('manifest_not_object');
     }
     _requireExactKeys(decoded, TarotBackupManifest.canonicalFieldOrder);
+    if (_integer(decoded, 'backupFormatVersion') !=
+        TarotBackupManifest.backupFormatVersion) {
+      throw const FormatException('unsupported_backup_format');
+    }
     final payloadSchemaVersion = _integer(decoded, 'schemaVersion');
+    if (payloadSchemaVersion > TarotBackupManifest.schemaVersion) {
+      throw const FormatException('unsupported_future_schema');
+    }
+    if (!TarotBackupManifest.supportedRestoreSchemaVersions.contains(
+      payloadSchemaVersion,
+    )) {
+      throw const FormatException('unsupported_schema_version');
+    }
     final requiredTables = TarotBackupManifest.requiredTablesFor(
       payloadSchemaVersion,
     );
-    if (requiredTables.isEmpty) {
-      throw const FormatException('invalid_schemaVersion');
+    final expectedContentScope = TarotBackupManifest.contentScopeFor(
+      payloadSchemaVersion,
+    );
+    if (_string(decoded, 'contentScope') != expectedContentScope) {
+      throw const FormatException('manifest_scope_mismatch');
     }
 
     final manifest = TarotBackupManifest(
@@ -87,13 +102,11 @@ final class TarotBackupManifestCodec {
       payloadSchemaVersion: payloadSchemaVersion,
     );
 
-    _requireFixed(decoded, 'backupFormatVersion', 1);
     _requireFixed(
       decoded,
       'applicationIdentity',
       TarotBackupManifest.applicationIdentity,
     );
-    _requireFixed(decoded, 'contentScope', TarotBackupManifest.contentScope);
 
     _requireFixed(
       decoded,
@@ -127,7 +140,9 @@ final class TarotBackupManifestCodec {
         'sourceRuntimeMode': manifest.sourceRuntimeMode,
         'sourceEnvironment': manifest.sourceEnvironment,
         'sourcePurpose': manifest.sourcePurpose,
-        'contentScope': TarotBackupManifest.contentScope,
+        'contentScope': TarotBackupManifest.contentScopeFor(
+          manifest.payloadSchemaVersion,
+        ),
         'createdAtUtc': _formatTimestamp(manifest.createdAtUtc),
         'schemaVersion': manifest.payloadSchemaVersion,
         'databasePayloadFilename': TarotBackupManifest.databasePayloadFilename,
@@ -158,6 +173,14 @@ final class TarotBackupManifestCodec {
       };
 
   void _validateManifest(TarotBackupManifest manifest) {
+    if (manifest.payloadSchemaVersion > TarotBackupManifest.schemaVersion) {
+      throw const FormatException('unsupported_future_schema');
+    }
+    if (!TarotBackupManifest.supportedRestoreSchemaVersions.contains(
+      manifest.payloadSchemaVersion,
+    )) {
+      throw const FormatException('unsupported_schema_version');
+    }
     final requiredTables = TarotBackupManifest.requiredTablesFor(
       manifest.payloadSchemaVersion,
     );

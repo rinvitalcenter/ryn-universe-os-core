@@ -27,10 +27,22 @@ void main() {
 
   Future<_RestoreSetup> createSetup({
     bool mutateLiveAfterCandidate = true,
+    int schemaVersion = 10,
+    bool linkReadingToPerson = false,
     Future<bool> Function(String)? inspectPath,
   }) async {
     fixture = await TarotBackupRecoveryFixture.create();
-    final package = await fixture!.createRestoreCandidate();
+    if (linkReadingToPerson) {
+      final database = fixture!.openSource();
+      fixture!.insertSyntheticPersonCore(database);
+      database.execute(
+        "UPDATE tarot_readings SET person_id = 'person.synthetic.study.01'",
+      );
+      fixture!.release(database);
+    }
+    final package = await fixture!.createRestoreCandidate(
+      schemaVersion: schemaVersion,
+    );
     if (mutateLiveAfterCandidate) {
       final database = fixture!.openSource();
       fixture!.insertValidReading(database, id: 'synthetic-r2');
@@ -90,6 +102,143 @@ void main() {
     expect(setup.lifecycle.reopenCount, 1);
     expect(setup.lifecycle.validateCount, 1);
   });
+
+  for (final sourceSchemaVersion in <int>[6, 7, 8, 9]) {
+    test(
+      'schema v$sourceSchemaVersion migrates with historical empty invariants',
+      () async {
+        final setup = await createSetup(
+          mutateLiveAfterCandidate: false,
+          schemaVersion: sourceSchemaVersion,
+        );
+
+        final result = await restore(setup);
+
+        expect(result.status, TarotRestoreOperationStatus.succeeded);
+        final database = sqlite3.open(
+          fixture!.sourceFile.path,
+          mode: OpenMode.readOnly,
+        );
+        try {
+          expect(database.userVersion, 10);
+          expect(_tableCount(database, 'tarot_readings'), 1);
+          final reading = database
+              .select(
+                "SELECT question_original_snapshot, question_display_text, "
+                "deck_id, deck_name_snapshot, spread_id, spread_name_snapshot "
+                "FROM tarot_readings WHERE reading_instance_id = 'synthetic-r1'",
+              )
+              .single;
+          expect(
+            reading['question_original_snapshot'],
+            'SYNTHETIC_QUESTION_synthetic-r1',
+          );
+          expect(
+            reading['question_display_text'],
+            'SYNTHETIC_QUESTION_synthetic-r1',
+          );
+          expect(reading['deck_id'], 'synthetic-deck');
+          expect(reading['deck_name_snapshot'], 'SYNTHETIC_DECK');
+          expect(reading['spread_id'], 'synthetic-spread');
+          expect(reading['spread_name_snapshot'], 'SYNTHETIC_SPREAD');
+          final placement = database
+              .select(
+                "SELECT card_id, card_name_snapshot, orientation "
+                "FROM tarot_card_placements "
+                "WHERE reading_instance_id = 'synthetic-r1' "
+                'AND placement_order = 2',
+              )
+              .single;
+          expect(placement['card_id'], 'synthetic-card-2');
+          expect(placement['card_name_snapshot'], 'SYNTHETIC_CARD_2');
+          expect(placement['orientation'], 'reversed');
+          final interpretation = database
+              .select(
+                "SELECT whole_image_observation, flow_interpretation, "
+                "core_message, small_action FROM tarot_interpretations "
+                "WHERE reading_instance_id = 'synthetic-r1'",
+              )
+              .single;
+          expect(
+            interpretation['whole_image_observation'],
+            'SYNTHETIC_INTERPRETATION',
+          );
+          expect(interpretation['flow_interpretation'], 'SYNTHETIC_FLOW');
+          expect(interpretation['core_message'], 'SYNTHETIC_CORE');
+          expect(interpretation['small_action'], 'SYNTHETIC_ACTION');
+          if (sourceSchemaVersion < 7) {
+            expect(_tableCount(database, 'person_groups'), 0);
+            expect(_tableCount(database, 'person_group_memberships'), 0);
+          }
+          if (sourceSchemaVersion < 8) {
+            expect(
+              _scalar(
+                database,
+                'SELECT count(*) FROM tarot_readings '
+                'WHERE person_id IS NOT NULL',
+              ),
+              0,
+            );
+          }
+          if (sourceSchemaVersion < 9) {
+            for (final table in const <String>[
+              'study_sessions',
+              'study_session_participants',
+              'study_materials',
+              'study_session_materials',
+            ]) {
+              expect(_tableCount(database, table), 0, reason: table);
+            }
+          }
+          for (final table in const <String>[
+            'qigong_media_assets',
+            'qigong_posts',
+            'qigong_post_blocks',
+            'qigong_post_media',
+            'qigong_tags',
+            'qigong_post_tags',
+            'qigong_publications',
+          ]) {
+            expect(_tableCount(database, table), 0, reason: table);
+          }
+        } finally {
+          database.close();
+        }
+      },
+    );
+  }
+
+  for (final sourceSchemaVersion in <int>[8, 9]) {
+    test(
+      'schema v$sourceSchemaVersion preserves existing Person linkage',
+      () async {
+        final setup = await createSetup(
+          mutateLiveAfterCandidate: false,
+          schemaVersion: sourceSchemaVersion,
+          linkReadingToPerson: true,
+        );
+
+        final result = await restore(setup);
+
+        expect(result.status, TarotRestoreOperationStatus.succeeded);
+        final database = sqlite3.open(
+          fixture!.sourceFile.path,
+          mode: OpenMode.readOnly,
+        );
+        try {
+          expect(
+            _scalar(
+              database,
+              'SELECT count(*) FROM tarot_readings WHERE person_id IS NOT NULL',
+            ),
+            1,
+          );
+        } finally {
+          database.close();
+        }
+      },
+    );
+  }
 
   test(
     'invalid candidate causes zero safety copy close and mutation',
@@ -438,6 +587,12 @@ int _readingCount(File databaseFile) {
     database.close();
   }
 }
+
+int _tableCount(Database database, String table) =>
+    _scalar(database, 'SELECT count(*) FROM $table');
+
+int _scalar(Database database, String sql) =>
+    database.select(sql).single.values.single as int;
 
 Future<Map<String, List<int>>> _sourceTree(Directory root) async {
   final result = <String, List<int>>{};

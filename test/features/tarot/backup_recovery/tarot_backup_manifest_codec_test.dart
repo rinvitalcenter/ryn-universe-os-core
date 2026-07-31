@@ -76,6 +76,85 @@ void main() {
     expect(TarotBackupManifest.requiredTablesFor(11), isEmpty);
   });
 
+  test('schema v6 through v10 use the exact legacy content scope', () {
+    expect(TarotBackupManifest.supportedRestoreSchemaVersions, <int>{
+      6,
+      7,
+      8,
+      9,
+      10,
+    });
+    for (final schemaVersion in <int>[6, 7, 8, 9, 10]) {
+      final encoded = codec.encode(
+        sampleManifest(schemaVersion: schemaVersion),
+      );
+      final map = _decodedMap(encoded);
+
+      expect(
+        map['contentScope'],
+        'person_core_tarot_study_qigong_persistence_v0_5',
+        reason: 'schema $schemaVersion',
+      );
+      expect(codec.decode(encoded).payloadSchemaVersion, schemaVersion);
+    }
+  });
+
+  test('scope format and unsupported schema failures remain typed', () {
+    final base = _decodedMap(codec.encode(sampleManifest()));
+
+    final wrongScope = Map<String, Object?>.from(base)
+      ..['contentScope'] =
+          'person_core_tarot_study_qigong_saju_persistence_v0_6';
+    expect(
+      () => codec.decode(_canonicalBytes(wrongScope)),
+      throwsA(
+        isA<FormatException>().having(
+          (error) => error.message,
+          'message',
+          'manifest_scope_mismatch',
+        ),
+      ),
+    );
+
+    final oldSchema = Map<String, Object?>.from(base)..['schemaVersion'] = 5;
+    expect(
+      () => codec.decode(_canonicalBytes(oldSchema)),
+      throwsA(
+        isA<FormatException>().having(
+          (error) => error.message,
+          'message',
+          'unsupported_schema_version',
+        ),
+      ),
+    );
+
+    final futureSchema = Map<String, Object?>.from(base)
+      ..['schemaVersion'] = 11;
+    expect(
+      () => codec.decode(_canonicalBytes(futureSchema)),
+      throwsA(
+        isA<FormatException>().having(
+          (error) => error.message,
+          'message',
+          'unsupported_future_schema',
+        ),
+      ),
+    );
+
+    final wrongFormat = Map<String, Object?>.from(base)
+      ..['backupFormatVersion'] = 2;
+    expect(
+      () => codec.decode(_canonicalBytes(wrongFormat)),
+      throwsA(
+        isA<FormatException>().having(
+          (error) => error.message,
+          'message',
+          'unsupported_backup_format',
+        ),
+      ),
+    );
+  });
+
   test('unknown and privacy-sensitive fields are rejected', () {
     for (final key in <String>[
       'unknownField',
@@ -242,10 +321,12 @@ void main() {
   });
 }
 
-TarotBackupManifest sampleManifest({String version = '1.0.0+1'}) {
-  final rowCounts = <String, int>{
-    for (final table in TarotBackupManifest.requiredTablesV1) table: 0,
-  };
+TarotBackupManifest sampleManifest({
+  String version = '1.0.0+1',
+  int schemaVersion = TarotBackupManifest.schemaVersion,
+}) {
+  final requiredTables = TarotBackupManifest.requiredTablesFor(schemaVersion);
+  final rowCounts = <String, int>{for (final table in requiredTables) table: 0};
   rowCounts
     ..['tarot_readings'] = 1
     ..['tarot_card_placements'] = 3
@@ -259,8 +340,10 @@ TarotBackupManifest sampleManifest({String version = '1.0.0+1'}) {
     createdAtUtc: DateTime.utc(2026, 7, 17, 1, 2, 3),
     databasePayloadSizeBytes: 4096,
     databasePayloadSha256: 'a' * 64,
-    requiredTables: TarotBackupManifest.requiredTablesV1,
-    requiredColumnsByTable: TarotBackupManifest.requiredColumnsByTableV1,
+    requiredTables: requiredTables,
+    requiredColumnsByTable: TarotBackupManifest.requiredColumnsFor(
+      schemaVersion,
+    ),
     tableRowCounts: rowCounts,
     readingIdCount: 1,
     placementCount: 3,
@@ -270,6 +353,7 @@ TarotBackupManifest sampleManifest({String version = '1.0.0+1'}) {
     lifecycleStateCounts: const <String, int>{'continuing': 1, 'finished': 0},
     unsupportedTableRowsZero: true,
     verifiedAtUtc: DateTime.utc(2026, 7, 17, 1, 2, 4),
+    payloadSchemaVersion: schemaVersion,
   );
 }
 

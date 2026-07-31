@@ -66,15 +66,60 @@ void main() {
     expect(result.snapshotSizeBytes, greaterThan(0));
   });
 
-  test('valid schema v7 candidate remains accepted for staging', () async {
-    fixture = await TarotBackupRecoveryFixture.create();
-    final package = await fixture.createRestoreCandidate(
-      schemaVersion: TarotBackupManifest.schemaVersionV7,
+  for (final schemaVersion in <int>[6, 7, 8, 9]) {
+    test(
+      'valid schema v$schemaVersion candidate is accepted for staging',
+      () async {
+        fixture = await TarotBackupRecoveryFixture.create();
+        final package = await fixture.createRestoreCandidate(
+          schemaVersion: schemaVersion,
+        );
+
+        final result = await validator().validate(package.path);
+
+        expect(result.schemaVersion, schemaVersion);
+      },
     );
+  }
 
-    final result = await validator().validate(package.path);
+  test('schema v5 is rejected with a typed compatibility failure', () async {
+    final package = await candidate();
+    await _changeManifestField(package, 'schemaVersion', 5);
 
-    expect(result.schemaVersion, TarotBackupManifest.schemaVersionV7);
+    await expectFailure(package, 'unsupported_schema_version');
+  });
+
+  test('schema v11 is rejected before snapshot inspection', () async {
+    final package = await candidate();
+    await _changeManifestField(package, 'schemaVersion', 11);
+
+    await expectFailure(package, 'unsupported_future_schema');
+  });
+
+  test('DB-only restore rejects Qigong managed media inventory', () async {
+    fixture = await TarotBackupRecoveryFixture.create();
+    final database = fixture.openSource();
+    database.execute(
+      '''INSERT INTO qigong_media_assets (
+        id, sha256, managed_relative_path, original_file_name,
+        mime_type, byte_size, caption, alt_text, created_at_utc_us
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
+      <Object?>[
+        'qigong-media.synthetic.01',
+        'a' * 64,
+        'qigong_media/aa/asset.bin',
+        'asset.bin',
+        'application/octet-stream',
+        1,
+        '',
+        '',
+        DateTime.utc(2026, 7, 17).microsecondsSinceEpoch,
+      ],
+    );
+    fixture.release(database);
+    final package = await fixture.createRestoreCandidate();
+
+    await expectFailure(package, 'qigong_complete_backup_required');
   });
 
   test('v8 orphan Person link is rejected', () async {
@@ -203,13 +248,13 @@ void main() {
     await manifest.writeAsString(
       const JsonEncoder.withIndent('  ').convert(decoded),
     );
-    await expectFailure(package, 'manifest_invalid');
+    await expectFailure(package, 'manifest_not_canonical');
   });
 
   test('unsupported backup format version fails', () async {
     final package = await candidate();
     await _changeManifestField(package, 'backupFormatVersion', 2);
-    await expectFailure(package, 'manifest_invalid');
+    await expectFailure(package, 'unsupported_backup_format');
   });
 
   test('wrong snapshot filename fails', () async {
@@ -264,7 +309,7 @@ void main() {
     final package = await candidate();
     await _mutateSnapshot(package, (database) => database.userVersion = 999);
     await fixture.refreshRestoreCandidateIntegrity(package);
-    await expectFailure(package, 'snapshot_invalid');
+    await expectFailure(package, 'manifest_database_schema_mismatch');
   });
 
   test('missing required table fails', () async {

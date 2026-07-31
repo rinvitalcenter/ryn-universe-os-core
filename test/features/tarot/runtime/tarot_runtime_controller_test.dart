@@ -1,8 +1,14 @@
 import 'dart:io';
 
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart' as p;
+import 'package:ryn_universe_os_core/core/persistence/app_database.dart';
 import 'package:ryn_universe_os_core/core/persistence/runtime_data_profile.dart';
 import 'package:ryn_universe_os_core/features/people/domain/person_core_models.dart';
+import 'package:ryn_universe_os_core/features/qigong_blog/application/qigong_complete_restore_startup_recovery_coordinator.dart';
+import 'package:ryn_universe_os_core/features/qigong_blog/domain/qigong_complete_restore_operation_marker.dart';
+import 'package:ryn_universe_os_core/features/qigong_blog/infrastructure/qigong_complete_backup_service.dart';
 import 'package:ryn_universe_os_core/features/tarot/application/tarot_runtime_controller.dart';
 import 'package:ryn_universe_os_core/features/tarot/domain/tarot_persistence_models.dart';
 import 'package:ryn_universe_os_core/features/tarot/models/tarot_interpretation_session_draft.dart';
@@ -87,6 +93,105 @@ void main() {
       expect(second.databasePath, qa.databasePath);
       await second.close();
     });
+
+    test('QA bootstrap runs composed Qigong recovery before DB open', () async {
+      final qa = paths.resolveMode(RynRuntimeDataMode.tarotBackupRecoveryQa);
+      final databaseFile = File(qa.databasePath);
+      await databaseFile.parent.create(recursive: true);
+      final database = RynAppDatabase(NativeDatabase(databaseFile));
+      await database.customSelect('SELECT 1').get();
+      await database.close();
+      await Directory(p.join(qa.profileRootPath, 'qigong_media')).create();
+      final operation = await Directory(
+        p.join(qa.profileRootPath, '.qigong-complete-restore-deadbeef'),
+      ).create();
+      final marker = QigongCompleteRestoreOperationMarker(
+        operationId: 'deadbeef',
+        phase: QigongCompleteRestorePhase.prepared,
+        startedAtUtc: DateTime.utc(2026, 7, 31, 1),
+        updatedAtUtc: DateTime.utc(2026, 7, 31, 1, 1),
+        candidatePackageIdentitySha256: 'a' * 64,
+        stagedDirectoryName: 'staged',
+        rollbackDirectoryName: 'rollback',
+        sourceSchemaVersion: 10,
+        expectedTargetSchemaVersion: 10,
+        lastCompletedStep: QigongCompleteRestorePhase.prepared.name,
+        originalMediaDirectoryPresent: true,
+      );
+      await const QigongCompleteRestoreOperationMarkerStore().write(
+        operationDirectory: operation,
+        marker: marker,
+      );
+      final service = QigongCompleteBackupService(
+        profileRoot: Directory(qa.profileRootPath),
+        sourceDatabaseFile: databaseFile,
+        backupRoot: Directory(
+          p.join(
+            p.dirname(qa.profileRootPath),
+            '${p.basename(qa.profileRootPath)}-qigong-backups',
+          ),
+        ),
+      );
+      final controller = TarotRuntimeController.development(
+        pathContract: paths,
+        runtimeDataMode: RynRuntimeDataMode.tarotBackupRecoveryQa,
+        qigongStartupRecoveryCoordinator:
+            QigongCompleteRestoreStartupRecoveryCoordinator(
+              backupService: service,
+            ),
+      );
+
+      await controller.bootstrap();
+
+      expect(controller.qigongStartupRecoveryResult?.failureCode, isNull);
+      expect(
+        controller.qigongStartupRecoveryResult?.status,
+        QigongCompleteRestoreStartupRecoveryStatus.untouchedFinalized,
+      );
+      expect(operation.existsSync(), isFalse);
+      expect(controller.startupStatus, TarotRuntimeStartupStatus.readyEmpty);
+      await controller.close();
+    });
+
+    test(
+      'complete restore lifecycle replaces stale runtime services',
+      () async {
+        final qa = paths.resolveMode(RynRuntimeDataMode.tarotBackupRecoveryQa);
+        final controller = TarotRuntimeController.development(
+          pathContract: paths,
+          runtimeDataMode: RynRuntimeDataMode.tarotBackupRecoveryQa,
+        );
+        await controller.bootstrap();
+        final originalServices = controller.runtimeServices;
+        final lifecycle = controller.syntheticQigongRestoreLifecycle(qa);
+        var detachedBeforeCloseCompleted = false;
+        controller.addListener(() {
+          if (controller.runtimeServices == null) {
+            detachedBeforeCloseCompleted = true;
+          }
+        });
+
+        await lifecycle.enterMaintenance();
+        expect(controller.restoreMaintenanceBusy, isTrue);
+        final closeFuture = lifecycle.close();
+        expect(controller.runtimeServices, isNull);
+        await closeFuture;
+        expect(detachedBeforeCloseCompleted, isTrue);
+        await lifecycle.reopen();
+        await lifecycle.validateBasicRead();
+        await lifecycle.rehydrate();
+        await lifecycle.leaveMaintenance();
+
+        expect(controller.runtimeServices, isNotNull);
+        expect(
+          identical(controller.runtimeServices, originalServices),
+          isFalse,
+        );
+        expect(controller.restoreMaintenanceBusy, isFalse);
+        expect(controller.startupStatus, TarotRuntimeStartupStatus.readyEmpty);
+        await controller.close();
+      },
+    );
 
     test('valid empty database is distinct from load failure', () async {
       final controller = TarotRuntimeController.development(

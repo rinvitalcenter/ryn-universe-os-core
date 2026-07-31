@@ -269,7 +269,16 @@ final class TarotBackupRecoveryFixture {
       '${TarotBackupManifest.databasePayloadFilename.replaceAll('/', Platform.pathSeparator)}',
     );
     await sourceFile.copy(snapshot.path);
-    if (schemaVersion < TarotBackupManifest.schemaVersion) {
+    if (!TarotBackupManifest.supportedRestoreSchemaVersions.contains(
+      schemaVersion,
+    )) {
+      throw ArgumentError.value(
+        schemaVersion,
+        'schemaVersion',
+        'unsupported synthetic fixture schema',
+      );
+    }
+    if (schemaVersion < 10) {
       final legacy = sqlite3.open(snapshot.path);
       legacy.execute('DROP TABLE qigong_publications');
       legacy.execute('DROP TABLE qigong_post_tags');
@@ -278,16 +287,16 @@ final class TarotBackupRecoveryFixture {
       legacy.execute('DROP TABLE qigong_post_blocks');
       legacy.execute('DROP TABLE qigong_posts');
       legacy.execute('DROP TABLE qigong_media_assets');
-      if (schemaVersion < TarotBackupManifest.schemaVersionV9) {
+      if (schemaVersion < 9) {
         legacy.execute('DROP TABLE study_session_materials');
         legacy.execute('DROP TABLE study_session_participants');
         legacy.execute('DROP TABLE study_materials');
         legacy.execute('DROP TABLE study_sessions');
       }
-      if (schemaVersion < TarotBackupManifest.schemaVersionV8) {
+      if (schemaVersion < 8) {
         legacy.execute('ALTER TABLE tarot_readings DROP COLUMN person_id');
       }
-      if (schemaVersion == TarotBackupManifest.legacySchemaVersion) {
+      if (schemaVersion < 7) {
         legacy.execute('DROP TABLE person_group_memberships');
         legacy.execute('DROP TABLE person_groups');
       }
