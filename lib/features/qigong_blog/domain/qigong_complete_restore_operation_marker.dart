@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
+import '../../tarot/backup_recovery/domain/tarot_backup_manifest.dart';
+
 typedef QigongMarkerFileRename =
     Future<File> Function(File source, String targetPath);
 
@@ -271,8 +273,15 @@ final class QigongCompleteRestoreOperationMarkerStore {
         !marker.startedAtUtc.isUtc ||
         !marker.updatedAtUtc.isUtc ||
         marker.updatedAtUtc.isBefore(marker.startedAtUtc) ||
-        marker.sourceSchemaVersion != 10 ||
-        marker.expectedTargetSchemaVersion != 10 ||
+        !const <int>{
+          TarotBackupManifest.schemaVersionV10,
+          TarotBackupManifest.schemaVersion,
+        }.contains(marker.sourceSchemaVersion) ||
+        !const <int>{
+          TarotBackupManifest.schemaVersionV10,
+          TarotBackupManifest.schemaVersion,
+        }.contains(marker.expectedTargetSchemaVersion) ||
+        marker.sourceSchemaVersion > marker.expectedTargetSchemaVersion ||
         marker.lastCompletedStep != marker.phase.name) {
       throw const FormatException('qigong_restore_marker_invalid_contract');
     }

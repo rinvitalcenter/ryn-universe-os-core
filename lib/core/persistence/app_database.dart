@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import '../../features/people/data/persistence/person_tables.dart';
 import '../../features/qigong_blog/data/persistence/qigong_blog_tables.dart';
+import '../../features/saju/data/persistence/saju_snapshot_tables.dart';
 import '../../features/study_os/data/persistence/study_operations_tables.dart';
 import '../../features/tarot/data/persistence/tarot_tables.dart';
 import 'database_connection.dart';
@@ -337,6 +338,7 @@ class ApprovalRecords extends Table {
     QigongTags,
     QigongPostTags,
     QigongPublications,
+    SajuChartSnapshots,
   ],
 )
 final class RynAppDatabase extends _$RynAppDatabase {
@@ -362,10 +364,11 @@ final class RynAppDatabase extends _$RynAppDatabase {
       await _ensurePersonCoreIndexes();
       await _ensureStudyIndexes();
       await _ensureQigongIndexes();
+      await _ensureSajuIndexes();
       await _ensureMainRuntimeState();
     },
     onUpgrade: (migrator, from, to) async {
-      if (to != 10 || (from < 4 || from > 9)) {
+      if (to != 11 || (from < 4 || from > 10)) {
         throw StateError('Unsupported database migration path: $from -> $to');
       }
       await transaction(() async {
@@ -396,16 +399,20 @@ final class RynAppDatabase extends _$RynAppDatabase {
           await migrator.createTable(studyMaterials);
           await migrator.createTable(studySessionMaterials);
         }
-        await migrator.createTable(qigongMediaAssets);
-        await migrator.createTable(qigongPosts);
-        await migrator.createTable(qigongPostBlocks);
-        await migrator.createTable(qigongPostMedia);
-        await migrator.createTable(qigongTags);
-        await migrator.createTable(qigongPostTags);
-        await migrator.createTable(qigongPublications);
+        if (from <= 9) {
+          await migrator.createTable(qigongMediaAssets);
+          await migrator.createTable(qigongPosts);
+          await migrator.createTable(qigongPostBlocks);
+          await migrator.createTable(qigongPostMedia);
+          await migrator.createTable(qigongTags);
+          await migrator.createTable(qigongPostTags);
+          await migrator.createTable(qigongPublications);
+        }
+        await migrator.createTable(sajuChartSnapshots);
         await _ensurePersonCoreIndexes();
         await _ensureStudyIndexes();
         await _ensureQigongIndexes();
+        await _ensureSajuIndexes();
         await _ensureMainRuntimeState();
       });
     },
@@ -470,6 +477,17 @@ final class RynAppDatabase extends _$RynAppDatabase {
       'CREATE UNIQUE INDEX IF NOT EXISTS qigong_post_cover_unique ON qigong_post_media (post_id) WHERE is_cover = 1',
       'CREATE INDEX IF NOT EXISTS qigong_post_media_asset_idx ON qigong_post_media (media_id, post_id)',
       'CREATE INDEX IF NOT EXISTS qigong_publications_state_idx ON qigong_publications (platform, status, post_id)',
+    ];
+    for (final statement in statements) {
+      await customStatement(statement);
+    }
+  }
+
+  Future<void> _ensureSajuIndexes() async {
+    const statements = <String>[
+      'CREATE INDEX IF NOT EXISTS saju_snapshots_person_calculated_idx ON saju_chart_snapshots (person_id, calculated_at_utc_us DESC)',
+      'CREATE INDEX IF NOT EXISTS saju_snapshots_person_group_revision_idx ON saju_chart_snapshots (person_id, chart_group_id, revision_number DESC)',
+      'CREATE INDEX IF NOT EXISTS saju_snapshots_person_birth_date_idx ON saju_chart_snapshots (person_id, converted_solar_date)',
     ];
     for (final statement in statements) {
       await customStatement(statement);

@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:sqlite3/sqlite3.dart';
 
+import '../../../../../core/persistence/app_database.dart';
+import '../../../saju/data/persistence/saju_snapshot_persistence_mapper.dart';
 import '../domain/tarot_backup_manifest.dart';
 
 typedef TarotInspectorDatabaseOpen =
@@ -154,11 +156,18 @@ final class TarotBackupDatabaseInspector {
         'qigong_publications',
       ].every(tableNames.contains);
       final qigongSchemaContractOk =
-          schemaVersion < TarotBackupManifest.schemaVersion ||
+          schemaVersion < TarotBackupManifest.schemaVersionV10 ||
           (hasQigongTables && _inspectQigongSchemaContract(database));
       final qigongInvariantsOk =
-          schemaVersion < TarotBackupManifest.schemaVersion ||
+          schemaVersion < TarotBackupManifest.schemaVersionV10 ||
           (hasQigongTables && _inspectQigongInvariants(database));
+      final hasSajuTable = tableNames.contains('saju_chart_snapshots');
+      final sajuSchemaContractOk =
+          schemaVersion < TarotBackupManifest.schemaVersion ||
+          (hasSajuTable && _inspectSajuSchemaContract(database));
+      final sajuInvariantsOk =
+          schemaVersion < TarotBackupManifest.schemaVersion ||
+          (hasSajuTable && _inspectSajuInvariants(database));
       final integrityCheckOk =
           database.select('PRAGMA integrity_check').length == 1 &&
           database.select('PRAGMA integrity_check').first.values.first == 'ok';
@@ -190,13 +199,15 @@ final class TarotBackupDatabaseInspector {
             personSchemaContractOk &&
             tarotPersonSchemaContractOk &&
             studySchemaContractOk &&
-            qigongSchemaContractOk,
+            qigongSchemaContractOk &&
+            sajuSchemaContractOk,
         aggregateInvariantsOk:
             tarotAggregate.valid &&
             personCoreInvariantsOk &&
             groupInvariantsOk &&
             studyInvariantsOk &&
-            qigongInvariantsOk,
+            qigongInvariantsOk &&
+            sajuInvariantsOk,
         freelistCount: _scalar(database, 'PRAGMA freelist_count'),
         hasUnexpectedNonEmptySidecar: false,
       );
@@ -461,6 +472,263 @@ final class TarotBackupDatabaseInspector {
         WHERE length(trim(id)) = 0 OR length(trim(title)) = 0
           OR updated_at_utc_us < created_at_utc_us)''');
     return invalidEnums == 0 && invalidValues == 0;
+  }
+
+  bool _inspectSajuSchemaContract(Database database) {
+    const nullableColumns = <String>{
+      'source_birth_profile_id',
+      'input_local_time',
+      'original_lunar_year',
+      'original_lunar_month',
+      'original_lunar_day',
+      'original_lunar_leap_month',
+      'birth_utc_instant_us',
+      'effective_hour_calculation_time',
+      'hour_pillar_canonical_id',
+      'hour_pillar_cycle_index',
+      'hour_pillar_stem_index',
+      'hour_pillar_branch_index',
+      'hour_pillar_hanja',
+      'hour_pillar_korean_label',
+    };
+    final tableInfo = database
+        .select('PRAGMA table_info("saju_chart_snapshots")')
+        .toList(growable: false);
+    if (tableInfo.length != 65) return false;
+    for (final row in tableInfo) {
+      final name = row['name'] as String;
+      final notNull = row['notnull'] == 1;
+      final primaryKeyOrder = row['pk'] as int;
+      if (notNull == nullableColumns.contains(name) ||
+          primaryKeyOrder != (name == 'id' ? 1 : 0)) {
+        return false;
+      }
+    }
+
+    final foreignKeys = database
+        .select('PRAGMA foreign_key_list("saju_chart_snapshots")')
+        .map(
+          (row) =>
+              '${row['from']}|${row['table']}|${row['to']}|'
+                      '${row['on_update']}|${row['on_delete']}'
+                  .toLowerCase(),
+        )
+        .toSet();
+    final userIndexes = <String, String>{
+      for (final row in database.select(
+        "SELECT name, sql FROM sqlite_master WHERE type = 'index' "
+        "AND tbl_name = 'saju_chart_snapshots' AND sql IS NOT NULL",
+      ))
+        row['name'] as String: _normalizeSchemaSql(row['sql'] as String),
+    };
+    const expectedIndexSql = <String, String>{
+      'saju_snapshots_person_calculated_idx':
+          'CREATE INDEX saju_snapshots_person_calculated_idx '
+          'ON saju_chart_snapshots (person_id, calculated_at_utc_us DESC)',
+      'saju_snapshots_person_group_revision_idx':
+          'CREATE INDEX saju_snapshots_person_group_revision_idx '
+          'ON saju_chart_snapshots '
+          '(person_id, chart_group_id, revision_number DESC)',
+      'saju_snapshots_person_birth_date_idx':
+          'CREATE INDEX saju_snapshots_person_birth_date_idx '
+          'ON saju_chart_snapshots (person_id, converted_solar_date)',
+    };
+    final uniqueContracts = database
+        .select('PRAGMA index_list("saju_chart_snapshots")')
+        .where((row) => row['unique'] == 1 && row['origin'] == 'u')
+        .map((row) {
+          final name = row['name'] as String;
+          final escaped = name.replaceAll('"', '""');
+          return database
+              .select('PRAGMA index_info("$escaped")')
+              .map((column) => column['name'] as String)
+              .join(',');
+        })
+        .toSet();
+
+    return _sameSet(uniqueContracts, const <String>{
+          'chart_group_id,revision_number',
+          'person_id,input_fingerprint_sha256,calculation_signature_sha256',
+        }) &&
+        _inspectSajuCheckContract(database) &&
+        _sameSet(foreignKeys, const <String>{
+          'person_id|persons|id|no action|restrict',
+          'source_birth_profile_id|person_birth_profiles|id|no action|restrict',
+        }) &&
+        _sameSet(userIndexes.keys.toSet(), expectedIndexSql.keys.toSet()) &&
+        expectedIndexSql.entries.every(
+          (entry) =>
+              userIndexes[entry.key] == _normalizeSchemaSql(entry.value),
+        );
+  }
+
+  bool _inspectSajuCheckContract(Database database) {
+    const expectedExpressions = <String>{
+      'hour_unknown IN (0, 1)',
+      'original_lunar_leap_month IN (0, 1)',
+      'yaja_enabled IN (0, 1)',
+      'converted_lunar_leap_month IN (0, 1)',
+      'length(trim(id)) BETWEEN 1 AND 120',
+      'length(trim(person_id)) BETWEEN 1 AND 120',
+      'source_birth_profile_id IS NULL OR length(trim(source_birth_profile_id)) BETWEEN 1 AND 120',
+      'length(trim(chart_group_id)) BETWEEN 1 AND 120',
+      'revision_number >= 1',
+      "revision_reason IN ('initial','inputCorrected','engineUpdated','policyUpdated','calculationErrorCorrected','birthPlaceProfileChanged')",
+      "(revision_number = 1 AND revision_reason = 'initial') OR (revision_number > 1 AND revision_reason != 'initial')",
+      'created_at_utc_us >= 0',
+      'calculated_at_utc_us >= 0',
+      "calendar_type IN ('solar','koreanLunar')",
+      "gender_compatibility_value IN ('male','female','unspecified')",
+      'length(trim(input_local_date)) > 0 AND length(trim(converted_solar_date)) > 0 AND length(trim(converted_lunar_date)) > 0',
+      "(calendar_type = 'solar' AND original_lunar_year IS NULL AND original_lunar_month IS NULL AND original_lunar_day IS NULL AND original_lunar_leap_month IS NULL) OR (calendar_type = 'koreanLunar' AND original_lunar_year IS NOT NULL AND original_lunar_month BETWEEN 1 AND 12 AND original_lunar_day BETWEEN 1 AND 30 AND original_lunar_leap_month IS NOT NULL)",
+      "timezone_id = 'Asia/Seoul'",
+      "birth_place_profile = 'seoulCompatibilityV1'",
+      'yaja_enabled = 0',
+      'utc_offset_at_birth_minutes = 540',
+      '(hour_unknown = 1 AND input_local_time IS NULL AND birth_utc_instant_us IS NULL AND effective_hour_calculation_time IS NULL AND hour_pillar_canonical_id IS NULL AND hour_pillar_cycle_index IS NULL AND hour_pillar_stem_index IS NULL AND hour_pillar_branch_index IS NULL AND hour_pillar_hanja IS NULL AND hour_pillar_korean_label IS NULL) OR (hour_unknown = 0 AND input_local_time IS NOT NULL AND birth_utc_instant_us IS NOT NULL AND effective_hour_calculation_time IS NOT NULL AND hour_pillar_canonical_id IS NOT NULL AND hour_pillar_cycle_index IS NOT NULL AND hour_pillar_stem_index IS NOT NULL AND hour_pillar_branch_index IS NOT NULL AND hour_pillar_hanja IS NOT NULL AND hour_pillar_korean_label IS NOT NULL)',
+      'year_pillar_cycle_index BETWEEN 0 AND 59 AND year_pillar_stem_index = year_pillar_cycle_index % 10 AND year_pillar_branch_index = year_pillar_cycle_index % 12',
+      'month_pillar_cycle_index BETWEEN 0 AND 59 AND month_pillar_stem_index = month_pillar_cycle_index % 10 AND month_pillar_branch_index = month_pillar_cycle_index % 12',
+      'day_pillar_cycle_index BETWEEN 0 AND 59 AND day_pillar_stem_index = day_pillar_cycle_index % 10 AND day_pillar_branch_index = day_pillar_cycle_index % 12',
+      'hour_pillar_cycle_index IS NULL OR (hour_pillar_cycle_index BETWEEN 0 AND 59 AND hour_pillar_stem_index = hour_pillar_cycle_index % 10 AND hour_pillar_branch_index = hour_pillar_cycle_index % 12)',
+      'length(year_pillar_canonical_id) = 13 AND length(year_pillar_hanja) = 2 AND length(year_pillar_korean_label) = 2 AND length(month_pillar_canonical_id) = 13 AND length(month_pillar_hanja) = 2 AND length(month_pillar_korean_label) = 2 AND length(day_pillar_canonical_id) = 13 AND length(day_pillar_hanja) = 2 AND length(day_pillar_korean_label) = 2',
+      'hour_pillar_canonical_id IS NULL OR (length(hour_pillar_canonical_id) = 13 AND length(hour_pillar_hanja) = 2 AND length(hour_pillar_korean_label) = 2)',
+      'length(trim(engine_id)) > 0 AND length(trim(engine_version)) > 0 AND length(trim(policy_id)) > 0 AND length(trim(policy_version)) > 0 AND length(trim(day_rollover_policy)) > 0 AND length(trim(longitude_correction_policy)) > 0 AND length(trim(dst_correction_policy)) > 0 AND length(trim(supported_range_version)) > 0 AND length(trim(solar_term_algorithm_version)) > 0 AND length(trim(lunar_converter_version)) > 0 AND length(trim(day_anchor_version)) > 0 AND length(trim(time_scale_adapter_version)) > 0',
+      'length(warnings_json) >= 2',
+      "length(input_fingerprint_sha256) = 64 AND input_fingerprint_sha256 NOT GLOB '*[^0-9a-f]*'",
+      "length(calculation_signature_sha256) = 64 AND calculation_signature_sha256 NOT GLOB '*[^0-9a-f]*'",
+    };
+    final rows = database.select(
+      "SELECT sql FROM sqlite_master WHERE type = 'table' "
+      "AND name = 'saju_chart_snapshots'",
+    );
+    if (rows.length != 1 || rows.single['sql'] is! String) return false;
+    final actual = _extractCheckExpressions(rows.single['sql'] as String);
+    if (actual == null) return false;
+    final expected = expectedExpressions.map(_normalizeSchemaSql).toSet();
+    return actual.length == expectedExpressions.length &&
+        _sameSet(actual, expected);
+  }
+
+  Set<String>? _extractCheckExpressions(String tableSql) {
+    final result = <String>{};
+    final lower = tableSql.toLowerCase();
+    var cursor = 0;
+    while (true) {
+      final match = RegExp(r'\bcheck\s*\(').firstMatch(lower.substring(cursor));
+      if (match == null) break;
+      final matchStart = cursor + match.start;
+      final open = tableSql.indexOf('(', matchStart);
+      var depth = 0;
+      var quoted = false;
+      var close = -1;
+      for (var index = open; index < tableSql.length; index++) {
+        final character = tableSql[index];
+        if (character == "'") {
+          if (quoted &&
+              index + 1 < tableSql.length &&
+              tableSql[index + 1] == "'") {
+            index += 1;
+            continue;
+          }
+          quoted = !quoted;
+          continue;
+        }
+        if (quoted) continue;
+        if (character == '(') depth += 1;
+        if (character == ')') {
+          depth -= 1;
+          if (depth == 0) {
+            close = index;
+            break;
+          }
+        }
+      }
+      if (close < 0 || quoted) return null;
+      final expression = _normalizeSchemaSql(
+        tableSql.substring(open + 1, close),
+      );
+      if (!result.add(expression)) return null;
+      cursor = close + 1;
+    }
+    return result;
+  }
+
+  String _normalizeSchemaSql(String value) => value
+      .replaceAll('"', '')
+      .replaceAll(RegExp(r'\s+'), '')
+      .toLowerCase();
+
+  bool _inspectSajuInvariants(Database database) {
+    final invalidRelationships = _scalar(database, '''SELECT count(*)
+      FROM saju_chart_snapshots s
+      LEFT JOIN persons p ON p.id = s.person_id
+      LEFT JOIN person_birth_profiles b ON b.id = s.source_birth_profile_id
+      WHERE p.id IS NULL OR
+        (s.source_birth_profile_id IS NOT NULL AND
+          (b.id IS NULL OR b.person_id != s.person_id))''');
+    final invalidRevisionChains = _scalar(database, '''SELECT count(*) FROM (
+      SELECT chart_group_id
+      FROM saju_chart_snapshots
+      GROUP BY chart_group_id
+      HAVING min(revision_number) != 1 OR
+        max(revision_number) != count(*) OR
+        sum(CASE WHEN revision_number = 1 AND revision_reason = 'initial'
+          THEN 0 WHEN revision_number > 1 AND revision_reason != 'initial'
+          THEN 0 ELSE 1 END) != 0
+    )''');
+    final invalidValues = _scalar(database, '''SELECT count(*)
+      FROM saju_chart_snapshots
+      WHERE length(trim(id)) NOT BETWEEN 1 AND 120 OR
+        length(trim(person_id)) NOT BETWEEN 1 AND 120 OR
+        length(trim(chart_group_id)) NOT BETWEEN 1 AND 120 OR
+        revision_number < 1 OR created_at_utc_us < 0 OR
+        calculated_at_utc_us < 0 OR
+        timezone_id != 'Asia/Seoul' OR
+        birth_place_profile != 'seoulCompatibilityV1' OR
+        yaja_enabled != 0 OR
+        calendar_type NOT IN ('solar', 'koreanLunar') OR
+        length(input_fingerprint_sha256) != 64 OR
+        input_fingerprint_sha256 GLOB '*[^0-9a-f]*' OR
+        length(calculation_signature_sha256) != 64 OR
+        calculation_signature_sha256 GLOB '*[^0-9a-f]*' OR
+        (calendar_type = 'solar' AND
+          (original_lunar_year IS NOT NULL OR original_lunar_month IS NOT NULL OR
+           original_lunar_day IS NOT NULL OR original_lunar_leap_month IS NOT NULL)) OR
+        (calendar_type = 'koreanLunar' AND
+          (original_lunar_year IS NULL OR original_lunar_month IS NULL OR
+           original_lunar_day IS NULL OR original_lunar_leap_month IS NULL)) OR
+        (hour_unknown = 1 AND
+          (input_local_time IS NOT NULL OR birth_utc_instant_us IS NOT NULL OR
+           effective_hour_calculation_time IS NOT NULL OR
+           hour_pillar_canonical_id IS NOT NULL OR
+           hour_pillar_cycle_index IS NOT NULL OR
+           hour_pillar_stem_index IS NOT NULL OR
+           hour_pillar_branch_index IS NOT NULL OR
+           hour_pillar_hanja IS NOT NULL OR
+           hour_pillar_korean_label IS NOT NULL)) OR
+        (hour_unknown = 0 AND
+          (input_local_time IS NULL OR birth_utc_instant_us IS NULL OR
+           effective_hour_calculation_time IS NULL OR
+           hour_pillar_canonical_id IS NULL OR
+           hour_pillar_cycle_index IS NULL OR
+           hour_pillar_stem_index IS NULL OR
+           hour_pillar_branch_index IS NULL OR
+           hour_pillar_hanja IS NULL OR
+           hour_pillar_korean_label IS NULL))''');
+    if (invalidRelationships != 0 ||
+        invalidRevisionChains != 0 ||
+        invalidValues != 0) {
+      return false;
+    }
+    try {
+      const mapper = SajuSnapshotPersistenceMapper();
+      for (final row in database.select('SELECT * FROM saju_chart_snapshots')) {
+        mapper.fromRow(_sajuRow(row));
+      }
+      return true;
+    } on Object {
+      return false;
+    }
   }
 
   bool _inspectQigongSchemaContract(Database database) {
@@ -896,6 +1164,88 @@ final class _IndexContract {
   final List<String> columns;
   final bool unique;
   final String? partialSql;
+}
+
+SajuChartSnapshotRow _sajuRow(Row row) {
+  String text(String name) => row[name]! as String;
+  String? nullableText(String name) => row[name] as String?;
+  int integer(String name) => row[name]! as int;
+  int? nullableInteger(String name) => row[name] as int?;
+  bool boolean(String name) => integer(name) != 0;
+  bool? nullableBoolean(String name) {
+    final value = nullableInteger(name);
+    return value == null ? null : value != 0;
+  }
+
+  return SajuChartSnapshotRow(
+    id: text('id'),
+    personId: text('person_id'),
+    sourceBirthProfileId: nullableText('source_birth_profile_id'),
+    chartGroupId: text('chart_group_id'),
+    revisionNumber: integer('revision_number'),
+    revisionReason: text('revision_reason'),
+    createdAtUtcUs: integer('created_at_utc_us'),
+    calculatedAtUtcUs: integer('calculated_at_utc_us'),
+    calendarType: text('calendar_type'),
+    inputLocalDate: text('input_local_date'),
+    inputLocalTime: nullableText('input_local_time'),
+    hourUnknown: boolean('hour_unknown'),
+    genderCompatibilityValue: text('gender_compatibility_value'),
+    originalLunarYear: nullableInteger('original_lunar_year'),
+    originalLunarMonth: nullableInteger('original_lunar_month'),
+    originalLunarDay: nullableInteger('original_lunar_day'),
+    originalLunarLeapMonth: nullableBoolean('original_lunar_leap_month'),
+    timezoneId: text('timezone_id'),
+    birthPlaceProfile: text('birth_place_profile'),
+    yajaEnabled: boolean('yaja_enabled'),
+    convertedSolarDate: text('converted_solar_date'),
+    convertedLunarDate: text('converted_lunar_date'),
+    convertedLunarLeapMonth: boolean('converted_lunar_leap_month'),
+    birthUtcInstantUs: nullableInteger('birth_utc_instant_us'),
+    utcOffsetAtBirthMinutes: integer('utc_offset_at_birth_minutes'),
+    effectiveHourCalculationTime: nullableText(
+      'effective_hour_calculation_time',
+    ),
+    yearPillarCanonicalId: text('year_pillar_canonical_id'),
+    yearPillarCycleIndex: integer('year_pillar_cycle_index'),
+    yearPillarStemIndex: integer('year_pillar_stem_index'),
+    yearPillarBranchIndex: integer('year_pillar_branch_index'),
+    yearPillarHanja: text('year_pillar_hanja'),
+    yearPillarKoreanLabel: text('year_pillar_korean_label'),
+    monthPillarCanonicalId: text('month_pillar_canonical_id'),
+    monthPillarCycleIndex: integer('month_pillar_cycle_index'),
+    monthPillarStemIndex: integer('month_pillar_stem_index'),
+    monthPillarBranchIndex: integer('month_pillar_branch_index'),
+    monthPillarHanja: text('month_pillar_hanja'),
+    monthPillarKoreanLabel: text('month_pillar_korean_label'),
+    dayPillarCanonicalId: text('day_pillar_canonical_id'),
+    dayPillarCycleIndex: integer('day_pillar_cycle_index'),
+    dayPillarStemIndex: integer('day_pillar_stem_index'),
+    dayPillarBranchIndex: integer('day_pillar_branch_index'),
+    dayPillarHanja: text('day_pillar_hanja'),
+    dayPillarKoreanLabel: text('day_pillar_korean_label'),
+    hourPillarCanonicalId: nullableText('hour_pillar_canonical_id'),
+    hourPillarCycleIndex: nullableInteger('hour_pillar_cycle_index'),
+    hourPillarStemIndex: nullableInteger('hour_pillar_stem_index'),
+    hourPillarBranchIndex: nullableInteger('hour_pillar_branch_index'),
+    hourPillarHanja: nullableText('hour_pillar_hanja'),
+    hourPillarKoreanLabel: nullableText('hour_pillar_korean_label'),
+    engineId: text('engine_id'),
+    engineVersion: text('engine_version'),
+    policyId: text('policy_id'),
+    policyVersion: text('policy_version'),
+    dayRolloverPolicy: text('day_rollover_policy'),
+    longitudeCorrectionPolicy: text('longitude_correction_policy'),
+    dstCorrectionPolicy: text('dst_correction_policy'),
+    supportedRangeVersion: text('supported_range_version'),
+    solarTermAlgorithmVersion: text('solar_term_algorithm_version'),
+    lunarConverterVersion: text('lunar_converter_version'),
+    dayAnchorVersion: text('day_anchor_version'),
+    timeScaleAdapterVersion: text('time_scale_adapter_version'),
+    warningsJson: text('warnings_json'),
+    inputFingerprintSha256: text('input_fingerprint_sha256'),
+    calculationSignatureSha256: text('calculation_signature_sha256'),
+  );
 }
 
 final class TarotDatabaseEvidence {

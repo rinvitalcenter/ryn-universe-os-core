@@ -1,7 +1,13 @@
 import 'dart:io';
 
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
+import 'package:ryn_universe_os_core/core/persistence/app_database.dart';
+import 'package:ryn_universe_os_core/features/saju/data/persistence/drift_saju_snapshot_repository.dart';
+import 'package:ryn_universe_os_core/features/saju/domain/saju_calculation_engine.dart';
+import 'package:ryn_universe_os_core/features/saju/domain/saju_models.dart';
+import 'package:ryn_universe_os_core/features/saju/domain/saju_snapshot_repository.dart';
 import 'package:ryn_universe_os_core/features/tarot/backup_recovery/application/tarot_backup_snapshot_coordinator.dart';
 import 'package:ryn_universe_os_core/features/tarot/backup_recovery/application/tarot_restore_coordinator.dart';
 import 'package:ryn_universe_os_core/features/tarot/backup_recovery/domain/tarot_restore_operation_marker.dart';
@@ -27,11 +33,14 @@ void main() {
 
   Future<_RestoreSetup> createSetup({
     bool mutateLiveAfterCandidate = true,
-    int schemaVersion = 10,
+    int schemaVersion = 11,
     bool linkReadingToPerson = false,
+    bool withSaju = false,
+    bool addSajuRevisionAfterCandidate = false,
     Future<bool> Function(String)? inspectPath,
   }) async {
     fixture = await TarotBackupRecoveryFixture.create();
+    if (withSaju) await _saveSajuInitial(fixture!.sourceFile);
     if (linkReadingToPerson) {
       final database = fixture!.openSource();
       fixture!.insertSyntheticPersonCore(database);
@@ -43,6 +52,9 @@ void main() {
     final package = await fixture!.createRestoreCandidate(
       schemaVersion: schemaVersion,
     );
+    if (addSajuRevisionAfterCandidate) {
+      await _saveSajuRevision(fixture!.sourceFile);
+    }
     if (mutateLiveAfterCandidate) {
       final database = fixture!.openSource();
       fixture!.insertValidReading(database, id: 'synthetic-r2');
@@ -103,7 +115,36 @@ void main() {
     expect(setup.lifecycle.validateCount, 1);
   });
 
-  for (final sourceSchemaVersion in <int>[6, 7, 8, 9]) {
+  test('schema v11 direct restore preserves Saju rows', () async {
+    final setup = await createSetup(
+      mutateLiveAfterCandidate: false,
+      withSaju: true,
+    );
+    final live = sqlite3.open(fixture!.sourceFile.path);
+    live.execute('DELETE FROM saju_chart_snapshots');
+    live.close();
+
+    final result = await restore(setup);
+
+    expect(result.status, TarotRestoreOperationStatus.succeeded);
+    expect(_sajuRevisions(fixture!.sourceFile), <int>[1]);
+  });
+
+  test('failed v11 restore rolls back the Saju revision chain', () async {
+    final setup = await createSetup(
+      mutateLiveAfterCandidate: false,
+      withSaju: true,
+      addSajuRevisionAfterCandidate: true,
+    );
+    setup.lifecycle.failNextValidation = true;
+
+    final result = await restore(setup);
+
+    expect(result.status, TarotRestoreOperationStatus.failedRolledBack);
+    expect(_sajuRevisions(fixture!.sourceFile), <int>[1, 2]);
+  });
+
+  for (final sourceSchemaVersion in <int>[6, 7, 8, 9, 10]) {
     test(
       'schema v$sourceSchemaVersion migrates with historical empty invariants',
       () async {
@@ -120,7 +161,7 @@ void main() {
           mode: OpenMode.readOnly,
         );
         try {
-          expect(database.userVersion, 10);
+          expect(database.userVersion, 11);
           expect(_tableCount(database, 'tarot_readings'), 1);
           final reading = database
               .select(
@@ -201,6 +242,7 @@ void main() {
           ]) {
             expect(_tableCount(database, table), 0, reason: table);
           }
+          expect(_tableCount(database, 'saju_chart_snapshots'), 0);
         } finally {
           database.close();
         }
@@ -502,6 +544,73 @@ void main() {
       isNot(contains('rinvitalcenter')),
     );
   });
+}
+
+Future<void> _saveSajuInitial(File databaseFile) async {
+  final database = RynAppDatabase(NativeDatabase(databaseFile));
+  try {
+    await database.customSelect('SELECT 1').getSingle();
+    await database.customStatement(
+      "INSERT OR IGNORE INTO persons (id, display_name, status, created_at_utc_us, updated_at_utc_us) VALUES ('person.saju.restore', '합성 사주 인물', 'active', 1, 1)",
+    );
+    final result = await DriftSajuSnapshotRepository(database)
+        .saveInitialSnapshot(
+          snapshotId: 'snapshot.restore.1',
+          personId: 'person.saju.restore',
+          chartGroupId: 'chart.restore',
+          snapshot: _sajuCalculation(10),
+          createdAtUtcUs: 0,
+        );
+    if (!result.isSuccess) throw StateError(result.failure!.safeMessage);
+  } finally {
+    await database.close();
+  }
+}
+
+Future<void> _saveSajuRevision(File databaseFile) async {
+  final database = RynAppDatabase(NativeDatabase(databaseFile));
+  try {
+    await database.customSelect('SELECT 1').getSingle();
+    final result = await DriftSajuSnapshotRepository(database).createRevision(
+      snapshotId: 'snapshot.restore.2',
+      personId: 'person.saju.restore',
+      chartGroupId: 'chart.restore',
+      expectedCurrentRevisionNumber: 1,
+      revisionReason: SajuRevisionReason.inputCorrected,
+      snapshot: _sajuCalculation(11),
+      createdAtUtcUs: 1,
+    );
+    if (!result.isSuccess) throw StateError(result.failure!.safeMessage);
+  } finally {
+    await database.close();
+  }
+}
+
+SajuChartSnapshot _sajuCalculation(int day) =>
+    SajuCalculationEngine.production(
+      utcNow: () => DateTime.utc(2026, 7, 31),
+    ).calculate(
+      SajuBirthInput.solar(
+        date: SajuLocalDate(2024, 2, day),
+        time: const SajuLocalTime(10, 0),
+        gender: SajuGender.female,
+      ),
+      calculatedAt: DateTime.utc(2026, 7, 31),
+    );
+
+List<int> _sajuRevisions(File databaseFile) {
+  final database = sqlite3.open(databaseFile.path, mode: OpenMode.readOnly);
+  try {
+    return database
+        .select(
+          'SELECT revision_number FROM saju_chart_snapshots '
+          'ORDER BY revision_number',
+        )
+        .map((row) => row['revision_number']! as int)
+        .toList(growable: false);
+  } finally {
+    database.close();
+  }
 }
 
 final class _RestoreSetup {

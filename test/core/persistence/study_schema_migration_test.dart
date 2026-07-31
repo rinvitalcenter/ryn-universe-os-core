@@ -7,12 +7,12 @@ import 'package:ryn_universe_os_core/core/persistence/migrations.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 void main() {
-  test('fresh v10 database retains exact Study relation foundation', () async {
+  test('fresh v11 database retains exact Study relation foundation', () async {
     final database = RynAppDatabase(NativeDatabase.memory());
     addTearDown(database.close);
 
-    expect(database.schemaVersion, 10);
-    expect(plannedCurrentSchemaVersion, 10);
+    expect(database.schemaVersion, 11);
+    expect(plannedCurrentSchemaVersion, 11);
     final tables = await _tableNames(database);
     expect(
       tables,
@@ -46,7 +46,7 @@ void main() {
   });
 
   test(
-    'file-backed v8 to v10 preserves rows and fabricates no domain rows',
+    'file-backed v8 to v11 preserves rows and fabricates no domain rows',
     () async {
       final root = await Directory.systemTemp.createTemp('ryn-study-v8-v9-');
       addTearDown(() async {
@@ -75,6 +75,7 @@ void main() {
       raw.execute('DROP TABLE study_session_participants');
       raw.execute('DROP TABLE study_materials');
       raw.execute('DROP TABLE study_sessions');
+      raw.execute('DROP TABLE saju_chart_snapshots');
       raw.userVersion = 8;
       raw.close();
 
@@ -87,7 +88,7 @@ void main() {
       expect(
         (await database.customSelect('PRAGMA user_version').getSingle())
             .read<int>('user_version'),
-        10,
+        11,
       );
       expect(
         await database.customSelect('PRAGMA foreign_key_check').get(),

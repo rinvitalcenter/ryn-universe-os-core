@@ -278,15 +278,18 @@ final class TarotBackupRecoveryFixture {
         'unsupported synthetic fixture schema',
       );
     }
-    if (schemaVersion < 10) {
+    if (schemaVersion < 11) {
       final legacy = sqlite3.open(snapshot.path);
-      legacy.execute('DROP TABLE qigong_publications');
-      legacy.execute('DROP TABLE qigong_post_tags');
-      legacy.execute('DROP TABLE qigong_tags');
-      legacy.execute('DROP TABLE qigong_post_media');
-      legacy.execute('DROP TABLE qigong_post_blocks');
-      legacy.execute('DROP TABLE qigong_posts');
-      legacy.execute('DROP TABLE qigong_media_assets');
+      legacy.execute('DROP TABLE saju_chart_snapshots');
+      if (schemaVersion < 10) {
+        legacy.execute('DROP TABLE qigong_publications');
+        legacy.execute('DROP TABLE qigong_post_tags');
+        legacy.execute('DROP TABLE qigong_tags');
+        legacy.execute('DROP TABLE qigong_post_media');
+        legacy.execute('DROP TABLE qigong_post_blocks');
+        legacy.execute('DROP TABLE qigong_posts');
+        legacy.execute('DROP TABLE qigong_media_assets');
+      }
       if (schemaVersion < 9) {
         legacy.execute('DROP TABLE study_session_materials');
         legacy.execute('DROP TABLE study_session_participants');

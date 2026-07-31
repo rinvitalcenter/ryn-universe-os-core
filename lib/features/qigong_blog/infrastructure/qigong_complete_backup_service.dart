@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqlite3/sqlite3.dart';
 
 import '../../../core/backup_recovery/sha256_digest_service.dart';
+import '../../../core/persistence/app_database.dart';
 import '../application/qigong_complete_restore_coordinator.dart';
 import '../../tarot/backup_recovery/domain/tarot_backup_manifest.dart';
 import '../../tarot/backup_recovery/infrastructure/tarot_backup_database_inspector.dart';
@@ -172,11 +174,16 @@ final class QigongCompleteBackupService {
         throw const QigongBackupException('manifest_noncanonical');
       }
       final manifest = decoded;
+      final manifestSchemaVersion = manifest['schemaVersion'];
       if (manifest['backupFormatVersion'] != 1 ||
           manifest['applicationIdentity'] !=
               TarotBackupManifest.applicationIdentity ||
           manifest['contentScope'] != 'qigong_complete_document_media_v1' ||
-          manifest['schemaVersion'] != TarotBackupManifest.schemaVersion ||
+          manifestSchemaVersion is! int ||
+          !const <int>{
+            TarotBackupManifest.schemaVersionV10,
+            TarotBackupManifest.schemaVersion,
+          }.contains(manifestSchemaVersion) ||
           manifest['databaseRelativePath'] != _databaseRelativePath ||
           manifest['checksumRelativePath'] != _checksumRelativePath) {
         throw const QigongBackupException('manifest_contract_mismatch');
@@ -200,7 +207,11 @@ final class QigongCompleteBackupService {
         snapshot.path,
         policy: TarotDatabaseInspectionPolicy.immutableReadOnlyFrozenTarget,
         requireAcceptableSidecars: true,
+        acceptedSchemaVersions: <int>{manifestSchemaVersion},
       );
+      if (evidence.schemaVersion != manifestSchemaVersion) {
+        throw const QigongBackupException('manifest_database_schema_mismatch');
+      }
       final manifestEntries = _manifestEntries(manifest['media']);
       final databaseEntries = await _databaseMediaEntries(snapshot);
       if (!_sameMediaEntries(manifestEntries, databaseEntries)) {
@@ -239,7 +250,7 @@ final class QigongCompleteBackupService {
     required Directory package,
     required Directory stagedRoot,
   }) async {
-    await validateBackup(package);
+    final sourceEvidence = await validateBackup(package);
     try {
       if (await stagedRoot.exists()) {
         throw const QigongBackupException('restore_stage_collision');
@@ -268,6 +279,13 @@ final class QigongCompleteBackupService {
       await Directory(
         p.join(stagedRoot.path, 'qigong_media'),
       ).create(recursive: true);
+      if (sourceEvidence.schemaVersion < TarotBackupManifest.schemaVersion) {
+        await _migrateStagedDatabase(
+          sourceDatabase: packageDatabase,
+          stagedDatabase: stageDatabase,
+          sourceSchemaVersion: sourceEvidence.schemaVersion,
+        );
+      }
       await validateDatabaseMediaPair(
         databaseFile: stageDatabase,
         pairRoot: stagedRoot,
@@ -284,14 +302,24 @@ final class QigongCompleteBackupService {
   Future<QigongBackupEvidence> validateDatabaseMediaPair({
     required File databaseFile,
     required Directory pairRoot,
+    int expectedSchemaVersion = TarotBackupManifest.schemaVersion,
   }) async {
     try {
+      if (!const <int>{
+        TarotBackupManifest.schemaVersionV10,
+        TarotBackupManifest.schemaVersion,
+      }.contains(expectedSchemaVersion)) {
+        throw const QigongBackupException('unsupported_schema_version');
+      }
       await _requireRegularFile(
         databaseFile,
         missingCode: 'database_payload_missing',
       );
-      final evidence = databaseInspector.inspectVerified(databaseFile.path);
-      if (evidence.schemaVersion != TarotBackupManifest.schemaVersion) {
+      final evidence = databaseInspector.inspectVerified(
+        databaseFile.path,
+        acceptedSchemaVersions: <int>{expectedSchemaVersion},
+      );
+      if (evidence.schemaVersion != expectedSchemaVersion) {
         throw const QigongBackupException('unsupported_schema_version');
       }
       final entries = await _databaseMediaEntries(databaseFile);
@@ -340,6 +368,48 @@ final class QigongCompleteBackupService {
       rethrow;
     } on Object {
       throw const QigongBackupException('database_media_validation_failed');
+    }
+  }
+
+  Future<void> _migrateStagedDatabase({
+    required File sourceDatabase,
+    required File stagedDatabase,
+    required int sourceSchemaVersion,
+  }) async {
+    if (sourceSchemaVersion != TarotBackupManifest.schemaVersionV10) {
+      throw const QigongBackupException('unsupported_schema_version');
+    }
+    final before = databaseInspector.inspectVerified(
+      sourceDatabase.path,
+      policy: TarotDatabaseInspectionPolicy.immutableReadOnlyFrozenTarget,
+      requireAcceptableSidecars: true,
+      acceptedSchemaVersions: <int>{sourceSchemaVersion},
+    );
+    final mediaBefore = await _databaseMediaEntries(sourceDatabase);
+    final database = RynAppDatabase(NativeDatabase(stagedDatabase));
+    try {
+      await database.customSelect('SELECT 1').get();
+    } finally {
+      await database.close();
+    }
+    final after = databaseInspector.inspectVerified(
+      stagedDatabase.path,
+      policy: TarotDatabaseInspectionPolicy.immutableReadOnlyFrozenTarget,
+      requireAcceptableSidecars: true,
+    );
+    for (final table in TarotBackupManifest.requiredTablesFor(
+      sourceSchemaVersion,
+    )) {
+      if (before.tableRowCounts[table] != after.tableRowCounts[table]) {
+        throw const QigongBackupException('staged_migration_row_mismatch');
+      }
+    }
+    if ((after.tableRowCounts['saju_chart_snapshots'] ?? -1) != 0) {
+      throw const QigongBackupException('staged_migration_saju_not_empty');
+    }
+    final mediaAfter = await _databaseMediaEntries(stagedDatabase);
+    if (!_sameMediaEntries(mediaBefore, mediaAfter)) {
+      throw const QigongBackupException('staged_migration_media_mismatch');
     }
   }
 
@@ -646,7 +716,7 @@ final class _OfflineQigongRestoreLifecycle
   Future<void> validateBasicRead() async {
     final database = sqlite3.open(databaseFile.path, mode: OpenMode.readOnly);
     try {
-      if (database.userVersion != 10 ||
+      if (database.userVersion != TarotBackupManifest.schemaVersion ||
           database.select('SELECT 1').single.values.single != 1) {
         throw const QigongBackupException('database_validation_failed');
       }

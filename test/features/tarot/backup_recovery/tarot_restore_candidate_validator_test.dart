@@ -66,7 +66,7 @@ void main() {
     expect(result.snapshotSizeBytes, greaterThan(0));
   });
 
-  for (final schemaVersion in <int>[6, 7, 8, 9]) {
+  for (final schemaVersion in <int>[6, 7, 8, 9, 10]) {
     test(
       'valid schema v$schemaVersion candidate is accepted for staging',
       () async {
@@ -89,9 +89,9 @@ void main() {
     await expectFailure(package, 'unsupported_schema_version');
   });
 
-  test('schema v11 is rejected before snapshot inspection', () async {
+  test('schema v12 is rejected before snapshot inspection', () async {
     final package = await candidate();
-    await _changeManifestField(package, 'schemaVersion', 11);
+    await _changeManifestField(package, 'schemaVersion', 12);
 
     await expectFailure(package, 'unsupported_future_schema');
   });
@@ -334,6 +334,92 @@ void main() {
     await expectFailure(package, 'snapshot_invalid');
   });
 
+  final sajuPhysicalContractMutations = <String, String Function(String)>{
+    'primary key': (sql) => _replaceSchemaToken(
+      sql,
+      RegExp(r'PRIMARY KEY\s*\(\s*"id"\s*\)', caseSensitive: false),
+      'CHECK (1 = 1)',
+    ),
+    'revision unique': (sql) => _replaceSchemaToken(
+      sql,
+      RegExp(
+        r'UNIQUE\s*\(\s*"chart_group_id"\s*,\s*"revision_number"\s*\)',
+        caseSensitive: false,
+      ),
+      'CHECK (1 = 1)',
+    ),
+    'duplicate fingerprint unique': (sql) => _replaceSchemaToken(
+      sql,
+      RegExp(
+        r'UNIQUE\s*\(\s*"person_id"\s*,\s*"input_fingerprint_sha256"\s*,\s*"calculation_signature_sha256"\s*\)',
+        caseSensitive: false,
+      ),
+      'CHECK (1 = 1)',
+    ),
+    'required nullability': (sql) => _replaceSchemaToken(
+      sql,
+      RegExp(r'"engine_id"\s+TEXT\s+NOT NULL', caseSensitive: false),
+      '"engine_id" TEXT',
+    ),
+    'nullable nullability': (sql) => _replaceSchemaToken(
+      sql,
+      RegExp(
+        r'"source_birth_profile_id"\s+TEXT\s+NULL',
+        caseSensitive: false,
+      ),
+      '"source_birth_profile_id" TEXT NOT NULL',
+    ),
+    'timestamp check': (sql) => _replaceSchemaToken(
+      sql,
+      RegExp(
+        r'CHECK\s*\(\s*created_at_utc_us\s*>=\s*0\s*\)',
+        caseSensitive: false,
+      ),
+      'CHECK (1 = 1)',
+    ),
+  };
+  for (final mutation in sajuPhysicalContractMutations.entries) {
+    test('v11 Saju physical ${mutation.key} loss is rejected', () async {
+      final package = await candidate();
+      await _mutateSnapshot(
+        package,
+        (database) => _rebuildSajuTable(database, mutation.value),
+      );
+      await fixture.refreshRestoreCandidateIntegrity(package);
+
+      await expectFailure(package, 'snapshot_invalid');
+    });
+  }
+
+  test('v11 Saju unapproved named index is rejected', () async {
+    final package = await candidate();
+    await _mutateSnapshot(
+      package,
+      (database) => database.execute(
+        'CREATE INDEX arbitrary_saju_source_profile_idx '
+        'ON saju_chart_snapshots (source_birth_profile_id)',
+      ),
+    );
+    await fixture.refreshRestoreCandidateIntegrity(package);
+
+    await expectFailure(package, 'snapshot_invalid');
+  });
+
+  test('v11 Saju approved index with partial SQL is rejected', () async {
+    final package = await candidate();
+    await _mutateSnapshot(package, (database) {
+      database.execute('DROP INDEX saju_snapshots_person_birth_date_idx');
+      database.execute(
+        'CREATE INDEX saju_snapshots_person_birth_date_idx '
+        'ON saju_chart_snapshots (person_id, converted_solar_date) '
+        'WHERE source_birth_profile_id IS NOT NULL',
+      );
+    });
+    await fixture.refreshRestoreCandidateIntegrity(package);
+
+    await expectFailure(package, 'snapshot_invalid');
+  });
+
   test('candidate root symlink junction or reparse evidence fails', () async {
     final package = await candidate();
     await expectFailure(
@@ -417,6 +503,46 @@ Future<void> _mutateSnapshot(
   } finally {
     database.close();
   }
+}
+
+void _rebuildSajuTable(
+  Database database,
+  String Function(String sql) mutate,
+) {
+  final tableSql = database
+      .select(
+        "SELECT sql FROM sqlite_master WHERE type = 'table' "
+        "AND name = 'saju_chart_snapshots'",
+      )
+      .single['sql'] as String;
+  final namedIndexSql = database
+      .select(
+        "SELECT sql FROM sqlite_master WHERE type = 'index' "
+        "AND name LIKE 'saju_snapshots_%' ORDER BY name",
+      )
+      .map((row) => row['sql'] as String)
+      .toList(growable: false);
+  final replacementSql = mutate(tableSql);
+  if (replacementSql == tableSql) {
+    throw StateError('synthetic Saju schema mutation did not match');
+  }
+  database.execute('PRAGMA foreign_keys = OFF');
+  database.execute('DROP TABLE saju_chart_snapshots');
+  database.execute(replacementSql);
+  for (final sql in namedIndexSql) {
+    database.execute(sql);
+  }
+}
+
+String _replaceSchemaToken(
+  String sql,
+  RegExp token,
+  String replacement,
+) {
+  if (!token.hasMatch(sql)) {
+    throw StateError('synthetic Saju schema token not found: $token');
+  }
+  return sql.replaceFirst(token, replacement);
 }
 
 Future<Map<String, List<int>>> _treeBytes(Directory root) async {

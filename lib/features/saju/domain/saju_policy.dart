@@ -6,6 +6,7 @@ abstract final class CheonEulGwiInModernKstPolicy {
   static const policyId = 'cheonEulGwiInModernKstV1';
   static const policyVersion = '1.0.0';
   static const timezoneId = 'Asia/Seoul';
+  static const birthPlaceProfile = 'seoulCompatibilityV1';
   static const utcOffsetMinutes = 540;
   static const supportedRangeVersion = 'modern-seoul-1990-2050-v1';
   static const dayRolloverPolicy = 'pendingCheonEulCapture';

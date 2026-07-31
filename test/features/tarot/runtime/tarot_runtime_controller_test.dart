@@ -37,7 +37,7 @@ void main() {
     });
 
     test(
-      'first run creates one shared version-ten development database',
+      'first run creates one shared version-eleven development database',
       () async {
         final controller = TarotRuntimeController.development(
           pathContract: paths,
@@ -59,7 +59,7 @@ void main() {
           development.databasePath,
           mode: OpenMode.readOnly,
         );
-        expect(check.userVersion, 10);
+        expect(check.userVersion, 11);
         check.close();
         await controller.close();
       },
@@ -113,8 +113,8 @@ void main() {
         candidatePackageIdentitySha256: 'a' * 64,
         stagedDirectoryName: 'staged',
         rollbackDirectoryName: 'rollback',
-        sourceSchemaVersion: 10,
-        expectedTargetSchemaVersion: 10,
+        sourceSchemaVersion: 11,
+        expectedTargetSchemaVersion: 11,
         lastCompletedStep: QigongCompleteRestorePhase.prepared.name,
         originalMediaDirectoryPresent: true,
       );

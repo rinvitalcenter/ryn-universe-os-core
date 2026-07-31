@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
+import '../../tarot/backup_recovery/domain/tarot_backup_manifest.dart';
 import '../domain/qigong_complete_restore_operation_marker.dart';
 import '../infrastructure/qigong_complete_backup_service.dart';
 
@@ -102,7 +103,10 @@ final class QigongCompleteRestoreCoordinator {
         throw const QigongBackupException('restore_operation_collision');
       }
       final evidence = await backupService.validateBackup(candidatePackage);
-      if (evidence.schemaVersion != 10) {
+      if (!const <int>{
+        TarotBackupManifest.schemaVersionV10,
+        TarotBackupManifest.schemaVersion,
+      }.contains(evidence.schemaVersion)) {
         throw const QigongBackupException('unsupported_schema_version');
       }
       final identity = await backupService.packageIdentitySha256(
@@ -120,7 +124,7 @@ final class QigongCompleteRestoreCoordinator {
         stagedDirectoryName: 'staged',
         rollbackDirectoryName: 'rollback',
         sourceSchemaVersion: evidence.schemaVersion,
-        expectedTargetSchemaVersion: 10,
+        expectedTargetSchemaVersion: TarotBackupManifest.schemaVersion,
         lastCompletedStep: QigongCompleteRestorePhase.prepared.name,
         originalMediaDirectoryPresent: backupService.liveMediaDirectory
             .existsSync(),

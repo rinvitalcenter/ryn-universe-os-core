@@ -18,13 +18,13 @@ void main() {
   };
 
   test(
-    'fresh schema 10 creates exact Qigong document and media foundation',
+    'fresh schema 11 preserves exact Qigong document and media foundation',
     () async {
       final database = RynAppDatabase(NativeDatabase.memory());
       addTearDown(database.close);
 
-      expect(database.schemaVersion, 10);
-      expect(plannedCurrentSchemaVersion, 10);
+      expect(database.schemaVersion, 11);
+      expect(plannedCurrentSchemaVersion, 11);
       expect(await _tableNames(database), containsAll(qigongTables));
       expect(
         await database.customSelect('PRAGMA foreign_key_check').get(),
@@ -33,8 +33,8 @@ void main() {
     },
   );
 
-  test('file-backed schema 9 to 10 preserves Person Tarot and Study rows', () async {
-    final root = await Directory.systemTemp.createTemp('ryn-qigong-v9-v10-');
+  test('file-backed schema 9 to 11 preserves Person Tarot and Study rows', () async {
+    final root = await Directory.systemTemp.createTemp('ryn-qigong-v9-v11-');
     addTearDown(() async {
       if (root.existsSync()) await root.delete(recursive: true);
     });
@@ -66,6 +66,7 @@ void main() {
     for (final table in qigongTables) {
       raw.execute('DROP TABLE $table');
     }
+    raw.execute('DROP TABLE saju_chart_snapshots');
     raw.userVersion = 9;
     raw.close();
 
@@ -107,7 +108,7 @@ void main() {
     expect(
       (await database.customSelect('PRAGMA user_version').getSingle())
           .read<int>('user_version'),
-      10,
+      11,
     );
     expect(
       await database.customSelect('PRAGMA foreign_key_check').get(),

@@ -21,9 +21,16 @@ final class SajuChartSnapshot {
     required this.lunarConverterVersion,
     required this.dayAnchorVersion,
     required this.timeScaleAdapterVersion,
+    required this.originalInputDate,
+    required this.inputLocalTime,
+    required this.gender,
+    required this.birthPlaceProfile,
     required this.inputLocalDateTime,
     required this.utcOffsetAtBirthMinutes,
     required this.convertedSolarDate,
+    required this.convertedLunarDate,
+    required this.birthUtcInstant,
+    required this.effectiveHourCalculationTime,
     required this.originalLunarDate,
     required this.hourUnknown,
     required this.yearPillar,
@@ -51,9 +58,17 @@ final class SajuChartSnapshot {
   final String lunarConverterVersion;
   final String dayAnchorVersion;
   final String timeScaleAdapterVersion;
+  final String originalInputDate;
+  final SajuLocalTime? inputLocalTime;
+  final SajuGender gender;
+  final String birthPlaceProfile;
   final String inputLocalDateTime;
   final int utcOffsetAtBirthMinutes;
   final SajuLocalDate convertedSolarDate;
+  final KoreanLunarDate convertedLunarDate;
+  bool get convertedLunarLeapMonth => convertedLunarDate.isLeapMonth;
+  final DateTime? birthUtcInstant;
+  final DateTime? effectiveHourCalculationTime;
   final KoreanLunarDate? originalLunarDate;
   final bool hourUnknown;
   final SexagenaryEntry yearPillar;
@@ -80,9 +95,17 @@ final class SajuChartSnapshot {
     'lunarConverterVersion': lunarConverterVersion,
     'dayAnchorVersion': dayAnchorVersion,
     'timeScaleAdapterVersion': timeScaleAdapterVersion,
+    'originalInputDate': originalInputDate,
+    'inputLocalTime': inputLocalTime?.toJson(),
+    'gender': gender.name,
+    'birthPlaceProfile': birthPlaceProfile,
     'inputLocalDateTime': inputLocalDateTime,
     'utcOffsetAtBirthMinutes': utcOffsetAtBirthMinutes,
     'convertedSolarDate': convertedSolarDate.toJson(),
+    'convertedLunarDate': convertedLunarDate.toJson(),
+    'birthUtcInstant': birthUtcInstant?.toIso8601String(),
+    'effectiveHourCalculationTime':
+        effectiveHourCalculationTime?.toIso8601String(),
     'originalLunarDate': originalLunarDate?.toJson(),
     'hourUnknown': hourUnknown,
     'yearPillar': yearPillar.toJson(),

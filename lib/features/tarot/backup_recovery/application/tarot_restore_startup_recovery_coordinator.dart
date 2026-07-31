@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 
+import '../domain/tarot_backup_manifest.dart';
 import '../domain/tarot_restore_operation_marker.dart';
 import '../infrastructure/tarot_backup_database_inspector.dart';
 import '../infrastructure/tarot_backup_path_contract.dart';
@@ -227,7 +228,13 @@ final class TarotRestoreStartupRecoveryCoordinator {
     ResolvedBackupRecoveryPaths paths,
   ) async {
     try {
-      databaseInspector.inspectVerified(liveFile.path);
+      databaseInspector.inspectVerified(
+        liveFile.path,
+        acceptedSchemaVersions: const <int>{
+          TarotBackupManifest.schemaVersionV10,
+          TarotBackupManifest.schemaVersion,
+        },
+      );
       await _deleteExternalStaging(liveFile, marker.operationId, paths);
       await _deleteOperationDirectory(operationDirectory, paths);
       return const TarotRestoreStartupRecoveryResult(

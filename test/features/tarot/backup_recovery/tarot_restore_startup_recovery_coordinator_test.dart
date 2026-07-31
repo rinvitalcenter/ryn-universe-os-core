@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
+import 'package:ryn_universe_os_core/core/persistence/app_database.dart';
 import 'package:ryn_universe_os_core/core/persistence/runtime_data_profile.dart';
 import 'package:ryn_universe_os_core/features/tarot/application/tarot_runtime_controller.dart';
 import 'package:ryn_universe_os_core/features/tarot/backup_recovery/application/tarot_restore_coordinator.dart';
 import 'package:ryn_universe_os_core/features/tarot/backup_recovery/application/tarot_restore_startup_recovery_coordinator.dart';
+import 'package:ryn_universe_os_core/features/tarot/backup_recovery/domain/tarot_backup_manifest.dart';
 import 'package:ryn_universe_os_core/features/tarot/backup_recovery/domain/tarot_restore_operation_marker.dart';
 import 'package:ryn_universe_os_core/features/tarot/backup_recovery/infrastructure/tarot_backup_path_contract.dart';
 import 'package:ryn_universe_os_core/features/tarot/backup_recovery/infrastructure/tarot_restore_candidate_validator.dart';
@@ -25,10 +28,13 @@ void main() {
     fixture = null;
   });
 
-  Future<_RecoverySetup> createSetup() async {
+  Future<_RecoverySetup> createSetup({
+    int candidateSchemaVersion = TarotBackupManifest.schemaVersion,
+  }) async {
     fixture = await TarotBackupRecoveryFixture.create();
     final candidate = await fixture!.createRestoreCandidate(
       operationId: 'a1b2c3d4',
+      schemaVersion: candidateSchemaVersion,
     );
     final database = fixture!.openSource();
     fixture!.insertValidReading(database, id: 'synthetic-r2');
@@ -157,6 +163,42 @@ void main() {
     expect(value.operationDirectory.existsSync(), isFalse);
     expect(value.safety.existsSync(), isTrue);
   });
+
+  test(
+    'historical v10 replacementVerified is kept for normal startup migration',
+    () async {
+      final value = await createSetup(
+        candidateSchemaVersion: TarotBackupManifest.schemaVersionV10,
+      );
+      await _preserveOriginal(value);
+      await _installCandidate(value);
+      await writeMarker(value, TarotRestoreMarkerStage.replacementVerified);
+      expect(
+        _schemaVersion(fixture!.sourceFile),
+        TarotBackupManifest.schemaVersionV10,
+      );
+
+      final result = await recover(value);
+
+      expect(result.status, TarotRestoreStartupRecoveryStatus.replacementKept);
+      expect(value.operationDirectory.existsSync(), isFalse);
+      expect(
+        _schemaVersion(fixture!.sourceFile),
+        TarotBackupManifest.schemaVersionV10,
+      );
+
+      final appDatabase = RynAppDatabase(NativeDatabase(fixture!.sourceFile));
+      try {
+        await appDatabase.customSelect('SELECT 1').get();
+      } finally {
+        await appDatabase.close();
+      }
+      expect(
+        _schemaVersion(fixture!.sourceFile),
+        TarotBackupManifest.schemaVersion,
+      );
+    },
+  );
 
   test('rollbackStarted retries rollback', () async {
     final value = await createSetup();
@@ -482,6 +524,15 @@ int _readingCount(File file) {
             .values
             .single
         as int;
+  } finally {
+    database.close();
+  }
+}
+
+int _schemaVersion(File file) {
+  final database = sqlite3.open(file.path, mode: OpenMode.readOnly);
+  try {
+    return database.userVersion;
   } finally {
     database.close();
   }

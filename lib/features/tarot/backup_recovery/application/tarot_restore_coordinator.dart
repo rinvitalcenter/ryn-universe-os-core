@@ -355,7 +355,7 @@ final class TarotRestoreCoordinator {
         'study_materials',
         'study_session_materials',
       ],
-      if (sourceSchemaVersion < TarotBackupManifest.schemaVersion) ...const [
+      if (sourceSchemaVersion < TarotBackupManifest.schemaVersionV10) ...const [
         'qigong_media_assets',
         'qigong_posts',
         'qigong_post_blocks',
@@ -363,6 +363,9 @@ final class TarotRestoreCoordinator {
         'qigong_tags',
         'qigong_post_tags',
         'qigong_publications',
+      ],
+      if (sourceSchemaVersion < TarotBackupManifest.schemaVersion) ...const [
+        'saju_chart_snapshots',
       ],
     ];
     for (final table in tablesRequiredEmpty) {

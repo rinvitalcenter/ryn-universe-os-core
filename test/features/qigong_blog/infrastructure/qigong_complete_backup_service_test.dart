@@ -6,6 +6,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:ryn_universe_os_core/core/backup_recovery/sha256_digest_service.dart';
 import 'package:ryn_universe_os_core/core/persistence/app_database.dart';
+import 'package:ryn_universe_os_core/features/saju/data/persistence/drift_saju_snapshot_repository.dart';
+import 'package:ryn_universe_os_core/features/saju/domain/saju_calculation_engine.dart';
+import 'package:ryn_universe_os_core/features/saju/domain/saju_models.dart';
+import 'package:ryn_universe_os_core/features/saju/domain/saju_snapshot_repository.dart';
 import 'package:ryn_universe_os_core/features/qigong_blog/application/qigong_complete_restore_coordinator.dart';
 import 'package:ryn_universe_os_core/features/qigong_blog/application/qigong_complete_restore_startup_recovery_coordinator.dart';
 import 'package:ryn_universe_os_core/features/qigong_blog/domain/qigong_complete_restore_operation_marker.dart';
@@ -33,7 +37,7 @@ void main() {
             stagedDirectoryName: 'staged',
             rollbackDirectoryName: 'rollback',
             sourceSchemaVersion: 10,
-            expectedTargetSchemaVersion: 10,
+            expectedTargetSchemaVersion: 11,
             lastCompletedStep: phase.name,
             originalMediaDirectoryPresent: true,
           );
@@ -109,6 +113,8 @@ void main() {
           createdAtUtc: DateTime.utc(2026, 7, 31, 2),
           operationId: 'a1b2c3d4',
         );
+        await _convertPackageToSchema10(fixture.service, package);
+        expect((await fixture.service.validateBackup(package)).schemaVersion, 10);
         final database = sqlite3.open(fixture.databaseFile.path);
         database.execute("DELETE FROM qigong_media_assets");
         database.close();
@@ -139,6 +145,7 @@ void main() {
           fixture.databaseFile.path,
           mode: OpenMode.readOnly,
         );
+        expect(restored.userVersion, 11);
         expect(
           restored
               .select('SELECT count(*) FROM qigong_media_assets')
@@ -147,6 +154,14 @@ void main() {
               .single,
           1,
         );
+        expect(
+          restored
+              .select('SELECT count(*) FROM saju_chart_snapshots')
+              .single
+              .values
+              .single,
+          0,
+        );
         restored.close();
         lifecycle.dispose();
       } finally {
@@ -154,6 +169,71 @@ void main() {
       }
     },
   );
+
+  test('schema eleven complete package round trips Saju rows', () async {
+    final fixture = await _QigongFixture.create();
+    await _saveSajuInitial(fixture.databaseFile);
+    final package = await fixture.service.createBackup(
+      createdAtUtc: DateTime.utc(2026, 7, 31, 5, 10),
+      operationId: '12340011',
+    );
+    final raw = sqlite3.open(fixture.databaseFile.path);
+    raw.execute('DELETE FROM saju_chart_snapshots');
+    raw.close();
+    final lifecycle = _TestQigongLifecycle(fixture.databaseFile)..openInitial();
+    try {
+      final result = await QigongCompleteRestoreCoordinator(
+        backupService: fixture.service,
+        clock: () => DateTime.utc(2026, 7, 31, 5, 11),
+        safetyOperationIdGenerator: () => '12340012',
+      ).restore(
+        candidatePackage: package,
+        operationId: '12340013',
+        lifecycle: lifecycle,
+      );
+
+      expect(result.status, QigongCompleteRestoreStatus.succeeded);
+      expect(_sajuRevisions(fixture.databaseFile), <int>[1]);
+    } finally {
+      lifecycle.dispose();
+      await fixture.dispose();
+    }
+  });
+
+  test('media failure rolls back Saju revision chain with media', () async {
+    final fixture = await _QigongFixture.create();
+    await _saveSajuInitial(fixture.databaseFile);
+    final package = await fixture.service.createBackup(
+      createdAtUtc: DateTime.utc(2026, 7, 31, 5, 20),
+      operationId: '12340021',
+    );
+    await _saveSajuRevision(fixture.databaseFile);
+    final lifecycle = _TestQigongLifecycle(fixture.databaseFile)..openInitial();
+    try {
+      final result = await QigongCompleteRestoreCoordinator(
+        backupService: fixture.service,
+        clock: () => DateTime.utc(2026, 7, 31, 5, 21),
+        safetyOperationIdGenerator: () => '12340022',
+        renameDirectory: (source, target) {
+          if (source.path.contains('${p.separator}staged${p.separator}')) {
+            throw const FileSystemException('synthetic media replace failure');
+          }
+          return source.rename(target);
+        },
+      ).restore(
+        candidatePackage: package,
+        operationId: '12340023',
+        lifecycle: lifecycle,
+      );
+
+      expect(result.status, QigongCompleteRestoreStatus.failedRolledBack);
+      expect(_sajuRevisions(fixture.databaseFile), <int>[1, 2]);
+      expect(await fixture.mediaFile.readAsBytes(), <int>[1, 2, 3, 4]);
+    } finally {
+      lifecycle.dispose();
+      await fixture.dispose();
+    }
+  });
 
   test('complete package rejects missing or changed media bytes', () async {
     final fixture = await _QigongFixture.create();
@@ -405,7 +485,7 @@ void main() {
         fixture.databaseFile.path,
         mode: OpenMode.readOnly,
       );
-      expect(database.userVersion, 10);
+      expect(database.userVersion, 11);
       database.close();
     } finally {
       lifecycle.dispose();
@@ -737,6 +817,86 @@ void main() {
     });
   }
 
+  for (final phase in const <QigongCompleteRestorePhase>[
+    QigongCompleteRestorePhase.prepared,
+    QigongCompleteRestorePhase.validated,
+  ]) {
+    test('historical 10 to 10 startup $phase validates the v10 pair', () async {
+      final fixture = await _QigongFixture.create();
+      try {
+        await _convertDatabaseToSchema10(fixture.databaseFile);
+        final operation = await _writeMarker(
+          fixture,
+          phase,
+          expectedTargetSchemaVersion: 10,
+        );
+
+        final result = await QigongCompleteRestoreStartupRecoveryCoordinator(
+          backupService: fixture.service,
+        ).recoverIfNeeded();
+
+        expect(
+          result.status,
+          phase == QigongCompleteRestorePhase.prepared
+              ? QigongCompleteRestoreStartupRecoveryStatus.untouchedFinalized
+              : QigongCompleteRestoreStartupRecoveryStatus.replacementKept,
+        );
+        final raw = sqlite3.open(fixture.databaseFile.path);
+        try {
+          expect(raw.userVersion, 10);
+        } finally {
+          raw.close();
+        }
+        expect(operation.existsSync(), isFalse);
+      } finally {
+        await fixture.dispose();
+      }
+    });
+  }
+
+  test('historical 10 to 10 startup restores the v10 rollback pair', () async {
+    final fixture = await _QigongFixture.create();
+    try {
+      await _convertDatabaseToSchema10(fixture.databaseFile);
+      final operation = await _writeMarker(
+        fixture,
+        QigongCompleteRestorePhase.rollbackCaptured,
+        expectedTargetSchemaVersion: 10,
+      );
+      final rollbackDatabaseRoot = await Directory(
+        p.join(operation.path, 'rollback', 'database'),
+      ).create(recursive: true);
+      await fixture.databaseFile.copy(
+        p.join(rollbackDatabaseRoot.path, p.basename(fixture.databaseFile.path)),
+      );
+      final rollbackMedia = await Directory(
+        p.join(operation.path, 'rollback', 'qigong_media'),
+      ).create(recursive: true);
+      await fixture.mediaFile.copy(p.join(rollbackMedia.path, 'asset.bin'));
+      await fixture.databaseFile.delete();
+      await fixture.mediaRoot.delete(recursive: true);
+
+      final result = await QigongCompleteRestoreStartupRecoveryCoordinator(
+        backupService: fixture.service,
+      ).recoverIfNeeded();
+
+      expect(
+        result.status,
+        QigongCompleteRestoreStartupRecoveryStatus.originalRecovered,
+      );
+      final raw = sqlite3.open(fixture.databaseFile.path);
+      try {
+        expect(raw.userVersion, 10);
+      } finally {
+        raw.close();
+      }
+      expect(await fixture.mediaFile.readAsBytes(), <int>[1, 2, 3, 4]);
+      expect(operation.existsSync(), isFalse);
+    } finally {
+      await fixture.dispose();
+    }
+  });
+
   test('fatalPreserved prevents automatic mutation', () async {
     final fixture = await _QigongFixture.create();
     try {
@@ -806,14 +966,16 @@ QigongCompleteRestoreOperationMarker _marker(
   stagedDirectoryName: 'staged',
   rollbackDirectoryName: 'rollback',
   sourceSchemaVersion: 10,
-  expectedTargetSchemaVersion: 10,
+  expectedTargetSchemaVersion: 11,
   lastCompletedStep: phase.name,
   originalMediaDirectoryPresent: true,
 );
 
 Future<Directory> _writeMarker(
   _QigongFixture fixture,
-  QigongCompleteRestorePhase phase,
+  QigongCompleteRestorePhase phase, {
+  int expectedTargetSchemaVersion = 11,
+}
 ) async {
   final operation = await Directory(
     p.join(fixture.profileRoot.path, '.qigong-complete-restore-deadbeef'),
@@ -827,7 +989,7 @@ Future<Directory> _writeMarker(
     stagedDirectoryName: 'staged',
     rollbackDirectoryName: 'rollback',
     sourceSchemaVersion: 10,
-    expectedTargetSchemaVersion: 10,
+    expectedTargetSchemaVersion: expectedTargetSchemaVersion,
     lastCompletedStep: phase.name,
     originalMediaDirectoryPresent: true,
   );
@@ -836,6 +998,119 @@ Future<Directory> _writeMarker(
     marker: marker,
   );
   return operation;
+}
+
+Future<void> _saveSajuInitial(File databaseFile) async {
+  final database = RynAppDatabase(NativeDatabase(databaseFile));
+  try {
+    await database.customSelect('SELECT 1').getSingle();
+    await database.customStatement(
+      "INSERT OR IGNORE INTO persons (id, display_name, status, created_at_utc_us, updated_at_utc_us) VALUES ('person.saju.complete', '합성 사주 인물', 'active', 1, 1)",
+    );
+    final result = await DriftSajuSnapshotRepository(database)
+        .saveInitialSnapshot(
+          snapshotId: 'snapshot.complete.1',
+          personId: 'person.saju.complete',
+          chartGroupId: 'chart.complete',
+          snapshot: _sajuCalculation(10),
+          createdAtUtcUs: 0,
+        );
+    if (!result.isSuccess) {
+      throw StateError(result.failure!.safeMessage);
+    }
+  } finally {
+    await database.close();
+  }
+}
+
+Future<void> _saveSajuRevision(File databaseFile) async {
+  final database = RynAppDatabase(NativeDatabase(databaseFile));
+  try {
+    await database.customSelect('SELECT 1').getSingle();
+    final result = await DriftSajuSnapshotRepository(database).createRevision(
+      snapshotId: 'snapshot.complete.2',
+      personId: 'person.saju.complete',
+      chartGroupId: 'chart.complete',
+      expectedCurrentRevisionNumber: 1,
+      revisionReason: SajuRevisionReason.inputCorrected,
+      snapshot: _sajuCalculation(11),
+      createdAtUtcUs: 1,
+    );
+    if (!result.isSuccess) {
+      throw StateError(result.failure!.safeMessage);
+    }
+  } finally {
+    await database.close();
+  }
+}
+
+SajuChartSnapshot _sajuCalculation(int day) =>
+    SajuCalculationEngine.production(
+      utcNow: () => DateTime.utc(2026, 7, 31),
+    ).calculate(
+      SajuBirthInput.solar(
+        date: SajuLocalDate(2024, 2, day),
+        time: const SajuLocalTime(10, 0),
+        gender: SajuGender.female,
+      ),
+      calculatedAt: DateTime.utc(2026, 7, 31),
+    );
+
+List<int> _sajuRevisions(File databaseFile) {
+  final database = sqlite3.open(databaseFile.path, mode: OpenMode.readOnly);
+  try {
+    return database
+        .select(
+          'SELECT revision_number FROM saju_chart_snapshots '
+          'ORDER BY revision_number',
+        )
+        .map((row) => row['revision_number']! as int)
+        .toList(growable: false);
+  } finally {
+    database.close();
+  }
+}
+
+Future<void> _convertPackageToSchema10(
+  QigongCompleteBackupService service,
+  Directory package,
+) async {
+  final databaseFile = service.packageDatabaseFile(package);
+  await _convertDatabaseToSchema10(databaseFile);
+  const digest = DartSha256DigestService();
+  final databaseHash = await digest.digestFile(databaseFile);
+  final manifestFile = File(p.join(package.path, 'manifest.json'));
+  final manifest =
+      jsonDecode(await manifestFile.readAsString()) as Map<String, dynamic>;
+  manifest
+    ..['schemaVersion'] = 10
+    ..['databaseSizeBytes'] = await databaseFile.length()
+    ..['databaseSha256'] = databaseHash;
+  await manifestFile.writeAsString(jsonEncode(manifest), flush: true);
+  final checksumFile = File(
+    p.joinAll(<String>[
+      package.path,
+      ...p.posix.split(manifest['checksumRelativePath']! as String),
+    ]),
+  );
+  final checksumLines = (await checksumFile.readAsLines()).toList();
+  checksumLines[0] =
+      '$databaseHash  ${manifest['databaseRelativePath']! as String}';
+  await checksumFile.writeAsString(
+    '${checksumLines.join('\n')}\n',
+    flush: true,
+  );
+}
+
+Future<void> _convertDatabaseToSchema10(File databaseFile) async {
+  final database = sqlite3.open(databaseFile.path);
+  try {
+    database.execute('DROP TABLE saju_chart_snapshots');
+    database.userVersion = 10;
+    database.execute('VACUUM');
+  } finally {
+    database.close();
+  }
 }
 
 final class _QigongFixture {

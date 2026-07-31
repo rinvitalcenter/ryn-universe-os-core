@@ -17970,6 +17970,4018 @@ class QigongPublicationsCompanion
   }
 }
 
+class $SajuChartSnapshotsTable extends SajuChartSnapshots
+    with TableInfo<$SajuChartSnapshotsTable, SajuChartSnapshotRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SajuChartSnapshotsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 120,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _personIdMeta = const VerificationMeta(
+    'personId',
+  );
+  @override
+  late final GeneratedColumn<String> personId = GeneratedColumn<String>(
+    'person_id',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 120,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES persons (id) ON DELETE RESTRICT',
+    ),
+  );
+  static const VerificationMeta _sourceBirthProfileIdMeta =
+      const VerificationMeta('sourceBirthProfileId');
+  @override
+  late final GeneratedColumn<String> sourceBirthProfileId =
+      GeneratedColumn<String>(
+        'source_birth_profile_id',
+        aliasedName,
+        true,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 1,
+          maxTextLength: 120,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES person_birth_profiles (id) ON DELETE RESTRICT',
+        ),
+      );
+  static const VerificationMeta _chartGroupIdMeta = const VerificationMeta(
+    'chartGroupId',
+  );
+  @override
+  late final GeneratedColumn<String> chartGroupId = GeneratedColumn<String>(
+    'chart_group_id',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 120,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _revisionNumberMeta = const VerificationMeta(
+    'revisionNumber',
+  );
+  @override
+  late final GeneratedColumn<int> revisionNumber = GeneratedColumn<int>(
+    'revision_number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _revisionReasonMeta = const VerificationMeta(
+    'revisionReason',
+  );
+  @override
+  late final GeneratedColumn<String> revisionReason = GeneratedColumn<String>(
+    'revision_reason',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 40,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtUtcUsMeta = const VerificationMeta(
+    'createdAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> createdAtUtcUs = GeneratedColumn<int>(
+    'created_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _calculatedAtUtcUsMeta = const VerificationMeta(
+    'calculatedAtUtcUs',
+  );
+  @override
+  late final GeneratedColumn<int> calculatedAtUtcUs = GeneratedColumn<int>(
+    'calculated_at_utc_us',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _calendarTypeMeta = const VerificationMeta(
+    'calendarType',
+  );
+  @override
+  late final GeneratedColumn<String> calendarType = GeneratedColumn<String>(
+    'calendar_type',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 20,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _inputLocalDateMeta = const VerificationMeta(
+    'inputLocalDate',
+  );
+  @override
+  late final GeneratedColumn<String> inputLocalDate = GeneratedColumn<String>(
+    'input_local_date',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 10,
+      maxTextLength: 15,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _inputLocalTimeMeta = const VerificationMeta(
+    'inputLocalTime',
+  );
+  @override
+  late final GeneratedColumn<String> inputLocalTime = GeneratedColumn<String>(
+    'input_local_time',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 8,
+      maxTextLength: 15,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _hourUnknownMeta = const VerificationMeta(
+    'hourUnknown',
+  );
+  @override
+  late final GeneratedColumn<bool> hourUnknown = GeneratedColumn<bool>(
+    'hour_unknown',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("hour_unknown" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _genderCompatibilityValueMeta =
+      const VerificationMeta('genderCompatibilityValue');
+  @override
+  late final GeneratedColumn<String> genderCompatibilityValue =
+      GeneratedColumn<String>(
+        'gender_compatibility_value',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 1,
+          maxTextLength: 20,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _originalLunarYearMeta = const VerificationMeta(
+    'originalLunarYear',
+  );
+  @override
+  late final GeneratedColumn<int> originalLunarYear = GeneratedColumn<int>(
+    'original_lunar_year',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originalLunarMonthMeta =
+      const VerificationMeta('originalLunarMonth');
+  @override
+  late final GeneratedColumn<int> originalLunarMonth = GeneratedColumn<int>(
+    'original_lunar_month',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originalLunarDayMeta = const VerificationMeta(
+    'originalLunarDay',
+  );
+  @override
+  late final GeneratedColumn<int> originalLunarDay = GeneratedColumn<int>(
+    'original_lunar_day',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _originalLunarLeapMonthMeta =
+      const VerificationMeta('originalLunarLeapMonth');
+  @override
+  late final GeneratedColumn<bool> originalLunarLeapMonth =
+      GeneratedColumn<bool>(
+        'original_lunar_leap_month',
+        aliasedName,
+        true,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("original_lunar_leap_month" IN (0, 1))',
+        ),
+      );
+  static const VerificationMeta _timezoneIdMeta = const VerificationMeta(
+    'timezoneId',
+  );
+  @override
+  late final GeneratedColumn<String> timezoneId = GeneratedColumn<String>(
+    'timezone_id',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 120,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _birthPlaceProfileMeta = const VerificationMeta(
+    'birthPlaceProfile',
+  );
+  @override
+  late final GeneratedColumn<String> birthPlaceProfile =
+      GeneratedColumn<String>(
+        'birth_place_profile',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 1,
+          maxTextLength: 80,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _yajaEnabledMeta = const VerificationMeta(
+    'yajaEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> yajaEnabled = GeneratedColumn<bool>(
+    'yaja_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("yaja_enabled" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _convertedSolarDateMeta =
+      const VerificationMeta('convertedSolarDate');
+  @override
+  late final GeneratedColumn<String> convertedSolarDate =
+      GeneratedColumn<String>(
+        'converted_solar_date',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 10,
+          maxTextLength: 10,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _convertedLunarDateMeta =
+      const VerificationMeta('convertedLunarDate');
+  @override
+  late final GeneratedColumn<String> convertedLunarDate =
+      GeneratedColumn<String>(
+        'converted_lunar_date',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 10,
+          maxTextLength: 10,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _convertedLunarLeapMonthMeta =
+      const VerificationMeta('convertedLunarLeapMonth');
+  @override
+  late final GeneratedColumn<bool> convertedLunarLeapMonth =
+      GeneratedColumn<bool>(
+        'converted_lunar_leap_month',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: true,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("converted_lunar_leap_month" IN (0, 1))',
+        ),
+      );
+  static const VerificationMeta _birthUtcInstantUsMeta = const VerificationMeta(
+    'birthUtcInstantUs',
+  );
+  @override
+  late final GeneratedColumn<int> birthUtcInstantUs = GeneratedColumn<int>(
+    'birth_utc_instant_us',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _utcOffsetAtBirthMinutesMeta =
+      const VerificationMeta('utcOffsetAtBirthMinutes');
+  @override
+  late final GeneratedColumn<int> utcOffsetAtBirthMinutes =
+      GeneratedColumn<int>(
+        'utc_offset_at_birth_minutes',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _effectiveHourCalculationTimeMeta =
+      const VerificationMeta('effectiveHourCalculationTime');
+  @override
+  late final GeneratedColumn<String> effectiveHourCalculationTime =
+      GeneratedColumn<String>(
+        'effective_hour_calculation_time',
+        aliasedName,
+        true,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 19,
+          maxTextLength: 27,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _yearPillarCanonicalIdMeta =
+      const VerificationMeta('yearPillarCanonicalId');
+  @override
+  late final GeneratedColumn<String> yearPillarCanonicalId =
+      GeneratedColumn<String>(
+        'year_pillar_canonical_id',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 13,
+          maxTextLength: 13,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _yearPillarCycleIndexMeta =
+      const VerificationMeta('yearPillarCycleIndex');
+  @override
+  late final GeneratedColumn<int> yearPillarCycleIndex = GeneratedColumn<int>(
+    'year_pillar_cycle_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _yearPillarStemIndexMeta =
+      const VerificationMeta('yearPillarStemIndex');
+  @override
+  late final GeneratedColumn<int> yearPillarStemIndex = GeneratedColumn<int>(
+    'year_pillar_stem_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _yearPillarBranchIndexMeta =
+      const VerificationMeta('yearPillarBranchIndex');
+  @override
+  late final GeneratedColumn<int> yearPillarBranchIndex = GeneratedColumn<int>(
+    'year_pillar_branch_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _yearPillarHanjaMeta = const VerificationMeta(
+    'yearPillarHanja',
+  );
+  @override
+  late final GeneratedColumn<String> yearPillarHanja = GeneratedColumn<String>(
+    'year_pillar_hanja',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 2,
+      maxTextLength: 2,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _yearPillarKoreanLabelMeta =
+      const VerificationMeta('yearPillarKoreanLabel');
+  @override
+  late final GeneratedColumn<String> yearPillarKoreanLabel =
+      GeneratedColumn<String>(
+        'year_pillar_korean_label',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 2,
+          maxTextLength: 2,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _monthPillarCanonicalIdMeta =
+      const VerificationMeta('monthPillarCanonicalId');
+  @override
+  late final GeneratedColumn<String> monthPillarCanonicalId =
+      GeneratedColumn<String>(
+        'month_pillar_canonical_id',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 13,
+          maxTextLength: 13,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _monthPillarCycleIndexMeta =
+      const VerificationMeta('monthPillarCycleIndex');
+  @override
+  late final GeneratedColumn<int> monthPillarCycleIndex = GeneratedColumn<int>(
+    'month_pillar_cycle_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _monthPillarStemIndexMeta =
+      const VerificationMeta('monthPillarStemIndex');
+  @override
+  late final GeneratedColumn<int> monthPillarStemIndex = GeneratedColumn<int>(
+    'month_pillar_stem_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _monthPillarBranchIndexMeta =
+      const VerificationMeta('monthPillarBranchIndex');
+  @override
+  late final GeneratedColumn<int> monthPillarBranchIndex = GeneratedColumn<int>(
+    'month_pillar_branch_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _monthPillarHanjaMeta = const VerificationMeta(
+    'monthPillarHanja',
+  );
+  @override
+  late final GeneratedColumn<String> monthPillarHanja = GeneratedColumn<String>(
+    'month_pillar_hanja',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 2,
+      maxTextLength: 2,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _monthPillarKoreanLabelMeta =
+      const VerificationMeta('monthPillarKoreanLabel');
+  @override
+  late final GeneratedColumn<String> monthPillarKoreanLabel =
+      GeneratedColumn<String>(
+        'month_pillar_korean_label',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 2,
+          maxTextLength: 2,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _dayPillarCanonicalIdMeta =
+      const VerificationMeta('dayPillarCanonicalId');
+  @override
+  late final GeneratedColumn<String> dayPillarCanonicalId =
+      GeneratedColumn<String>(
+        'day_pillar_canonical_id',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 13,
+          maxTextLength: 13,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _dayPillarCycleIndexMeta =
+      const VerificationMeta('dayPillarCycleIndex');
+  @override
+  late final GeneratedColumn<int> dayPillarCycleIndex = GeneratedColumn<int>(
+    'day_pillar_cycle_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayPillarStemIndexMeta =
+      const VerificationMeta('dayPillarStemIndex');
+  @override
+  late final GeneratedColumn<int> dayPillarStemIndex = GeneratedColumn<int>(
+    'day_pillar_stem_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayPillarBranchIndexMeta =
+      const VerificationMeta('dayPillarBranchIndex');
+  @override
+  late final GeneratedColumn<int> dayPillarBranchIndex = GeneratedColumn<int>(
+    'day_pillar_branch_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayPillarHanjaMeta = const VerificationMeta(
+    'dayPillarHanja',
+  );
+  @override
+  late final GeneratedColumn<String> dayPillarHanja = GeneratedColumn<String>(
+    'day_pillar_hanja',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 2,
+      maxTextLength: 2,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayPillarKoreanLabelMeta =
+      const VerificationMeta('dayPillarKoreanLabel');
+  @override
+  late final GeneratedColumn<String> dayPillarKoreanLabel =
+      GeneratedColumn<String>(
+        'day_pillar_korean_label',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 2,
+          maxTextLength: 2,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _hourPillarCanonicalIdMeta =
+      const VerificationMeta('hourPillarCanonicalId');
+  @override
+  late final GeneratedColumn<String> hourPillarCanonicalId =
+      GeneratedColumn<String>(
+        'hour_pillar_canonical_id',
+        aliasedName,
+        true,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 13,
+          maxTextLength: 13,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _hourPillarCycleIndexMeta =
+      const VerificationMeta('hourPillarCycleIndex');
+  @override
+  late final GeneratedColumn<int> hourPillarCycleIndex = GeneratedColumn<int>(
+    'hour_pillar_cycle_index',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _hourPillarStemIndexMeta =
+      const VerificationMeta('hourPillarStemIndex');
+  @override
+  late final GeneratedColumn<int> hourPillarStemIndex = GeneratedColumn<int>(
+    'hour_pillar_stem_index',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _hourPillarBranchIndexMeta =
+      const VerificationMeta('hourPillarBranchIndex');
+  @override
+  late final GeneratedColumn<int> hourPillarBranchIndex = GeneratedColumn<int>(
+    'hour_pillar_branch_index',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _hourPillarHanjaMeta = const VerificationMeta(
+    'hourPillarHanja',
+  );
+  @override
+  late final GeneratedColumn<String> hourPillarHanja = GeneratedColumn<String>(
+    'hour_pillar_hanja',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 2,
+      maxTextLength: 2,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _hourPillarKoreanLabelMeta =
+      const VerificationMeta('hourPillarKoreanLabel');
+  @override
+  late final GeneratedColumn<String> hourPillarKoreanLabel =
+      GeneratedColumn<String>(
+        'hour_pillar_korean_label',
+        aliasedName,
+        true,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 2,
+          maxTextLength: 2,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _engineIdMeta = const VerificationMeta(
+    'engineId',
+  );
+  @override
+  late final GeneratedColumn<String> engineId = GeneratedColumn<String>(
+    'engine_id',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 120,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _engineVersionMeta = const VerificationMeta(
+    'engineVersion',
+  );
+  @override
+  late final GeneratedColumn<String> engineVersion = GeneratedColumn<String>(
+    'engine_version',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 40,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _policyIdMeta = const VerificationMeta(
+    'policyId',
+  );
+  @override
+  late final GeneratedColumn<String> policyId = GeneratedColumn<String>(
+    'policy_id',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 120,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _policyVersionMeta = const VerificationMeta(
+    'policyVersion',
+  );
+  @override
+  late final GeneratedColumn<String> policyVersion = GeneratedColumn<String>(
+    'policy_version',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 40,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _dayRolloverPolicyMeta = const VerificationMeta(
+    'dayRolloverPolicy',
+  );
+  @override
+  late final GeneratedColumn<String> dayRolloverPolicy =
+      GeneratedColumn<String>(
+        'day_rollover_policy',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 1,
+          maxTextLength: 120,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _longitudeCorrectionPolicyMeta =
+      const VerificationMeta('longitudeCorrectionPolicy');
+  @override
+  late final GeneratedColumn<String> longitudeCorrectionPolicy =
+      GeneratedColumn<String>(
+        'longitude_correction_policy',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 1,
+          maxTextLength: 120,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _dstCorrectionPolicyMeta =
+      const VerificationMeta('dstCorrectionPolicy');
+  @override
+  late final GeneratedColumn<String> dstCorrectionPolicy =
+      GeneratedColumn<String>(
+        'dst_correction_policy',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 1,
+          maxTextLength: 120,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _supportedRangeVersionMeta =
+      const VerificationMeta('supportedRangeVersion');
+  @override
+  late final GeneratedColumn<String> supportedRangeVersion =
+      GeneratedColumn<String>(
+        'supported_range_version',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 1,
+          maxTextLength: 120,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _solarTermAlgorithmVersionMeta =
+      const VerificationMeta('solarTermAlgorithmVersion');
+  @override
+  late final GeneratedColumn<String> solarTermAlgorithmVersion =
+      GeneratedColumn<String>(
+        'solar_term_algorithm_version',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 1,
+          maxTextLength: 160,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _lunarConverterVersionMeta =
+      const VerificationMeta('lunarConverterVersion');
+  @override
+  late final GeneratedColumn<String> lunarConverterVersion =
+      GeneratedColumn<String>(
+        'lunar_converter_version',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 1,
+          maxTextLength: 120,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _dayAnchorVersionMeta = const VerificationMeta(
+    'dayAnchorVersion',
+  );
+  @override
+  late final GeneratedColumn<String> dayAnchorVersion = GeneratedColumn<String>(
+    'day_anchor_version',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 120,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _timeScaleAdapterVersionMeta =
+      const VerificationMeta('timeScaleAdapterVersion');
+  @override
+  late final GeneratedColumn<String> timeScaleAdapterVersion =
+      GeneratedColumn<String>(
+        'time_scale_adapter_version',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 1,
+          maxTextLength: 120,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _warningsJsonMeta = const VerificationMeta(
+    'warningsJson',
+  );
+  @override
+  late final GeneratedColumn<String> warningsJson = GeneratedColumn<String>(
+    'warnings_json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _inputFingerprintSha256Meta =
+      const VerificationMeta('inputFingerprintSha256');
+  @override
+  late final GeneratedColumn<String> inputFingerprintSha256 =
+      GeneratedColumn<String>(
+        'input_fingerprint_sha256',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 64,
+          maxTextLength: 64,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _calculationSignatureSha256Meta =
+      const VerificationMeta('calculationSignatureSha256');
+  @override
+  late final GeneratedColumn<String> calculationSignatureSha256 =
+      GeneratedColumn<String>(
+        'calculation_signature_sha256',
+        aliasedName,
+        false,
+        additionalChecks: GeneratedColumn.checkTextLength(
+          minTextLength: 64,
+          maxTextLength: 64,
+        ),
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    personId,
+    sourceBirthProfileId,
+    chartGroupId,
+    revisionNumber,
+    revisionReason,
+    createdAtUtcUs,
+    calculatedAtUtcUs,
+    calendarType,
+    inputLocalDate,
+    inputLocalTime,
+    hourUnknown,
+    genderCompatibilityValue,
+    originalLunarYear,
+    originalLunarMonth,
+    originalLunarDay,
+    originalLunarLeapMonth,
+    timezoneId,
+    birthPlaceProfile,
+    yajaEnabled,
+    convertedSolarDate,
+    convertedLunarDate,
+    convertedLunarLeapMonth,
+    birthUtcInstantUs,
+    utcOffsetAtBirthMinutes,
+    effectiveHourCalculationTime,
+    yearPillarCanonicalId,
+    yearPillarCycleIndex,
+    yearPillarStemIndex,
+    yearPillarBranchIndex,
+    yearPillarHanja,
+    yearPillarKoreanLabel,
+    monthPillarCanonicalId,
+    monthPillarCycleIndex,
+    monthPillarStemIndex,
+    monthPillarBranchIndex,
+    monthPillarHanja,
+    monthPillarKoreanLabel,
+    dayPillarCanonicalId,
+    dayPillarCycleIndex,
+    dayPillarStemIndex,
+    dayPillarBranchIndex,
+    dayPillarHanja,
+    dayPillarKoreanLabel,
+    hourPillarCanonicalId,
+    hourPillarCycleIndex,
+    hourPillarStemIndex,
+    hourPillarBranchIndex,
+    hourPillarHanja,
+    hourPillarKoreanLabel,
+    engineId,
+    engineVersion,
+    policyId,
+    policyVersion,
+    dayRolloverPolicy,
+    longitudeCorrectionPolicy,
+    dstCorrectionPolicy,
+    supportedRangeVersion,
+    solarTermAlgorithmVersion,
+    lunarConverterVersion,
+    dayAnchorVersion,
+    timeScaleAdapterVersion,
+    warningsJson,
+    inputFingerprintSha256,
+    calculationSignatureSha256,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'saju_chart_snapshots';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SajuChartSnapshotRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('person_id')) {
+      context.handle(
+        _personIdMeta,
+        personId.isAcceptableOrUnknown(data['person_id']!, _personIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_personIdMeta);
+    }
+    if (data.containsKey('source_birth_profile_id')) {
+      context.handle(
+        _sourceBirthProfileIdMeta,
+        sourceBirthProfileId.isAcceptableOrUnknown(
+          data['source_birth_profile_id']!,
+          _sourceBirthProfileIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('chart_group_id')) {
+      context.handle(
+        _chartGroupIdMeta,
+        chartGroupId.isAcceptableOrUnknown(
+          data['chart_group_id']!,
+          _chartGroupIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_chartGroupIdMeta);
+    }
+    if (data.containsKey('revision_number')) {
+      context.handle(
+        _revisionNumberMeta,
+        revisionNumber.isAcceptableOrUnknown(
+          data['revision_number']!,
+          _revisionNumberMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_revisionNumberMeta);
+    }
+    if (data.containsKey('revision_reason')) {
+      context.handle(
+        _revisionReasonMeta,
+        revisionReason.isAcceptableOrUnknown(
+          data['revision_reason']!,
+          _revisionReasonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_revisionReasonMeta);
+    }
+    if (data.containsKey('created_at_utc_us')) {
+      context.handle(
+        _createdAtUtcUsMeta,
+        createdAtUtcUs.isAcceptableOrUnknown(
+          data['created_at_utc_us']!,
+          _createdAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtUtcUsMeta);
+    }
+    if (data.containsKey('calculated_at_utc_us')) {
+      context.handle(
+        _calculatedAtUtcUsMeta,
+        calculatedAtUtcUs.isAcceptableOrUnknown(
+          data['calculated_at_utc_us']!,
+          _calculatedAtUtcUsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_calculatedAtUtcUsMeta);
+    }
+    if (data.containsKey('calendar_type')) {
+      context.handle(
+        _calendarTypeMeta,
+        calendarType.isAcceptableOrUnknown(
+          data['calendar_type']!,
+          _calendarTypeMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_calendarTypeMeta);
+    }
+    if (data.containsKey('input_local_date')) {
+      context.handle(
+        _inputLocalDateMeta,
+        inputLocalDate.isAcceptableOrUnknown(
+          data['input_local_date']!,
+          _inputLocalDateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_inputLocalDateMeta);
+    }
+    if (data.containsKey('input_local_time')) {
+      context.handle(
+        _inputLocalTimeMeta,
+        inputLocalTime.isAcceptableOrUnknown(
+          data['input_local_time']!,
+          _inputLocalTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('hour_unknown')) {
+      context.handle(
+        _hourUnknownMeta,
+        hourUnknown.isAcceptableOrUnknown(
+          data['hour_unknown']!,
+          _hourUnknownMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_hourUnknownMeta);
+    }
+    if (data.containsKey('gender_compatibility_value')) {
+      context.handle(
+        _genderCompatibilityValueMeta,
+        genderCompatibilityValue.isAcceptableOrUnknown(
+          data['gender_compatibility_value']!,
+          _genderCompatibilityValueMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_genderCompatibilityValueMeta);
+    }
+    if (data.containsKey('original_lunar_year')) {
+      context.handle(
+        _originalLunarYearMeta,
+        originalLunarYear.isAcceptableOrUnknown(
+          data['original_lunar_year']!,
+          _originalLunarYearMeta,
+        ),
+      );
+    }
+    if (data.containsKey('original_lunar_month')) {
+      context.handle(
+        _originalLunarMonthMeta,
+        originalLunarMonth.isAcceptableOrUnknown(
+          data['original_lunar_month']!,
+          _originalLunarMonthMeta,
+        ),
+      );
+    }
+    if (data.containsKey('original_lunar_day')) {
+      context.handle(
+        _originalLunarDayMeta,
+        originalLunarDay.isAcceptableOrUnknown(
+          data['original_lunar_day']!,
+          _originalLunarDayMeta,
+        ),
+      );
+    }
+    if (data.containsKey('original_lunar_leap_month')) {
+      context.handle(
+        _originalLunarLeapMonthMeta,
+        originalLunarLeapMonth.isAcceptableOrUnknown(
+          data['original_lunar_leap_month']!,
+          _originalLunarLeapMonthMeta,
+        ),
+      );
+    }
+    if (data.containsKey('timezone_id')) {
+      context.handle(
+        _timezoneIdMeta,
+        timezoneId.isAcceptableOrUnknown(data['timezone_id']!, _timezoneIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_timezoneIdMeta);
+    }
+    if (data.containsKey('birth_place_profile')) {
+      context.handle(
+        _birthPlaceProfileMeta,
+        birthPlaceProfile.isAcceptableOrUnknown(
+          data['birth_place_profile']!,
+          _birthPlaceProfileMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_birthPlaceProfileMeta);
+    }
+    if (data.containsKey('yaja_enabled')) {
+      context.handle(
+        _yajaEnabledMeta,
+        yajaEnabled.isAcceptableOrUnknown(
+          data['yaja_enabled']!,
+          _yajaEnabledMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_yajaEnabledMeta);
+    }
+    if (data.containsKey('converted_solar_date')) {
+      context.handle(
+        _convertedSolarDateMeta,
+        convertedSolarDate.isAcceptableOrUnknown(
+          data['converted_solar_date']!,
+          _convertedSolarDateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_convertedSolarDateMeta);
+    }
+    if (data.containsKey('converted_lunar_date')) {
+      context.handle(
+        _convertedLunarDateMeta,
+        convertedLunarDate.isAcceptableOrUnknown(
+          data['converted_lunar_date']!,
+          _convertedLunarDateMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_convertedLunarDateMeta);
+    }
+    if (data.containsKey('converted_lunar_leap_month')) {
+      context.handle(
+        _convertedLunarLeapMonthMeta,
+        convertedLunarLeapMonth.isAcceptableOrUnknown(
+          data['converted_lunar_leap_month']!,
+          _convertedLunarLeapMonthMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_convertedLunarLeapMonthMeta);
+    }
+    if (data.containsKey('birth_utc_instant_us')) {
+      context.handle(
+        _birthUtcInstantUsMeta,
+        birthUtcInstantUs.isAcceptableOrUnknown(
+          data['birth_utc_instant_us']!,
+          _birthUtcInstantUsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('utc_offset_at_birth_minutes')) {
+      context.handle(
+        _utcOffsetAtBirthMinutesMeta,
+        utcOffsetAtBirthMinutes.isAcceptableOrUnknown(
+          data['utc_offset_at_birth_minutes']!,
+          _utcOffsetAtBirthMinutesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_utcOffsetAtBirthMinutesMeta);
+    }
+    if (data.containsKey('effective_hour_calculation_time')) {
+      context.handle(
+        _effectiveHourCalculationTimeMeta,
+        effectiveHourCalculationTime.isAcceptableOrUnknown(
+          data['effective_hour_calculation_time']!,
+          _effectiveHourCalculationTimeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('year_pillar_canonical_id')) {
+      context.handle(
+        _yearPillarCanonicalIdMeta,
+        yearPillarCanonicalId.isAcceptableOrUnknown(
+          data['year_pillar_canonical_id']!,
+          _yearPillarCanonicalIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_yearPillarCanonicalIdMeta);
+    }
+    if (data.containsKey('year_pillar_cycle_index')) {
+      context.handle(
+        _yearPillarCycleIndexMeta,
+        yearPillarCycleIndex.isAcceptableOrUnknown(
+          data['year_pillar_cycle_index']!,
+          _yearPillarCycleIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_yearPillarCycleIndexMeta);
+    }
+    if (data.containsKey('year_pillar_stem_index')) {
+      context.handle(
+        _yearPillarStemIndexMeta,
+        yearPillarStemIndex.isAcceptableOrUnknown(
+          data['year_pillar_stem_index']!,
+          _yearPillarStemIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_yearPillarStemIndexMeta);
+    }
+    if (data.containsKey('year_pillar_branch_index')) {
+      context.handle(
+        _yearPillarBranchIndexMeta,
+        yearPillarBranchIndex.isAcceptableOrUnknown(
+          data['year_pillar_branch_index']!,
+          _yearPillarBranchIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_yearPillarBranchIndexMeta);
+    }
+    if (data.containsKey('year_pillar_hanja')) {
+      context.handle(
+        _yearPillarHanjaMeta,
+        yearPillarHanja.isAcceptableOrUnknown(
+          data['year_pillar_hanja']!,
+          _yearPillarHanjaMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_yearPillarHanjaMeta);
+    }
+    if (data.containsKey('year_pillar_korean_label')) {
+      context.handle(
+        _yearPillarKoreanLabelMeta,
+        yearPillarKoreanLabel.isAcceptableOrUnknown(
+          data['year_pillar_korean_label']!,
+          _yearPillarKoreanLabelMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_yearPillarKoreanLabelMeta);
+    }
+    if (data.containsKey('month_pillar_canonical_id')) {
+      context.handle(
+        _monthPillarCanonicalIdMeta,
+        monthPillarCanonicalId.isAcceptableOrUnknown(
+          data['month_pillar_canonical_id']!,
+          _monthPillarCanonicalIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_monthPillarCanonicalIdMeta);
+    }
+    if (data.containsKey('month_pillar_cycle_index')) {
+      context.handle(
+        _monthPillarCycleIndexMeta,
+        monthPillarCycleIndex.isAcceptableOrUnknown(
+          data['month_pillar_cycle_index']!,
+          _monthPillarCycleIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_monthPillarCycleIndexMeta);
+    }
+    if (data.containsKey('month_pillar_stem_index')) {
+      context.handle(
+        _monthPillarStemIndexMeta,
+        monthPillarStemIndex.isAcceptableOrUnknown(
+          data['month_pillar_stem_index']!,
+          _monthPillarStemIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_monthPillarStemIndexMeta);
+    }
+    if (data.containsKey('month_pillar_branch_index')) {
+      context.handle(
+        _monthPillarBranchIndexMeta,
+        monthPillarBranchIndex.isAcceptableOrUnknown(
+          data['month_pillar_branch_index']!,
+          _monthPillarBranchIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_monthPillarBranchIndexMeta);
+    }
+    if (data.containsKey('month_pillar_hanja')) {
+      context.handle(
+        _monthPillarHanjaMeta,
+        monthPillarHanja.isAcceptableOrUnknown(
+          data['month_pillar_hanja']!,
+          _monthPillarHanjaMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_monthPillarHanjaMeta);
+    }
+    if (data.containsKey('month_pillar_korean_label')) {
+      context.handle(
+        _monthPillarKoreanLabelMeta,
+        monthPillarKoreanLabel.isAcceptableOrUnknown(
+          data['month_pillar_korean_label']!,
+          _monthPillarKoreanLabelMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_monthPillarKoreanLabelMeta);
+    }
+    if (data.containsKey('day_pillar_canonical_id')) {
+      context.handle(
+        _dayPillarCanonicalIdMeta,
+        dayPillarCanonicalId.isAcceptableOrUnknown(
+          data['day_pillar_canonical_id']!,
+          _dayPillarCanonicalIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dayPillarCanonicalIdMeta);
+    }
+    if (data.containsKey('day_pillar_cycle_index')) {
+      context.handle(
+        _dayPillarCycleIndexMeta,
+        dayPillarCycleIndex.isAcceptableOrUnknown(
+          data['day_pillar_cycle_index']!,
+          _dayPillarCycleIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dayPillarCycleIndexMeta);
+    }
+    if (data.containsKey('day_pillar_stem_index')) {
+      context.handle(
+        _dayPillarStemIndexMeta,
+        dayPillarStemIndex.isAcceptableOrUnknown(
+          data['day_pillar_stem_index']!,
+          _dayPillarStemIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dayPillarStemIndexMeta);
+    }
+    if (data.containsKey('day_pillar_branch_index')) {
+      context.handle(
+        _dayPillarBranchIndexMeta,
+        dayPillarBranchIndex.isAcceptableOrUnknown(
+          data['day_pillar_branch_index']!,
+          _dayPillarBranchIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dayPillarBranchIndexMeta);
+    }
+    if (data.containsKey('day_pillar_hanja')) {
+      context.handle(
+        _dayPillarHanjaMeta,
+        dayPillarHanja.isAcceptableOrUnknown(
+          data['day_pillar_hanja']!,
+          _dayPillarHanjaMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dayPillarHanjaMeta);
+    }
+    if (data.containsKey('day_pillar_korean_label')) {
+      context.handle(
+        _dayPillarKoreanLabelMeta,
+        dayPillarKoreanLabel.isAcceptableOrUnknown(
+          data['day_pillar_korean_label']!,
+          _dayPillarKoreanLabelMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dayPillarKoreanLabelMeta);
+    }
+    if (data.containsKey('hour_pillar_canonical_id')) {
+      context.handle(
+        _hourPillarCanonicalIdMeta,
+        hourPillarCanonicalId.isAcceptableOrUnknown(
+          data['hour_pillar_canonical_id']!,
+          _hourPillarCanonicalIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('hour_pillar_cycle_index')) {
+      context.handle(
+        _hourPillarCycleIndexMeta,
+        hourPillarCycleIndex.isAcceptableOrUnknown(
+          data['hour_pillar_cycle_index']!,
+          _hourPillarCycleIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('hour_pillar_stem_index')) {
+      context.handle(
+        _hourPillarStemIndexMeta,
+        hourPillarStemIndex.isAcceptableOrUnknown(
+          data['hour_pillar_stem_index']!,
+          _hourPillarStemIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('hour_pillar_branch_index')) {
+      context.handle(
+        _hourPillarBranchIndexMeta,
+        hourPillarBranchIndex.isAcceptableOrUnknown(
+          data['hour_pillar_branch_index']!,
+          _hourPillarBranchIndexMeta,
+        ),
+      );
+    }
+    if (data.containsKey('hour_pillar_hanja')) {
+      context.handle(
+        _hourPillarHanjaMeta,
+        hourPillarHanja.isAcceptableOrUnknown(
+          data['hour_pillar_hanja']!,
+          _hourPillarHanjaMeta,
+        ),
+      );
+    }
+    if (data.containsKey('hour_pillar_korean_label')) {
+      context.handle(
+        _hourPillarKoreanLabelMeta,
+        hourPillarKoreanLabel.isAcceptableOrUnknown(
+          data['hour_pillar_korean_label']!,
+          _hourPillarKoreanLabelMeta,
+        ),
+      );
+    }
+    if (data.containsKey('engine_id')) {
+      context.handle(
+        _engineIdMeta,
+        engineId.isAcceptableOrUnknown(data['engine_id']!, _engineIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_engineIdMeta);
+    }
+    if (data.containsKey('engine_version')) {
+      context.handle(
+        _engineVersionMeta,
+        engineVersion.isAcceptableOrUnknown(
+          data['engine_version']!,
+          _engineVersionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_engineVersionMeta);
+    }
+    if (data.containsKey('policy_id')) {
+      context.handle(
+        _policyIdMeta,
+        policyId.isAcceptableOrUnknown(data['policy_id']!, _policyIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_policyIdMeta);
+    }
+    if (data.containsKey('policy_version')) {
+      context.handle(
+        _policyVersionMeta,
+        policyVersion.isAcceptableOrUnknown(
+          data['policy_version']!,
+          _policyVersionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_policyVersionMeta);
+    }
+    if (data.containsKey('day_rollover_policy')) {
+      context.handle(
+        _dayRolloverPolicyMeta,
+        dayRolloverPolicy.isAcceptableOrUnknown(
+          data['day_rollover_policy']!,
+          _dayRolloverPolicyMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dayRolloverPolicyMeta);
+    }
+    if (data.containsKey('longitude_correction_policy')) {
+      context.handle(
+        _longitudeCorrectionPolicyMeta,
+        longitudeCorrectionPolicy.isAcceptableOrUnknown(
+          data['longitude_correction_policy']!,
+          _longitudeCorrectionPolicyMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_longitudeCorrectionPolicyMeta);
+    }
+    if (data.containsKey('dst_correction_policy')) {
+      context.handle(
+        _dstCorrectionPolicyMeta,
+        dstCorrectionPolicy.isAcceptableOrUnknown(
+          data['dst_correction_policy']!,
+          _dstCorrectionPolicyMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dstCorrectionPolicyMeta);
+    }
+    if (data.containsKey('supported_range_version')) {
+      context.handle(
+        _supportedRangeVersionMeta,
+        supportedRangeVersion.isAcceptableOrUnknown(
+          data['supported_range_version']!,
+          _supportedRangeVersionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_supportedRangeVersionMeta);
+    }
+    if (data.containsKey('solar_term_algorithm_version')) {
+      context.handle(
+        _solarTermAlgorithmVersionMeta,
+        solarTermAlgorithmVersion.isAcceptableOrUnknown(
+          data['solar_term_algorithm_version']!,
+          _solarTermAlgorithmVersionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_solarTermAlgorithmVersionMeta);
+    }
+    if (data.containsKey('lunar_converter_version')) {
+      context.handle(
+        _lunarConverterVersionMeta,
+        lunarConverterVersion.isAcceptableOrUnknown(
+          data['lunar_converter_version']!,
+          _lunarConverterVersionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_lunarConverterVersionMeta);
+    }
+    if (data.containsKey('day_anchor_version')) {
+      context.handle(
+        _dayAnchorVersionMeta,
+        dayAnchorVersion.isAcceptableOrUnknown(
+          data['day_anchor_version']!,
+          _dayAnchorVersionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_dayAnchorVersionMeta);
+    }
+    if (data.containsKey('time_scale_adapter_version')) {
+      context.handle(
+        _timeScaleAdapterVersionMeta,
+        timeScaleAdapterVersion.isAcceptableOrUnknown(
+          data['time_scale_adapter_version']!,
+          _timeScaleAdapterVersionMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_timeScaleAdapterVersionMeta);
+    }
+    if (data.containsKey('warnings_json')) {
+      context.handle(
+        _warningsJsonMeta,
+        warningsJson.isAcceptableOrUnknown(
+          data['warnings_json']!,
+          _warningsJsonMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_warningsJsonMeta);
+    }
+    if (data.containsKey('input_fingerprint_sha256')) {
+      context.handle(
+        _inputFingerprintSha256Meta,
+        inputFingerprintSha256.isAcceptableOrUnknown(
+          data['input_fingerprint_sha256']!,
+          _inputFingerprintSha256Meta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_inputFingerprintSha256Meta);
+    }
+    if (data.containsKey('calculation_signature_sha256')) {
+      context.handle(
+        _calculationSignatureSha256Meta,
+        calculationSignatureSha256.isAcceptableOrUnknown(
+          data['calculation_signature_sha256']!,
+          _calculationSignatureSha256Meta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_calculationSignatureSha256Meta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {chartGroupId, revisionNumber},
+    {personId, inputFingerprintSha256, calculationSignatureSha256},
+  ];
+  @override
+  SajuChartSnapshotRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SajuChartSnapshotRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      personId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}person_id'],
+      )!,
+      sourceBirthProfileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source_birth_profile_id'],
+      ),
+      chartGroupId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chart_group_id'],
+      )!,
+      revisionNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}revision_number'],
+      )!,
+      revisionReason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}revision_reason'],
+      )!,
+      createdAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at_utc_us'],
+      )!,
+      calculatedAtUtcUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}calculated_at_utc_us'],
+      )!,
+      calendarType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}calendar_type'],
+      )!,
+      inputLocalDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}input_local_date'],
+      )!,
+      inputLocalTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}input_local_time'],
+      ),
+      hourUnknown: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}hour_unknown'],
+      )!,
+      genderCompatibilityValue: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}gender_compatibility_value'],
+      )!,
+      originalLunarYear: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}original_lunar_year'],
+      ),
+      originalLunarMonth: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}original_lunar_month'],
+      ),
+      originalLunarDay: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}original_lunar_day'],
+      ),
+      originalLunarLeapMonth: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}original_lunar_leap_month'],
+      ),
+      timezoneId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}timezone_id'],
+      )!,
+      birthPlaceProfile: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}birth_place_profile'],
+      )!,
+      yajaEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}yaja_enabled'],
+      )!,
+      convertedSolarDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}converted_solar_date'],
+      )!,
+      convertedLunarDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}converted_lunar_date'],
+      )!,
+      convertedLunarLeapMonth: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}converted_lunar_leap_month'],
+      )!,
+      birthUtcInstantUs: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}birth_utc_instant_us'],
+      ),
+      utcOffsetAtBirthMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}utc_offset_at_birth_minutes'],
+      )!,
+      effectiveHourCalculationTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}effective_hour_calculation_time'],
+      ),
+      yearPillarCanonicalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}year_pillar_canonical_id'],
+      )!,
+      yearPillarCycleIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}year_pillar_cycle_index'],
+      )!,
+      yearPillarStemIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}year_pillar_stem_index'],
+      )!,
+      yearPillarBranchIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}year_pillar_branch_index'],
+      )!,
+      yearPillarHanja: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}year_pillar_hanja'],
+      )!,
+      yearPillarKoreanLabel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}year_pillar_korean_label'],
+      )!,
+      monthPillarCanonicalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}month_pillar_canonical_id'],
+      )!,
+      monthPillarCycleIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}month_pillar_cycle_index'],
+      )!,
+      monthPillarStemIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}month_pillar_stem_index'],
+      )!,
+      monthPillarBranchIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}month_pillar_branch_index'],
+      )!,
+      monthPillarHanja: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}month_pillar_hanja'],
+      )!,
+      monthPillarKoreanLabel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}month_pillar_korean_label'],
+      )!,
+      dayPillarCanonicalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day_pillar_canonical_id'],
+      )!,
+      dayPillarCycleIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}day_pillar_cycle_index'],
+      )!,
+      dayPillarStemIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}day_pillar_stem_index'],
+      )!,
+      dayPillarBranchIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}day_pillar_branch_index'],
+      )!,
+      dayPillarHanja: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day_pillar_hanja'],
+      )!,
+      dayPillarKoreanLabel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day_pillar_korean_label'],
+      )!,
+      hourPillarCanonicalId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}hour_pillar_canonical_id'],
+      ),
+      hourPillarCycleIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}hour_pillar_cycle_index'],
+      ),
+      hourPillarStemIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}hour_pillar_stem_index'],
+      ),
+      hourPillarBranchIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}hour_pillar_branch_index'],
+      ),
+      hourPillarHanja: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}hour_pillar_hanja'],
+      ),
+      hourPillarKoreanLabel: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}hour_pillar_korean_label'],
+      ),
+      engineId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}engine_id'],
+      )!,
+      engineVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}engine_version'],
+      )!,
+      policyId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}policy_id'],
+      )!,
+      policyVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}policy_version'],
+      )!,
+      dayRolloverPolicy: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day_rollover_policy'],
+      )!,
+      longitudeCorrectionPolicy: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}longitude_correction_policy'],
+      )!,
+      dstCorrectionPolicy: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}dst_correction_policy'],
+      )!,
+      supportedRangeVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}supported_range_version'],
+      )!,
+      solarTermAlgorithmVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}solar_term_algorithm_version'],
+      )!,
+      lunarConverterVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}lunar_converter_version'],
+      )!,
+      dayAnchorVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}day_anchor_version'],
+      )!,
+      timeScaleAdapterVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}time_scale_adapter_version'],
+      )!,
+      warningsJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}warnings_json'],
+      )!,
+      inputFingerprintSha256: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}input_fingerprint_sha256'],
+      )!,
+      calculationSignatureSha256: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}calculation_signature_sha256'],
+      )!,
+    );
+  }
+
+  @override
+  $SajuChartSnapshotsTable createAlias(String alias) {
+    return $SajuChartSnapshotsTable(attachedDatabase, alias);
+  }
+}
+
+class SajuChartSnapshotRow extends DataClass
+    implements Insertable<SajuChartSnapshotRow> {
+  final String id;
+  final String personId;
+  final String? sourceBirthProfileId;
+  final String chartGroupId;
+  final int revisionNumber;
+  final String revisionReason;
+  final int createdAtUtcUs;
+  final int calculatedAtUtcUs;
+  final String calendarType;
+  final String inputLocalDate;
+  final String? inputLocalTime;
+  final bool hourUnknown;
+  final String genderCompatibilityValue;
+  final int? originalLunarYear;
+  final int? originalLunarMonth;
+  final int? originalLunarDay;
+  final bool? originalLunarLeapMonth;
+  final String timezoneId;
+  final String birthPlaceProfile;
+  final bool yajaEnabled;
+  final String convertedSolarDate;
+  final String convertedLunarDate;
+  final bool convertedLunarLeapMonth;
+  final int? birthUtcInstantUs;
+  final int utcOffsetAtBirthMinutes;
+  final String? effectiveHourCalculationTime;
+  final String yearPillarCanonicalId;
+  final int yearPillarCycleIndex;
+  final int yearPillarStemIndex;
+  final int yearPillarBranchIndex;
+  final String yearPillarHanja;
+  final String yearPillarKoreanLabel;
+  final String monthPillarCanonicalId;
+  final int monthPillarCycleIndex;
+  final int monthPillarStemIndex;
+  final int monthPillarBranchIndex;
+  final String monthPillarHanja;
+  final String monthPillarKoreanLabel;
+  final String dayPillarCanonicalId;
+  final int dayPillarCycleIndex;
+  final int dayPillarStemIndex;
+  final int dayPillarBranchIndex;
+  final String dayPillarHanja;
+  final String dayPillarKoreanLabel;
+  final String? hourPillarCanonicalId;
+  final int? hourPillarCycleIndex;
+  final int? hourPillarStemIndex;
+  final int? hourPillarBranchIndex;
+  final String? hourPillarHanja;
+  final String? hourPillarKoreanLabel;
+  final String engineId;
+  final String engineVersion;
+  final String policyId;
+  final String policyVersion;
+  final String dayRolloverPolicy;
+  final String longitudeCorrectionPolicy;
+  final String dstCorrectionPolicy;
+  final String supportedRangeVersion;
+  final String solarTermAlgorithmVersion;
+  final String lunarConverterVersion;
+  final String dayAnchorVersion;
+  final String timeScaleAdapterVersion;
+  final String warningsJson;
+  final String inputFingerprintSha256;
+  final String calculationSignatureSha256;
+  const SajuChartSnapshotRow({
+    required this.id,
+    required this.personId,
+    this.sourceBirthProfileId,
+    required this.chartGroupId,
+    required this.revisionNumber,
+    required this.revisionReason,
+    required this.createdAtUtcUs,
+    required this.calculatedAtUtcUs,
+    required this.calendarType,
+    required this.inputLocalDate,
+    this.inputLocalTime,
+    required this.hourUnknown,
+    required this.genderCompatibilityValue,
+    this.originalLunarYear,
+    this.originalLunarMonth,
+    this.originalLunarDay,
+    this.originalLunarLeapMonth,
+    required this.timezoneId,
+    required this.birthPlaceProfile,
+    required this.yajaEnabled,
+    required this.convertedSolarDate,
+    required this.convertedLunarDate,
+    required this.convertedLunarLeapMonth,
+    this.birthUtcInstantUs,
+    required this.utcOffsetAtBirthMinutes,
+    this.effectiveHourCalculationTime,
+    required this.yearPillarCanonicalId,
+    required this.yearPillarCycleIndex,
+    required this.yearPillarStemIndex,
+    required this.yearPillarBranchIndex,
+    required this.yearPillarHanja,
+    required this.yearPillarKoreanLabel,
+    required this.monthPillarCanonicalId,
+    required this.monthPillarCycleIndex,
+    required this.monthPillarStemIndex,
+    required this.monthPillarBranchIndex,
+    required this.monthPillarHanja,
+    required this.monthPillarKoreanLabel,
+    required this.dayPillarCanonicalId,
+    required this.dayPillarCycleIndex,
+    required this.dayPillarStemIndex,
+    required this.dayPillarBranchIndex,
+    required this.dayPillarHanja,
+    required this.dayPillarKoreanLabel,
+    this.hourPillarCanonicalId,
+    this.hourPillarCycleIndex,
+    this.hourPillarStemIndex,
+    this.hourPillarBranchIndex,
+    this.hourPillarHanja,
+    this.hourPillarKoreanLabel,
+    required this.engineId,
+    required this.engineVersion,
+    required this.policyId,
+    required this.policyVersion,
+    required this.dayRolloverPolicy,
+    required this.longitudeCorrectionPolicy,
+    required this.dstCorrectionPolicy,
+    required this.supportedRangeVersion,
+    required this.solarTermAlgorithmVersion,
+    required this.lunarConverterVersion,
+    required this.dayAnchorVersion,
+    required this.timeScaleAdapterVersion,
+    required this.warningsJson,
+    required this.inputFingerprintSha256,
+    required this.calculationSignatureSha256,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['person_id'] = Variable<String>(personId);
+    if (!nullToAbsent || sourceBirthProfileId != null) {
+      map['source_birth_profile_id'] = Variable<String>(sourceBirthProfileId);
+    }
+    map['chart_group_id'] = Variable<String>(chartGroupId);
+    map['revision_number'] = Variable<int>(revisionNumber);
+    map['revision_reason'] = Variable<String>(revisionReason);
+    map['created_at_utc_us'] = Variable<int>(createdAtUtcUs);
+    map['calculated_at_utc_us'] = Variable<int>(calculatedAtUtcUs);
+    map['calendar_type'] = Variable<String>(calendarType);
+    map['input_local_date'] = Variable<String>(inputLocalDate);
+    if (!nullToAbsent || inputLocalTime != null) {
+      map['input_local_time'] = Variable<String>(inputLocalTime);
+    }
+    map['hour_unknown'] = Variable<bool>(hourUnknown);
+    map['gender_compatibility_value'] = Variable<String>(
+      genderCompatibilityValue,
+    );
+    if (!nullToAbsent || originalLunarYear != null) {
+      map['original_lunar_year'] = Variable<int>(originalLunarYear);
+    }
+    if (!nullToAbsent || originalLunarMonth != null) {
+      map['original_lunar_month'] = Variable<int>(originalLunarMonth);
+    }
+    if (!nullToAbsent || originalLunarDay != null) {
+      map['original_lunar_day'] = Variable<int>(originalLunarDay);
+    }
+    if (!nullToAbsent || originalLunarLeapMonth != null) {
+      map['original_lunar_leap_month'] = Variable<bool>(originalLunarLeapMonth);
+    }
+    map['timezone_id'] = Variable<String>(timezoneId);
+    map['birth_place_profile'] = Variable<String>(birthPlaceProfile);
+    map['yaja_enabled'] = Variable<bool>(yajaEnabled);
+    map['converted_solar_date'] = Variable<String>(convertedSolarDate);
+    map['converted_lunar_date'] = Variable<String>(convertedLunarDate);
+    map['converted_lunar_leap_month'] = Variable<bool>(convertedLunarLeapMonth);
+    if (!nullToAbsent || birthUtcInstantUs != null) {
+      map['birth_utc_instant_us'] = Variable<int>(birthUtcInstantUs);
+    }
+    map['utc_offset_at_birth_minutes'] = Variable<int>(utcOffsetAtBirthMinutes);
+    if (!nullToAbsent || effectiveHourCalculationTime != null) {
+      map['effective_hour_calculation_time'] = Variable<String>(
+        effectiveHourCalculationTime,
+      );
+    }
+    map['year_pillar_canonical_id'] = Variable<String>(yearPillarCanonicalId);
+    map['year_pillar_cycle_index'] = Variable<int>(yearPillarCycleIndex);
+    map['year_pillar_stem_index'] = Variable<int>(yearPillarStemIndex);
+    map['year_pillar_branch_index'] = Variable<int>(yearPillarBranchIndex);
+    map['year_pillar_hanja'] = Variable<String>(yearPillarHanja);
+    map['year_pillar_korean_label'] = Variable<String>(yearPillarKoreanLabel);
+    map['month_pillar_canonical_id'] = Variable<String>(monthPillarCanonicalId);
+    map['month_pillar_cycle_index'] = Variable<int>(monthPillarCycleIndex);
+    map['month_pillar_stem_index'] = Variable<int>(monthPillarStemIndex);
+    map['month_pillar_branch_index'] = Variable<int>(monthPillarBranchIndex);
+    map['month_pillar_hanja'] = Variable<String>(monthPillarHanja);
+    map['month_pillar_korean_label'] = Variable<String>(monthPillarKoreanLabel);
+    map['day_pillar_canonical_id'] = Variable<String>(dayPillarCanonicalId);
+    map['day_pillar_cycle_index'] = Variable<int>(dayPillarCycleIndex);
+    map['day_pillar_stem_index'] = Variable<int>(dayPillarStemIndex);
+    map['day_pillar_branch_index'] = Variable<int>(dayPillarBranchIndex);
+    map['day_pillar_hanja'] = Variable<String>(dayPillarHanja);
+    map['day_pillar_korean_label'] = Variable<String>(dayPillarKoreanLabel);
+    if (!nullToAbsent || hourPillarCanonicalId != null) {
+      map['hour_pillar_canonical_id'] = Variable<String>(hourPillarCanonicalId);
+    }
+    if (!nullToAbsent || hourPillarCycleIndex != null) {
+      map['hour_pillar_cycle_index'] = Variable<int>(hourPillarCycleIndex);
+    }
+    if (!nullToAbsent || hourPillarStemIndex != null) {
+      map['hour_pillar_stem_index'] = Variable<int>(hourPillarStemIndex);
+    }
+    if (!nullToAbsent || hourPillarBranchIndex != null) {
+      map['hour_pillar_branch_index'] = Variable<int>(hourPillarBranchIndex);
+    }
+    if (!nullToAbsent || hourPillarHanja != null) {
+      map['hour_pillar_hanja'] = Variable<String>(hourPillarHanja);
+    }
+    if (!nullToAbsent || hourPillarKoreanLabel != null) {
+      map['hour_pillar_korean_label'] = Variable<String>(hourPillarKoreanLabel);
+    }
+    map['engine_id'] = Variable<String>(engineId);
+    map['engine_version'] = Variable<String>(engineVersion);
+    map['policy_id'] = Variable<String>(policyId);
+    map['policy_version'] = Variable<String>(policyVersion);
+    map['day_rollover_policy'] = Variable<String>(dayRolloverPolicy);
+    map['longitude_correction_policy'] = Variable<String>(
+      longitudeCorrectionPolicy,
+    );
+    map['dst_correction_policy'] = Variable<String>(dstCorrectionPolicy);
+    map['supported_range_version'] = Variable<String>(supportedRangeVersion);
+    map['solar_term_algorithm_version'] = Variable<String>(
+      solarTermAlgorithmVersion,
+    );
+    map['lunar_converter_version'] = Variable<String>(lunarConverterVersion);
+    map['day_anchor_version'] = Variable<String>(dayAnchorVersion);
+    map['time_scale_adapter_version'] = Variable<String>(
+      timeScaleAdapterVersion,
+    );
+    map['warnings_json'] = Variable<String>(warningsJson);
+    map['input_fingerprint_sha256'] = Variable<String>(inputFingerprintSha256);
+    map['calculation_signature_sha256'] = Variable<String>(
+      calculationSignatureSha256,
+    );
+    return map;
+  }
+
+  SajuChartSnapshotsCompanion toCompanion(bool nullToAbsent) {
+    return SajuChartSnapshotsCompanion(
+      id: Value(id),
+      personId: Value(personId),
+      sourceBirthProfileId: sourceBirthProfileId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sourceBirthProfileId),
+      chartGroupId: Value(chartGroupId),
+      revisionNumber: Value(revisionNumber),
+      revisionReason: Value(revisionReason),
+      createdAtUtcUs: Value(createdAtUtcUs),
+      calculatedAtUtcUs: Value(calculatedAtUtcUs),
+      calendarType: Value(calendarType),
+      inputLocalDate: Value(inputLocalDate),
+      inputLocalTime: inputLocalTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(inputLocalTime),
+      hourUnknown: Value(hourUnknown),
+      genderCompatibilityValue: Value(genderCompatibilityValue),
+      originalLunarYear: originalLunarYear == null && nullToAbsent
+          ? const Value.absent()
+          : Value(originalLunarYear),
+      originalLunarMonth: originalLunarMonth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(originalLunarMonth),
+      originalLunarDay: originalLunarDay == null && nullToAbsent
+          ? const Value.absent()
+          : Value(originalLunarDay),
+      originalLunarLeapMonth: originalLunarLeapMonth == null && nullToAbsent
+          ? const Value.absent()
+          : Value(originalLunarLeapMonth),
+      timezoneId: Value(timezoneId),
+      birthPlaceProfile: Value(birthPlaceProfile),
+      yajaEnabled: Value(yajaEnabled),
+      convertedSolarDate: Value(convertedSolarDate),
+      convertedLunarDate: Value(convertedLunarDate),
+      convertedLunarLeapMonth: Value(convertedLunarLeapMonth),
+      birthUtcInstantUs: birthUtcInstantUs == null && nullToAbsent
+          ? const Value.absent()
+          : Value(birthUtcInstantUs),
+      utcOffsetAtBirthMinutes: Value(utcOffsetAtBirthMinutes),
+      effectiveHourCalculationTime:
+          effectiveHourCalculationTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(effectiveHourCalculationTime),
+      yearPillarCanonicalId: Value(yearPillarCanonicalId),
+      yearPillarCycleIndex: Value(yearPillarCycleIndex),
+      yearPillarStemIndex: Value(yearPillarStemIndex),
+      yearPillarBranchIndex: Value(yearPillarBranchIndex),
+      yearPillarHanja: Value(yearPillarHanja),
+      yearPillarKoreanLabel: Value(yearPillarKoreanLabel),
+      monthPillarCanonicalId: Value(monthPillarCanonicalId),
+      monthPillarCycleIndex: Value(monthPillarCycleIndex),
+      monthPillarStemIndex: Value(monthPillarStemIndex),
+      monthPillarBranchIndex: Value(monthPillarBranchIndex),
+      monthPillarHanja: Value(monthPillarHanja),
+      monthPillarKoreanLabel: Value(monthPillarKoreanLabel),
+      dayPillarCanonicalId: Value(dayPillarCanonicalId),
+      dayPillarCycleIndex: Value(dayPillarCycleIndex),
+      dayPillarStemIndex: Value(dayPillarStemIndex),
+      dayPillarBranchIndex: Value(dayPillarBranchIndex),
+      dayPillarHanja: Value(dayPillarHanja),
+      dayPillarKoreanLabel: Value(dayPillarKoreanLabel),
+      hourPillarCanonicalId: hourPillarCanonicalId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(hourPillarCanonicalId),
+      hourPillarCycleIndex: hourPillarCycleIndex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(hourPillarCycleIndex),
+      hourPillarStemIndex: hourPillarStemIndex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(hourPillarStemIndex),
+      hourPillarBranchIndex: hourPillarBranchIndex == null && nullToAbsent
+          ? const Value.absent()
+          : Value(hourPillarBranchIndex),
+      hourPillarHanja: hourPillarHanja == null && nullToAbsent
+          ? const Value.absent()
+          : Value(hourPillarHanja),
+      hourPillarKoreanLabel: hourPillarKoreanLabel == null && nullToAbsent
+          ? const Value.absent()
+          : Value(hourPillarKoreanLabel),
+      engineId: Value(engineId),
+      engineVersion: Value(engineVersion),
+      policyId: Value(policyId),
+      policyVersion: Value(policyVersion),
+      dayRolloverPolicy: Value(dayRolloverPolicy),
+      longitudeCorrectionPolicy: Value(longitudeCorrectionPolicy),
+      dstCorrectionPolicy: Value(dstCorrectionPolicy),
+      supportedRangeVersion: Value(supportedRangeVersion),
+      solarTermAlgorithmVersion: Value(solarTermAlgorithmVersion),
+      lunarConverterVersion: Value(lunarConverterVersion),
+      dayAnchorVersion: Value(dayAnchorVersion),
+      timeScaleAdapterVersion: Value(timeScaleAdapterVersion),
+      warningsJson: Value(warningsJson),
+      inputFingerprintSha256: Value(inputFingerprintSha256),
+      calculationSignatureSha256: Value(calculationSignatureSha256),
+    );
+  }
+
+  factory SajuChartSnapshotRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SajuChartSnapshotRow(
+      id: serializer.fromJson<String>(json['id']),
+      personId: serializer.fromJson<String>(json['personId']),
+      sourceBirthProfileId: serializer.fromJson<String?>(
+        json['sourceBirthProfileId'],
+      ),
+      chartGroupId: serializer.fromJson<String>(json['chartGroupId']),
+      revisionNumber: serializer.fromJson<int>(json['revisionNumber']),
+      revisionReason: serializer.fromJson<String>(json['revisionReason']),
+      createdAtUtcUs: serializer.fromJson<int>(json['createdAtUtcUs']),
+      calculatedAtUtcUs: serializer.fromJson<int>(json['calculatedAtUtcUs']),
+      calendarType: serializer.fromJson<String>(json['calendarType']),
+      inputLocalDate: serializer.fromJson<String>(json['inputLocalDate']),
+      inputLocalTime: serializer.fromJson<String?>(json['inputLocalTime']),
+      hourUnknown: serializer.fromJson<bool>(json['hourUnknown']),
+      genderCompatibilityValue: serializer.fromJson<String>(
+        json['genderCompatibilityValue'],
+      ),
+      originalLunarYear: serializer.fromJson<int?>(json['originalLunarYear']),
+      originalLunarMonth: serializer.fromJson<int?>(json['originalLunarMonth']),
+      originalLunarDay: serializer.fromJson<int?>(json['originalLunarDay']),
+      originalLunarLeapMonth: serializer.fromJson<bool?>(
+        json['originalLunarLeapMonth'],
+      ),
+      timezoneId: serializer.fromJson<String>(json['timezoneId']),
+      birthPlaceProfile: serializer.fromJson<String>(json['birthPlaceProfile']),
+      yajaEnabled: serializer.fromJson<bool>(json['yajaEnabled']),
+      convertedSolarDate: serializer.fromJson<String>(
+        json['convertedSolarDate'],
+      ),
+      convertedLunarDate: serializer.fromJson<String>(
+        json['convertedLunarDate'],
+      ),
+      convertedLunarLeapMonth: serializer.fromJson<bool>(
+        json['convertedLunarLeapMonth'],
+      ),
+      birthUtcInstantUs: serializer.fromJson<int?>(json['birthUtcInstantUs']),
+      utcOffsetAtBirthMinutes: serializer.fromJson<int>(
+        json['utcOffsetAtBirthMinutes'],
+      ),
+      effectiveHourCalculationTime: serializer.fromJson<String?>(
+        json['effectiveHourCalculationTime'],
+      ),
+      yearPillarCanonicalId: serializer.fromJson<String>(
+        json['yearPillarCanonicalId'],
+      ),
+      yearPillarCycleIndex: serializer.fromJson<int>(
+        json['yearPillarCycleIndex'],
+      ),
+      yearPillarStemIndex: serializer.fromJson<int>(
+        json['yearPillarStemIndex'],
+      ),
+      yearPillarBranchIndex: serializer.fromJson<int>(
+        json['yearPillarBranchIndex'],
+      ),
+      yearPillarHanja: serializer.fromJson<String>(json['yearPillarHanja']),
+      yearPillarKoreanLabel: serializer.fromJson<String>(
+        json['yearPillarKoreanLabel'],
+      ),
+      monthPillarCanonicalId: serializer.fromJson<String>(
+        json['monthPillarCanonicalId'],
+      ),
+      monthPillarCycleIndex: serializer.fromJson<int>(
+        json['monthPillarCycleIndex'],
+      ),
+      monthPillarStemIndex: serializer.fromJson<int>(
+        json['monthPillarStemIndex'],
+      ),
+      monthPillarBranchIndex: serializer.fromJson<int>(
+        json['monthPillarBranchIndex'],
+      ),
+      monthPillarHanja: serializer.fromJson<String>(json['monthPillarHanja']),
+      monthPillarKoreanLabel: serializer.fromJson<String>(
+        json['monthPillarKoreanLabel'],
+      ),
+      dayPillarCanonicalId: serializer.fromJson<String>(
+        json['dayPillarCanonicalId'],
+      ),
+      dayPillarCycleIndex: serializer.fromJson<int>(
+        json['dayPillarCycleIndex'],
+      ),
+      dayPillarStemIndex: serializer.fromJson<int>(json['dayPillarStemIndex']),
+      dayPillarBranchIndex: serializer.fromJson<int>(
+        json['dayPillarBranchIndex'],
+      ),
+      dayPillarHanja: serializer.fromJson<String>(json['dayPillarHanja']),
+      dayPillarKoreanLabel: serializer.fromJson<String>(
+        json['dayPillarKoreanLabel'],
+      ),
+      hourPillarCanonicalId: serializer.fromJson<String?>(
+        json['hourPillarCanonicalId'],
+      ),
+      hourPillarCycleIndex: serializer.fromJson<int?>(
+        json['hourPillarCycleIndex'],
+      ),
+      hourPillarStemIndex: serializer.fromJson<int?>(
+        json['hourPillarStemIndex'],
+      ),
+      hourPillarBranchIndex: serializer.fromJson<int?>(
+        json['hourPillarBranchIndex'],
+      ),
+      hourPillarHanja: serializer.fromJson<String?>(json['hourPillarHanja']),
+      hourPillarKoreanLabel: serializer.fromJson<String?>(
+        json['hourPillarKoreanLabel'],
+      ),
+      engineId: serializer.fromJson<String>(json['engineId']),
+      engineVersion: serializer.fromJson<String>(json['engineVersion']),
+      policyId: serializer.fromJson<String>(json['policyId']),
+      policyVersion: serializer.fromJson<String>(json['policyVersion']),
+      dayRolloverPolicy: serializer.fromJson<String>(json['dayRolloverPolicy']),
+      longitudeCorrectionPolicy: serializer.fromJson<String>(
+        json['longitudeCorrectionPolicy'],
+      ),
+      dstCorrectionPolicy: serializer.fromJson<String>(
+        json['dstCorrectionPolicy'],
+      ),
+      supportedRangeVersion: serializer.fromJson<String>(
+        json['supportedRangeVersion'],
+      ),
+      solarTermAlgorithmVersion: serializer.fromJson<String>(
+        json['solarTermAlgorithmVersion'],
+      ),
+      lunarConverterVersion: serializer.fromJson<String>(
+        json['lunarConverterVersion'],
+      ),
+      dayAnchorVersion: serializer.fromJson<String>(json['dayAnchorVersion']),
+      timeScaleAdapterVersion: serializer.fromJson<String>(
+        json['timeScaleAdapterVersion'],
+      ),
+      warningsJson: serializer.fromJson<String>(json['warningsJson']),
+      inputFingerprintSha256: serializer.fromJson<String>(
+        json['inputFingerprintSha256'],
+      ),
+      calculationSignatureSha256: serializer.fromJson<String>(
+        json['calculationSignatureSha256'],
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'personId': serializer.toJson<String>(personId),
+      'sourceBirthProfileId': serializer.toJson<String?>(sourceBirthProfileId),
+      'chartGroupId': serializer.toJson<String>(chartGroupId),
+      'revisionNumber': serializer.toJson<int>(revisionNumber),
+      'revisionReason': serializer.toJson<String>(revisionReason),
+      'createdAtUtcUs': serializer.toJson<int>(createdAtUtcUs),
+      'calculatedAtUtcUs': serializer.toJson<int>(calculatedAtUtcUs),
+      'calendarType': serializer.toJson<String>(calendarType),
+      'inputLocalDate': serializer.toJson<String>(inputLocalDate),
+      'inputLocalTime': serializer.toJson<String?>(inputLocalTime),
+      'hourUnknown': serializer.toJson<bool>(hourUnknown),
+      'genderCompatibilityValue': serializer.toJson<String>(
+        genderCompatibilityValue,
+      ),
+      'originalLunarYear': serializer.toJson<int?>(originalLunarYear),
+      'originalLunarMonth': serializer.toJson<int?>(originalLunarMonth),
+      'originalLunarDay': serializer.toJson<int?>(originalLunarDay),
+      'originalLunarLeapMonth': serializer.toJson<bool?>(
+        originalLunarLeapMonth,
+      ),
+      'timezoneId': serializer.toJson<String>(timezoneId),
+      'birthPlaceProfile': serializer.toJson<String>(birthPlaceProfile),
+      'yajaEnabled': serializer.toJson<bool>(yajaEnabled),
+      'convertedSolarDate': serializer.toJson<String>(convertedSolarDate),
+      'convertedLunarDate': serializer.toJson<String>(convertedLunarDate),
+      'convertedLunarLeapMonth': serializer.toJson<bool>(
+        convertedLunarLeapMonth,
+      ),
+      'birthUtcInstantUs': serializer.toJson<int?>(birthUtcInstantUs),
+      'utcOffsetAtBirthMinutes': serializer.toJson<int>(
+        utcOffsetAtBirthMinutes,
+      ),
+      'effectiveHourCalculationTime': serializer.toJson<String?>(
+        effectiveHourCalculationTime,
+      ),
+      'yearPillarCanonicalId': serializer.toJson<String>(yearPillarCanonicalId),
+      'yearPillarCycleIndex': serializer.toJson<int>(yearPillarCycleIndex),
+      'yearPillarStemIndex': serializer.toJson<int>(yearPillarStemIndex),
+      'yearPillarBranchIndex': serializer.toJson<int>(yearPillarBranchIndex),
+      'yearPillarHanja': serializer.toJson<String>(yearPillarHanja),
+      'yearPillarKoreanLabel': serializer.toJson<String>(yearPillarKoreanLabel),
+      'monthPillarCanonicalId': serializer.toJson<String>(
+        monthPillarCanonicalId,
+      ),
+      'monthPillarCycleIndex': serializer.toJson<int>(monthPillarCycleIndex),
+      'monthPillarStemIndex': serializer.toJson<int>(monthPillarStemIndex),
+      'monthPillarBranchIndex': serializer.toJson<int>(monthPillarBranchIndex),
+      'monthPillarHanja': serializer.toJson<String>(monthPillarHanja),
+      'monthPillarKoreanLabel': serializer.toJson<String>(
+        monthPillarKoreanLabel,
+      ),
+      'dayPillarCanonicalId': serializer.toJson<String>(dayPillarCanonicalId),
+      'dayPillarCycleIndex': serializer.toJson<int>(dayPillarCycleIndex),
+      'dayPillarStemIndex': serializer.toJson<int>(dayPillarStemIndex),
+      'dayPillarBranchIndex': serializer.toJson<int>(dayPillarBranchIndex),
+      'dayPillarHanja': serializer.toJson<String>(dayPillarHanja),
+      'dayPillarKoreanLabel': serializer.toJson<String>(dayPillarKoreanLabel),
+      'hourPillarCanonicalId': serializer.toJson<String?>(
+        hourPillarCanonicalId,
+      ),
+      'hourPillarCycleIndex': serializer.toJson<int?>(hourPillarCycleIndex),
+      'hourPillarStemIndex': serializer.toJson<int?>(hourPillarStemIndex),
+      'hourPillarBranchIndex': serializer.toJson<int?>(hourPillarBranchIndex),
+      'hourPillarHanja': serializer.toJson<String?>(hourPillarHanja),
+      'hourPillarKoreanLabel': serializer.toJson<String?>(
+        hourPillarKoreanLabel,
+      ),
+      'engineId': serializer.toJson<String>(engineId),
+      'engineVersion': serializer.toJson<String>(engineVersion),
+      'policyId': serializer.toJson<String>(policyId),
+      'policyVersion': serializer.toJson<String>(policyVersion),
+      'dayRolloverPolicy': serializer.toJson<String>(dayRolloverPolicy),
+      'longitudeCorrectionPolicy': serializer.toJson<String>(
+        longitudeCorrectionPolicy,
+      ),
+      'dstCorrectionPolicy': serializer.toJson<String>(dstCorrectionPolicy),
+      'supportedRangeVersion': serializer.toJson<String>(supportedRangeVersion),
+      'solarTermAlgorithmVersion': serializer.toJson<String>(
+        solarTermAlgorithmVersion,
+      ),
+      'lunarConverterVersion': serializer.toJson<String>(lunarConverterVersion),
+      'dayAnchorVersion': serializer.toJson<String>(dayAnchorVersion),
+      'timeScaleAdapterVersion': serializer.toJson<String>(
+        timeScaleAdapterVersion,
+      ),
+      'warningsJson': serializer.toJson<String>(warningsJson),
+      'inputFingerprintSha256': serializer.toJson<String>(
+        inputFingerprintSha256,
+      ),
+      'calculationSignatureSha256': serializer.toJson<String>(
+        calculationSignatureSha256,
+      ),
+    };
+  }
+
+  SajuChartSnapshotRow copyWith({
+    String? id,
+    String? personId,
+    Value<String?> sourceBirthProfileId = const Value.absent(),
+    String? chartGroupId,
+    int? revisionNumber,
+    String? revisionReason,
+    int? createdAtUtcUs,
+    int? calculatedAtUtcUs,
+    String? calendarType,
+    String? inputLocalDate,
+    Value<String?> inputLocalTime = const Value.absent(),
+    bool? hourUnknown,
+    String? genderCompatibilityValue,
+    Value<int?> originalLunarYear = const Value.absent(),
+    Value<int?> originalLunarMonth = const Value.absent(),
+    Value<int?> originalLunarDay = const Value.absent(),
+    Value<bool?> originalLunarLeapMonth = const Value.absent(),
+    String? timezoneId,
+    String? birthPlaceProfile,
+    bool? yajaEnabled,
+    String? convertedSolarDate,
+    String? convertedLunarDate,
+    bool? convertedLunarLeapMonth,
+    Value<int?> birthUtcInstantUs = const Value.absent(),
+    int? utcOffsetAtBirthMinutes,
+    Value<String?> effectiveHourCalculationTime = const Value.absent(),
+    String? yearPillarCanonicalId,
+    int? yearPillarCycleIndex,
+    int? yearPillarStemIndex,
+    int? yearPillarBranchIndex,
+    String? yearPillarHanja,
+    String? yearPillarKoreanLabel,
+    String? monthPillarCanonicalId,
+    int? monthPillarCycleIndex,
+    int? monthPillarStemIndex,
+    int? monthPillarBranchIndex,
+    String? monthPillarHanja,
+    String? monthPillarKoreanLabel,
+    String? dayPillarCanonicalId,
+    int? dayPillarCycleIndex,
+    int? dayPillarStemIndex,
+    int? dayPillarBranchIndex,
+    String? dayPillarHanja,
+    String? dayPillarKoreanLabel,
+    Value<String?> hourPillarCanonicalId = const Value.absent(),
+    Value<int?> hourPillarCycleIndex = const Value.absent(),
+    Value<int?> hourPillarStemIndex = const Value.absent(),
+    Value<int?> hourPillarBranchIndex = const Value.absent(),
+    Value<String?> hourPillarHanja = const Value.absent(),
+    Value<String?> hourPillarKoreanLabel = const Value.absent(),
+    String? engineId,
+    String? engineVersion,
+    String? policyId,
+    String? policyVersion,
+    String? dayRolloverPolicy,
+    String? longitudeCorrectionPolicy,
+    String? dstCorrectionPolicy,
+    String? supportedRangeVersion,
+    String? solarTermAlgorithmVersion,
+    String? lunarConverterVersion,
+    String? dayAnchorVersion,
+    String? timeScaleAdapterVersion,
+    String? warningsJson,
+    String? inputFingerprintSha256,
+    String? calculationSignatureSha256,
+  }) => SajuChartSnapshotRow(
+    id: id ?? this.id,
+    personId: personId ?? this.personId,
+    sourceBirthProfileId: sourceBirthProfileId.present
+        ? sourceBirthProfileId.value
+        : this.sourceBirthProfileId,
+    chartGroupId: chartGroupId ?? this.chartGroupId,
+    revisionNumber: revisionNumber ?? this.revisionNumber,
+    revisionReason: revisionReason ?? this.revisionReason,
+    createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+    calculatedAtUtcUs: calculatedAtUtcUs ?? this.calculatedAtUtcUs,
+    calendarType: calendarType ?? this.calendarType,
+    inputLocalDate: inputLocalDate ?? this.inputLocalDate,
+    inputLocalTime: inputLocalTime.present
+        ? inputLocalTime.value
+        : this.inputLocalTime,
+    hourUnknown: hourUnknown ?? this.hourUnknown,
+    genderCompatibilityValue:
+        genderCompatibilityValue ?? this.genderCompatibilityValue,
+    originalLunarYear: originalLunarYear.present
+        ? originalLunarYear.value
+        : this.originalLunarYear,
+    originalLunarMonth: originalLunarMonth.present
+        ? originalLunarMonth.value
+        : this.originalLunarMonth,
+    originalLunarDay: originalLunarDay.present
+        ? originalLunarDay.value
+        : this.originalLunarDay,
+    originalLunarLeapMonth: originalLunarLeapMonth.present
+        ? originalLunarLeapMonth.value
+        : this.originalLunarLeapMonth,
+    timezoneId: timezoneId ?? this.timezoneId,
+    birthPlaceProfile: birthPlaceProfile ?? this.birthPlaceProfile,
+    yajaEnabled: yajaEnabled ?? this.yajaEnabled,
+    convertedSolarDate: convertedSolarDate ?? this.convertedSolarDate,
+    convertedLunarDate: convertedLunarDate ?? this.convertedLunarDate,
+    convertedLunarLeapMonth:
+        convertedLunarLeapMonth ?? this.convertedLunarLeapMonth,
+    birthUtcInstantUs: birthUtcInstantUs.present
+        ? birthUtcInstantUs.value
+        : this.birthUtcInstantUs,
+    utcOffsetAtBirthMinutes:
+        utcOffsetAtBirthMinutes ?? this.utcOffsetAtBirthMinutes,
+    effectiveHourCalculationTime: effectiveHourCalculationTime.present
+        ? effectiveHourCalculationTime.value
+        : this.effectiveHourCalculationTime,
+    yearPillarCanonicalId: yearPillarCanonicalId ?? this.yearPillarCanonicalId,
+    yearPillarCycleIndex: yearPillarCycleIndex ?? this.yearPillarCycleIndex,
+    yearPillarStemIndex: yearPillarStemIndex ?? this.yearPillarStemIndex,
+    yearPillarBranchIndex: yearPillarBranchIndex ?? this.yearPillarBranchIndex,
+    yearPillarHanja: yearPillarHanja ?? this.yearPillarHanja,
+    yearPillarKoreanLabel: yearPillarKoreanLabel ?? this.yearPillarKoreanLabel,
+    monthPillarCanonicalId:
+        monthPillarCanonicalId ?? this.monthPillarCanonicalId,
+    monthPillarCycleIndex: monthPillarCycleIndex ?? this.monthPillarCycleIndex,
+    monthPillarStemIndex: monthPillarStemIndex ?? this.monthPillarStemIndex,
+    monthPillarBranchIndex:
+        monthPillarBranchIndex ?? this.monthPillarBranchIndex,
+    monthPillarHanja: monthPillarHanja ?? this.monthPillarHanja,
+    monthPillarKoreanLabel:
+        monthPillarKoreanLabel ?? this.monthPillarKoreanLabel,
+    dayPillarCanonicalId: dayPillarCanonicalId ?? this.dayPillarCanonicalId,
+    dayPillarCycleIndex: dayPillarCycleIndex ?? this.dayPillarCycleIndex,
+    dayPillarStemIndex: dayPillarStemIndex ?? this.dayPillarStemIndex,
+    dayPillarBranchIndex: dayPillarBranchIndex ?? this.dayPillarBranchIndex,
+    dayPillarHanja: dayPillarHanja ?? this.dayPillarHanja,
+    dayPillarKoreanLabel: dayPillarKoreanLabel ?? this.dayPillarKoreanLabel,
+    hourPillarCanonicalId: hourPillarCanonicalId.present
+        ? hourPillarCanonicalId.value
+        : this.hourPillarCanonicalId,
+    hourPillarCycleIndex: hourPillarCycleIndex.present
+        ? hourPillarCycleIndex.value
+        : this.hourPillarCycleIndex,
+    hourPillarStemIndex: hourPillarStemIndex.present
+        ? hourPillarStemIndex.value
+        : this.hourPillarStemIndex,
+    hourPillarBranchIndex: hourPillarBranchIndex.present
+        ? hourPillarBranchIndex.value
+        : this.hourPillarBranchIndex,
+    hourPillarHanja: hourPillarHanja.present
+        ? hourPillarHanja.value
+        : this.hourPillarHanja,
+    hourPillarKoreanLabel: hourPillarKoreanLabel.present
+        ? hourPillarKoreanLabel.value
+        : this.hourPillarKoreanLabel,
+    engineId: engineId ?? this.engineId,
+    engineVersion: engineVersion ?? this.engineVersion,
+    policyId: policyId ?? this.policyId,
+    policyVersion: policyVersion ?? this.policyVersion,
+    dayRolloverPolicy: dayRolloverPolicy ?? this.dayRolloverPolicy,
+    longitudeCorrectionPolicy:
+        longitudeCorrectionPolicy ?? this.longitudeCorrectionPolicy,
+    dstCorrectionPolicy: dstCorrectionPolicy ?? this.dstCorrectionPolicy,
+    supportedRangeVersion: supportedRangeVersion ?? this.supportedRangeVersion,
+    solarTermAlgorithmVersion:
+        solarTermAlgorithmVersion ?? this.solarTermAlgorithmVersion,
+    lunarConverterVersion: lunarConverterVersion ?? this.lunarConverterVersion,
+    dayAnchorVersion: dayAnchorVersion ?? this.dayAnchorVersion,
+    timeScaleAdapterVersion:
+        timeScaleAdapterVersion ?? this.timeScaleAdapterVersion,
+    warningsJson: warningsJson ?? this.warningsJson,
+    inputFingerprintSha256:
+        inputFingerprintSha256 ?? this.inputFingerprintSha256,
+    calculationSignatureSha256:
+        calculationSignatureSha256 ?? this.calculationSignatureSha256,
+  );
+  SajuChartSnapshotRow copyWithCompanion(SajuChartSnapshotsCompanion data) {
+    return SajuChartSnapshotRow(
+      id: data.id.present ? data.id.value : this.id,
+      personId: data.personId.present ? data.personId.value : this.personId,
+      sourceBirthProfileId: data.sourceBirthProfileId.present
+          ? data.sourceBirthProfileId.value
+          : this.sourceBirthProfileId,
+      chartGroupId: data.chartGroupId.present
+          ? data.chartGroupId.value
+          : this.chartGroupId,
+      revisionNumber: data.revisionNumber.present
+          ? data.revisionNumber.value
+          : this.revisionNumber,
+      revisionReason: data.revisionReason.present
+          ? data.revisionReason.value
+          : this.revisionReason,
+      createdAtUtcUs: data.createdAtUtcUs.present
+          ? data.createdAtUtcUs.value
+          : this.createdAtUtcUs,
+      calculatedAtUtcUs: data.calculatedAtUtcUs.present
+          ? data.calculatedAtUtcUs.value
+          : this.calculatedAtUtcUs,
+      calendarType: data.calendarType.present
+          ? data.calendarType.value
+          : this.calendarType,
+      inputLocalDate: data.inputLocalDate.present
+          ? data.inputLocalDate.value
+          : this.inputLocalDate,
+      inputLocalTime: data.inputLocalTime.present
+          ? data.inputLocalTime.value
+          : this.inputLocalTime,
+      hourUnknown: data.hourUnknown.present
+          ? data.hourUnknown.value
+          : this.hourUnknown,
+      genderCompatibilityValue: data.genderCompatibilityValue.present
+          ? data.genderCompatibilityValue.value
+          : this.genderCompatibilityValue,
+      originalLunarYear: data.originalLunarYear.present
+          ? data.originalLunarYear.value
+          : this.originalLunarYear,
+      originalLunarMonth: data.originalLunarMonth.present
+          ? data.originalLunarMonth.value
+          : this.originalLunarMonth,
+      originalLunarDay: data.originalLunarDay.present
+          ? data.originalLunarDay.value
+          : this.originalLunarDay,
+      originalLunarLeapMonth: data.originalLunarLeapMonth.present
+          ? data.originalLunarLeapMonth.value
+          : this.originalLunarLeapMonth,
+      timezoneId: data.timezoneId.present
+          ? data.timezoneId.value
+          : this.timezoneId,
+      birthPlaceProfile: data.birthPlaceProfile.present
+          ? data.birthPlaceProfile.value
+          : this.birthPlaceProfile,
+      yajaEnabled: data.yajaEnabled.present
+          ? data.yajaEnabled.value
+          : this.yajaEnabled,
+      convertedSolarDate: data.convertedSolarDate.present
+          ? data.convertedSolarDate.value
+          : this.convertedSolarDate,
+      convertedLunarDate: data.convertedLunarDate.present
+          ? data.convertedLunarDate.value
+          : this.convertedLunarDate,
+      convertedLunarLeapMonth: data.convertedLunarLeapMonth.present
+          ? data.convertedLunarLeapMonth.value
+          : this.convertedLunarLeapMonth,
+      birthUtcInstantUs: data.birthUtcInstantUs.present
+          ? data.birthUtcInstantUs.value
+          : this.birthUtcInstantUs,
+      utcOffsetAtBirthMinutes: data.utcOffsetAtBirthMinutes.present
+          ? data.utcOffsetAtBirthMinutes.value
+          : this.utcOffsetAtBirthMinutes,
+      effectiveHourCalculationTime: data.effectiveHourCalculationTime.present
+          ? data.effectiveHourCalculationTime.value
+          : this.effectiveHourCalculationTime,
+      yearPillarCanonicalId: data.yearPillarCanonicalId.present
+          ? data.yearPillarCanonicalId.value
+          : this.yearPillarCanonicalId,
+      yearPillarCycleIndex: data.yearPillarCycleIndex.present
+          ? data.yearPillarCycleIndex.value
+          : this.yearPillarCycleIndex,
+      yearPillarStemIndex: data.yearPillarStemIndex.present
+          ? data.yearPillarStemIndex.value
+          : this.yearPillarStemIndex,
+      yearPillarBranchIndex: data.yearPillarBranchIndex.present
+          ? data.yearPillarBranchIndex.value
+          : this.yearPillarBranchIndex,
+      yearPillarHanja: data.yearPillarHanja.present
+          ? data.yearPillarHanja.value
+          : this.yearPillarHanja,
+      yearPillarKoreanLabel: data.yearPillarKoreanLabel.present
+          ? data.yearPillarKoreanLabel.value
+          : this.yearPillarKoreanLabel,
+      monthPillarCanonicalId: data.monthPillarCanonicalId.present
+          ? data.monthPillarCanonicalId.value
+          : this.monthPillarCanonicalId,
+      monthPillarCycleIndex: data.monthPillarCycleIndex.present
+          ? data.monthPillarCycleIndex.value
+          : this.monthPillarCycleIndex,
+      monthPillarStemIndex: data.monthPillarStemIndex.present
+          ? data.monthPillarStemIndex.value
+          : this.monthPillarStemIndex,
+      monthPillarBranchIndex: data.monthPillarBranchIndex.present
+          ? data.monthPillarBranchIndex.value
+          : this.monthPillarBranchIndex,
+      monthPillarHanja: data.monthPillarHanja.present
+          ? data.monthPillarHanja.value
+          : this.monthPillarHanja,
+      monthPillarKoreanLabel: data.monthPillarKoreanLabel.present
+          ? data.monthPillarKoreanLabel.value
+          : this.monthPillarKoreanLabel,
+      dayPillarCanonicalId: data.dayPillarCanonicalId.present
+          ? data.dayPillarCanonicalId.value
+          : this.dayPillarCanonicalId,
+      dayPillarCycleIndex: data.dayPillarCycleIndex.present
+          ? data.dayPillarCycleIndex.value
+          : this.dayPillarCycleIndex,
+      dayPillarStemIndex: data.dayPillarStemIndex.present
+          ? data.dayPillarStemIndex.value
+          : this.dayPillarStemIndex,
+      dayPillarBranchIndex: data.dayPillarBranchIndex.present
+          ? data.dayPillarBranchIndex.value
+          : this.dayPillarBranchIndex,
+      dayPillarHanja: data.dayPillarHanja.present
+          ? data.dayPillarHanja.value
+          : this.dayPillarHanja,
+      dayPillarKoreanLabel: data.dayPillarKoreanLabel.present
+          ? data.dayPillarKoreanLabel.value
+          : this.dayPillarKoreanLabel,
+      hourPillarCanonicalId: data.hourPillarCanonicalId.present
+          ? data.hourPillarCanonicalId.value
+          : this.hourPillarCanonicalId,
+      hourPillarCycleIndex: data.hourPillarCycleIndex.present
+          ? data.hourPillarCycleIndex.value
+          : this.hourPillarCycleIndex,
+      hourPillarStemIndex: data.hourPillarStemIndex.present
+          ? data.hourPillarStemIndex.value
+          : this.hourPillarStemIndex,
+      hourPillarBranchIndex: data.hourPillarBranchIndex.present
+          ? data.hourPillarBranchIndex.value
+          : this.hourPillarBranchIndex,
+      hourPillarHanja: data.hourPillarHanja.present
+          ? data.hourPillarHanja.value
+          : this.hourPillarHanja,
+      hourPillarKoreanLabel: data.hourPillarKoreanLabel.present
+          ? data.hourPillarKoreanLabel.value
+          : this.hourPillarKoreanLabel,
+      engineId: data.engineId.present ? data.engineId.value : this.engineId,
+      engineVersion: data.engineVersion.present
+          ? data.engineVersion.value
+          : this.engineVersion,
+      policyId: data.policyId.present ? data.policyId.value : this.policyId,
+      policyVersion: data.policyVersion.present
+          ? data.policyVersion.value
+          : this.policyVersion,
+      dayRolloverPolicy: data.dayRolloverPolicy.present
+          ? data.dayRolloverPolicy.value
+          : this.dayRolloverPolicy,
+      longitudeCorrectionPolicy: data.longitudeCorrectionPolicy.present
+          ? data.longitudeCorrectionPolicy.value
+          : this.longitudeCorrectionPolicy,
+      dstCorrectionPolicy: data.dstCorrectionPolicy.present
+          ? data.dstCorrectionPolicy.value
+          : this.dstCorrectionPolicy,
+      supportedRangeVersion: data.supportedRangeVersion.present
+          ? data.supportedRangeVersion.value
+          : this.supportedRangeVersion,
+      solarTermAlgorithmVersion: data.solarTermAlgorithmVersion.present
+          ? data.solarTermAlgorithmVersion.value
+          : this.solarTermAlgorithmVersion,
+      lunarConverterVersion: data.lunarConverterVersion.present
+          ? data.lunarConverterVersion.value
+          : this.lunarConverterVersion,
+      dayAnchorVersion: data.dayAnchorVersion.present
+          ? data.dayAnchorVersion.value
+          : this.dayAnchorVersion,
+      timeScaleAdapterVersion: data.timeScaleAdapterVersion.present
+          ? data.timeScaleAdapterVersion.value
+          : this.timeScaleAdapterVersion,
+      warningsJson: data.warningsJson.present
+          ? data.warningsJson.value
+          : this.warningsJson,
+      inputFingerprintSha256: data.inputFingerprintSha256.present
+          ? data.inputFingerprintSha256.value
+          : this.inputFingerprintSha256,
+      calculationSignatureSha256: data.calculationSignatureSha256.present
+          ? data.calculationSignatureSha256.value
+          : this.calculationSignatureSha256,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SajuChartSnapshotRow(')
+          ..write('id: $id, ')
+          ..write('personId: $personId, ')
+          ..write('sourceBirthProfileId: $sourceBirthProfileId, ')
+          ..write('chartGroupId: $chartGroupId, ')
+          ..write('revisionNumber: $revisionNumber, ')
+          ..write('revisionReason: $revisionReason, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('calculatedAtUtcUs: $calculatedAtUtcUs, ')
+          ..write('calendarType: $calendarType, ')
+          ..write('inputLocalDate: $inputLocalDate, ')
+          ..write('inputLocalTime: $inputLocalTime, ')
+          ..write('hourUnknown: $hourUnknown, ')
+          ..write('genderCompatibilityValue: $genderCompatibilityValue, ')
+          ..write('originalLunarYear: $originalLunarYear, ')
+          ..write('originalLunarMonth: $originalLunarMonth, ')
+          ..write('originalLunarDay: $originalLunarDay, ')
+          ..write('originalLunarLeapMonth: $originalLunarLeapMonth, ')
+          ..write('timezoneId: $timezoneId, ')
+          ..write('birthPlaceProfile: $birthPlaceProfile, ')
+          ..write('yajaEnabled: $yajaEnabled, ')
+          ..write('convertedSolarDate: $convertedSolarDate, ')
+          ..write('convertedLunarDate: $convertedLunarDate, ')
+          ..write('convertedLunarLeapMonth: $convertedLunarLeapMonth, ')
+          ..write('birthUtcInstantUs: $birthUtcInstantUs, ')
+          ..write('utcOffsetAtBirthMinutes: $utcOffsetAtBirthMinutes, ')
+          ..write(
+            'effectiveHourCalculationTime: $effectiveHourCalculationTime, ',
+          )
+          ..write('yearPillarCanonicalId: $yearPillarCanonicalId, ')
+          ..write('yearPillarCycleIndex: $yearPillarCycleIndex, ')
+          ..write('yearPillarStemIndex: $yearPillarStemIndex, ')
+          ..write('yearPillarBranchIndex: $yearPillarBranchIndex, ')
+          ..write('yearPillarHanja: $yearPillarHanja, ')
+          ..write('yearPillarKoreanLabel: $yearPillarKoreanLabel, ')
+          ..write('monthPillarCanonicalId: $monthPillarCanonicalId, ')
+          ..write('monthPillarCycleIndex: $monthPillarCycleIndex, ')
+          ..write('monthPillarStemIndex: $monthPillarStemIndex, ')
+          ..write('monthPillarBranchIndex: $monthPillarBranchIndex, ')
+          ..write('monthPillarHanja: $monthPillarHanja, ')
+          ..write('monthPillarKoreanLabel: $monthPillarKoreanLabel, ')
+          ..write('dayPillarCanonicalId: $dayPillarCanonicalId, ')
+          ..write('dayPillarCycleIndex: $dayPillarCycleIndex, ')
+          ..write('dayPillarStemIndex: $dayPillarStemIndex, ')
+          ..write('dayPillarBranchIndex: $dayPillarBranchIndex, ')
+          ..write('dayPillarHanja: $dayPillarHanja, ')
+          ..write('dayPillarKoreanLabel: $dayPillarKoreanLabel, ')
+          ..write('hourPillarCanonicalId: $hourPillarCanonicalId, ')
+          ..write('hourPillarCycleIndex: $hourPillarCycleIndex, ')
+          ..write('hourPillarStemIndex: $hourPillarStemIndex, ')
+          ..write('hourPillarBranchIndex: $hourPillarBranchIndex, ')
+          ..write('hourPillarHanja: $hourPillarHanja, ')
+          ..write('hourPillarKoreanLabel: $hourPillarKoreanLabel, ')
+          ..write('engineId: $engineId, ')
+          ..write('engineVersion: $engineVersion, ')
+          ..write('policyId: $policyId, ')
+          ..write('policyVersion: $policyVersion, ')
+          ..write('dayRolloverPolicy: $dayRolloverPolicy, ')
+          ..write('longitudeCorrectionPolicy: $longitudeCorrectionPolicy, ')
+          ..write('dstCorrectionPolicy: $dstCorrectionPolicy, ')
+          ..write('supportedRangeVersion: $supportedRangeVersion, ')
+          ..write('solarTermAlgorithmVersion: $solarTermAlgorithmVersion, ')
+          ..write('lunarConverterVersion: $lunarConverterVersion, ')
+          ..write('dayAnchorVersion: $dayAnchorVersion, ')
+          ..write('timeScaleAdapterVersion: $timeScaleAdapterVersion, ')
+          ..write('warningsJson: $warningsJson, ')
+          ..write('inputFingerprintSha256: $inputFingerprintSha256, ')
+          ..write('calculationSignatureSha256: $calculationSignatureSha256')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hashAll([
+    id,
+    personId,
+    sourceBirthProfileId,
+    chartGroupId,
+    revisionNumber,
+    revisionReason,
+    createdAtUtcUs,
+    calculatedAtUtcUs,
+    calendarType,
+    inputLocalDate,
+    inputLocalTime,
+    hourUnknown,
+    genderCompatibilityValue,
+    originalLunarYear,
+    originalLunarMonth,
+    originalLunarDay,
+    originalLunarLeapMonth,
+    timezoneId,
+    birthPlaceProfile,
+    yajaEnabled,
+    convertedSolarDate,
+    convertedLunarDate,
+    convertedLunarLeapMonth,
+    birthUtcInstantUs,
+    utcOffsetAtBirthMinutes,
+    effectiveHourCalculationTime,
+    yearPillarCanonicalId,
+    yearPillarCycleIndex,
+    yearPillarStemIndex,
+    yearPillarBranchIndex,
+    yearPillarHanja,
+    yearPillarKoreanLabel,
+    monthPillarCanonicalId,
+    monthPillarCycleIndex,
+    monthPillarStemIndex,
+    monthPillarBranchIndex,
+    monthPillarHanja,
+    monthPillarKoreanLabel,
+    dayPillarCanonicalId,
+    dayPillarCycleIndex,
+    dayPillarStemIndex,
+    dayPillarBranchIndex,
+    dayPillarHanja,
+    dayPillarKoreanLabel,
+    hourPillarCanonicalId,
+    hourPillarCycleIndex,
+    hourPillarStemIndex,
+    hourPillarBranchIndex,
+    hourPillarHanja,
+    hourPillarKoreanLabel,
+    engineId,
+    engineVersion,
+    policyId,
+    policyVersion,
+    dayRolloverPolicy,
+    longitudeCorrectionPolicy,
+    dstCorrectionPolicy,
+    supportedRangeVersion,
+    solarTermAlgorithmVersion,
+    lunarConverterVersion,
+    dayAnchorVersion,
+    timeScaleAdapterVersion,
+    warningsJson,
+    inputFingerprintSha256,
+    calculationSignatureSha256,
+  ]);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SajuChartSnapshotRow &&
+          other.id == this.id &&
+          other.personId == this.personId &&
+          other.sourceBirthProfileId == this.sourceBirthProfileId &&
+          other.chartGroupId == this.chartGroupId &&
+          other.revisionNumber == this.revisionNumber &&
+          other.revisionReason == this.revisionReason &&
+          other.createdAtUtcUs == this.createdAtUtcUs &&
+          other.calculatedAtUtcUs == this.calculatedAtUtcUs &&
+          other.calendarType == this.calendarType &&
+          other.inputLocalDate == this.inputLocalDate &&
+          other.inputLocalTime == this.inputLocalTime &&
+          other.hourUnknown == this.hourUnknown &&
+          other.genderCompatibilityValue == this.genderCompatibilityValue &&
+          other.originalLunarYear == this.originalLunarYear &&
+          other.originalLunarMonth == this.originalLunarMonth &&
+          other.originalLunarDay == this.originalLunarDay &&
+          other.originalLunarLeapMonth == this.originalLunarLeapMonth &&
+          other.timezoneId == this.timezoneId &&
+          other.birthPlaceProfile == this.birthPlaceProfile &&
+          other.yajaEnabled == this.yajaEnabled &&
+          other.convertedSolarDate == this.convertedSolarDate &&
+          other.convertedLunarDate == this.convertedLunarDate &&
+          other.convertedLunarLeapMonth == this.convertedLunarLeapMonth &&
+          other.birthUtcInstantUs == this.birthUtcInstantUs &&
+          other.utcOffsetAtBirthMinutes == this.utcOffsetAtBirthMinutes &&
+          other.effectiveHourCalculationTime ==
+              this.effectiveHourCalculationTime &&
+          other.yearPillarCanonicalId == this.yearPillarCanonicalId &&
+          other.yearPillarCycleIndex == this.yearPillarCycleIndex &&
+          other.yearPillarStemIndex == this.yearPillarStemIndex &&
+          other.yearPillarBranchIndex == this.yearPillarBranchIndex &&
+          other.yearPillarHanja == this.yearPillarHanja &&
+          other.yearPillarKoreanLabel == this.yearPillarKoreanLabel &&
+          other.monthPillarCanonicalId == this.monthPillarCanonicalId &&
+          other.monthPillarCycleIndex == this.monthPillarCycleIndex &&
+          other.monthPillarStemIndex == this.monthPillarStemIndex &&
+          other.monthPillarBranchIndex == this.monthPillarBranchIndex &&
+          other.monthPillarHanja == this.monthPillarHanja &&
+          other.monthPillarKoreanLabel == this.monthPillarKoreanLabel &&
+          other.dayPillarCanonicalId == this.dayPillarCanonicalId &&
+          other.dayPillarCycleIndex == this.dayPillarCycleIndex &&
+          other.dayPillarStemIndex == this.dayPillarStemIndex &&
+          other.dayPillarBranchIndex == this.dayPillarBranchIndex &&
+          other.dayPillarHanja == this.dayPillarHanja &&
+          other.dayPillarKoreanLabel == this.dayPillarKoreanLabel &&
+          other.hourPillarCanonicalId == this.hourPillarCanonicalId &&
+          other.hourPillarCycleIndex == this.hourPillarCycleIndex &&
+          other.hourPillarStemIndex == this.hourPillarStemIndex &&
+          other.hourPillarBranchIndex == this.hourPillarBranchIndex &&
+          other.hourPillarHanja == this.hourPillarHanja &&
+          other.hourPillarKoreanLabel == this.hourPillarKoreanLabel &&
+          other.engineId == this.engineId &&
+          other.engineVersion == this.engineVersion &&
+          other.policyId == this.policyId &&
+          other.policyVersion == this.policyVersion &&
+          other.dayRolloverPolicy == this.dayRolloverPolicy &&
+          other.longitudeCorrectionPolicy == this.longitudeCorrectionPolicy &&
+          other.dstCorrectionPolicy == this.dstCorrectionPolicy &&
+          other.supportedRangeVersion == this.supportedRangeVersion &&
+          other.solarTermAlgorithmVersion == this.solarTermAlgorithmVersion &&
+          other.lunarConverterVersion == this.lunarConverterVersion &&
+          other.dayAnchorVersion == this.dayAnchorVersion &&
+          other.timeScaleAdapterVersion == this.timeScaleAdapterVersion &&
+          other.warningsJson == this.warningsJson &&
+          other.inputFingerprintSha256 == this.inputFingerprintSha256 &&
+          other.calculationSignatureSha256 == this.calculationSignatureSha256);
+}
+
+class SajuChartSnapshotsCompanion
+    extends UpdateCompanion<SajuChartSnapshotRow> {
+  final Value<String> id;
+  final Value<String> personId;
+  final Value<String?> sourceBirthProfileId;
+  final Value<String> chartGroupId;
+  final Value<int> revisionNumber;
+  final Value<String> revisionReason;
+  final Value<int> createdAtUtcUs;
+  final Value<int> calculatedAtUtcUs;
+  final Value<String> calendarType;
+  final Value<String> inputLocalDate;
+  final Value<String?> inputLocalTime;
+  final Value<bool> hourUnknown;
+  final Value<String> genderCompatibilityValue;
+  final Value<int?> originalLunarYear;
+  final Value<int?> originalLunarMonth;
+  final Value<int?> originalLunarDay;
+  final Value<bool?> originalLunarLeapMonth;
+  final Value<String> timezoneId;
+  final Value<String> birthPlaceProfile;
+  final Value<bool> yajaEnabled;
+  final Value<String> convertedSolarDate;
+  final Value<String> convertedLunarDate;
+  final Value<bool> convertedLunarLeapMonth;
+  final Value<int?> birthUtcInstantUs;
+  final Value<int> utcOffsetAtBirthMinutes;
+  final Value<String?> effectiveHourCalculationTime;
+  final Value<String> yearPillarCanonicalId;
+  final Value<int> yearPillarCycleIndex;
+  final Value<int> yearPillarStemIndex;
+  final Value<int> yearPillarBranchIndex;
+  final Value<String> yearPillarHanja;
+  final Value<String> yearPillarKoreanLabel;
+  final Value<String> monthPillarCanonicalId;
+  final Value<int> monthPillarCycleIndex;
+  final Value<int> monthPillarStemIndex;
+  final Value<int> monthPillarBranchIndex;
+  final Value<String> monthPillarHanja;
+  final Value<String> monthPillarKoreanLabel;
+  final Value<String> dayPillarCanonicalId;
+  final Value<int> dayPillarCycleIndex;
+  final Value<int> dayPillarStemIndex;
+  final Value<int> dayPillarBranchIndex;
+  final Value<String> dayPillarHanja;
+  final Value<String> dayPillarKoreanLabel;
+  final Value<String?> hourPillarCanonicalId;
+  final Value<int?> hourPillarCycleIndex;
+  final Value<int?> hourPillarStemIndex;
+  final Value<int?> hourPillarBranchIndex;
+  final Value<String?> hourPillarHanja;
+  final Value<String?> hourPillarKoreanLabel;
+  final Value<String> engineId;
+  final Value<String> engineVersion;
+  final Value<String> policyId;
+  final Value<String> policyVersion;
+  final Value<String> dayRolloverPolicy;
+  final Value<String> longitudeCorrectionPolicy;
+  final Value<String> dstCorrectionPolicy;
+  final Value<String> supportedRangeVersion;
+  final Value<String> solarTermAlgorithmVersion;
+  final Value<String> lunarConverterVersion;
+  final Value<String> dayAnchorVersion;
+  final Value<String> timeScaleAdapterVersion;
+  final Value<String> warningsJson;
+  final Value<String> inputFingerprintSha256;
+  final Value<String> calculationSignatureSha256;
+  final Value<int> rowid;
+  const SajuChartSnapshotsCompanion({
+    this.id = const Value.absent(),
+    this.personId = const Value.absent(),
+    this.sourceBirthProfileId = const Value.absent(),
+    this.chartGroupId = const Value.absent(),
+    this.revisionNumber = const Value.absent(),
+    this.revisionReason = const Value.absent(),
+    this.createdAtUtcUs = const Value.absent(),
+    this.calculatedAtUtcUs = const Value.absent(),
+    this.calendarType = const Value.absent(),
+    this.inputLocalDate = const Value.absent(),
+    this.inputLocalTime = const Value.absent(),
+    this.hourUnknown = const Value.absent(),
+    this.genderCompatibilityValue = const Value.absent(),
+    this.originalLunarYear = const Value.absent(),
+    this.originalLunarMonth = const Value.absent(),
+    this.originalLunarDay = const Value.absent(),
+    this.originalLunarLeapMonth = const Value.absent(),
+    this.timezoneId = const Value.absent(),
+    this.birthPlaceProfile = const Value.absent(),
+    this.yajaEnabled = const Value.absent(),
+    this.convertedSolarDate = const Value.absent(),
+    this.convertedLunarDate = const Value.absent(),
+    this.convertedLunarLeapMonth = const Value.absent(),
+    this.birthUtcInstantUs = const Value.absent(),
+    this.utcOffsetAtBirthMinutes = const Value.absent(),
+    this.effectiveHourCalculationTime = const Value.absent(),
+    this.yearPillarCanonicalId = const Value.absent(),
+    this.yearPillarCycleIndex = const Value.absent(),
+    this.yearPillarStemIndex = const Value.absent(),
+    this.yearPillarBranchIndex = const Value.absent(),
+    this.yearPillarHanja = const Value.absent(),
+    this.yearPillarKoreanLabel = const Value.absent(),
+    this.monthPillarCanonicalId = const Value.absent(),
+    this.monthPillarCycleIndex = const Value.absent(),
+    this.monthPillarStemIndex = const Value.absent(),
+    this.monthPillarBranchIndex = const Value.absent(),
+    this.monthPillarHanja = const Value.absent(),
+    this.monthPillarKoreanLabel = const Value.absent(),
+    this.dayPillarCanonicalId = const Value.absent(),
+    this.dayPillarCycleIndex = const Value.absent(),
+    this.dayPillarStemIndex = const Value.absent(),
+    this.dayPillarBranchIndex = const Value.absent(),
+    this.dayPillarHanja = const Value.absent(),
+    this.dayPillarKoreanLabel = const Value.absent(),
+    this.hourPillarCanonicalId = const Value.absent(),
+    this.hourPillarCycleIndex = const Value.absent(),
+    this.hourPillarStemIndex = const Value.absent(),
+    this.hourPillarBranchIndex = const Value.absent(),
+    this.hourPillarHanja = const Value.absent(),
+    this.hourPillarKoreanLabel = const Value.absent(),
+    this.engineId = const Value.absent(),
+    this.engineVersion = const Value.absent(),
+    this.policyId = const Value.absent(),
+    this.policyVersion = const Value.absent(),
+    this.dayRolloverPolicy = const Value.absent(),
+    this.longitudeCorrectionPolicy = const Value.absent(),
+    this.dstCorrectionPolicy = const Value.absent(),
+    this.supportedRangeVersion = const Value.absent(),
+    this.solarTermAlgorithmVersion = const Value.absent(),
+    this.lunarConverterVersion = const Value.absent(),
+    this.dayAnchorVersion = const Value.absent(),
+    this.timeScaleAdapterVersion = const Value.absent(),
+    this.warningsJson = const Value.absent(),
+    this.inputFingerprintSha256 = const Value.absent(),
+    this.calculationSignatureSha256 = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SajuChartSnapshotsCompanion.insert({
+    required String id,
+    required String personId,
+    this.sourceBirthProfileId = const Value.absent(),
+    required String chartGroupId,
+    required int revisionNumber,
+    required String revisionReason,
+    required int createdAtUtcUs,
+    required int calculatedAtUtcUs,
+    required String calendarType,
+    required String inputLocalDate,
+    this.inputLocalTime = const Value.absent(),
+    required bool hourUnknown,
+    required String genderCompatibilityValue,
+    this.originalLunarYear = const Value.absent(),
+    this.originalLunarMonth = const Value.absent(),
+    this.originalLunarDay = const Value.absent(),
+    this.originalLunarLeapMonth = const Value.absent(),
+    required String timezoneId,
+    required String birthPlaceProfile,
+    required bool yajaEnabled,
+    required String convertedSolarDate,
+    required String convertedLunarDate,
+    required bool convertedLunarLeapMonth,
+    this.birthUtcInstantUs = const Value.absent(),
+    required int utcOffsetAtBirthMinutes,
+    this.effectiveHourCalculationTime = const Value.absent(),
+    required String yearPillarCanonicalId,
+    required int yearPillarCycleIndex,
+    required int yearPillarStemIndex,
+    required int yearPillarBranchIndex,
+    required String yearPillarHanja,
+    required String yearPillarKoreanLabel,
+    required String monthPillarCanonicalId,
+    required int monthPillarCycleIndex,
+    required int monthPillarStemIndex,
+    required int monthPillarBranchIndex,
+    required String monthPillarHanja,
+    required String monthPillarKoreanLabel,
+    required String dayPillarCanonicalId,
+    required int dayPillarCycleIndex,
+    required int dayPillarStemIndex,
+    required int dayPillarBranchIndex,
+    required String dayPillarHanja,
+    required String dayPillarKoreanLabel,
+    this.hourPillarCanonicalId = const Value.absent(),
+    this.hourPillarCycleIndex = const Value.absent(),
+    this.hourPillarStemIndex = const Value.absent(),
+    this.hourPillarBranchIndex = const Value.absent(),
+    this.hourPillarHanja = const Value.absent(),
+    this.hourPillarKoreanLabel = const Value.absent(),
+    required String engineId,
+    required String engineVersion,
+    required String policyId,
+    required String policyVersion,
+    required String dayRolloverPolicy,
+    required String longitudeCorrectionPolicy,
+    required String dstCorrectionPolicy,
+    required String supportedRangeVersion,
+    required String solarTermAlgorithmVersion,
+    required String lunarConverterVersion,
+    required String dayAnchorVersion,
+    required String timeScaleAdapterVersion,
+    required String warningsJson,
+    required String inputFingerprintSha256,
+    required String calculationSignatureSha256,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       personId = Value(personId),
+       chartGroupId = Value(chartGroupId),
+       revisionNumber = Value(revisionNumber),
+       revisionReason = Value(revisionReason),
+       createdAtUtcUs = Value(createdAtUtcUs),
+       calculatedAtUtcUs = Value(calculatedAtUtcUs),
+       calendarType = Value(calendarType),
+       inputLocalDate = Value(inputLocalDate),
+       hourUnknown = Value(hourUnknown),
+       genderCompatibilityValue = Value(genderCompatibilityValue),
+       timezoneId = Value(timezoneId),
+       birthPlaceProfile = Value(birthPlaceProfile),
+       yajaEnabled = Value(yajaEnabled),
+       convertedSolarDate = Value(convertedSolarDate),
+       convertedLunarDate = Value(convertedLunarDate),
+       convertedLunarLeapMonth = Value(convertedLunarLeapMonth),
+       utcOffsetAtBirthMinutes = Value(utcOffsetAtBirthMinutes),
+       yearPillarCanonicalId = Value(yearPillarCanonicalId),
+       yearPillarCycleIndex = Value(yearPillarCycleIndex),
+       yearPillarStemIndex = Value(yearPillarStemIndex),
+       yearPillarBranchIndex = Value(yearPillarBranchIndex),
+       yearPillarHanja = Value(yearPillarHanja),
+       yearPillarKoreanLabel = Value(yearPillarKoreanLabel),
+       monthPillarCanonicalId = Value(monthPillarCanonicalId),
+       monthPillarCycleIndex = Value(monthPillarCycleIndex),
+       monthPillarStemIndex = Value(monthPillarStemIndex),
+       monthPillarBranchIndex = Value(monthPillarBranchIndex),
+       monthPillarHanja = Value(monthPillarHanja),
+       monthPillarKoreanLabel = Value(monthPillarKoreanLabel),
+       dayPillarCanonicalId = Value(dayPillarCanonicalId),
+       dayPillarCycleIndex = Value(dayPillarCycleIndex),
+       dayPillarStemIndex = Value(dayPillarStemIndex),
+       dayPillarBranchIndex = Value(dayPillarBranchIndex),
+       dayPillarHanja = Value(dayPillarHanja),
+       dayPillarKoreanLabel = Value(dayPillarKoreanLabel),
+       engineId = Value(engineId),
+       engineVersion = Value(engineVersion),
+       policyId = Value(policyId),
+       policyVersion = Value(policyVersion),
+       dayRolloverPolicy = Value(dayRolloverPolicy),
+       longitudeCorrectionPolicy = Value(longitudeCorrectionPolicy),
+       dstCorrectionPolicy = Value(dstCorrectionPolicy),
+       supportedRangeVersion = Value(supportedRangeVersion),
+       solarTermAlgorithmVersion = Value(solarTermAlgorithmVersion),
+       lunarConverterVersion = Value(lunarConverterVersion),
+       dayAnchorVersion = Value(dayAnchorVersion),
+       timeScaleAdapterVersion = Value(timeScaleAdapterVersion),
+       warningsJson = Value(warningsJson),
+       inputFingerprintSha256 = Value(inputFingerprintSha256),
+       calculationSignatureSha256 = Value(calculationSignatureSha256);
+  static Insertable<SajuChartSnapshotRow> custom({
+    Expression<String>? id,
+    Expression<String>? personId,
+    Expression<String>? sourceBirthProfileId,
+    Expression<String>? chartGroupId,
+    Expression<int>? revisionNumber,
+    Expression<String>? revisionReason,
+    Expression<int>? createdAtUtcUs,
+    Expression<int>? calculatedAtUtcUs,
+    Expression<String>? calendarType,
+    Expression<String>? inputLocalDate,
+    Expression<String>? inputLocalTime,
+    Expression<bool>? hourUnknown,
+    Expression<String>? genderCompatibilityValue,
+    Expression<int>? originalLunarYear,
+    Expression<int>? originalLunarMonth,
+    Expression<int>? originalLunarDay,
+    Expression<bool>? originalLunarLeapMonth,
+    Expression<String>? timezoneId,
+    Expression<String>? birthPlaceProfile,
+    Expression<bool>? yajaEnabled,
+    Expression<String>? convertedSolarDate,
+    Expression<String>? convertedLunarDate,
+    Expression<bool>? convertedLunarLeapMonth,
+    Expression<int>? birthUtcInstantUs,
+    Expression<int>? utcOffsetAtBirthMinutes,
+    Expression<String>? effectiveHourCalculationTime,
+    Expression<String>? yearPillarCanonicalId,
+    Expression<int>? yearPillarCycleIndex,
+    Expression<int>? yearPillarStemIndex,
+    Expression<int>? yearPillarBranchIndex,
+    Expression<String>? yearPillarHanja,
+    Expression<String>? yearPillarKoreanLabel,
+    Expression<String>? monthPillarCanonicalId,
+    Expression<int>? monthPillarCycleIndex,
+    Expression<int>? monthPillarStemIndex,
+    Expression<int>? monthPillarBranchIndex,
+    Expression<String>? monthPillarHanja,
+    Expression<String>? monthPillarKoreanLabel,
+    Expression<String>? dayPillarCanonicalId,
+    Expression<int>? dayPillarCycleIndex,
+    Expression<int>? dayPillarStemIndex,
+    Expression<int>? dayPillarBranchIndex,
+    Expression<String>? dayPillarHanja,
+    Expression<String>? dayPillarKoreanLabel,
+    Expression<String>? hourPillarCanonicalId,
+    Expression<int>? hourPillarCycleIndex,
+    Expression<int>? hourPillarStemIndex,
+    Expression<int>? hourPillarBranchIndex,
+    Expression<String>? hourPillarHanja,
+    Expression<String>? hourPillarKoreanLabel,
+    Expression<String>? engineId,
+    Expression<String>? engineVersion,
+    Expression<String>? policyId,
+    Expression<String>? policyVersion,
+    Expression<String>? dayRolloverPolicy,
+    Expression<String>? longitudeCorrectionPolicy,
+    Expression<String>? dstCorrectionPolicy,
+    Expression<String>? supportedRangeVersion,
+    Expression<String>? solarTermAlgorithmVersion,
+    Expression<String>? lunarConverterVersion,
+    Expression<String>? dayAnchorVersion,
+    Expression<String>? timeScaleAdapterVersion,
+    Expression<String>? warningsJson,
+    Expression<String>? inputFingerprintSha256,
+    Expression<String>? calculationSignatureSha256,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (personId != null) 'person_id': personId,
+      if (sourceBirthProfileId != null)
+        'source_birth_profile_id': sourceBirthProfileId,
+      if (chartGroupId != null) 'chart_group_id': chartGroupId,
+      if (revisionNumber != null) 'revision_number': revisionNumber,
+      if (revisionReason != null) 'revision_reason': revisionReason,
+      if (createdAtUtcUs != null) 'created_at_utc_us': createdAtUtcUs,
+      if (calculatedAtUtcUs != null) 'calculated_at_utc_us': calculatedAtUtcUs,
+      if (calendarType != null) 'calendar_type': calendarType,
+      if (inputLocalDate != null) 'input_local_date': inputLocalDate,
+      if (inputLocalTime != null) 'input_local_time': inputLocalTime,
+      if (hourUnknown != null) 'hour_unknown': hourUnknown,
+      if (genderCompatibilityValue != null)
+        'gender_compatibility_value': genderCompatibilityValue,
+      if (originalLunarYear != null) 'original_lunar_year': originalLunarYear,
+      if (originalLunarMonth != null)
+        'original_lunar_month': originalLunarMonth,
+      if (originalLunarDay != null) 'original_lunar_day': originalLunarDay,
+      if (originalLunarLeapMonth != null)
+        'original_lunar_leap_month': originalLunarLeapMonth,
+      if (timezoneId != null) 'timezone_id': timezoneId,
+      if (birthPlaceProfile != null) 'birth_place_profile': birthPlaceProfile,
+      if (yajaEnabled != null) 'yaja_enabled': yajaEnabled,
+      if (convertedSolarDate != null)
+        'converted_solar_date': convertedSolarDate,
+      if (convertedLunarDate != null)
+        'converted_lunar_date': convertedLunarDate,
+      if (convertedLunarLeapMonth != null)
+        'converted_lunar_leap_month': convertedLunarLeapMonth,
+      if (birthUtcInstantUs != null) 'birth_utc_instant_us': birthUtcInstantUs,
+      if (utcOffsetAtBirthMinutes != null)
+        'utc_offset_at_birth_minutes': utcOffsetAtBirthMinutes,
+      if (effectiveHourCalculationTime != null)
+        'effective_hour_calculation_time': effectiveHourCalculationTime,
+      if (yearPillarCanonicalId != null)
+        'year_pillar_canonical_id': yearPillarCanonicalId,
+      if (yearPillarCycleIndex != null)
+        'year_pillar_cycle_index': yearPillarCycleIndex,
+      if (yearPillarStemIndex != null)
+        'year_pillar_stem_index': yearPillarStemIndex,
+      if (yearPillarBranchIndex != null)
+        'year_pillar_branch_index': yearPillarBranchIndex,
+      if (yearPillarHanja != null) 'year_pillar_hanja': yearPillarHanja,
+      if (yearPillarKoreanLabel != null)
+        'year_pillar_korean_label': yearPillarKoreanLabel,
+      if (monthPillarCanonicalId != null)
+        'month_pillar_canonical_id': monthPillarCanonicalId,
+      if (monthPillarCycleIndex != null)
+        'month_pillar_cycle_index': monthPillarCycleIndex,
+      if (monthPillarStemIndex != null)
+        'month_pillar_stem_index': monthPillarStemIndex,
+      if (monthPillarBranchIndex != null)
+        'month_pillar_branch_index': monthPillarBranchIndex,
+      if (monthPillarHanja != null) 'month_pillar_hanja': monthPillarHanja,
+      if (monthPillarKoreanLabel != null)
+        'month_pillar_korean_label': monthPillarKoreanLabel,
+      if (dayPillarCanonicalId != null)
+        'day_pillar_canonical_id': dayPillarCanonicalId,
+      if (dayPillarCycleIndex != null)
+        'day_pillar_cycle_index': dayPillarCycleIndex,
+      if (dayPillarStemIndex != null)
+        'day_pillar_stem_index': dayPillarStemIndex,
+      if (dayPillarBranchIndex != null)
+        'day_pillar_branch_index': dayPillarBranchIndex,
+      if (dayPillarHanja != null) 'day_pillar_hanja': dayPillarHanja,
+      if (dayPillarKoreanLabel != null)
+        'day_pillar_korean_label': dayPillarKoreanLabel,
+      if (hourPillarCanonicalId != null)
+        'hour_pillar_canonical_id': hourPillarCanonicalId,
+      if (hourPillarCycleIndex != null)
+        'hour_pillar_cycle_index': hourPillarCycleIndex,
+      if (hourPillarStemIndex != null)
+        'hour_pillar_stem_index': hourPillarStemIndex,
+      if (hourPillarBranchIndex != null)
+        'hour_pillar_branch_index': hourPillarBranchIndex,
+      if (hourPillarHanja != null) 'hour_pillar_hanja': hourPillarHanja,
+      if (hourPillarKoreanLabel != null)
+        'hour_pillar_korean_label': hourPillarKoreanLabel,
+      if (engineId != null) 'engine_id': engineId,
+      if (engineVersion != null) 'engine_version': engineVersion,
+      if (policyId != null) 'policy_id': policyId,
+      if (policyVersion != null) 'policy_version': policyVersion,
+      if (dayRolloverPolicy != null) 'day_rollover_policy': dayRolloverPolicy,
+      if (longitudeCorrectionPolicy != null)
+        'longitude_correction_policy': longitudeCorrectionPolicy,
+      if (dstCorrectionPolicy != null)
+        'dst_correction_policy': dstCorrectionPolicy,
+      if (supportedRangeVersion != null)
+        'supported_range_version': supportedRangeVersion,
+      if (solarTermAlgorithmVersion != null)
+        'solar_term_algorithm_version': solarTermAlgorithmVersion,
+      if (lunarConverterVersion != null)
+        'lunar_converter_version': lunarConverterVersion,
+      if (dayAnchorVersion != null) 'day_anchor_version': dayAnchorVersion,
+      if (timeScaleAdapterVersion != null)
+        'time_scale_adapter_version': timeScaleAdapterVersion,
+      if (warningsJson != null) 'warnings_json': warningsJson,
+      if (inputFingerprintSha256 != null)
+        'input_fingerprint_sha256': inputFingerprintSha256,
+      if (calculationSignatureSha256 != null)
+        'calculation_signature_sha256': calculationSignatureSha256,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SajuChartSnapshotsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? personId,
+    Value<String?>? sourceBirthProfileId,
+    Value<String>? chartGroupId,
+    Value<int>? revisionNumber,
+    Value<String>? revisionReason,
+    Value<int>? createdAtUtcUs,
+    Value<int>? calculatedAtUtcUs,
+    Value<String>? calendarType,
+    Value<String>? inputLocalDate,
+    Value<String?>? inputLocalTime,
+    Value<bool>? hourUnknown,
+    Value<String>? genderCompatibilityValue,
+    Value<int?>? originalLunarYear,
+    Value<int?>? originalLunarMonth,
+    Value<int?>? originalLunarDay,
+    Value<bool?>? originalLunarLeapMonth,
+    Value<String>? timezoneId,
+    Value<String>? birthPlaceProfile,
+    Value<bool>? yajaEnabled,
+    Value<String>? convertedSolarDate,
+    Value<String>? convertedLunarDate,
+    Value<bool>? convertedLunarLeapMonth,
+    Value<int?>? birthUtcInstantUs,
+    Value<int>? utcOffsetAtBirthMinutes,
+    Value<String?>? effectiveHourCalculationTime,
+    Value<String>? yearPillarCanonicalId,
+    Value<int>? yearPillarCycleIndex,
+    Value<int>? yearPillarStemIndex,
+    Value<int>? yearPillarBranchIndex,
+    Value<String>? yearPillarHanja,
+    Value<String>? yearPillarKoreanLabel,
+    Value<String>? monthPillarCanonicalId,
+    Value<int>? monthPillarCycleIndex,
+    Value<int>? monthPillarStemIndex,
+    Value<int>? monthPillarBranchIndex,
+    Value<String>? monthPillarHanja,
+    Value<String>? monthPillarKoreanLabel,
+    Value<String>? dayPillarCanonicalId,
+    Value<int>? dayPillarCycleIndex,
+    Value<int>? dayPillarStemIndex,
+    Value<int>? dayPillarBranchIndex,
+    Value<String>? dayPillarHanja,
+    Value<String>? dayPillarKoreanLabel,
+    Value<String?>? hourPillarCanonicalId,
+    Value<int?>? hourPillarCycleIndex,
+    Value<int?>? hourPillarStemIndex,
+    Value<int?>? hourPillarBranchIndex,
+    Value<String?>? hourPillarHanja,
+    Value<String?>? hourPillarKoreanLabel,
+    Value<String>? engineId,
+    Value<String>? engineVersion,
+    Value<String>? policyId,
+    Value<String>? policyVersion,
+    Value<String>? dayRolloverPolicy,
+    Value<String>? longitudeCorrectionPolicy,
+    Value<String>? dstCorrectionPolicy,
+    Value<String>? supportedRangeVersion,
+    Value<String>? solarTermAlgorithmVersion,
+    Value<String>? lunarConverterVersion,
+    Value<String>? dayAnchorVersion,
+    Value<String>? timeScaleAdapterVersion,
+    Value<String>? warningsJson,
+    Value<String>? inputFingerprintSha256,
+    Value<String>? calculationSignatureSha256,
+    Value<int>? rowid,
+  }) {
+    return SajuChartSnapshotsCompanion(
+      id: id ?? this.id,
+      personId: personId ?? this.personId,
+      sourceBirthProfileId: sourceBirthProfileId ?? this.sourceBirthProfileId,
+      chartGroupId: chartGroupId ?? this.chartGroupId,
+      revisionNumber: revisionNumber ?? this.revisionNumber,
+      revisionReason: revisionReason ?? this.revisionReason,
+      createdAtUtcUs: createdAtUtcUs ?? this.createdAtUtcUs,
+      calculatedAtUtcUs: calculatedAtUtcUs ?? this.calculatedAtUtcUs,
+      calendarType: calendarType ?? this.calendarType,
+      inputLocalDate: inputLocalDate ?? this.inputLocalDate,
+      inputLocalTime: inputLocalTime ?? this.inputLocalTime,
+      hourUnknown: hourUnknown ?? this.hourUnknown,
+      genderCompatibilityValue:
+          genderCompatibilityValue ?? this.genderCompatibilityValue,
+      originalLunarYear: originalLunarYear ?? this.originalLunarYear,
+      originalLunarMonth: originalLunarMonth ?? this.originalLunarMonth,
+      originalLunarDay: originalLunarDay ?? this.originalLunarDay,
+      originalLunarLeapMonth:
+          originalLunarLeapMonth ?? this.originalLunarLeapMonth,
+      timezoneId: timezoneId ?? this.timezoneId,
+      birthPlaceProfile: birthPlaceProfile ?? this.birthPlaceProfile,
+      yajaEnabled: yajaEnabled ?? this.yajaEnabled,
+      convertedSolarDate: convertedSolarDate ?? this.convertedSolarDate,
+      convertedLunarDate: convertedLunarDate ?? this.convertedLunarDate,
+      convertedLunarLeapMonth:
+          convertedLunarLeapMonth ?? this.convertedLunarLeapMonth,
+      birthUtcInstantUs: birthUtcInstantUs ?? this.birthUtcInstantUs,
+      utcOffsetAtBirthMinutes:
+          utcOffsetAtBirthMinutes ?? this.utcOffsetAtBirthMinutes,
+      effectiveHourCalculationTime:
+          effectiveHourCalculationTime ?? this.effectiveHourCalculationTime,
+      yearPillarCanonicalId:
+          yearPillarCanonicalId ?? this.yearPillarCanonicalId,
+      yearPillarCycleIndex: yearPillarCycleIndex ?? this.yearPillarCycleIndex,
+      yearPillarStemIndex: yearPillarStemIndex ?? this.yearPillarStemIndex,
+      yearPillarBranchIndex:
+          yearPillarBranchIndex ?? this.yearPillarBranchIndex,
+      yearPillarHanja: yearPillarHanja ?? this.yearPillarHanja,
+      yearPillarKoreanLabel:
+          yearPillarKoreanLabel ?? this.yearPillarKoreanLabel,
+      monthPillarCanonicalId:
+          monthPillarCanonicalId ?? this.monthPillarCanonicalId,
+      monthPillarCycleIndex:
+          monthPillarCycleIndex ?? this.monthPillarCycleIndex,
+      monthPillarStemIndex: monthPillarStemIndex ?? this.monthPillarStemIndex,
+      monthPillarBranchIndex:
+          monthPillarBranchIndex ?? this.monthPillarBranchIndex,
+      monthPillarHanja: monthPillarHanja ?? this.monthPillarHanja,
+      monthPillarKoreanLabel:
+          monthPillarKoreanLabel ?? this.monthPillarKoreanLabel,
+      dayPillarCanonicalId: dayPillarCanonicalId ?? this.dayPillarCanonicalId,
+      dayPillarCycleIndex: dayPillarCycleIndex ?? this.dayPillarCycleIndex,
+      dayPillarStemIndex: dayPillarStemIndex ?? this.dayPillarStemIndex,
+      dayPillarBranchIndex: dayPillarBranchIndex ?? this.dayPillarBranchIndex,
+      dayPillarHanja: dayPillarHanja ?? this.dayPillarHanja,
+      dayPillarKoreanLabel: dayPillarKoreanLabel ?? this.dayPillarKoreanLabel,
+      hourPillarCanonicalId:
+          hourPillarCanonicalId ?? this.hourPillarCanonicalId,
+      hourPillarCycleIndex: hourPillarCycleIndex ?? this.hourPillarCycleIndex,
+      hourPillarStemIndex: hourPillarStemIndex ?? this.hourPillarStemIndex,
+      hourPillarBranchIndex:
+          hourPillarBranchIndex ?? this.hourPillarBranchIndex,
+      hourPillarHanja: hourPillarHanja ?? this.hourPillarHanja,
+      hourPillarKoreanLabel:
+          hourPillarKoreanLabel ?? this.hourPillarKoreanLabel,
+      engineId: engineId ?? this.engineId,
+      engineVersion: engineVersion ?? this.engineVersion,
+      policyId: policyId ?? this.policyId,
+      policyVersion: policyVersion ?? this.policyVersion,
+      dayRolloverPolicy: dayRolloverPolicy ?? this.dayRolloverPolicy,
+      longitudeCorrectionPolicy:
+          longitudeCorrectionPolicy ?? this.longitudeCorrectionPolicy,
+      dstCorrectionPolicy: dstCorrectionPolicy ?? this.dstCorrectionPolicy,
+      supportedRangeVersion:
+          supportedRangeVersion ?? this.supportedRangeVersion,
+      solarTermAlgorithmVersion:
+          solarTermAlgorithmVersion ?? this.solarTermAlgorithmVersion,
+      lunarConverterVersion:
+          lunarConverterVersion ?? this.lunarConverterVersion,
+      dayAnchorVersion: dayAnchorVersion ?? this.dayAnchorVersion,
+      timeScaleAdapterVersion:
+          timeScaleAdapterVersion ?? this.timeScaleAdapterVersion,
+      warningsJson: warningsJson ?? this.warningsJson,
+      inputFingerprintSha256:
+          inputFingerprintSha256 ?? this.inputFingerprintSha256,
+      calculationSignatureSha256:
+          calculationSignatureSha256 ?? this.calculationSignatureSha256,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (personId.present) {
+      map['person_id'] = Variable<String>(personId.value);
+    }
+    if (sourceBirthProfileId.present) {
+      map['source_birth_profile_id'] = Variable<String>(
+        sourceBirthProfileId.value,
+      );
+    }
+    if (chartGroupId.present) {
+      map['chart_group_id'] = Variable<String>(chartGroupId.value);
+    }
+    if (revisionNumber.present) {
+      map['revision_number'] = Variable<int>(revisionNumber.value);
+    }
+    if (revisionReason.present) {
+      map['revision_reason'] = Variable<String>(revisionReason.value);
+    }
+    if (createdAtUtcUs.present) {
+      map['created_at_utc_us'] = Variable<int>(createdAtUtcUs.value);
+    }
+    if (calculatedAtUtcUs.present) {
+      map['calculated_at_utc_us'] = Variable<int>(calculatedAtUtcUs.value);
+    }
+    if (calendarType.present) {
+      map['calendar_type'] = Variable<String>(calendarType.value);
+    }
+    if (inputLocalDate.present) {
+      map['input_local_date'] = Variable<String>(inputLocalDate.value);
+    }
+    if (inputLocalTime.present) {
+      map['input_local_time'] = Variable<String>(inputLocalTime.value);
+    }
+    if (hourUnknown.present) {
+      map['hour_unknown'] = Variable<bool>(hourUnknown.value);
+    }
+    if (genderCompatibilityValue.present) {
+      map['gender_compatibility_value'] = Variable<String>(
+        genderCompatibilityValue.value,
+      );
+    }
+    if (originalLunarYear.present) {
+      map['original_lunar_year'] = Variable<int>(originalLunarYear.value);
+    }
+    if (originalLunarMonth.present) {
+      map['original_lunar_month'] = Variable<int>(originalLunarMonth.value);
+    }
+    if (originalLunarDay.present) {
+      map['original_lunar_day'] = Variable<int>(originalLunarDay.value);
+    }
+    if (originalLunarLeapMonth.present) {
+      map['original_lunar_leap_month'] = Variable<bool>(
+        originalLunarLeapMonth.value,
+      );
+    }
+    if (timezoneId.present) {
+      map['timezone_id'] = Variable<String>(timezoneId.value);
+    }
+    if (birthPlaceProfile.present) {
+      map['birth_place_profile'] = Variable<String>(birthPlaceProfile.value);
+    }
+    if (yajaEnabled.present) {
+      map['yaja_enabled'] = Variable<bool>(yajaEnabled.value);
+    }
+    if (convertedSolarDate.present) {
+      map['converted_solar_date'] = Variable<String>(convertedSolarDate.value);
+    }
+    if (convertedLunarDate.present) {
+      map['converted_lunar_date'] = Variable<String>(convertedLunarDate.value);
+    }
+    if (convertedLunarLeapMonth.present) {
+      map['converted_lunar_leap_month'] = Variable<bool>(
+        convertedLunarLeapMonth.value,
+      );
+    }
+    if (birthUtcInstantUs.present) {
+      map['birth_utc_instant_us'] = Variable<int>(birthUtcInstantUs.value);
+    }
+    if (utcOffsetAtBirthMinutes.present) {
+      map['utc_offset_at_birth_minutes'] = Variable<int>(
+        utcOffsetAtBirthMinutes.value,
+      );
+    }
+    if (effectiveHourCalculationTime.present) {
+      map['effective_hour_calculation_time'] = Variable<String>(
+        effectiveHourCalculationTime.value,
+      );
+    }
+    if (yearPillarCanonicalId.present) {
+      map['year_pillar_canonical_id'] = Variable<String>(
+        yearPillarCanonicalId.value,
+      );
+    }
+    if (yearPillarCycleIndex.present) {
+      map['year_pillar_cycle_index'] = Variable<int>(
+        yearPillarCycleIndex.value,
+      );
+    }
+    if (yearPillarStemIndex.present) {
+      map['year_pillar_stem_index'] = Variable<int>(yearPillarStemIndex.value);
+    }
+    if (yearPillarBranchIndex.present) {
+      map['year_pillar_branch_index'] = Variable<int>(
+        yearPillarBranchIndex.value,
+      );
+    }
+    if (yearPillarHanja.present) {
+      map['year_pillar_hanja'] = Variable<String>(yearPillarHanja.value);
+    }
+    if (yearPillarKoreanLabel.present) {
+      map['year_pillar_korean_label'] = Variable<String>(
+        yearPillarKoreanLabel.value,
+      );
+    }
+    if (monthPillarCanonicalId.present) {
+      map['month_pillar_canonical_id'] = Variable<String>(
+        monthPillarCanonicalId.value,
+      );
+    }
+    if (monthPillarCycleIndex.present) {
+      map['month_pillar_cycle_index'] = Variable<int>(
+        monthPillarCycleIndex.value,
+      );
+    }
+    if (monthPillarStemIndex.present) {
+      map['month_pillar_stem_index'] = Variable<int>(
+        monthPillarStemIndex.value,
+      );
+    }
+    if (monthPillarBranchIndex.present) {
+      map['month_pillar_branch_index'] = Variable<int>(
+        monthPillarBranchIndex.value,
+      );
+    }
+    if (monthPillarHanja.present) {
+      map['month_pillar_hanja'] = Variable<String>(monthPillarHanja.value);
+    }
+    if (monthPillarKoreanLabel.present) {
+      map['month_pillar_korean_label'] = Variable<String>(
+        monthPillarKoreanLabel.value,
+      );
+    }
+    if (dayPillarCanonicalId.present) {
+      map['day_pillar_canonical_id'] = Variable<String>(
+        dayPillarCanonicalId.value,
+      );
+    }
+    if (dayPillarCycleIndex.present) {
+      map['day_pillar_cycle_index'] = Variable<int>(dayPillarCycleIndex.value);
+    }
+    if (dayPillarStemIndex.present) {
+      map['day_pillar_stem_index'] = Variable<int>(dayPillarStemIndex.value);
+    }
+    if (dayPillarBranchIndex.present) {
+      map['day_pillar_branch_index'] = Variable<int>(
+        dayPillarBranchIndex.value,
+      );
+    }
+    if (dayPillarHanja.present) {
+      map['day_pillar_hanja'] = Variable<String>(dayPillarHanja.value);
+    }
+    if (dayPillarKoreanLabel.present) {
+      map['day_pillar_korean_label'] = Variable<String>(
+        dayPillarKoreanLabel.value,
+      );
+    }
+    if (hourPillarCanonicalId.present) {
+      map['hour_pillar_canonical_id'] = Variable<String>(
+        hourPillarCanonicalId.value,
+      );
+    }
+    if (hourPillarCycleIndex.present) {
+      map['hour_pillar_cycle_index'] = Variable<int>(
+        hourPillarCycleIndex.value,
+      );
+    }
+    if (hourPillarStemIndex.present) {
+      map['hour_pillar_stem_index'] = Variable<int>(hourPillarStemIndex.value);
+    }
+    if (hourPillarBranchIndex.present) {
+      map['hour_pillar_branch_index'] = Variable<int>(
+        hourPillarBranchIndex.value,
+      );
+    }
+    if (hourPillarHanja.present) {
+      map['hour_pillar_hanja'] = Variable<String>(hourPillarHanja.value);
+    }
+    if (hourPillarKoreanLabel.present) {
+      map['hour_pillar_korean_label'] = Variable<String>(
+        hourPillarKoreanLabel.value,
+      );
+    }
+    if (engineId.present) {
+      map['engine_id'] = Variable<String>(engineId.value);
+    }
+    if (engineVersion.present) {
+      map['engine_version'] = Variable<String>(engineVersion.value);
+    }
+    if (policyId.present) {
+      map['policy_id'] = Variable<String>(policyId.value);
+    }
+    if (policyVersion.present) {
+      map['policy_version'] = Variable<String>(policyVersion.value);
+    }
+    if (dayRolloverPolicy.present) {
+      map['day_rollover_policy'] = Variable<String>(dayRolloverPolicy.value);
+    }
+    if (longitudeCorrectionPolicy.present) {
+      map['longitude_correction_policy'] = Variable<String>(
+        longitudeCorrectionPolicy.value,
+      );
+    }
+    if (dstCorrectionPolicy.present) {
+      map['dst_correction_policy'] = Variable<String>(
+        dstCorrectionPolicy.value,
+      );
+    }
+    if (supportedRangeVersion.present) {
+      map['supported_range_version'] = Variable<String>(
+        supportedRangeVersion.value,
+      );
+    }
+    if (solarTermAlgorithmVersion.present) {
+      map['solar_term_algorithm_version'] = Variable<String>(
+        solarTermAlgorithmVersion.value,
+      );
+    }
+    if (lunarConverterVersion.present) {
+      map['lunar_converter_version'] = Variable<String>(
+        lunarConverterVersion.value,
+      );
+    }
+    if (dayAnchorVersion.present) {
+      map['day_anchor_version'] = Variable<String>(dayAnchorVersion.value);
+    }
+    if (timeScaleAdapterVersion.present) {
+      map['time_scale_adapter_version'] = Variable<String>(
+        timeScaleAdapterVersion.value,
+      );
+    }
+    if (warningsJson.present) {
+      map['warnings_json'] = Variable<String>(warningsJson.value);
+    }
+    if (inputFingerprintSha256.present) {
+      map['input_fingerprint_sha256'] = Variable<String>(
+        inputFingerprintSha256.value,
+      );
+    }
+    if (calculationSignatureSha256.present) {
+      map['calculation_signature_sha256'] = Variable<String>(
+        calculationSignatureSha256.value,
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SajuChartSnapshotsCompanion(')
+          ..write('id: $id, ')
+          ..write('personId: $personId, ')
+          ..write('sourceBirthProfileId: $sourceBirthProfileId, ')
+          ..write('chartGroupId: $chartGroupId, ')
+          ..write('revisionNumber: $revisionNumber, ')
+          ..write('revisionReason: $revisionReason, ')
+          ..write('createdAtUtcUs: $createdAtUtcUs, ')
+          ..write('calculatedAtUtcUs: $calculatedAtUtcUs, ')
+          ..write('calendarType: $calendarType, ')
+          ..write('inputLocalDate: $inputLocalDate, ')
+          ..write('inputLocalTime: $inputLocalTime, ')
+          ..write('hourUnknown: $hourUnknown, ')
+          ..write('genderCompatibilityValue: $genderCompatibilityValue, ')
+          ..write('originalLunarYear: $originalLunarYear, ')
+          ..write('originalLunarMonth: $originalLunarMonth, ')
+          ..write('originalLunarDay: $originalLunarDay, ')
+          ..write('originalLunarLeapMonth: $originalLunarLeapMonth, ')
+          ..write('timezoneId: $timezoneId, ')
+          ..write('birthPlaceProfile: $birthPlaceProfile, ')
+          ..write('yajaEnabled: $yajaEnabled, ')
+          ..write('convertedSolarDate: $convertedSolarDate, ')
+          ..write('convertedLunarDate: $convertedLunarDate, ')
+          ..write('convertedLunarLeapMonth: $convertedLunarLeapMonth, ')
+          ..write('birthUtcInstantUs: $birthUtcInstantUs, ')
+          ..write('utcOffsetAtBirthMinutes: $utcOffsetAtBirthMinutes, ')
+          ..write(
+            'effectiveHourCalculationTime: $effectiveHourCalculationTime, ',
+          )
+          ..write('yearPillarCanonicalId: $yearPillarCanonicalId, ')
+          ..write('yearPillarCycleIndex: $yearPillarCycleIndex, ')
+          ..write('yearPillarStemIndex: $yearPillarStemIndex, ')
+          ..write('yearPillarBranchIndex: $yearPillarBranchIndex, ')
+          ..write('yearPillarHanja: $yearPillarHanja, ')
+          ..write('yearPillarKoreanLabel: $yearPillarKoreanLabel, ')
+          ..write('monthPillarCanonicalId: $monthPillarCanonicalId, ')
+          ..write('monthPillarCycleIndex: $monthPillarCycleIndex, ')
+          ..write('monthPillarStemIndex: $monthPillarStemIndex, ')
+          ..write('monthPillarBranchIndex: $monthPillarBranchIndex, ')
+          ..write('monthPillarHanja: $monthPillarHanja, ')
+          ..write('monthPillarKoreanLabel: $monthPillarKoreanLabel, ')
+          ..write('dayPillarCanonicalId: $dayPillarCanonicalId, ')
+          ..write('dayPillarCycleIndex: $dayPillarCycleIndex, ')
+          ..write('dayPillarStemIndex: $dayPillarStemIndex, ')
+          ..write('dayPillarBranchIndex: $dayPillarBranchIndex, ')
+          ..write('dayPillarHanja: $dayPillarHanja, ')
+          ..write('dayPillarKoreanLabel: $dayPillarKoreanLabel, ')
+          ..write('hourPillarCanonicalId: $hourPillarCanonicalId, ')
+          ..write('hourPillarCycleIndex: $hourPillarCycleIndex, ')
+          ..write('hourPillarStemIndex: $hourPillarStemIndex, ')
+          ..write('hourPillarBranchIndex: $hourPillarBranchIndex, ')
+          ..write('hourPillarHanja: $hourPillarHanja, ')
+          ..write('hourPillarKoreanLabel: $hourPillarKoreanLabel, ')
+          ..write('engineId: $engineId, ')
+          ..write('engineVersion: $engineVersion, ')
+          ..write('policyId: $policyId, ')
+          ..write('policyVersion: $policyVersion, ')
+          ..write('dayRolloverPolicy: $dayRolloverPolicy, ')
+          ..write('longitudeCorrectionPolicy: $longitudeCorrectionPolicy, ')
+          ..write('dstCorrectionPolicy: $dstCorrectionPolicy, ')
+          ..write('supportedRangeVersion: $supportedRangeVersion, ')
+          ..write('solarTermAlgorithmVersion: $solarTermAlgorithmVersion, ')
+          ..write('lunarConverterVersion: $lunarConverterVersion, ')
+          ..write('dayAnchorVersion: $dayAnchorVersion, ')
+          ..write('timeScaleAdapterVersion: $timeScaleAdapterVersion, ')
+          ..write('warningsJson: $warningsJson, ')
+          ..write('inputFingerprintSha256: $inputFingerprintSha256, ')
+          ..write('calculationSignatureSha256: $calculationSignatureSha256, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$RynAppDatabase extends GeneratedDatabase {
   _$RynAppDatabase(QueryExecutor e) : super(e);
   $RynAppDatabaseManager get managers => $RynAppDatabaseManager(this);
@@ -18021,6 +22033,8 @@ abstract class _$RynAppDatabase extends GeneratedDatabase {
   late final $QigongPostTagsTable qigongPostTags = $QigongPostTagsTable(this);
   late final $QigongPublicationsTable qigongPublications =
       $QigongPublicationsTable(this);
+  late final $SajuChartSnapshotsTable sajuChartSnapshots =
+      $SajuChartSnapshotsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -18056,6 +22070,7 @@ abstract class _$RynAppDatabase extends GeneratedDatabase {
     qigongTags,
     qigongPostTags,
     qigongPublications,
+    sajuChartSnapshots,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -20655,6 +24670,33 @@ final class $$PersonsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<
+    $SajuChartSnapshotsTable,
+    List<SajuChartSnapshotRow>
+  >
+  _sajuChartSnapshotsRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.sajuChartSnapshots,
+        aliasName: $_aliasNameGenerator(
+          db.persons.id,
+          db.sajuChartSnapshots.personId,
+        ),
+      );
+
+  $$SajuChartSnapshotsTableProcessedTableManager get sajuChartSnapshotsRefs {
+    final manager = $$SajuChartSnapshotsTableTableManager(
+      $_db,
+      $_db.sajuChartSnapshots,
+    ).filter((f) => f.personId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _sajuChartSnapshotsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$PersonsTableFilterComposer
@@ -20906,6 +24948,31 @@ class $$PersonsTableFilterComposer
                     $removeJoinBuilderFromRootComposer,
               ),
         );
+    return f(composer);
+  }
+
+  Expression<bool> sajuChartSnapshotsRefs(
+    Expression<bool> Function($$SajuChartSnapshotsTableFilterComposer f) f,
+  ) {
+    final $$SajuChartSnapshotsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.sajuChartSnapshots,
+      getReferencedColumn: (t) => t.personId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SajuChartSnapshotsTableFilterComposer(
+            $db: $db,
+            $table: $db.sajuChartSnapshots,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
@@ -21210,6 +25277,32 @@ class $$PersonsTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> sajuChartSnapshotsRefs<T extends Object>(
+    Expression<T> Function($$SajuChartSnapshotsTableAnnotationComposer a) f,
+  ) {
+    final $$SajuChartSnapshotsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.sajuChartSnapshots,
+          getReferencedColumn: (t) => t.personId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$SajuChartSnapshotsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.sajuChartSnapshots,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$PersonsTableTableManager
@@ -21234,6 +25327,7 @@ class $$PersonsTableTableManager
             bool personBirthProfilesRefs,
             bool encountersRefs,
             bool studySessionParticipantsRefs,
+            bool sajuChartSnapshotsRefs,
           })
         > {
   $$PersonsTableTableManager(_$RynAppDatabase db, $PersonsTable table)
@@ -21309,6 +25403,7 @@ class $$PersonsTableTableManager
                 personBirthProfilesRefs = false,
                 encountersRefs = false,
                 studySessionParticipantsRefs = false,
+                sajuChartSnapshotsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -21322,6 +25417,7 @@ class $$PersonsTableTableManager
                     if (encountersRefs) db.encounters,
                     if (studySessionParticipantsRefs)
                       db.studySessionParticipants,
+                    if (sajuChartSnapshotsRefs) db.sajuChartSnapshots,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -21494,6 +25590,27 @@ class $$PersonsTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (sajuChartSnapshotsRefs)
+                        await $_getPrefetchedData<
+                          PersonRow,
+                          $PersonsTable,
+                          SajuChartSnapshotRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PersonsTableReferences
+                              ._sajuChartSnapshotsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PersonsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).sajuChartSnapshotsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.personId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -21523,6 +25640,7 @@ typedef $$PersonsTableProcessedTableManager =
         bool personBirthProfilesRefs,
         bool encountersRefs,
         bool studySessionParticipantsRefs,
+        bool sajuChartSnapshotsRefs,
       })
     >;
 typedef $$TarotReadingsTableCreateCompanionBuilder =
@@ -25245,6 +29363,37 @@ final class $$PersonBirthProfilesTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<
+    $SajuChartSnapshotsTable,
+    List<SajuChartSnapshotRow>
+  >
+  _sajuChartSnapshotsRefsTable(_$RynAppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.sajuChartSnapshots,
+        aliasName: $_aliasNameGenerator(
+          db.personBirthProfiles.id,
+          db.sajuChartSnapshots.sourceBirthProfileId,
+        ),
+      );
+
+  $$SajuChartSnapshotsTableProcessedTableManager get sajuChartSnapshotsRefs {
+    final manager =
+        $$SajuChartSnapshotsTableTableManager(
+          $_db,
+          $_db.sajuChartSnapshots,
+        ).filter(
+          (f) =>
+              f.sourceBirthProfileId.id.sqlEquals($_itemColumn<String>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _sajuChartSnapshotsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$PersonBirthProfilesTableFilterComposer
@@ -25375,6 +29524,31 @@ class $$PersonBirthProfilesTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> sajuChartSnapshotsRefs(
+    Expression<bool> Function($$SajuChartSnapshotsTableFilterComposer f) f,
+  ) {
+    final $$SajuChartSnapshotsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.sajuChartSnapshots,
+      getReferencedColumn: (t) => t.sourceBirthProfileId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SajuChartSnapshotsTableFilterComposer(
+            $db: $db,
+            $table: $db.sajuChartSnapshots,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -25634,6 +29808,32 @@ class $$PersonBirthProfilesTableAnnotationComposer
         );
     return composer;
   }
+
+  Expression<T> sajuChartSnapshotsRefs<T extends Object>(
+    Expression<T> Function($$SajuChartSnapshotsTableAnnotationComposer a) f,
+  ) {
+    final $$SajuChartSnapshotsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.sajuChartSnapshots,
+          getReferencedColumn: (t) => t.sourceBirthProfileId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$SajuChartSnapshotsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.sajuChartSnapshots,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$PersonBirthProfilesTableTableManager
@@ -25649,7 +29849,11 @@ class $$PersonBirthProfilesTableTableManager
           $$PersonBirthProfilesTableUpdateCompanionBuilder,
           (PersonBirthProfileRow, $$PersonBirthProfilesTableReferences),
           PersonBirthProfileRow,
-          PrefetchHooks Function({bool personId, bool supersedesBirthProfileId})
+          PrefetchHooks Function({
+            bool personId,
+            bool supersedesBirthProfileId,
+            bool sajuChartSnapshotsRefs,
+          })
         > {
   $$PersonBirthProfilesTableTableManager(
     _$RynAppDatabase db,
@@ -25759,10 +29963,16 @@ class $$PersonBirthProfilesTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({personId = false, supersedesBirthProfileId = false}) {
+              ({
+                personId = false,
+                supersedesBirthProfileId = false,
+                sajuChartSnapshotsRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
-                  explicitlyWatchedTables: [],
+                  explicitlyWatchedTables: [
+                    if (sajuChartSnapshotsRefs) db.sajuChartSnapshots,
+                  ],
                   addJoins:
                       <
                         T extends TableManagerState<
@@ -25814,7 +30024,29 @@ class $$PersonBirthProfilesTableTableManager
                         return state;
                       },
                   getPrefetchedDataCallback: (items) async {
-                    return [];
+                    return [
+                      if (sajuChartSnapshotsRefs)
+                        await $_getPrefetchedData<
+                          PersonBirthProfileRow,
+                          $PersonBirthProfilesTable,
+                          SajuChartSnapshotRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PersonBirthProfilesTableReferences
+                              ._sajuChartSnapshotsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PersonBirthProfilesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).sajuChartSnapshotsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.sourceBirthProfileId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
                 );
               },
@@ -25834,7 +30066,11 @@ typedef $$PersonBirthProfilesTableProcessedTableManager =
       $$PersonBirthProfilesTableUpdateCompanionBuilder,
       (PersonBirthProfileRow, $$PersonBirthProfilesTableReferences),
       PersonBirthProfileRow,
-      PrefetchHooks Function({bool personId, bool supersedesBirthProfileId})
+      PrefetchHooks Function({
+        bool personId,
+        bool supersedesBirthProfileId,
+        bool sajuChartSnapshotsRefs,
+      })
     >;
 typedef $$EncountersTableCreateCompanionBuilder =
     EncountersCompanion Function({
@@ -32386,6 +36622,1704 @@ typedef $$QigongPublicationsTableProcessedTableManager =
       QigongPublicationRow,
       PrefetchHooks Function({bool postId})
     >;
+typedef $$SajuChartSnapshotsTableCreateCompanionBuilder =
+    SajuChartSnapshotsCompanion Function({
+      required String id,
+      required String personId,
+      Value<String?> sourceBirthProfileId,
+      required String chartGroupId,
+      required int revisionNumber,
+      required String revisionReason,
+      required int createdAtUtcUs,
+      required int calculatedAtUtcUs,
+      required String calendarType,
+      required String inputLocalDate,
+      Value<String?> inputLocalTime,
+      required bool hourUnknown,
+      required String genderCompatibilityValue,
+      Value<int?> originalLunarYear,
+      Value<int?> originalLunarMonth,
+      Value<int?> originalLunarDay,
+      Value<bool?> originalLunarLeapMonth,
+      required String timezoneId,
+      required String birthPlaceProfile,
+      required bool yajaEnabled,
+      required String convertedSolarDate,
+      required String convertedLunarDate,
+      required bool convertedLunarLeapMonth,
+      Value<int?> birthUtcInstantUs,
+      required int utcOffsetAtBirthMinutes,
+      Value<String?> effectiveHourCalculationTime,
+      required String yearPillarCanonicalId,
+      required int yearPillarCycleIndex,
+      required int yearPillarStemIndex,
+      required int yearPillarBranchIndex,
+      required String yearPillarHanja,
+      required String yearPillarKoreanLabel,
+      required String monthPillarCanonicalId,
+      required int monthPillarCycleIndex,
+      required int monthPillarStemIndex,
+      required int monthPillarBranchIndex,
+      required String monthPillarHanja,
+      required String monthPillarKoreanLabel,
+      required String dayPillarCanonicalId,
+      required int dayPillarCycleIndex,
+      required int dayPillarStemIndex,
+      required int dayPillarBranchIndex,
+      required String dayPillarHanja,
+      required String dayPillarKoreanLabel,
+      Value<String?> hourPillarCanonicalId,
+      Value<int?> hourPillarCycleIndex,
+      Value<int?> hourPillarStemIndex,
+      Value<int?> hourPillarBranchIndex,
+      Value<String?> hourPillarHanja,
+      Value<String?> hourPillarKoreanLabel,
+      required String engineId,
+      required String engineVersion,
+      required String policyId,
+      required String policyVersion,
+      required String dayRolloverPolicy,
+      required String longitudeCorrectionPolicy,
+      required String dstCorrectionPolicy,
+      required String supportedRangeVersion,
+      required String solarTermAlgorithmVersion,
+      required String lunarConverterVersion,
+      required String dayAnchorVersion,
+      required String timeScaleAdapterVersion,
+      required String warningsJson,
+      required String inputFingerprintSha256,
+      required String calculationSignatureSha256,
+      Value<int> rowid,
+    });
+typedef $$SajuChartSnapshotsTableUpdateCompanionBuilder =
+    SajuChartSnapshotsCompanion Function({
+      Value<String> id,
+      Value<String> personId,
+      Value<String?> sourceBirthProfileId,
+      Value<String> chartGroupId,
+      Value<int> revisionNumber,
+      Value<String> revisionReason,
+      Value<int> createdAtUtcUs,
+      Value<int> calculatedAtUtcUs,
+      Value<String> calendarType,
+      Value<String> inputLocalDate,
+      Value<String?> inputLocalTime,
+      Value<bool> hourUnknown,
+      Value<String> genderCompatibilityValue,
+      Value<int?> originalLunarYear,
+      Value<int?> originalLunarMonth,
+      Value<int?> originalLunarDay,
+      Value<bool?> originalLunarLeapMonth,
+      Value<String> timezoneId,
+      Value<String> birthPlaceProfile,
+      Value<bool> yajaEnabled,
+      Value<String> convertedSolarDate,
+      Value<String> convertedLunarDate,
+      Value<bool> convertedLunarLeapMonth,
+      Value<int?> birthUtcInstantUs,
+      Value<int> utcOffsetAtBirthMinutes,
+      Value<String?> effectiveHourCalculationTime,
+      Value<String> yearPillarCanonicalId,
+      Value<int> yearPillarCycleIndex,
+      Value<int> yearPillarStemIndex,
+      Value<int> yearPillarBranchIndex,
+      Value<String> yearPillarHanja,
+      Value<String> yearPillarKoreanLabel,
+      Value<String> monthPillarCanonicalId,
+      Value<int> monthPillarCycleIndex,
+      Value<int> monthPillarStemIndex,
+      Value<int> monthPillarBranchIndex,
+      Value<String> monthPillarHanja,
+      Value<String> monthPillarKoreanLabel,
+      Value<String> dayPillarCanonicalId,
+      Value<int> dayPillarCycleIndex,
+      Value<int> dayPillarStemIndex,
+      Value<int> dayPillarBranchIndex,
+      Value<String> dayPillarHanja,
+      Value<String> dayPillarKoreanLabel,
+      Value<String?> hourPillarCanonicalId,
+      Value<int?> hourPillarCycleIndex,
+      Value<int?> hourPillarStemIndex,
+      Value<int?> hourPillarBranchIndex,
+      Value<String?> hourPillarHanja,
+      Value<String?> hourPillarKoreanLabel,
+      Value<String> engineId,
+      Value<String> engineVersion,
+      Value<String> policyId,
+      Value<String> policyVersion,
+      Value<String> dayRolloverPolicy,
+      Value<String> longitudeCorrectionPolicy,
+      Value<String> dstCorrectionPolicy,
+      Value<String> supportedRangeVersion,
+      Value<String> solarTermAlgorithmVersion,
+      Value<String> lunarConverterVersion,
+      Value<String> dayAnchorVersion,
+      Value<String> timeScaleAdapterVersion,
+      Value<String> warningsJson,
+      Value<String> inputFingerprintSha256,
+      Value<String> calculationSignatureSha256,
+      Value<int> rowid,
+    });
+
+final class $$SajuChartSnapshotsTableReferences
+    extends
+        BaseReferences<
+          _$RynAppDatabase,
+          $SajuChartSnapshotsTable,
+          SajuChartSnapshotRow
+        > {
+  $$SajuChartSnapshotsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $PersonsTable _personIdTable(_$RynAppDatabase db) =>
+      db.persons.createAlias(
+        $_aliasNameGenerator(db.sajuChartSnapshots.personId, db.persons.id),
+      );
+
+  $$PersonsTableProcessedTableManager get personId {
+    final $_column = $_itemColumn<String>('person_id')!;
+
+    final manager = $$PersonsTableTableManager(
+      $_db,
+      $_db.persons,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_personIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PersonBirthProfilesTable _sourceBirthProfileIdTable(
+    _$RynAppDatabase db,
+  ) => db.personBirthProfiles.createAlias(
+    $_aliasNameGenerator(
+      db.sajuChartSnapshots.sourceBirthProfileId,
+      db.personBirthProfiles.id,
+    ),
+  );
+
+  $$PersonBirthProfilesTableProcessedTableManager? get sourceBirthProfileId {
+    final $_column = $_itemColumn<String>('source_birth_profile_id');
+    if ($_column == null) return null;
+    final manager = $$PersonBirthProfilesTableTableManager(
+      $_db,
+      $_db.personBirthProfiles,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(
+      _sourceBirthProfileIdTable($_db),
+    );
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$SajuChartSnapshotsTableFilterComposer
+    extends Composer<_$RynAppDatabase, $SajuChartSnapshotsTable> {
+  $$SajuChartSnapshotsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get chartGroupId => $composableBuilder(
+    column: $table.chartGroupId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get revisionNumber => $composableBuilder(
+    column: $table.revisionNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get revisionReason => $composableBuilder(
+    column: $table.revisionReason,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get calculatedAtUtcUs => $composableBuilder(
+    column: $table.calculatedAtUtcUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get calendarType => $composableBuilder(
+    column: $table.calendarType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get inputLocalDate => $composableBuilder(
+    column: $table.inputLocalDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get inputLocalTime => $composableBuilder(
+    column: $table.inputLocalTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get hourUnknown => $composableBuilder(
+    column: $table.hourUnknown,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get genderCompatibilityValue => $composableBuilder(
+    column: $table.genderCompatibilityValue,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get originalLunarYear => $composableBuilder(
+    column: $table.originalLunarYear,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get originalLunarMonth => $composableBuilder(
+    column: $table.originalLunarMonth,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get originalLunarDay => $composableBuilder(
+    column: $table.originalLunarDay,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get originalLunarLeapMonth => $composableBuilder(
+    column: $table.originalLunarLeapMonth,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get timezoneId => $composableBuilder(
+    column: $table.timezoneId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get birthPlaceProfile => $composableBuilder(
+    column: $table.birthPlaceProfile,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get yajaEnabled => $composableBuilder(
+    column: $table.yajaEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get convertedSolarDate => $composableBuilder(
+    column: $table.convertedSolarDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get convertedLunarDate => $composableBuilder(
+    column: $table.convertedLunarDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get convertedLunarLeapMonth => $composableBuilder(
+    column: $table.convertedLunarLeapMonth,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get birthUtcInstantUs => $composableBuilder(
+    column: $table.birthUtcInstantUs,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get utcOffsetAtBirthMinutes => $composableBuilder(
+    column: $table.utcOffsetAtBirthMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get effectiveHourCalculationTime => $composableBuilder(
+    column: $table.effectiveHourCalculationTime,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get yearPillarCanonicalId => $composableBuilder(
+    column: $table.yearPillarCanonicalId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get yearPillarCycleIndex => $composableBuilder(
+    column: $table.yearPillarCycleIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get yearPillarStemIndex => $composableBuilder(
+    column: $table.yearPillarStemIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get yearPillarBranchIndex => $composableBuilder(
+    column: $table.yearPillarBranchIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get yearPillarHanja => $composableBuilder(
+    column: $table.yearPillarHanja,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get yearPillarKoreanLabel => $composableBuilder(
+    column: $table.yearPillarKoreanLabel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get monthPillarCanonicalId => $composableBuilder(
+    column: $table.monthPillarCanonicalId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get monthPillarCycleIndex => $composableBuilder(
+    column: $table.monthPillarCycleIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get monthPillarStemIndex => $composableBuilder(
+    column: $table.monthPillarStemIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get monthPillarBranchIndex => $composableBuilder(
+    column: $table.monthPillarBranchIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get monthPillarHanja => $composableBuilder(
+    column: $table.monthPillarHanja,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get monthPillarKoreanLabel => $composableBuilder(
+    column: $table.monthPillarKoreanLabel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dayPillarCanonicalId => $composableBuilder(
+    column: $table.dayPillarCanonicalId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get dayPillarCycleIndex => $composableBuilder(
+    column: $table.dayPillarCycleIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get dayPillarStemIndex => $composableBuilder(
+    column: $table.dayPillarStemIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get dayPillarBranchIndex => $composableBuilder(
+    column: $table.dayPillarBranchIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dayPillarHanja => $composableBuilder(
+    column: $table.dayPillarHanja,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dayPillarKoreanLabel => $composableBuilder(
+    column: $table.dayPillarKoreanLabel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get hourPillarCanonicalId => $composableBuilder(
+    column: $table.hourPillarCanonicalId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get hourPillarCycleIndex => $composableBuilder(
+    column: $table.hourPillarCycleIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get hourPillarStemIndex => $composableBuilder(
+    column: $table.hourPillarStemIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get hourPillarBranchIndex => $composableBuilder(
+    column: $table.hourPillarBranchIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get hourPillarHanja => $composableBuilder(
+    column: $table.hourPillarHanja,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get hourPillarKoreanLabel => $composableBuilder(
+    column: $table.hourPillarKoreanLabel,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get engineId => $composableBuilder(
+    column: $table.engineId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get engineVersion => $composableBuilder(
+    column: $table.engineVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get policyId => $composableBuilder(
+    column: $table.policyId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get policyVersion => $composableBuilder(
+    column: $table.policyVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dayRolloverPolicy => $composableBuilder(
+    column: $table.dayRolloverPolicy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get longitudeCorrectionPolicy => $composableBuilder(
+    column: $table.longitudeCorrectionPolicy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dstCorrectionPolicy => $composableBuilder(
+    column: $table.dstCorrectionPolicy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get supportedRangeVersion => $composableBuilder(
+    column: $table.supportedRangeVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get solarTermAlgorithmVersion => $composableBuilder(
+    column: $table.solarTermAlgorithmVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lunarConverterVersion => $composableBuilder(
+    column: $table.lunarConverterVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get dayAnchorVersion => $composableBuilder(
+    column: $table.dayAnchorVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get timeScaleAdapterVersion => $composableBuilder(
+    column: $table.timeScaleAdapterVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get warningsJson => $composableBuilder(
+    column: $table.warningsJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get inputFingerprintSha256 => $composableBuilder(
+    column: $table.inputFingerprintSha256,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get calculationSignatureSha256 => $composableBuilder(
+    column: $table.calculationSignatureSha256,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$PersonsTableFilterComposer get personId {
+    final $$PersonsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.persons,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonsTableFilterComposer(
+            $db: $db,
+            $table: $db.persons,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PersonBirthProfilesTableFilterComposer get sourceBirthProfileId {
+    final $$PersonBirthProfilesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.sourceBirthProfileId,
+      referencedTable: $db.personBirthProfiles,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonBirthProfilesTableFilterComposer(
+            $db: $db,
+            $table: $db.personBirthProfiles,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SajuChartSnapshotsTableOrderingComposer
+    extends Composer<_$RynAppDatabase, $SajuChartSnapshotsTable> {
+  $$SajuChartSnapshotsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get chartGroupId => $composableBuilder(
+    column: $table.chartGroupId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get revisionNumber => $composableBuilder(
+    column: $table.revisionNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get revisionReason => $composableBuilder(
+    column: $table.revisionReason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get calculatedAtUtcUs => $composableBuilder(
+    column: $table.calculatedAtUtcUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get calendarType => $composableBuilder(
+    column: $table.calendarType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get inputLocalDate => $composableBuilder(
+    column: $table.inputLocalDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get inputLocalTime => $composableBuilder(
+    column: $table.inputLocalTime,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get hourUnknown => $composableBuilder(
+    column: $table.hourUnknown,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get genderCompatibilityValue => $composableBuilder(
+    column: $table.genderCompatibilityValue,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get originalLunarYear => $composableBuilder(
+    column: $table.originalLunarYear,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get originalLunarMonth => $composableBuilder(
+    column: $table.originalLunarMonth,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get originalLunarDay => $composableBuilder(
+    column: $table.originalLunarDay,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get originalLunarLeapMonth => $composableBuilder(
+    column: $table.originalLunarLeapMonth,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get timezoneId => $composableBuilder(
+    column: $table.timezoneId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get birthPlaceProfile => $composableBuilder(
+    column: $table.birthPlaceProfile,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get yajaEnabled => $composableBuilder(
+    column: $table.yajaEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get convertedSolarDate => $composableBuilder(
+    column: $table.convertedSolarDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get convertedLunarDate => $composableBuilder(
+    column: $table.convertedLunarDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get convertedLunarLeapMonth => $composableBuilder(
+    column: $table.convertedLunarLeapMonth,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get birthUtcInstantUs => $composableBuilder(
+    column: $table.birthUtcInstantUs,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get utcOffsetAtBirthMinutes => $composableBuilder(
+    column: $table.utcOffsetAtBirthMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get effectiveHourCalculationTime =>
+      $composableBuilder(
+        column: $table.effectiveHourCalculationTime,
+        builder: (column) => ColumnOrderings(column),
+      );
+
+  ColumnOrderings<String> get yearPillarCanonicalId => $composableBuilder(
+    column: $table.yearPillarCanonicalId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get yearPillarCycleIndex => $composableBuilder(
+    column: $table.yearPillarCycleIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get yearPillarStemIndex => $composableBuilder(
+    column: $table.yearPillarStemIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get yearPillarBranchIndex => $composableBuilder(
+    column: $table.yearPillarBranchIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get yearPillarHanja => $composableBuilder(
+    column: $table.yearPillarHanja,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get yearPillarKoreanLabel => $composableBuilder(
+    column: $table.yearPillarKoreanLabel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get monthPillarCanonicalId => $composableBuilder(
+    column: $table.monthPillarCanonicalId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get monthPillarCycleIndex => $composableBuilder(
+    column: $table.monthPillarCycleIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get monthPillarStemIndex => $composableBuilder(
+    column: $table.monthPillarStemIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get monthPillarBranchIndex => $composableBuilder(
+    column: $table.monthPillarBranchIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get monthPillarHanja => $composableBuilder(
+    column: $table.monthPillarHanja,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get monthPillarKoreanLabel => $composableBuilder(
+    column: $table.monthPillarKoreanLabel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dayPillarCanonicalId => $composableBuilder(
+    column: $table.dayPillarCanonicalId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get dayPillarCycleIndex => $composableBuilder(
+    column: $table.dayPillarCycleIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get dayPillarStemIndex => $composableBuilder(
+    column: $table.dayPillarStemIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get dayPillarBranchIndex => $composableBuilder(
+    column: $table.dayPillarBranchIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dayPillarHanja => $composableBuilder(
+    column: $table.dayPillarHanja,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dayPillarKoreanLabel => $composableBuilder(
+    column: $table.dayPillarKoreanLabel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get hourPillarCanonicalId => $composableBuilder(
+    column: $table.hourPillarCanonicalId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get hourPillarCycleIndex => $composableBuilder(
+    column: $table.hourPillarCycleIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get hourPillarStemIndex => $composableBuilder(
+    column: $table.hourPillarStemIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get hourPillarBranchIndex => $composableBuilder(
+    column: $table.hourPillarBranchIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get hourPillarHanja => $composableBuilder(
+    column: $table.hourPillarHanja,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get hourPillarKoreanLabel => $composableBuilder(
+    column: $table.hourPillarKoreanLabel,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get engineId => $composableBuilder(
+    column: $table.engineId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get engineVersion => $composableBuilder(
+    column: $table.engineVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get policyId => $composableBuilder(
+    column: $table.policyId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get policyVersion => $composableBuilder(
+    column: $table.policyVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dayRolloverPolicy => $composableBuilder(
+    column: $table.dayRolloverPolicy,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get longitudeCorrectionPolicy => $composableBuilder(
+    column: $table.longitudeCorrectionPolicy,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dstCorrectionPolicy => $composableBuilder(
+    column: $table.dstCorrectionPolicy,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get supportedRangeVersion => $composableBuilder(
+    column: $table.supportedRangeVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get solarTermAlgorithmVersion => $composableBuilder(
+    column: $table.solarTermAlgorithmVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lunarConverterVersion => $composableBuilder(
+    column: $table.lunarConverterVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get dayAnchorVersion => $composableBuilder(
+    column: $table.dayAnchorVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get timeScaleAdapterVersion => $composableBuilder(
+    column: $table.timeScaleAdapterVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get warningsJson => $composableBuilder(
+    column: $table.warningsJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get inputFingerprintSha256 => $composableBuilder(
+    column: $table.inputFingerprintSha256,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get calculationSignatureSha256 => $composableBuilder(
+    column: $table.calculationSignatureSha256,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$PersonsTableOrderingComposer get personId {
+    final $$PersonsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.persons,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonsTableOrderingComposer(
+            $db: $db,
+            $table: $db.persons,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PersonBirthProfilesTableOrderingComposer get sourceBirthProfileId {
+    final $$PersonBirthProfilesTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.sourceBirthProfileId,
+          referencedTable: $db.personBirthProfiles,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PersonBirthProfilesTableOrderingComposer(
+                $db: $db,
+                $table: $db.personBirthProfiles,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$SajuChartSnapshotsTableAnnotationComposer
+    extends Composer<_$RynAppDatabase, $SajuChartSnapshotsTable> {
+  $$SajuChartSnapshotsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get chartGroupId => $composableBuilder(
+    column: $table.chartGroupId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get revisionNumber => $composableBuilder(
+    column: $table.revisionNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get revisionReason => $composableBuilder(
+    column: $table.revisionReason,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get createdAtUtcUs => $composableBuilder(
+    column: $table.createdAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get calculatedAtUtcUs => $composableBuilder(
+    column: $table.calculatedAtUtcUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get calendarType => $composableBuilder(
+    column: $table.calendarType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get inputLocalDate => $composableBuilder(
+    column: $table.inputLocalDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get inputLocalTime => $composableBuilder(
+    column: $table.inputLocalTime,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get hourUnknown => $composableBuilder(
+    column: $table.hourUnknown,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get genderCompatibilityValue => $composableBuilder(
+    column: $table.genderCompatibilityValue,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get originalLunarYear => $composableBuilder(
+    column: $table.originalLunarYear,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get originalLunarMonth => $composableBuilder(
+    column: $table.originalLunarMonth,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get originalLunarDay => $composableBuilder(
+    column: $table.originalLunarDay,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get originalLunarLeapMonth => $composableBuilder(
+    column: $table.originalLunarLeapMonth,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get timezoneId => $composableBuilder(
+    column: $table.timezoneId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get birthPlaceProfile => $composableBuilder(
+    column: $table.birthPlaceProfile,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get yajaEnabled => $composableBuilder(
+    column: $table.yajaEnabled,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get convertedSolarDate => $composableBuilder(
+    column: $table.convertedSolarDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get convertedLunarDate => $composableBuilder(
+    column: $table.convertedLunarDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get convertedLunarLeapMonth => $composableBuilder(
+    column: $table.convertedLunarLeapMonth,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get birthUtcInstantUs => $composableBuilder(
+    column: $table.birthUtcInstantUs,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get utcOffsetAtBirthMinutes => $composableBuilder(
+    column: $table.utcOffsetAtBirthMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get effectiveHourCalculationTime =>
+      $composableBuilder(
+        column: $table.effectiveHourCalculationTime,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get yearPillarCanonicalId => $composableBuilder(
+    column: $table.yearPillarCanonicalId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get yearPillarCycleIndex => $composableBuilder(
+    column: $table.yearPillarCycleIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get yearPillarStemIndex => $composableBuilder(
+    column: $table.yearPillarStemIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get yearPillarBranchIndex => $composableBuilder(
+    column: $table.yearPillarBranchIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get yearPillarHanja => $composableBuilder(
+    column: $table.yearPillarHanja,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get yearPillarKoreanLabel => $composableBuilder(
+    column: $table.yearPillarKoreanLabel,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get monthPillarCanonicalId => $composableBuilder(
+    column: $table.monthPillarCanonicalId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get monthPillarCycleIndex => $composableBuilder(
+    column: $table.monthPillarCycleIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get monthPillarStemIndex => $composableBuilder(
+    column: $table.monthPillarStemIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get monthPillarBranchIndex => $composableBuilder(
+    column: $table.monthPillarBranchIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get monthPillarHanja => $composableBuilder(
+    column: $table.monthPillarHanja,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get monthPillarKoreanLabel => $composableBuilder(
+    column: $table.monthPillarKoreanLabel,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get dayPillarCanonicalId => $composableBuilder(
+    column: $table.dayPillarCanonicalId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get dayPillarCycleIndex => $composableBuilder(
+    column: $table.dayPillarCycleIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get dayPillarStemIndex => $composableBuilder(
+    column: $table.dayPillarStemIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get dayPillarBranchIndex => $composableBuilder(
+    column: $table.dayPillarBranchIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get dayPillarHanja => $composableBuilder(
+    column: $table.dayPillarHanja,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get dayPillarKoreanLabel => $composableBuilder(
+    column: $table.dayPillarKoreanLabel,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get hourPillarCanonicalId => $composableBuilder(
+    column: $table.hourPillarCanonicalId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get hourPillarCycleIndex => $composableBuilder(
+    column: $table.hourPillarCycleIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get hourPillarStemIndex => $composableBuilder(
+    column: $table.hourPillarStemIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get hourPillarBranchIndex => $composableBuilder(
+    column: $table.hourPillarBranchIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get hourPillarHanja => $composableBuilder(
+    column: $table.hourPillarHanja,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get hourPillarKoreanLabel => $composableBuilder(
+    column: $table.hourPillarKoreanLabel,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get engineId =>
+      $composableBuilder(column: $table.engineId, builder: (column) => column);
+
+  GeneratedColumn<String> get engineVersion => $composableBuilder(
+    column: $table.engineVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get policyId =>
+      $composableBuilder(column: $table.policyId, builder: (column) => column);
+
+  GeneratedColumn<String> get policyVersion => $composableBuilder(
+    column: $table.policyVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get dayRolloverPolicy => $composableBuilder(
+    column: $table.dayRolloverPolicy,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get longitudeCorrectionPolicy => $composableBuilder(
+    column: $table.longitudeCorrectionPolicy,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get dstCorrectionPolicy => $composableBuilder(
+    column: $table.dstCorrectionPolicy,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get supportedRangeVersion => $composableBuilder(
+    column: $table.supportedRangeVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get solarTermAlgorithmVersion => $composableBuilder(
+    column: $table.solarTermAlgorithmVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lunarConverterVersion => $composableBuilder(
+    column: $table.lunarConverterVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get dayAnchorVersion => $composableBuilder(
+    column: $table.dayAnchorVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get timeScaleAdapterVersion => $composableBuilder(
+    column: $table.timeScaleAdapterVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get warningsJson => $composableBuilder(
+    column: $table.warningsJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get inputFingerprintSha256 => $composableBuilder(
+    column: $table.inputFingerprintSha256,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get calculationSignatureSha256 => $composableBuilder(
+    column: $table.calculationSignatureSha256,
+    builder: (column) => column,
+  );
+
+  $$PersonsTableAnnotationComposer get personId {
+    final $$PersonsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personId,
+      referencedTable: $db.persons,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersonsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.persons,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PersonBirthProfilesTableAnnotationComposer get sourceBirthProfileId {
+    final $$PersonBirthProfilesTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.sourceBirthProfileId,
+          referencedTable: $db.personBirthProfiles,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$PersonBirthProfilesTableAnnotationComposer(
+                $db: $db,
+                $table: $db.personBirthProfiles,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$SajuChartSnapshotsTableTableManager
+    extends
+        RootTableManager<
+          _$RynAppDatabase,
+          $SajuChartSnapshotsTable,
+          SajuChartSnapshotRow,
+          $$SajuChartSnapshotsTableFilterComposer,
+          $$SajuChartSnapshotsTableOrderingComposer,
+          $$SajuChartSnapshotsTableAnnotationComposer,
+          $$SajuChartSnapshotsTableCreateCompanionBuilder,
+          $$SajuChartSnapshotsTableUpdateCompanionBuilder,
+          (SajuChartSnapshotRow, $$SajuChartSnapshotsTableReferences),
+          SajuChartSnapshotRow,
+          PrefetchHooks Function({bool personId, bool sourceBirthProfileId})
+        > {
+  $$SajuChartSnapshotsTableTableManager(
+    _$RynAppDatabase db,
+    $SajuChartSnapshotsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SajuChartSnapshotsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SajuChartSnapshotsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SajuChartSnapshotsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> personId = const Value.absent(),
+                Value<String?> sourceBirthProfileId = const Value.absent(),
+                Value<String> chartGroupId = const Value.absent(),
+                Value<int> revisionNumber = const Value.absent(),
+                Value<String> revisionReason = const Value.absent(),
+                Value<int> createdAtUtcUs = const Value.absent(),
+                Value<int> calculatedAtUtcUs = const Value.absent(),
+                Value<String> calendarType = const Value.absent(),
+                Value<String> inputLocalDate = const Value.absent(),
+                Value<String?> inputLocalTime = const Value.absent(),
+                Value<bool> hourUnknown = const Value.absent(),
+                Value<String> genderCompatibilityValue = const Value.absent(),
+                Value<int?> originalLunarYear = const Value.absent(),
+                Value<int?> originalLunarMonth = const Value.absent(),
+                Value<int?> originalLunarDay = const Value.absent(),
+                Value<bool?> originalLunarLeapMonth = const Value.absent(),
+                Value<String> timezoneId = const Value.absent(),
+                Value<String> birthPlaceProfile = const Value.absent(),
+                Value<bool> yajaEnabled = const Value.absent(),
+                Value<String> convertedSolarDate = const Value.absent(),
+                Value<String> convertedLunarDate = const Value.absent(),
+                Value<bool> convertedLunarLeapMonth = const Value.absent(),
+                Value<int?> birthUtcInstantUs = const Value.absent(),
+                Value<int> utcOffsetAtBirthMinutes = const Value.absent(),
+                Value<String?> effectiveHourCalculationTime =
+                    const Value.absent(),
+                Value<String> yearPillarCanonicalId = const Value.absent(),
+                Value<int> yearPillarCycleIndex = const Value.absent(),
+                Value<int> yearPillarStemIndex = const Value.absent(),
+                Value<int> yearPillarBranchIndex = const Value.absent(),
+                Value<String> yearPillarHanja = const Value.absent(),
+                Value<String> yearPillarKoreanLabel = const Value.absent(),
+                Value<String> monthPillarCanonicalId = const Value.absent(),
+                Value<int> monthPillarCycleIndex = const Value.absent(),
+                Value<int> monthPillarStemIndex = const Value.absent(),
+                Value<int> monthPillarBranchIndex = const Value.absent(),
+                Value<String> monthPillarHanja = const Value.absent(),
+                Value<String> monthPillarKoreanLabel = const Value.absent(),
+                Value<String> dayPillarCanonicalId = const Value.absent(),
+                Value<int> dayPillarCycleIndex = const Value.absent(),
+                Value<int> dayPillarStemIndex = const Value.absent(),
+                Value<int> dayPillarBranchIndex = const Value.absent(),
+                Value<String> dayPillarHanja = const Value.absent(),
+                Value<String> dayPillarKoreanLabel = const Value.absent(),
+                Value<String?> hourPillarCanonicalId = const Value.absent(),
+                Value<int?> hourPillarCycleIndex = const Value.absent(),
+                Value<int?> hourPillarStemIndex = const Value.absent(),
+                Value<int?> hourPillarBranchIndex = const Value.absent(),
+                Value<String?> hourPillarHanja = const Value.absent(),
+                Value<String?> hourPillarKoreanLabel = const Value.absent(),
+                Value<String> engineId = const Value.absent(),
+                Value<String> engineVersion = const Value.absent(),
+                Value<String> policyId = const Value.absent(),
+                Value<String> policyVersion = const Value.absent(),
+                Value<String> dayRolloverPolicy = const Value.absent(),
+                Value<String> longitudeCorrectionPolicy = const Value.absent(),
+                Value<String> dstCorrectionPolicy = const Value.absent(),
+                Value<String> supportedRangeVersion = const Value.absent(),
+                Value<String> solarTermAlgorithmVersion = const Value.absent(),
+                Value<String> lunarConverterVersion = const Value.absent(),
+                Value<String> dayAnchorVersion = const Value.absent(),
+                Value<String> timeScaleAdapterVersion = const Value.absent(),
+                Value<String> warningsJson = const Value.absent(),
+                Value<String> inputFingerprintSha256 = const Value.absent(),
+                Value<String> calculationSignatureSha256 = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SajuChartSnapshotsCompanion(
+                id: id,
+                personId: personId,
+                sourceBirthProfileId: sourceBirthProfileId,
+                chartGroupId: chartGroupId,
+                revisionNumber: revisionNumber,
+                revisionReason: revisionReason,
+                createdAtUtcUs: createdAtUtcUs,
+                calculatedAtUtcUs: calculatedAtUtcUs,
+                calendarType: calendarType,
+                inputLocalDate: inputLocalDate,
+                inputLocalTime: inputLocalTime,
+                hourUnknown: hourUnknown,
+                genderCompatibilityValue: genderCompatibilityValue,
+                originalLunarYear: originalLunarYear,
+                originalLunarMonth: originalLunarMonth,
+                originalLunarDay: originalLunarDay,
+                originalLunarLeapMonth: originalLunarLeapMonth,
+                timezoneId: timezoneId,
+                birthPlaceProfile: birthPlaceProfile,
+                yajaEnabled: yajaEnabled,
+                convertedSolarDate: convertedSolarDate,
+                convertedLunarDate: convertedLunarDate,
+                convertedLunarLeapMonth: convertedLunarLeapMonth,
+                birthUtcInstantUs: birthUtcInstantUs,
+                utcOffsetAtBirthMinutes: utcOffsetAtBirthMinutes,
+                effectiveHourCalculationTime: effectiveHourCalculationTime,
+                yearPillarCanonicalId: yearPillarCanonicalId,
+                yearPillarCycleIndex: yearPillarCycleIndex,
+                yearPillarStemIndex: yearPillarStemIndex,
+                yearPillarBranchIndex: yearPillarBranchIndex,
+                yearPillarHanja: yearPillarHanja,
+                yearPillarKoreanLabel: yearPillarKoreanLabel,
+                monthPillarCanonicalId: monthPillarCanonicalId,
+                monthPillarCycleIndex: monthPillarCycleIndex,
+                monthPillarStemIndex: monthPillarStemIndex,
+                monthPillarBranchIndex: monthPillarBranchIndex,
+                monthPillarHanja: monthPillarHanja,
+                monthPillarKoreanLabel: monthPillarKoreanLabel,
+                dayPillarCanonicalId: dayPillarCanonicalId,
+                dayPillarCycleIndex: dayPillarCycleIndex,
+                dayPillarStemIndex: dayPillarStemIndex,
+                dayPillarBranchIndex: dayPillarBranchIndex,
+                dayPillarHanja: dayPillarHanja,
+                dayPillarKoreanLabel: dayPillarKoreanLabel,
+                hourPillarCanonicalId: hourPillarCanonicalId,
+                hourPillarCycleIndex: hourPillarCycleIndex,
+                hourPillarStemIndex: hourPillarStemIndex,
+                hourPillarBranchIndex: hourPillarBranchIndex,
+                hourPillarHanja: hourPillarHanja,
+                hourPillarKoreanLabel: hourPillarKoreanLabel,
+                engineId: engineId,
+                engineVersion: engineVersion,
+                policyId: policyId,
+                policyVersion: policyVersion,
+                dayRolloverPolicy: dayRolloverPolicy,
+                longitudeCorrectionPolicy: longitudeCorrectionPolicy,
+                dstCorrectionPolicy: dstCorrectionPolicy,
+                supportedRangeVersion: supportedRangeVersion,
+                solarTermAlgorithmVersion: solarTermAlgorithmVersion,
+                lunarConverterVersion: lunarConverterVersion,
+                dayAnchorVersion: dayAnchorVersion,
+                timeScaleAdapterVersion: timeScaleAdapterVersion,
+                warningsJson: warningsJson,
+                inputFingerprintSha256: inputFingerprintSha256,
+                calculationSignatureSha256: calculationSignatureSha256,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String personId,
+                Value<String?> sourceBirthProfileId = const Value.absent(),
+                required String chartGroupId,
+                required int revisionNumber,
+                required String revisionReason,
+                required int createdAtUtcUs,
+                required int calculatedAtUtcUs,
+                required String calendarType,
+                required String inputLocalDate,
+                Value<String?> inputLocalTime = const Value.absent(),
+                required bool hourUnknown,
+                required String genderCompatibilityValue,
+                Value<int?> originalLunarYear = const Value.absent(),
+                Value<int?> originalLunarMonth = const Value.absent(),
+                Value<int?> originalLunarDay = const Value.absent(),
+                Value<bool?> originalLunarLeapMonth = const Value.absent(),
+                required String timezoneId,
+                required String birthPlaceProfile,
+                required bool yajaEnabled,
+                required String convertedSolarDate,
+                required String convertedLunarDate,
+                required bool convertedLunarLeapMonth,
+                Value<int?> birthUtcInstantUs = const Value.absent(),
+                required int utcOffsetAtBirthMinutes,
+                Value<String?> effectiveHourCalculationTime =
+                    const Value.absent(),
+                required String yearPillarCanonicalId,
+                required int yearPillarCycleIndex,
+                required int yearPillarStemIndex,
+                required int yearPillarBranchIndex,
+                required String yearPillarHanja,
+                required String yearPillarKoreanLabel,
+                required String monthPillarCanonicalId,
+                required int monthPillarCycleIndex,
+                required int monthPillarStemIndex,
+                required int monthPillarBranchIndex,
+                required String monthPillarHanja,
+                required String monthPillarKoreanLabel,
+                required String dayPillarCanonicalId,
+                required int dayPillarCycleIndex,
+                required int dayPillarStemIndex,
+                required int dayPillarBranchIndex,
+                required String dayPillarHanja,
+                required String dayPillarKoreanLabel,
+                Value<String?> hourPillarCanonicalId = const Value.absent(),
+                Value<int?> hourPillarCycleIndex = const Value.absent(),
+                Value<int?> hourPillarStemIndex = const Value.absent(),
+                Value<int?> hourPillarBranchIndex = const Value.absent(),
+                Value<String?> hourPillarHanja = const Value.absent(),
+                Value<String?> hourPillarKoreanLabel = const Value.absent(),
+                required String engineId,
+                required String engineVersion,
+                required String policyId,
+                required String policyVersion,
+                required String dayRolloverPolicy,
+                required String longitudeCorrectionPolicy,
+                required String dstCorrectionPolicy,
+                required String supportedRangeVersion,
+                required String solarTermAlgorithmVersion,
+                required String lunarConverterVersion,
+                required String dayAnchorVersion,
+                required String timeScaleAdapterVersion,
+                required String warningsJson,
+                required String inputFingerprintSha256,
+                required String calculationSignatureSha256,
+                Value<int> rowid = const Value.absent(),
+              }) => SajuChartSnapshotsCompanion.insert(
+                id: id,
+                personId: personId,
+                sourceBirthProfileId: sourceBirthProfileId,
+                chartGroupId: chartGroupId,
+                revisionNumber: revisionNumber,
+                revisionReason: revisionReason,
+                createdAtUtcUs: createdAtUtcUs,
+                calculatedAtUtcUs: calculatedAtUtcUs,
+                calendarType: calendarType,
+                inputLocalDate: inputLocalDate,
+                inputLocalTime: inputLocalTime,
+                hourUnknown: hourUnknown,
+                genderCompatibilityValue: genderCompatibilityValue,
+                originalLunarYear: originalLunarYear,
+                originalLunarMonth: originalLunarMonth,
+                originalLunarDay: originalLunarDay,
+                originalLunarLeapMonth: originalLunarLeapMonth,
+                timezoneId: timezoneId,
+                birthPlaceProfile: birthPlaceProfile,
+                yajaEnabled: yajaEnabled,
+                convertedSolarDate: convertedSolarDate,
+                convertedLunarDate: convertedLunarDate,
+                convertedLunarLeapMonth: convertedLunarLeapMonth,
+                birthUtcInstantUs: birthUtcInstantUs,
+                utcOffsetAtBirthMinutes: utcOffsetAtBirthMinutes,
+                effectiveHourCalculationTime: effectiveHourCalculationTime,
+                yearPillarCanonicalId: yearPillarCanonicalId,
+                yearPillarCycleIndex: yearPillarCycleIndex,
+                yearPillarStemIndex: yearPillarStemIndex,
+                yearPillarBranchIndex: yearPillarBranchIndex,
+                yearPillarHanja: yearPillarHanja,
+                yearPillarKoreanLabel: yearPillarKoreanLabel,
+                monthPillarCanonicalId: monthPillarCanonicalId,
+                monthPillarCycleIndex: monthPillarCycleIndex,
+                monthPillarStemIndex: monthPillarStemIndex,
+                monthPillarBranchIndex: monthPillarBranchIndex,
+                monthPillarHanja: monthPillarHanja,
+                monthPillarKoreanLabel: monthPillarKoreanLabel,
+                dayPillarCanonicalId: dayPillarCanonicalId,
+                dayPillarCycleIndex: dayPillarCycleIndex,
+                dayPillarStemIndex: dayPillarStemIndex,
+                dayPillarBranchIndex: dayPillarBranchIndex,
+                dayPillarHanja: dayPillarHanja,
+                dayPillarKoreanLabel: dayPillarKoreanLabel,
+                hourPillarCanonicalId: hourPillarCanonicalId,
+                hourPillarCycleIndex: hourPillarCycleIndex,
+                hourPillarStemIndex: hourPillarStemIndex,
+                hourPillarBranchIndex: hourPillarBranchIndex,
+                hourPillarHanja: hourPillarHanja,
+                hourPillarKoreanLabel: hourPillarKoreanLabel,
+                engineId: engineId,
+                engineVersion: engineVersion,
+                policyId: policyId,
+                policyVersion: policyVersion,
+                dayRolloverPolicy: dayRolloverPolicy,
+                longitudeCorrectionPolicy: longitudeCorrectionPolicy,
+                dstCorrectionPolicy: dstCorrectionPolicy,
+                supportedRangeVersion: supportedRangeVersion,
+                solarTermAlgorithmVersion: solarTermAlgorithmVersion,
+                lunarConverterVersion: lunarConverterVersion,
+                dayAnchorVersion: dayAnchorVersion,
+                timeScaleAdapterVersion: timeScaleAdapterVersion,
+                warningsJson: warningsJson,
+                inputFingerprintSha256: inputFingerprintSha256,
+                calculationSignatureSha256: calculationSignatureSha256,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$SajuChartSnapshotsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({personId = false, sourceBirthProfileId = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (personId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.personId,
+                                    referencedTable:
+                                        $$SajuChartSnapshotsTableReferences
+                                            ._personIdTable(db),
+                                    referencedColumn:
+                                        $$SajuChartSnapshotsTableReferences
+                                            ._personIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (sourceBirthProfileId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.sourceBirthProfileId,
+                                    referencedTable:
+                                        $$SajuChartSnapshotsTableReferences
+                                            ._sourceBirthProfileIdTable(db),
+                                    referencedColumn:
+                                        $$SajuChartSnapshotsTableReferences
+                                            ._sourceBirthProfileIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$SajuChartSnapshotsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$RynAppDatabase,
+      $SajuChartSnapshotsTable,
+      SajuChartSnapshotRow,
+      $$SajuChartSnapshotsTableFilterComposer,
+      $$SajuChartSnapshotsTableOrderingComposer,
+      $$SajuChartSnapshotsTableAnnotationComposer,
+      $$SajuChartSnapshotsTableCreateCompanionBuilder,
+      $$SajuChartSnapshotsTableUpdateCompanionBuilder,
+      (SajuChartSnapshotRow, $$SajuChartSnapshotsTableReferences),
+      SajuChartSnapshotRow,
+      PrefetchHooks Function({bool personId, bool sourceBirthProfileId})
+    >;
 
 class $RynAppDatabaseManager {
   final _$RynAppDatabase _db;
@@ -32456,4 +38390,6 @@ class $RynAppDatabaseManager {
       $$QigongPostTagsTableTableManager(_db, _db.qigongPostTags);
   $$QigongPublicationsTableTableManager get qigongPublications =>
       $$QigongPublicationsTableTableManager(_db, _db.qigongPublications);
+  $$SajuChartSnapshotsTableTableManager get sajuChartSnapshots =>
+      $$SajuChartSnapshotsTableTableManager(_db, _db.sajuChartSnapshots);
 }

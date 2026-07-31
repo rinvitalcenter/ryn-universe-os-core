@@ -31,9 +31,12 @@ final class TarotBackupManifest {
 
   static const int backupFormatVersion = 1;
   static const String applicationIdentity = 'RinVitalCenter/RynUniverseOS';
-  static const String contentScope =
+  static const String legacyContentScope =
       'person_core_tarot_study_qigong_persistence_v0_5';
-  static const int schemaVersion = 10;
+  static const String contentScope =
+      'person_core_tarot_study_qigong_saju_persistence_v0_6';
+  static const int schemaVersion = 11;
+  static const int schemaVersionV10 = 10;
   static const int schemaVersionV9 = 9;
   static const int schemaVersionV8 = 8;
   static const int schemaVersionV7 = 7;
@@ -43,6 +46,7 @@ final class TarotBackupManifest {
     schemaVersionV7,
     schemaVersionV8,
     schemaVersionV9,
+    schemaVersionV10,
     schemaVersion,
   };
   static const String schemaV5RestorePolicy =
@@ -488,17 +492,95 @@ final class TarotBackupManifest {
         ],
       });
 
+  static const List<String> requiredTablesV11 = <String>[
+    ...requiredTablesV10,
+    'saju_chart_snapshots',
+  ];
+
+  static final Map<String, List<String>> requiredColumnsByTableV11 =
+      Map.unmodifiable(<String, List<String>>{
+        ...requiredColumnsByTableV10,
+        'saju_chart_snapshots': <String>[
+          'id',
+          'person_id',
+          'source_birth_profile_id',
+          'chart_group_id',
+          'revision_number',
+          'revision_reason',
+          'created_at_utc_us',
+          'calculated_at_utc_us',
+          'calendar_type',
+          'input_local_date',
+          'input_local_time',
+          'hour_unknown',
+          'gender_compatibility_value',
+          'original_lunar_year',
+          'original_lunar_month',
+          'original_lunar_day',
+          'original_lunar_leap_month',
+          'timezone_id',
+          'birth_place_profile',
+          'yaja_enabled',
+          'converted_solar_date',
+          'converted_lunar_date',
+          'converted_lunar_leap_month',
+          'birth_utc_instant_us',
+          'utc_offset_at_birth_minutes',
+          'effective_hour_calculation_time',
+          'year_pillar_canonical_id',
+          'year_pillar_cycle_index',
+          'year_pillar_stem_index',
+          'year_pillar_branch_index',
+          'year_pillar_hanja',
+          'year_pillar_korean_label',
+          'month_pillar_canonical_id',
+          'month_pillar_cycle_index',
+          'month_pillar_stem_index',
+          'month_pillar_branch_index',
+          'month_pillar_hanja',
+          'month_pillar_korean_label',
+          'day_pillar_canonical_id',
+          'day_pillar_cycle_index',
+          'day_pillar_stem_index',
+          'day_pillar_branch_index',
+          'day_pillar_hanja',
+          'day_pillar_korean_label',
+          'hour_pillar_canonical_id',
+          'hour_pillar_cycle_index',
+          'hour_pillar_stem_index',
+          'hour_pillar_branch_index',
+          'hour_pillar_hanja',
+          'hour_pillar_korean_label',
+          'engine_id',
+          'engine_version',
+          'policy_id',
+          'policy_version',
+          'day_rollover_policy',
+          'longitude_correction_policy',
+          'dst_correction_policy',
+          'supported_range_version',
+          'solar_term_algorithm_version',
+          'lunar_converter_version',
+          'day_anchor_version',
+          'time_scale_adapter_version',
+          'warnings_json',
+          'input_fingerprint_sha256',
+          'calculation_signature_sha256',
+        ],
+      });
+
   /// Current backup-format-v1 physical inventory.
-  static const List<String> requiredTablesV1 = requiredTablesV10;
+  static const List<String> requiredTablesV1 = requiredTablesV11;
   static final Map<String, List<String>> requiredColumnsByTableV1 =
-      requiredColumnsByTableV10;
+      requiredColumnsByTableV11;
 
   static List<String> requiredTablesFor(int version) => switch (version) {
     legacySchemaVersion => requiredTablesV6,
     schemaVersionV7 => requiredTablesV7,
     schemaVersionV8 => requiredTablesV8,
     schemaVersionV9 => requiredTablesV9,
-    schemaVersion => requiredTablesV10,
+    schemaVersionV10 => requiredTablesV10,
+    schemaVersion => requiredTablesV11,
     _ => const <String>[],
   };
 
@@ -508,12 +590,20 @@ final class TarotBackupManifest {
         schemaVersionV7 => requiredColumnsByTableV7,
         schemaVersionV8 => requiredColumnsByTableV8,
         schemaVersionV9 => requiredColumnsByTableV9,
-        schemaVersion => requiredColumnsByTableV10,
+        schemaVersionV10 => requiredColumnsByTableV10,
+        schemaVersion => requiredColumnsByTableV11,
         _ => const <String, List<String>>{},
       };
 
-  static String? contentScopeFor(int version) =>
-      supportedRestoreSchemaVersions.contains(version) ? contentScope : null;
+  static String? contentScopeFor(int version) => switch (version) {
+    legacySchemaVersion ||
+    schemaVersionV7 ||
+    schemaVersionV8 ||
+    schemaVersionV9 ||
+    schemaVersionV10 => legacyContentScope,
+    schemaVersion => contentScope,
+    _ => null,
+  };
 
   final String applicationVersion;
   final String sourceRuntimeMode;

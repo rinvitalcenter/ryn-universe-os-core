@@ -29,7 +29,19 @@ final class SajuCalculationEngine {
   SajuChartSnapshot calculate(SajuBirthInput input, {DateTime? calculatedAt}) {
     CheonEulGwiInModernKstPolicy.validate(input);
     final solarDate = _resolveSolarDate(input);
+    final convertedLunarDate = input.calendarType == SajuCalendarType.koreanLunar
+        ? input.lunarDate!
+        : _lunarConverter.solarToLunar(solarDate);
     final localTime = input.localTime;
+    final birthUtcInstant = localTime == null
+        ? null
+        : CheonEulGwiInModernKstPolicy.utcFromLocal(solarDate, localTime);
+    final effectiveHourCalculationTime = localTime == null
+        ? null
+        : CheonEulGwiInModernKstPolicy.observedCompatibilityClock(
+            solarDate,
+            localTime,
+          );
     final state = localTime == null
         ? _yearMonthStateForUnknownTime(solarDate)
         : _yearMonthStateAt(
@@ -76,11 +88,20 @@ final class SajuCalculationEngine {
       lunarConverterVersion: KoreanLunarCalendarConverter.version,
       dayAnchorVersion: SexagenaryCalculator.dayAnchorVersion,
       timeScaleAdapterVersion: _solarTermCalculator.timeScaleAdapterVersion,
+      originalInputDate: input.calendarType == SajuCalendarType.solar
+          ? input.solarDate!.iso8601
+          : input.lunarDate!.iso8601,
+      inputLocalTime: localTime,
+      gender: input.gender,
+      birthPlaceProfile: CheonEulGwiInModernKstPolicy.birthPlaceProfile,
       inputLocalDateTime: localTime == null
           ? '${solarDate.iso8601}Tunknown'
           : '${solarDate.iso8601}T${localTime.iso8601}',
       utcOffsetAtBirthMinutes: CheonEulGwiInModernKstPolicy.utcOffsetMinutes,
       convertedSolarDate: solarDate,
+      convertedLunarDate: convertedLunarDate,
+      birthUtcInstant: birthUtcInstant,
+      effectiveHourCalculationTime: effectiveHourCalculationTime,
       originalLunarDate: input.lunarDate,
       hourUnknown: localTime == null,
       yearPillar: state.yearPillar,

@@ -35,8 +35,8 @@ void main() {
     }
   });
 
-  test('schema v6 through v10 retain exact versioned inventories', () {
-    expect(TarotBackupManifest.schemaVersion, 10);
+  test('schema v6 through v11 retain exact versioned inventories', () {
+    expect(TarotBackupManifest.schemaVersion, 11);
     expect(TarotBackupManifest.requiredTablesFor(6), isNotEmpty);
     expect(TarotBackupManifest.requiredTablesFor(7), isNotEmpty);
     expect(TarotBackupManifest.requiredTablesFor(8), isNotEmpty);
@@ -73,16 +73,25 @@ void main() {
         'qigong_publications',
       }),
     );
-    expect(TarotBackupManifest.requiredTablesFor(11), isEmpty);
+    expect(
+      TarotBackupManifest.requiredTablesFor(11),
+      contains('saju_chart_snapshots'),
+    );
+    expect(
+      TarotBackupManifest.requiredColumnsFor(11)['saju_chart_snapshots'],
+      hasLength(65),
+    );
+    expect(TarotBackupManifest.requiredTablesFor(12), isEmpty);
   });
 
-  test('schema v6 through v10 use the exact legacy content scope', () {
+  test('schema scopes stay legacy through v10 and switch only at v11', () {
     expect(TarotBackupManifest.supportedRestoreSchemaVersions, <int>{
       6,
       7,
       8,
       9,
       10,
+      11,
     });
     for (final schemaVersion in <int>[6, 7, 8, 9, 10]) {
       final encoded = codec.encode(
@@ -97,14 +106,18 @@ void main() {
       );
       expect(codec.decode(encoded).payloadSchemaVersion, schemaVersion);
     }
+    final current = _decodedMap(codec.encode(sampleManifest(schemaVersion: 11)));
+    expect(
+      current['contentScope'],
+      'person_core_tarot_study_qigong_saju_persistence_v0_6',
+    );
   });
 
   test('scope format and unsupported schema failures remain typed', () {
     final base = _decodedMap(codec.encode(sampleManifest()));
 
     final wrongScope = Map<String, Object?>.from(base)
-      ..['contentScope'] =
-          'person_core_tarot_study_qigong_saju_persistence_v0_6';
+      ..['contentScope'] = 'person_core_tarot_study_qigong_persistence_v0_5';
     expect(
       () => codec.decode(_canonicalBytes(wrongScope)),
       throwsA(
@@ -129,7 +142,7 @@ void main() {
     );
 
     final futureSchema = Map<String, Object?>.from(base)
-      ..['schemaVersion'] = 11;
+      ..['schemaVersion'] = 12;
     expect(
       () => codec.decode(_canonicalBytes(futureSchema)),
       throwsA(

@@ -150,6 +150,7 @@ final class QigongCompleteRestoreStartupRecoveryCoordinator {
       await backupService.validateDatabaseMediaPair(
         databaseFile: backupService.sourceDatabaseFile,
         pairRoot: backupService.profileRoot,
+        expectedSchemaVersion: marker.expectedTargetSchemaVersion,
       );
       await _deleteOperationRoot(operationRoot);
       return const QigongCompleteRestoreStartupRecoveryResult(
@@ -176,6 +177,7 @@ final class QigongCompleteRestoreStartupRecoveryCoordinator {
       await backupService.validateDatabaseMediaPair(
         databaseFile: backupService.sourceDatabaseFile,
         pairRoot: backupService.profileRoot,
+        expectedSchemaVersion: marker.expectedTargetSchemaVersion,
       );
       await _deleteOperationRoot(operationRoot);
       return const QigongCompleteRestoreStartupRecoveryResult(
@@ -194,6 +196,7 @@ final class QigongCompleteRestoreStartupRecoveryCoordinator {
       await backupService.validateDatabaseMediaPair(
         databaseFile: backupService.sourceDatabaseFile,
         pairRoot: backupService.profileRoot,
+        expectedSchemaVersion: marker.expectedTargetSchemaVersion,
       );
       await _deleteOperationRoot(operationRoot);
       return const QigongCompleteRestoreStartupRecoveryResult(

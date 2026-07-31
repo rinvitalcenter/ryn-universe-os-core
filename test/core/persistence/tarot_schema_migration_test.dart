@@ -7,7 +7,7 @@ import 'package:ryn_universe_os_core/core/persistence/migrations.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 void main() {
-  group('Tarot and Person schema preserved in v9', () {
+  group('Tarot and Person schema preserved through v11', () {
     late RynAppDatabase database;
 
     setUp(() {
@@ -19,10 +19,10 @@ void main() {
     });
 
     test(
-      'fresh database creates schema version 10 with canonical Person FK',
+      'fresh database creates schema version 11 with canonical Person FK',
       () async {
-        expect(database.schemaVersion, 10);
-        expect(plannedCurrentSchemaVersion, 10);
+        expect(database.schemaVersion, 11);
+        expect(plannedCurrentSchemaVersion, 11);
 
         final tables = await _tableNames(database);
         expect(
@@ -250,9 +250,9 @@ void main() {
     );
   });
 
-  group('Tarot and Person preserving add-only migration through v9', () {
+  group('Tarot and Person preserving add-only migration through v11', () {
     test(
-      'file-backed v6 to v9 preserves Person Role and adds nullable Person link',
+      'file-backed v6 to v11 preserves Person Role and adds nullable Person link',
       () async {
         final root = await Directory.systemTemp.createTemp('ryn-group-v6-v7-');
         addTearDown(() async {
@@ -274,6 +274,18 @@ void main() {
         await database.close();
 
         final raw = sqlite3.open(file.path);
+        raw.execute('DROP TABLE qigong_publications');
+        raw.execute('DROP TABLE qigong_post_tags');
+        raw.execute('DROP TABLE qigong_tags');
+        raw.execute('DROP TABLE qigong_post_media');
+        raw.execute('DROP TABLE qigong_post_blocks');
+        raw.execute('DROP TABLE qigong_posts');
+        raw.execute('DROP TABLE qigong_media_assets');
+        raw.execute('DROP TABLE study_session_materials');
+        raw.execute('DROP TABLE study_session_participants');
+        raw.execute('DROP TABLE study_materials');
+        raw.execute('DROP TABLE study_sessions');
+        raw.execute('DROP TABLE saju_chart_snapshots');
         raw.execute('ALTER TABLE tarot_readings DROP COLUMN person_id');
         raw.execute('DROP TABLE person_group_memberships');
         raw.execute('DROP TABLE person_groups');
@@ -285,7 +297,7 @@ void main() {
         expect(await _count(database, 'person_roles'), 1);
         expect(await _count(database, 'person_groups'), 0);
         expect(await _count(database, 'person_group_memberships'), 0);
-        expect(database.schemaVersion, 10);
+        expect(database.schemaVersion, 11);
         final personId = await database
             .customSelect(
               "SELECT person_id FROM tarot_readings WHERE reading_instance_id = 'missing'",
@@ -336,7 +348,7 @@ void main() {
       },
     );
 
-    test('file-backed v7 to v10 preserves rows with null Person links', () async {
+    test('file-backed v7 to v11 preserves rows with null Person links', () async {
       final root = await Directory.systemTemp.createTemp('ryn-tarot-v7-v9-');
       addTearDown(() async {
         if (await root.exists()) await root.delete(recursive: true);
@@ -360,6 +372,7 @@ void main() {
       raw.execute('DROP TABLE study_session_participants');
       raw.execute('DROP TABLE study_materials');
       raw.execute('DROP TABLE study_sessions');
+      raw.execute('DROP TABLE saju_chart_snapshots');
       raw.execute('ALTER TABLE tarot_readings DROP COLUMN person_id');
       raw.userVersion = 7;
       raw.close();
@@ -374,7 +387,7 @@ void main() {
       final version = await database
           .customSelect('PRAGMA user_version')
           .getSingle();
-      expect(version.read<int>('user_version'), 10);
+      expect(version.read<int>('user_version'), 11);
       expect(
         await database.customSelect('PRAGMA foreign_key_check').get(),
         isEmpty,
@@ -447,7 +460,7 @@ void main() {
           NativeDatabase.memory(
             setup: (raw) {
               raw.execute(_version4AppSettingsSql);
-              raw.execute('PRAGMA user_version = 11');
+              raw.execute('PRAGMA user_version = 12');
             },
           ),
         );

@@ -265,6 +265,34 @@ void main() {
         const KoreanLunarDate(2023, 2, 1, isLeapMonth: true),
       );
       expect(result.convertedSolarDate, const SajuLocalDate(2023, 3, 22));
+      expect(
+        result.convertedLunarDate,
+        const KoreanLunarDate(2023, 2, 1, isLeapMonth: true),
+      );
+      expect(result.convertedLunarLeapMonth, isTrue);
+    });
+
+    test('snapshot carries normalized time without persistence recalculation', () {
+      final result = engine.calculate(
+        SajuBirthInput.solar(
+          date: const SajuLocalDate(2024, 2, 10),
+          time: const SajuLocalTime(10, 0),
+        ),
+      );
+
+      expect(result.convertedLunarDate, const KoreanLunarDate(2024, 1, 1));
+      expect(result.convertedLunarLeapMonth, isFalse);
+      expect(result.birthUtcInstant, DateTime.utc(2024, 2, 10, 1));
+      expect(
+        result.effectiveHourCalculationTime,
+        DateTime.utc(2024, 2, 10, 9, 30),
+      );
+
+      final unknown = engine.calculate(
+        SajuBirthInput.solar(date: const SajuLocalDate(2024, 2, 10)),
+      );
+      expect(unknown.birthUtcInstant, isNull);
+      expect(unknown.effectiveHourCalculationTime, isNull);
     });
 
     test('calculatedAt is UTC and excluded from deterministic signature', () {
