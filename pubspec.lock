@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.7.0"
+  astronomia:
+    dependency: "direct main"
+    description:
+      name: astronomia
+      sha256: "34df5331f6184f1491ce9e13b87309b579bada8c26a5c2e6758bebbec94c2594"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   async:
     dependency: transitive
     description:
