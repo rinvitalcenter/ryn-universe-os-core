@@ -4,6 +4,24 @@ This file records third-party software and data used by Ryn Universe OS Core.
 The Saju foundation is deterministic and offline; no third-party service is
 called at runtime.
 
+## ChosunGs (조선궁서체)
+
+Official information: https://event.chosun.com/100/100font.html
+Official distribution: https://fontdown.chosun.com/100/ChosunGs.zip
+Use: unmodified original `ChosunGs.TTF` for the Saju four-pillar Hanja glyphs.
+
+The official page states that the intellectual property rights for the nine
+Chosun Ilbo typefaces belong to Chosun Ilbo Co., Ltd. The typefaces are
+provided free of charge to individual and corporate users and may be freely
+redistributed. No fee may be demanded for copying or distribution, the font
+may not be modified and sold, and it must be used in the distributed form.
+
+The bundled file is the unmodified font extracted from the official ZIP.
+Its SHA-256 is
+`4e191bc30d23ce34797dcaf7a0965dedd67a2d85cc5dd87325ee96626cba7bea`.
+The Korean source text and provenance are preserved in
+`assets/fonts/chosun_gs/LICENSE.txt`.
+
 ## Astronomia 1.0.0
 
 Source: https://github.com/dmvvilela/astronomia

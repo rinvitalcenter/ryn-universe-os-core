@@ -126,13 +126,17 @@ void main() {
     await tester.pumpWidget(const RynUniverseApp(bootstrapOnStart: false));
     await tester.pumpAndSettle();
 
-    final readingNav = find.text('리딩').first;
+    final readingNav = find.byKey(const Key('ryn-nav-reading'));
     await tester.ensureVisible(readingNav);
+    await tester.pump();
     await tester.tap(readingNav);
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('reading-atelier-page')), findsOneWidget);
 
-    await tester.tap(find.byKey(const Key('atelier-oracle-action')));
+    final oracleAction = find.byKey(const Key('atelier-oracle-action'));
+    await tester.ensureVisible(oracleAction);
+    await tester.pump();
+    await tester.tap(oracleAction);
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('oracle-reading-shell')), findsOneWidget);
   });

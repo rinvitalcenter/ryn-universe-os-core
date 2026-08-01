@@ -8,6 +8,7 @@ abstract final class UserText {
   static const navPeople = '사람';
   static const navStudy = '스터디';
   static const navReading = '리딩';
+  static const navSaju = '사주';
   static const navPractice = '수련';
   static const navContent = '콘텐츠';
   static const navRecord = '기록';

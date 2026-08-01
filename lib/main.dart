@@ -33,6 +33,7 @@ import 'features/records/presentation/tarot_result_detail_page.dart';
 import 'features/qigong_blog/application/qigong_complete_restore_startup_recovery_coordinator.dart';
 import 'features/qigong_blog/infrastructure/qigong_complete_backup_service.dart';
 import 'features/qigong_blog/presentation/qigong_blog_shell.dart';
+import 'features/saju/presentation/saju_manse_page.dart';
 import 'features/study_os/study_os_shell.dart';
 import 'features/tarot/application/tarot_runtime_controller.dart';
 import 'features/tarot/backup_recovery/application/tarot_backup_restore_action_controller.dart';
@@ -517,6 +518,7 @@ class CoreOsShell extends StatefulWidget {
     NavItem(UserText.navPeople, Icons.people_alt_rounded),
     NavItem(UserText.navStudy, Icons.school_rounded),
     NavItem(UserText.navReading, Icons.auto_stories_rounded),
+    NavItem(UserText.navSaju, Icons.grid_view_rounded),
     NavItem(UserText.navPractice, Icons.self_improvement_rounded),
     NavItem(UserText.navContent, Icons.draw_rounded),
     NavItem(UserText.navRecord, Icons.edit_note_rounded),
@@ -600,6 +602,7 @@ class _CoreOsShellState extends State<CoreOsShell> {
     'people',
     'study',
     'reading',
+    'saju',
     'practice',
     'content',
     'records',
@@ -1223,6 +1226,16 @@ class _ShellPageContent extends StatelessWidget {
               )
             else
               const PeopleUnavailablePage(),
+          ]
+        : selectedLabel == UserText.navSaju
+        ? <Widget>[
+            if (runtimeServices case final services?)
+              SajuMansePage(
+                peopleRepository: services.people,
+                snapshotRepository: services.sajuSnapshots,
+              )
+            else
+              const SajuUnavailablePage(),
           ]
         : selectedLabel == UserText.navRecord
         ? <Widget>[

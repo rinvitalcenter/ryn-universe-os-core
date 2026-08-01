@@ -60,6 +60,7 @@ const _navIdByLabel = <String, String>{
   UserText.navPeople: 'people',
   UserText.navStudy: 'study',
   UserText.navReading: 'reading',
+  UserText.navSaju: 'saju',
   UserText.navPractice: 'practice',
   UserText.navContent: 'content',
   UserText.navRecord: 'records',

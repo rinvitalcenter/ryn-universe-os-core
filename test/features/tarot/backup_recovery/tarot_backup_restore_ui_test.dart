@@ -42,7 +42,10 @@ void main() {
         bootstrapOnStart: false,
       ),
     );
-    await tester.tap(find.text('설정').first);
+    final settingsNav = find.byKey(const Key('ryn-nav-settings'));
+    await tester.ensureVisible(settingsNav);
+    await tester.pump();
+    await tester.tap(settingsNav);
     await tester.pumpAndSettle();
   }
 
