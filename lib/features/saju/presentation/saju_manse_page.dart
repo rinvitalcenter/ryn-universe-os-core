@@ -5,13 +5,16 @@ import 'package:flutter/services.dart';
 
 import '../../../core/theme/ryn_tokens.dart';
 import '../../people/domain/person_core_repositories.dart';
+import '../application/saju_daeun_seun_controller.dart';
 import '../application/saju_manse_controller.dart';
 import '../domain/saju_calculation_engine.dart';
 import '../domain/saju_models.dart';
 import '../domain/saju_snapshot_repository.dart';
 import '../domain/sexagenary_cycle.dart';
 import '../domain/ten_gods.dart';
+import 'saju_daeun_timeline.dart';
 import 'saju_element_palette.dart';
+import 'saju_seun_panel.dart';
 
 class SajuMansePage extends StatefulWidget {
   const SajuMansePage({
@@ -31,11 +34,14 @@ class SajuMansePage extends StatefulWidget {
 
 class _SajuMansePageState extends State<SajuMansePage> {
   late final SajuManseController _controller;
+  late final SajuDaeunSeunController _daeunSeunController;
   late final TextEditingController _yearController;
   late final TextEditingController _monthController;
   late final TextEditingController _dayController;
   late final TextEditingController _hourController;
   late final TextEditingController _minuteController;
+  SajuChartSnapshot? _lastCalculatedSnapshot;
+  int _natalCalculationGeneration = 0;
 
   @override
   void initState() {
@@ -45,7 +51,9 @@ class _SajuMansePageState extends State<SajuMansePage> {
       snapshotRepository: widget.snapshotRepository,
       calculationEngine:
           widget.calculationEngine ?? SajuCalculationEngine.production(),
-    )..addListener(_onChanged);
+    )..addListener(_onNatalChanged);
+    _daeunSeunController = SajuDaeunSeunController()
+      ..addListener(_onDerivedChanged);
     final draft = _controller.draft;
     _yearController = TextEditingController(
       text: draft.birthDate.year.toString(),
@@ -65,15 +73,59 @@ class _SajuMansePageState extends State<SajuMansePage> {
     _controller.start();
   }
 
-  void _onChanged() {
+  void _onNatalChanged() {
+    unawaited(_syncDerivedSource());
     if (mounted) setState(() {});
+  }
+
+  void _onDerivedChanged() {
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _syncDerivedSource() async {
+    final persisted = _controller.currentPersistedSnapshot;
+    if (persisted != null) {
+      final canPromote =
+          _daeunSeunController.sourceType ==
+              SajuDaeunSeunSourceType.unsavedNatalResult &&
+          _daeunSeunController.sourceSnapshot?.deterministicSignature ==
+              persisted.snapshot.deterministicSignature;
+      if (canPromote) {
+        await _daeunSeunController.promoteToPersistedSource(persisted);
+      } else {
+        await _daeunSeunController.loadPersistedSource(persisted);
+      }
+      return;
+    }
+
+    final calculated = _controller.currentCalculatedSnapshot;
+    final person = _controller.selectedPerson;
+    if (calculated != null && person != null) {
+      if (!identical(calculated, _lastCalculatedSnapshot)) {
+        _lastCalculatedSnapshot = calculated;
+        _natalCalculationGeneration += 1;
+      }
+      await _daeunSeunController.loadUnsavedSource(
+        personId: person.id,
+        natalCalculationGeneration: _natalCalculationGeneration,
+        snapshot: calculated,
+      );
+      return;
+    }
+
+    _lastCalculatedSnapshot = null;
+    if (_daeunSeunController.hasSource) {
+      _daeunSeunController.clearSource();
+    }
   }
 
   @override
   void dispose() {
-    _controller.removeListener(_onChanged);
+    _controller.removeListener(_onNatalChanged);
+    _daeunSeunController.removeListener(_onDerivedChanged);
     unawaited(_controller.stop());
     _controller.dispose();
+    _daeunSeunController.dispose();
     _yearController.dispose();
     _monthController.dispose();
     _dayController.dispose();
@@ -127,41 +179,10 @@ class _SajuMansePageState extends State<SajuMansePage> {
                   controller: _controller,
                   onNewChart: _startNewChart,
                 ),
+                const SizedBox(height: 18),
+                _WorkspaceTabs(controller: _daeunSeunController),
                 const SizedBox(height: 22),
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final wide = constraints.maxWidth >= 920;
-                    final input = _BirthInputPanel(
-                      controller: _controller,
-                      yearController: _yearController,
-                      monthController: _monthController,
-                      dayController: _dayController,
-                      hourController: _hourController,
-                      minuteController: _minuteController,
-                      onCalculate: _calculate,
-                    );
-                    final result = _ResultBoard(
-                      controller: _controller,
-                      onSave: _controller.save,
-                    );
-                    if (!wide) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [input, const SizedBox(height: 20), result],
-                      );
-                    }
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(width: 388, child: input),
-                        const SizedBox(width: 22),
-                        Expanded(child: result),
-                      ],
-                    );
-                  },
-                ),
-                const SizedBox(height: 22),
-                _SavedHistory(controller: _controller),
+                _buildSelectedWorkspace(),
               ],
             ),
           ),
@@ -169,6 +190,87 @@ class _SajuMansePageState extends State<SajuMansePage> {
       ),
     );
   }
+
+  Widget _buildSelectedWorkspace() => switch (_daeunSeunController.currentTab) {
+    SajuWorkspaceTab.natal => _buildNatalWorkspace(),
+    SajuWorkspaceTab.daeun => SajuDaeunTimeline(
+      controller: _daeunSeunController,
+    ),
+    SajuWorkspaceTab.seun => SajuSeunPanel(controller: _daeunSeunController),
+  };
+
+  Widget _buildNatalWorkspace() => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      LayoutBuilder(
+        builder: (context, constraints) {
+          final wide = constraints.maxWidth >= 920;
+          final input = _BirthInputPanel(
+            controller: _controller,
+            yearController: _yearController,
+            monthController: _monthController,
+            dayController: _dayController,
+            hourController: _hourController,
+            minuteController: _minuteController,
+            onCalculate: _calculate,
+          );
+          final result = _ResultBoard(
+            controller: _controller,
+            onSave: _controller.save,
+          );
+          if (!wide) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [input, const SizedBox(height: 20), result],
+            );
+          }
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(width: 388, child: input),
+              const SizedBox(width: 22),
+              Expanded(child: result),
+            ],
+          );
+        },
+      ),
+      const SizedBox(height: 22),
+      _SavedHistory(controller: _controller),
+    ],
+  );
+}
+
+class _WorkspaceTabs extends StatelessWidget {
+  const _WorkspaceTabs({required this.controller});
+
+  final SajuDaeunSeunController controller;
+
+  @override
+  Widget build(BuildContext context) => SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    child: SegmentedButton<SajuWorkspaceTab>(
+      showSelectedIcon: false,
+      segments: const [
+        ButtonSegment(
+          value: SajuWorkspaceTab.natal,
+          label: Text('원국', key: Key('saju-tab-natal')),
+          icon: Icon(Icons.grid_view_rounded),
+        ),
+        ButtonSegment(
+          value: SajuWorkspaceTab.daeun,
+          label: Text('대운', key: Key('saju-tab-daeun')),
+          icon: Icon(Icons.timeline_rounded),
+        ),
+        ButtonSegment(
+          value: SajuWorkspaceTab.seun,
+          label: Text('세운', key: Key('saju-tab-seun')),
+          icon: Icon(Icons.calendar_view_month_rounded),
+        ),
+      ],
+      selected: {controller.currentTab},
+      onSelectionChanged: (selection) => controller.selectTab(selection.first),
+    ),
+  );
 }
 
 class _WorkspaceHeader extends StatelessWidget {
@@ -442,6 +544,7 @@ class _BirthInputPanel extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             DropdownButtonFormField<SajuGender>(
+              key: const Key('saju-gender'),
               initialValue: draft.gender,
               decoration: const InputDecoration(labelText: '성별'),
               items: const [

@@ -100,6 +100,12 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  Future<void> selectMale(WidgetTester tester) async {
+    await tapVisible(tester, find.byKey(const Key('saju-gender')));
+    await tester.tap(find.text('남성').last);
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('empty state asks for a Person without developer placeholders', (
     tester,
   ) async {
@@ -310,6 +316,172 @@ void main() {
       );
     },
   );
+
+  testWidgets('Daeun and Seun tabs expose a safe no-source state', (
+    tester,
+  ) async {
+    await pumpPage(tester);
+
+    expect(find.byKey(const Key('saju-tab-natal')), findsOneWidget);
+    expect(find.byKey(const Key('saju-tab-daeun')), findsOneWidget);
+    expect(find.byKey(const Key('saju-tab-seun')), findsOneWidget);
+
+    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
+    expect(
+      find.text('대운과 세운을 확인하려면 먼저 원국을 계산하거나 저장된 명식을 선택해 주세요.'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('Revision 0'), findsNothing);
+  });
+
+  testWidgets('unsaved natal source renders eleven Daeun and ten Seun labels', (
+    tester,
+  ) async {
+    await seedPerson();
+    await pumpPage(tester, size: const Size(1600, 1000));
+    await tester.enterText(find.byKey(const Key('saju-date-year')), '1990');
+    await tester.enterText(find.byKey(const Key('saju-date-month')), '3');
+    await tester.enterText(find.byKey(const Key('saju-date-day')), '15');
+    await selectMale(tester);
+    await tapVisible(tester, find.byKey(const Key('saju-calculate')));
+
+    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
+    expect(find.text('저장 전 원국'), findsWidgets);
+    expect(find.text('대운수 7 · 순행'), findsOneWidget);
+    expect(find.text('첫 시작 7세 · 1996년'), findsOneWidget);
+    expect(find.byKey(const Key('saju-daeun-timeline-scroll')), findsOneWidget);
+    for (var sequence = 1; sequence <= 11; sequence++) {
+      expect(find.byKey(Key('saju-daeun-cycle-$sequence')), findsOneWidget);
+    }
+
+    await tapVisible(tester, find.byKey(const Key('saju-daeun-provenance')));
+    expect(find.text('계산 기준과 출처'), findsWidgets);
+    expect(find.textContaining('rynSajuDaeunSeun'), findsOneWidget);
+    expect(find.textContaining('annualSexagenaryLabelOnlyV1'), findsOneWidget);
+    await tester.tap(find.text('닫기'));
+    await tester.pumpAndSettle();
+
+    await tapVisible(tester, find.byKey(const Key('saju-daeun-cycle-2')));
+    expect(find.text('2번째 대운'), findsOneWidget);
+
+    await tapVisible(tester, find.byKey(const Key('saju-tab-seun')));
+    for (var year = 2006; year <= 2015; year++) {
+      expect(find.byKey(Key('saju-seun-year-$year')), findsOneWidget);
+    }
+    expect(find.byKey(const Key('saju-seun-disclaimer')), findsOneWidget);
+    expect(find.text('올해 위치'), findsOneWidget);
+    expect(find.textContaining('특정 날짜의 활성 세운을 판정하지 않습니다'), findsOneWidget);
+    expect(find.text('활성'), findsNothing);
+    expect(find.text('적용 중'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('save promotes provenance without losing Daeun selection', (
+    tester,
+  ) async {
+    await seedPerson();
+    await pumpPage(tester, size: const Size(1600, 1000));
+    await tester.enterText(find.byKey(const Key('saju-date-year')), '1990');
+    await tester.enterText(find.byKey(const Key('saju-date-month')), '3');
+    await tester.enterText(find.byKey(const Key('saju-date-day')), '15');
+    await selectMale(tester);
+    await tapVisible(tester, find.byKey(const Key('saju-calculate')));
+    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
+    await tester.tap(find.byKey(const Key('saju-daeun-cycle-2')));
+    await tester.pumpAndSettle();
+
+    await tapVisible(tester, find.byKey(const Key('saju-tab-natal')));
+    await tapVisible(tester, find.byKey(const Key('saju-save')));
+    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
+
+    expect(find.text('Revision 1'), findsWidgets);
+    expect(find.text('2번째 대운'), findsOneWidget);
+    expect(find.text('저장 전 원국'), findsNothing);
+  });
+
+  testWidgets('derived workspace is responsive in dark and scaled desktop', (
+    tester,
+  ) async {
+    await seedPerson();
+    await pumpPage(
+      tester,
+      size: const Size(1280, 800),
+      themeMode: ThemeMode.dark,
+      textScale: 1.2,
+    );
+    await selectMale(tester);
+    await tapVisible(tester, find.byKey(const Key('saju-calculate')));
+    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
+
+    expect(find.byKey(const Key('saju-daeun-timeline-scroll')), findsOneWidget);
+    expect(find.byKey(const Key('saju-daeun-detail')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    await tapVisible(tester, find.byKey(const Key('saju-tab-seun')));
+    expect(find.byKey(const Key('saju-seun-detail')), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('unknown-time stable result warns and still shows 11 cycles', (
+    tester,
+  ) async {
+    await seedPerson();
+    await pumpPage(tester, size: const Size(1600, 1000));
+    await tester.enterText(find.byKey(const Key('saju-date-year')), '2023');
+    await tester.enterText(find.byKey(const Key('saju-date-month')), '6');
+    await tester.enterText(find.byKey(const Key('saju-date-day')), '15');
+    await tapVisible(tester, find.byKey(const Key('saju-hour-unknown')));
+    await selectMale(tester);
+    await tapVisible(tester, find.byKey(const Key('saju-calculate')));
+    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
+
+    expect(
+      find.textContaining('해당 날짜의 분 단위 후보에서 대운수가 동일하게 계산되어'),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('saju-daeun-cycle-11')), findsOneWidget);
+  });
+
+  testWidgets('ambiguous Daeun fails while annual Seun remains available', (
+    tester,
+  ) async {
+    await seedPerson();
+    await pumpPage(tester, size: const Size(1600, 1000));
+    await tester.enterText(find.byKey(const Key('saju-date-year')), '2023');
+    await tester.enterText(find.byKey(const Key('saju-date-month')), '6');
+    await tester.enterText(find.byKey(const Key('saju-date-day')), '10');
+    await tapVisible(tester, find.byKey(const Key('saju-hour-unknown')));
+    await selectMale(tester);
+    await tapVisible(tester, find.byKey(const Key('saju-calculate')));
+    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
+
+    expect(
+      find.text('출생시간에 따라 대운수가 달라질 수 있어 현재 대운 결과를 확정할 수 없습니다.'),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('saju-daeun-timeline-scroll')), findsNothing);
+
+    await tapVisible(tester, find.byKey(const Key('saju-tab-seun')));
+    expect(find.byKey(const Key('saju-seun-year-2023')), findsOneWidget);
+    expect(find.byKey(const Key('saju-seun-disclaimer')), findsOneWidget);
+  });
+
+  testWidgets('forward horizon fails closed without blocking Seun', (
+    tester,
+  ) async {
+    await seedPerson();
+    await pumpPage(tester, size: const Size(1600, 1000));
+    await tester.enterText(find.byKey(const Key('saju-date-year')), '2050');
+    await tester.enterText(find.byKey(const Key('saju-date-month')), '12');
+    await tester.enterText(find.byKey(const Key('saju-date-day')), '20');
+    await selectMale(tester);
+    await tapVisible(tester, find.byKey(const Key('saju-calculate')));
+    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
+
+    expect(find.text('현재 절입 계산 지원 범위를 넘어 대운수를 계산할 수 없습니다.'), findsOneWidget);
+    await tapVisible(tester, find.byKey(const Key('saju-tab-seun')));
+    expect(find.byKey(const Key('saju-seun-year-2050')), findsOneWidget);
+  });
 
   testWidgets('light/dark, text scale and desktop widths have no overflow', (
     tester,
