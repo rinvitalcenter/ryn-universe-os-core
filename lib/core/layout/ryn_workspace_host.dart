@@ -16,27 +16,39 @@ enum RynWorkspaceScrollMode {
   independentPanels,
 }
 
+/// Declares horizontal composition independently from scroll ownership.
+enum RynWorkspaceWidthPolicy { ordinary, immersive, adaptiveWorkbench, focused }
+
 @immutable
 final class RynWorkspacePresentation {
   const RynWorkspacePresentation({
     required this.mode,
     this.bypassAppWorkspaceCap = false,
+    this.widthPolicy = RynWorkspaceWidthPolicy.ordinary,
   });
 
   const RynWorkspacePresentation.featurePage({
     this.bypassAppWorkspaceCap = false,
+    this.widthPolicy = RynWorkspaceWidthPolicy.ordinary,
   }) : mode = RynWorkspaceScrollMode.featurePage;
 
   const RynWorkspacePresentation.viewportBounded({
     this.bypassAppWorkspaceCap = false,
+    this.widthPolicy = RynWorkspaceWidthPolicy.ordinary,
   }) : mode = RynWorkspaceScrollMode.viewportBounded;
 
   const RynWorkspacePresentation.independentPanels({
     this.bypassAppWorkspaceCap = false,
+    this.widthPolicy = RynWorkspaceWidthPolicy.ordinary,
   }) : mode = RynWorkspaceScrollMode.independentPanels;
 
   final RynWorkspaceScrollMode mode;
   final bool bypassAppWorkspaceCap;
+  final RynWorkspaceWidthPolicy widthPolicy;
+
+  /// Legacy bypass always wins so existing immersive callers remain unchanged.
+  RynWorkspaceWidthPolicy get effectiveWidthPolicy =>
+      bypassAppWorkspaceCap ? RynWorkspaceWidthPolicy.immersive : widthPolicy;
 }
 
 final class RynWorkspacePresentationScope extends InheritedWidget {
@@ -67,7 +79,8 @@ final class RynWorkspacePresentationScope extends InheritedWidget {
   bool updateShouldNotify(RynWorkspacePresentationScope oldWidget) =>
       presentation.mode != oldWidget.presentation.mode ||
       presentation.bypassAppWorkspaceCap !=
-          oldWidget.presentation.bypassAppWorkspaceCap;
+          oldWidget.presentation.bypassAppWorkspaceCap ||
+      presentation.widthPolicy != oldWidget.presentation.widthPolicy;
 }
 
 /// Aligns one route workspace without becoming its vertical scroll owner.
@@ -106,10 +119,25 @@ final class RynWorkspaceHost extends StatelessWidget {
           0.0,
           constraints.maxHeight - _topPadding - _bottomPadding,
         );
-        final maxContentWidth = presentation.bypassAppWorkspaceCap
-            ? math.max(_readingMinimumBroadWidth, availableWidth)
-            : tokens.appWorkspaceMaxWidth;
+        final widthPolicy = presentation.effectiveWidthPolicy;
+        final maxContentWidth = switch (widthPolicy) {
+          RynWorkspaceWidthPolicy.ordinary => tokens.appWorkspaceMaxWidth,
+          RynWorkspaceWidthPolicy.immersive => math.max(
+            _readingMinimumBroadWidth,
+            availableWidth,
+          ),
+          RynWorkspaceWidthPolicy.adaptiveWorkbench =>
+            tokens.adaptiveWorkbenchMaxWidth,
+          RynWorkspaceWidthPolicy.focused => tokens.focusedWorkspaceMaxWidth,
+        };
         final contentWidth = math.min(availableWidth, maxContentWidth);
+        final centersWhenCapped =
+            widthPolicy == RynWorkspaceWidthPolicy.adaptiveWorkbench ||
+            widthPolicy == RynWorkspaceWidthPolicy.focused;
+        final workspaceAlignment =
+            centersWhenCapped && availableWidth > maxContentWidth
+            ? Alignment.topCenter
+            : Alignment.topLeft;
         final workspaceMetrics = shellScope.metrics.copyWithWorkspace(
           workspaceWidth: contentWidth,
           workspaceHeight: availableHeight,
@@ -127,7 +155,7 @@ final class RynWorkspaceHost extends StatelessWidget {
             _bottomPadding,
           ),
           child: Align(
-            alignment: Alignment.topLeft,
+            alignment: workspaceAlignment,
             child: SizedBox(
               key: workspaceBoundsKey,
               width: contentWidth,

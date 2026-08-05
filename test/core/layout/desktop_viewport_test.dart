@@ -218,6 +218,21 @@ void main() {
       );
     });
 
+    test('publishes semantic workspace maximums from shared tokens', () {
+      final tokens = DesktopWorkspaceTokens.resolve(_metrics());
+
+      expect(
+        tokens.adaptiveWorkbenchMaxWidth,
+        DesktopWorkspaceTokens.adaptiveWorkbenchMaximumWidth,
+      );
+      expect(tokens.adaptiveWorkbenchMaxWidth, 2240);
+      expect(
+        tokens.focusedWorkspaceMaxWidth,
+        DesktopWorkspaceTokens.focusedWorkspaceMaximumWidth,
+      );
+      expect(tokens.focusedWorkspaceMaxWidth, 1120);
+    });
+
     test('keeps feature-specific caps as unwired extension points', () {
       final tokens = DesktopWorkspaceTokens.resolve(_metrics());
 

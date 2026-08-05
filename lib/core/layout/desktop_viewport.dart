@@ -210,13 +210,13 @@ final class DesktopViewportMetrics {
       '${size.width.toStringAsFixed(1)}x${size.height.toStringAsFixed(1)}';
 }
 
-/// Shared workspace policy. Only [appWorkspaceMaxWidth] is active today.
-/// Feature-specific caps remain explicit, unwired extension points so a single
-/// universal maximum cannot accidentally resize Reading or Tarot surfaces.
+/// Shared workspace sizing facts resolved from the active shell viewport.
 @immutable
 final class DesktopWorkspaceTokens {
   const DesktopWorkspaceTokens._({
     required this.appWorkspaceMaxWidth,
+    required this.adaptiveWorkbenchMaxWidth,
+    required this.focusedWorkspaceMaxWidth,
     required this.shellHorizontalPadding,
     required this.elasticWorkspaceGutter,
   });
@@ -227,11 +227,15 @@ final class DesktopWorkspaceTokens {
   static const double appWorkspaceStandardMaxWidth = 1480;
   static const double appWorkspaceExpandedMaxWidth = 1680;
   static const double appWorkspaceUltraCompactMaxWidth = 260;
+  static const double adaptiveWorkbenchMaximumWidth = 2240;
+  static const double focusedWorkspaceMaximumWidth = 1120;
   static const double shellPaddingUltraCompact = 6;
   static const double shellPaddingReduced = 12;
   static const double shellPaddingStandard = 20;
 
   final double appWorkspaceMaxWidth;
+  final double adaptiveWorkbenchMaxWidth;
+  final double focusedWorkspaceMaxWidth;
   final double shellHorizontalPadding;
   final double elasticWorkspaceGutter;
 
@@ -256,6 +260,8 @@ final class DesktopWorkspaceTokens {
 
     return DesktopWorkspaceTokens._(
       appWorkspaceMaxWidth: appCap,
+      adaptiveWorkbenchMaxWidth: adaptiveWorkbenchMaximumWidth,
+      focusedWorkspaceMaxWidth: focusedWorkspaceMaximumWidth,
       shellHorizontalPadding: padding,
       elasticWorkspaceGutter: padding,
     );
@@ -266,6 +272,8 @@ final class DesktopWorkspaceTokens {
     return identical(this, other) ||
         other is DesktopWorkspaceTokens &&
             other.appWorkspaceMaxWidth == appWorkspaceMaxWidth &&
+            other.adaptiveWorkbenchMaxWidth == adaptiveWorkbenchMaxWidth &&
+            other.focusedWorkspaceMaxWidth == focusedWorkspaceMaxWidth &&
             other.shellHorizontalPadding == shellHorizontalPadding &&
             other.elasticWorkspaceGutter == elasticWorkspaceGutter;
   }
@@ -273,6 +281,8 @@ final class DesktopWorkspaceTokens {
   @override
   int get hashCode => Object.hash(
     appWorkspaceMaxWidth,
+    adaptiveWorkbenchMaxWidth,
+    focusedWorkspaceMaxWidth,
     shellHorizontalPadding,
     elasticWorkspaceGutter,
   );
