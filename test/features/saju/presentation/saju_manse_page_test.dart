@@ -1,5 +1,6 @@
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ryn_universe_os_core/core/persistence/app_database.dart';
 import 'package:ryn_universe_os_core/core/repositories/repository_result.dart';
@@ -166,6 +167,25 @@ void main() {
       expect(find.byKey(const Key('saju-pillar-day')), findsOneWidget);
       expect(find.byKey(const Key('saju-pillar-month')), findsOneWidget);
       expect(find.byKey(const Key('saju-pillar-year')), findsOneWidget);
+      expect(find.byKey(const Key('saju-natal-section')), findsOneWidget);
+      expect(find.byKey(const Key('saju-daeun-section')), findsOneWidget);
+      expect(find.byKey(const Key('saju-seun-section')), findsOneWidget);
+      expect(find.byKey(const Key('saju-pillar-grid')), findsOneWidget);
+      final hourX = tester
+          .getCenter(find.byKey(const Key('saju-pillar-hour')))
+          .dx;
+      final dayX = tester
+          .getCenter(find.byKey(const Key('saju-pillar-day')))
+          .dx;
+      final monthX = tester
+          .getCenter(find.byKey(const Key('saju-pillar-month')))
+          .dx;
+      final yearX = tester
+          .getCenter(find.byKey(const Key('saju-pillar-year')))
+          .dx;
+      expect(hourX, lessThan(dayX));
+      expect(dayX, lessThan(monthX));
+      expect(monthX, lessThan(yearX));
       expect(find.text('네 기둥과 여덟 글자'), findsOneWidget);
       expect(find.text('양력 2024-02-10'), findsOneWidget);
       expect(find.textContaining('음력'), findsWidgets);
@@ -222,7 +242,7 @@ void main() {
 
       expect(inside('saju-pillar-day-stem', '丙'), findsOneWidget);
       expect(inside('saju-pillar-day-stem', '화'), findsOneWidget);
-      expect(inside('saju-pillar-day-stem-relation', '일간(나)'), findsOneWidget);
+      expect(inside('saju-pillar-day-stem-relation', '일간·나'), findsOneWidget);
       expect(inside('saju-pillar-day-branch', '寅'), findsOneWidget);
       expect(inside('saju-pillar-day-branch', '목'), findsOneWidget);
       expect(inside('saju-pillar-day-branch-relation', '편인'), findsOneWidget);
@@ -303,7 +323,7 @@ void main() {
       expect(
         find.descendant(
           of: find.byKey(const Key('saju-pillar-day-stem-relation')),
-          matching: find.text('일간(나)'),
+          matching: find.text('일간·나'),
         ),
         findsOneWidget,
       );
@@ -317,22 +337,28 @@ void main() {
     },
   );
 
-  testWidgets('Daeun and Seun tabs expose a safe no-source state', (
-    tester,
-  ) async {
-    await pumpPage(tester);
+  testWidgets(
+    'integrated Daeun and Seun sections expose a safe no-source state',
+    (tester) async {
+      await pumpPage(tester);
 
-    expect(find.byKey(const Key('saju-tab-natal')), findsOneWidget);
-    expect(find.byKey(const Key('saju-tab-daeun')), findsOneWidget);
-    expect(find.byKey(const Key('saju-tab-seun')), findsOneWidget);
-
-    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
-    expect(
-      find.text('대운과 세운을 확인하려면 먼저 원국을 계산하거나 저장된 명식을 선택해 주세요.'),
-      findsOneWidget,
-    );
-    expect(find.textContaining('Revision 0'), findsNothing);
-  });
+      expect(
+        find.byKey(const Key('saju-integrated-workbench')),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('saju-natal-section')), findsOneWidget);
+      expect(find.byKey(const Key('saju-daeun-section')), findsOneWidget);
+      expect(find.byKey(const Key('saju-seun-section')), findsOneWidget);
+      expect(find.byKey(const Key('saju-tab-natal')), findsNothing);
+      expect(find.byKey(const Key('saju-tab-daeun')), findsNothing);
+      expect(find.byKey(const Key('saju-tab-seun')), findsNothing);
+      expect(
+        find.text('대운과 세운을 확인하려면 먼저 원국을 계산하거나 저장된 명식을 선택해 주세요.'),
+        findsNWidgets(2),
+      );
+      expect(find.textContaining('Revision 0'), findsNothing);
+    },
+  );
 
   testWidgets('unsaved natal source renders eleven Daeun and ten Seun labels', (
     tester,
@@ -345,7 +371,6 @@ void main() {
     await selectMale(tester);
     await tapVisible(tester, find.byKey(const Key('saju-calculate')));
 
-    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
     expect(find.text('저장 전 원국'), findsWidgets);
     expect(find.text('대운수 7 · 순행'), findsOneWidget);
     expect(find.text('첫 시작 7세 · 1996년'), findsOneWidget);
@@ -363,8 +388,10 @@ void main() {
 
     await tapVisible(tester, find.byKey(const Key('saju-daeun-cycle-2')));
     expect(find.text('2번째 대운'), findsOneWidget);
+    expect(find.byKey(const Key('saju-natal-section')), findsOneWidget);
+    expect(find.byKey(const Key('saju-daeun-section')), findsOneWidget);
+    expect(find.byKey(const Key('saju-seun-section')), findsOneWidget);
 
-    await tapVisible(tester, find.byKey(const Key('saju-tab-seun')));
     for (var year = 2006; year <= 2015; year++) {
       expect(find.byKey(Key('saju-seun-year-$year')), findsOneWidget);
     }
@@ -373,8 +400,109 @@ void main() {
     expect(find.textContaining('특정 날짜의 활성 세운을 판정하지 않습니다'), findsOneWidget);
     expect(find.text('활성'), findsNothing);
     expect(find.text('적용 중'), findsNothing);
+
+    final daeunFocus = tester.widget<Focus>(
+      find.byKey(const Key('saju-daeun-keyboard')),
+    );
+    daeunFocus.focusNode!.requestFocus();
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(
+        of: find.byKey(const Key('saju-daeun-detail')),
+        matching: find.text('3번째 대운'),
+      ),
+      findsOneWidget,
+    );
+
+    final seunFocus = tester.widget<Focus>(
+      find.byKey(const Key('saju-seun-keyboard')),
+    );
+    seunFocus.focusNode!.requestFocus();
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(
+        of: find.byKey(const Key('saju-seun-detail')),
+        matching: find.text('2017년'),
+      ),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('saju-natal-section')), findsOneWidget);
+    expect(find.byKey(const Key('saju-daeun-section')), findsOneWidget);
+    expect(find.byKey(const Key('saju-seun-section')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'Galaxy first viewport keeps natal, selected Daeun and selected Seun visible',
+    (tester) async {
+      await seedPerson();
+      await pumpPage(tester, size: const Size(1440, 830));
+      await selectMale(tester);
+      await tapVisible(tester, find.byKey(const Key('saju-calculate')));
+
+      final workspaceScroll = tester.state<ScrollableState>(
+        find.descendant(
+          of: find.byKey(const Key('saju-workspace-scroll')),
+          matching: find.byType(Scrollable),
+        ).first,
+      );
+      workspaceScroll.position.jumpTo(0);
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('saju-input-summary')), findsOneWidget);
+      expect(find.byKey(const Key('saju-natal-section')), findsOneWidget);
+      expect(find.byKey(const Key('saju-daeun-section')), findsOneWidget);
+      expect(find.byKey(const Key('saju-seun-section')), findsOneWidget);
+      expect(find.byKey(const Key('saju-daeun-cycle-1')), findsOneWidget);
+      expect(find.byKey(const Key('saju-seun-year-1997')), findsOneWidget);
+
+      for (var sequence = 1; sequence <= 11; sequence++) {
+        expect(find.byKey(Key('saju-daeun-cycle-$sequence')), findsOneWidget);
+      }
+      for (var year = 1997; year <= 2006; year++) {
+        expect(find.byKey(Key('saju-seun-year-$year')), findsOneWidget);
+      }
+
+      final hourX = tester
+          .getCenter(find.byKey(const Key('saju-pillar-hour')))
+          .dx;
+      final dayX = tester
+          .getCenter(find.byKey(const Key('saju-pillar-day')))
+          .dx;
+      final monthX = tester
+          .getCenter(find.byKey(const Key('saju-pillar-month')))
+          .dx;
+      final yearX = tester
+          .getCenter(find.byKey(const Key('saju-pillar-year')))
+          .dx;
+      expect(hourX, lessThan(dayX));
+      expect(dayX, lessThan(monthX));
+      expect(monthX, lessThan(yearX));
+
+      for (final key in const [
+        'saju-pillar-grid',
+        'saju-daeun-section',
+        'saju-daeun-cycle-1',
+        'saju-seun-section',
+        'saju-seun-year-1997',
+      ]) {
+        final rect = tester.getRect(find.byKey(Key(key)));
+        expect(rect.top, greaterThanOrEqualTo(0), reason: '$key starts above viewport');
+        expect(rect.bottom, lessThanOrEqualTo(830), reason: '$key ends below viewport');
+      }
+
+      final workspaceRect = tester.getRect(
+        find.byKey(const Key('saju-integrated-workbench')),
+      );
+      expect(workspaceRect.left, greaterThanOrEqualTo(0));
+      expect(workspaceRect.right, lessThanOrEqualTo(1440));
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('save promotes provenance without losing Daeun selection', (
     tester,
@@ -386,13 +514,10 @@ void main() {
     await tester.enterText(find.byKey(const Key('saju-date-day')), '15');
     await selectMale(tester);
     await tapVisible(tester, find.byKey(const Key('saju-calculate')));
-    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
     await tester.tap(find.byKey(const Key('saju-daeun-cycle-2')));
     await tester.pumpAndSettle();
 
-    await tapVisible(tester, find.byKey(const Key('saju-tab-natal')));
     await tapVisible(tester, find.byKey(const Key('saju-save')));
-    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
 
     expect(find.text('Revision 1'), findsWidgets);
     expect(find.text('2번째 대운'), findsOneWidget);
@@ -411,13 +536,9 @@ void main() {
     );
     await selectMale(tester);
     await tapVisible(tester, find.byKey(const Key('saju-calculate')));
-    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
 
     expect(find.byKey(const Key('saju-daeun-timeline-scroll')), findsOneWidget);
     expect(find.byKey(const Key('saju-daeun-detail')), findsOneWidget);
-    expect(tester.takeException(), isNull);
-
-    await tapVisible(tester, find.byKey(const Key('saju-tab-seun')));
     expect(find.byKey(const Key('saju-seun-detail')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -433,7 +554,6 @@ void main() {
     await tapVisible(tester, find.byKey(const Key('saju-hour-unknown')));
     await selectMale(tester);
     await tapVisible(tester, find.byKey(const Key('saju-calculate')));
-    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
 
     expect(
       find.textContaining('해당 날짜의 분 단위 후보에서 대운수가 동일하게 계산되어'),
@@ -453,7 +573,6 @@ void main() {
     await tapVisible(tester, find.byKey(const Key('saju-hour-unknown')));
     await selectMale(tester);
     await tapVisible(tester, find.byKey(const Key('saju-calculate')));
-    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
 
     expect(
       find.text('출생시간에 따라 대운수가 달라질 수 있어 현재 대운 결과를 확정할 수 없습니다.'),
@@ -461,7 +580,6 @@ void main() {
     );
     expect(find.byKey(const Key('saju-daeun-timeline-scroll')), findsNothing);
 
-    await tapVisible(tester, find.byKey(const Key('saju-tab-seun')));
     expect(find.byKey(const Key('saju-seun-year-2023')), findsOneWidget);
     expect(find.byKey(const Key('saju-seun-disclaimer')), findsOneWidget);
   });
@@ -476,10 +594,8 @@ void main() {
     await tester.enterText(find.byKey(const Key('saju-date-day')), '20');
     await selectMale(tester);
     await tapVisible(tester, find.byKey(const Key('saju-calculate')));
-    await tapVisible(tester, find.byKey(const Key('saju-tab-daeun')));
 
     expect(find.text('현재 절입 계산 지원 범위를 넘어 대운수를 계산할 수 없습니다.'), findsOneWidget);
-    await tapVisible(tester, find.byKey(const Key('saju-tab-seun')));
     expect(find.byKey(const Key('saju-seun-year-2050')), findsOneWidget);
   });
 

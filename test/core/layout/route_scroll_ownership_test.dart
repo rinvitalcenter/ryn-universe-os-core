@@ -113,6 +113,24 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Saju alone uses the adaptive workbench width policy', (
+    tester,
+  ) async {
+    await _pumpApp(tester);
+    await tester.tap(find.byKey(const Key('ryn-nav-saju')));
+    await tester.pumpAndSettle();
+
+    final destination = find.text('사주 기록을 열 수 없습니다.');
+    expect(destination, findsOneWidget);
+    final scope = RynWorkspacePresentationScope.of(tester.element(destination));
+    expect(scope.presentation.mode, RynWorkspaceScrollMode.featurePage);
+    expect(
+      scope.presentation.effectiveWidthPolicy,
+      RynWorkspaceWidthPolicy.adaptiveWorkbench,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   for (final textScale in <double>[1, 1.25, 1.5]) {
     testWidgets('route ownership stays usable at text scale $textScale', (
       tester,

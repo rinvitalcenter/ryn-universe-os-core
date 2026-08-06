@@ -10,10 +10,8 @@ import '../application/saju_manse_controller.dart';
 import '../domain/saju_calculation_engine.dart';
 import '../domain/saju_models.dart';
 import '../domain/saju_snapshot_repository.dart';
-import '../domain/sexagenary_cycle.dart';
-import '../domain/ten_gods.dart';
 import 'saju_daeun_timeline.dart';
-import 'saju_element_palette.dart';
+import 'saju_integrated_workbench.dart';
 import 'saju_seun_panel.dart';
 
 class SajuMansePage extends StatefulWidget {
@@ -168,10 +166,10 @@ class _SajuMansePageState extends State<SajuMansePage> {
       color: colors.appCanvas,
       child: SingleChildScrollView(
         key: const Key('saju-workspace-scroll'),
-        padding: const EdgeInsets.fromLTRB(28, 24, 28, 44),
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1480),
+            constraints: const BoxConstraints(maxWidth: 2200),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -179,10 +177,8 @@ class _SajuMansePageState extends State<SajuMansePage> {
                   controller: _controller,
                   onNewChart: _startNewChart,
                 ),
-                const SizedBox(height: 18),
-                _WorkspaceTabs(controller: _daeunSeunController),
-                const SizedBox(height: 22),
-                _buildSelectedWorkspace(),
+                const SizedBox(height: 10),
+                LayoutBuilder(builder: _buildIntegratedWorkbench),
               ],
             ),
           ),
@@ -191,86 +187,332 @@ class _SajuMansePageState extends State<SajuMansePage> {
     );
   }
 
-  Widget _buildSelectedWorkspace() => switch (_daeunSeunController.currentTab) {
-    SajuWorkspaceTab.natal => _buildNatalWorkspace(),
-    SajuWorkspaceTab.daeun => SajuDaeunTimeline(
-      controller: _daeunSeunController,
-    ),
-    SajuWorkspaceTab.seun => SajuSeunPanel(controller: _daeunSeunController),
-  };
-
-  Widget _buildNatalWorkspace() => Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      LayoutBuilder(
-        builder: (context, constraints) {
-          final wide = constraints.maxWidth >= 920;
-          final input = _BirthInputPanel(
-            controller: _controller,
-            yearController: _yearController,
-            monthController: _monthController,
-            dayController: _dayController,
-            hourController: _hourController,
-            minuteController: _minuteController,
-            onCalculate: _calculate,
-          );
-          final result = _ResultBoard(
-            controller: _controller,
-            onSave: _controller.save,
-          );
-          if (!wide) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [input, const SizedBox(height: 20), result],
-            );
-          }
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(width: 388, child: input),
-              const SizedBox(width: 22),
-              Expanded(child: result),
-            ],
-          );
-        },
-      ),
-      const SizedBox(height: 22),
-      _SavedHistory(controller: _controller),
-    ],
-  );
-}
-
-class _WorkspaceTabs extends StatelessWidget {
-  const _WorkspaceTabs({required this.controller});
-
-  final SajuDaeunSeunController controller;
-
-  @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-    scrollDirection: Axis.horizontal,
-    child: SegmentedButton<SajuWorkspaceTab>(
-      showSelectedIcon: false,
-      segments: const [
-        ButtonSegment(
-          value: SajuWorkspaceTab.natal,
-          label: Text('원국', key: Key('saju-tab-natal')),
-          icon: Icon(Icons.grid_view_rounded),
+  Widget _buildIntegratedWorkbench(
+    BuildContext context,
+    BoxConstraints constraints,
+  ) {
+    final inputRail = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _BirthInputPanel(
+          controller: _controller,
+          yearController: _yearController,
+          monthController: _monthController,
+          dayController: _dayController,
+          hourController: _hourController,
+          minuteController: _minuteController,
+          onCalculate: _calculate,
         ),
-        ButtonSegment(
-          value: SajuWorkspaceTab.daeun,
-          label: Text('대운', key: Key('saju-tab-daeun')),
-          icon: Icon(Icons.timeline_rounded),
+        const SizedBox(height: 16),
+        _SavedHistory(controller: _controller),
+      ],
+    );
+    final analysis = Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        KeyedSubtree(
+          key: const Key('saju-natal-section'),
+          child: _ResultBoard(controller: _controller),
         ),
-        ButtonSegment(
-          value: SajuWorkspaceTab.seun,
-          label: Text('세운', key: Key('saju-tab-seun')),
-          icon: Icon(Icons.calendar_view_month_rounded),
+        const SizedBox(height: 8),
+        _WorkbenchSection(
+          key: const Key('saju-daeun-section'),
+          index: '02',
+          title: '대운 · 11주기',
+          helper: '선택한 흐름이 세운 10년의 기준이 됩니다.',
+          child: SajuDaeunTimeline(
+            controller: _daeunSeunController,
+            showSourceBanner: false,
+            showDetail: false,
+          ),
+        ),
+        const SizedBox(height: 8),
+        _WorkbenchSection(
+          key: const Key('saju-seun-section'),
+          index: '03',
+          title: '세운 · 선택 대운의 10년',
+          helper: '연도 간지 라벨이며 특정 날짜의 활성 세운을 판정하지 않습니다.',
+          child: SajuSeunPanel(
+            controller: _daeunSeunController,
+            showHeader: false,
+            showDetail: false,
+          ),
         ),
       ],
-      selected: {controller.currentTab},
-      onSelectionChanged: (selection) => controller.selectTab(selection.first),
-    ),
-  );
+    );
+    final contextRail = _WorkbenchContextRail(
+      controller: _daeunSeunController,
+      natalController: _controller,
+      onSave: _controller.save,
+    );
+
+    final content = constraints.maxWidth >= 1740
+        ? Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                key: const Key('saju-input-rail'),
+                width: 300,
+                child: inputRail,
+              ),
+              const SizedBox(width: 18),
+              Expanded(child: analysis),
+              const SizedBox(width: 18),
+              SizedBox(
+                key: const Key('saju-context-rail'),
+                width: 320,
+                child: contextRail,
+              ),
+            ],
+          )
+        : constraints.maxWidth >= 1080
+        ? Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                key: const Key('saju-input-rail'),
+                width: 282,
+                child: inputRail,
+              ),
+              const SizedBox(width: 18),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    analysis,
+                    const SizedBox(height: 14),
+                    KeyedSubtree(
+                      key: const Key('saju-context-rail'),
+                      child: contextRail,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              KeyedSubtree(key: const Key('saju-input-rail'), child: inputRail),
+              const SizedBox(height: 16),
+              analysis,
+              const SizedBox(height: 14),
+              KeyedSubtree(
+                key: const Key('saju-context-rail'),
+                child: contextRail,
+              ),
+            ],
+          );
+
+    return KeyedSubtree(
+      key: const Key('saju-integrated-workbench'),
+      child: content,
+    );
+  }
+}
+
+class _WorkbenchSection extends StatelessWidget {
+  const _WorkbenchSection({
+    super.key,
+    required this.index,
+    required this.title,
+    required this.helper,
+    required this.child,
+  });
+
+  final String index;
+  final String title;
+  final String helper;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.rynColors;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.primarySurface,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: colors.hairline),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  index,
+                  style: TextStyle(
+                    color: colors.mutedText,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.1,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: colors.primaryText,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(
+                    helper,
+                    textAlign: TextAlign.right,
+                    style: TextStyle(color: colors.mutedText, fontSize: 12),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WorkbenchContextRail extends StatelessWidget {
+  const _WorkbenchContextRail({
+    required this.controller,
+    required this.natalController,
+    required this.onSave,
+  });
+
+  final SajuDaeunSeunController controller;
+  final SajuManseController natalController;
+  final Future<void> Function() onSave;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.rynColors;
+    final provenance = controller.sourceProvenance;
+    final persisted = natalController.currentPersistedSnapshot;
+    final status = persisted != null
+        ? '저장된 원국 · R${persisted.revisionNumber}'
+        : natalController.displayedSnapshot != null
+        ? '저장 전 원국'
+        : '계산 전';
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.secondarySurface,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: colors.hairline),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              '선택 정보',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              status,
+              style: TextStyle(color: colors.secondaryText, fontSize: 12),
+            ),
+            const SizedBox(height: 14),
+            if (!controller.hasSource)
+              Text(
+                '원국을 계산하거나 저장 이력에서 명식을 선택하면 대운과 세운의 선택 정보가 여기에 표시됩니다.',
+                style: TextStyle(color: colors.secondaryText, height: 1.5),
+              )
+            else ...[
+              SajuDaeunDetailPanel(controller: controller),
+              const SizedBox(height: 10),
+              SajuSeunDetailPanel(controller: controller),
+              const SizedBox(height: 10),
+              Text(
+                '올해 위치',
+                style: TextStyle(
+                  color: colors.mutedText,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                '현재 ${controller.currentGregorianYear}년 · 선택 ${controller.selectedSeunYear ?? '—'}년',
+                style: TextStyle(color: colors.secondaryText, fontSize: 11),
+              ),
+              const SizedBox(height: 14),
+              Divider(height: 1, color: colors.hairline),
+              const SizedBox(height: 12),
+              Container(
+                key: const Key('saju-source-context'),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: colors.primarySurface,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: colors.hairline),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '출처 · ${provenance?.sourceLabel ?? status}',
+                      style: const TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Engine ${provenance?.sourceEngineVersion ?? '—'} · Policy ${provenance?.sourcePolicyVersion ?? '—'}',
+                      style: TextStyle(
+                        color: colors.secondaryText,
+                        fontSize: 11,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '${provenance?.timezoneId ?? 'Asia/Seoul'} · ${provenance?.birthPlaceProfile ?? '서울 호환'}',
+                      style: TextStyle(color: colors.mutedText, fontSize: 11),
+                    ),
+                  ],
+                ),
+              ),
+              if (natalController.displayedSnapshot case final snapshot?) ...[
+                const SizedBox(height: 12),
+                Divider(height: 1, color: colors.hairline),
+                const SizedBox(height: 10),
+                _ResultFacts(snapshot: snapshot),
+                const SizedBox(height: 8),
+                _Warnings(snapshot: snapshot),
+                const SizedBox(height: 4),
+                _PolicyDetails(snapshot: snapshot),
+                const SizedBox(height: 8),
+                FilledButton.icon(
+                  key: const Key('saju-save'),
+                  onPressed: natalController.canSave ? onSave : null,
+                  icon: natalController.phase == SajuMansePhase.saving
+                      ? const SizedBox.square(
+                          dimension: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.bookmark_add_outlined),
+                  label: Text(
+                    natalController.currentPersistedSnapshot != null
+                        ? '저장됨'
+                        : natalController.phase == SajuMansePhase.saving
+                        ? '저장 중'
+                        : '명식 저장',
+                  ),
+                ),
+              ],
+            ],
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _WorkspaceHeader extends StatelessWidget {
@@ -284,6 +526,7 @@ class _WorkspaceHeader extends StatelessWidget {
     final colors = context.rynColors;
     final selected = controller.selectedPerson;
     final latest = controller.savedSnapshots.firstOrNull;
+    final hasResult = controller.displayedSnapshot != null;
     return Wrap(
       spacing: 18,
       runSpacing: 14,
@@ -297,13 +540,16 @@ class _WorkspaceHeader extends StatelessWidget {
             children: [
               Text(
                 '사주 만세력',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                style: (hasResult
+                        ? Theme.of(context).textTheme.titleLarge
+                        : Theme.of(context).textTheme.headlineMedium)
+                    ?.copyWith(
                   color: colors.primaryText,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: -0.8,
+                  letterSpacing: hasResult ? -0.3 : -0.8,
                 ),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: hasResult ? 2 : 6),
               Text(
                 selected == null
                     ? '사람과 출생 정보를 연결해 정확한 명식을 계산하고 기록합니다.'
@@ -327,7 +573,7 @@ class _WorkspaceHeader extends StatelessWidget {
   }
 }
 
-class _BirthInputPanel extends StatelessWidget {
+class _BirthInputPanel extends StatefulWidget {
   const _BirthInputPanel({
     required this.controller,
     required this.yearController,
@@ -347,9 +593,31 @@ class _BirthInputPanel extends StatelessWidget {
   final Future<void> Function() onCalculate;
 
   @override
+  State<_BirthInputPanel> createState() => _BirthInputPanelState();
+}
+
+class _BirthInputPanelState extends State<_BirthInputPanel> {
+  var _editing = false;
+
+  @override
   Widget build(BuildContext context) {
     final colors = context.rynColors;
+    final controller = widget.controller;
+    final yearController = widget.yearController;
+    final monthController = widget.monthController;
+    final dayController = widget.dayController;
+    final hourController = widget.hourController;
+    final minuteController = widget.minuteController;
+    final onCalculate = widget.onCalculate;
     final draft = controller.draft;
+    final snapshot = controller.displayedSnapshot;
+    if (snapshot != null && !_editing) {
+      return _BirthInputSummary(
+        controller: controller,
+        snapshot: snapshot,
+        onEdit: () => setState(() => _editing = true),
+      );
+    }
     return Material(
       color: colors.primarySurface,
       elevation: 1,
@@ -379,6 +647,7 @@ class _BirthInputPanel extends StatelessWidget {
             const SizedBox(height: 20),
             DropdownButtonFormField<String>(
               key: const Key('saju-person-selector'),
+              isExpanded: true,
               initialValue: controller.selectedPerson?.id,
               decoration: const InputDecoration(
                 labelText: 'Person',
@@ -389,7 +658,10 @@ class _BirthInputPanel extends StatelessWidget {
                 for (final person in controller.activePeople)
                   DropdownMenuItem(
                     value: person.id,
-                    child: Text(person.displayName),
+                    child: Text(
+                      person.displayName,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
               ],
               onChanged: controller.isBusy
@@ -590,6 +862,75 @@ class _BirthInputPanel extends StatelessWidget {
   ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w800);
 }
 
+class _BirthInputSummary extends StatelessWidget {
+  const _BirthInputSummary({
+    required this.controller,
+    required this.snapshot,
+    required this.onEdit,
+  });
+
+  final SajuManseController controller;
+  final SajuChartSnapshot snapshot;
+  final VoidCallback onEdit;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.rynColors;
+    final time = snapshot.hourUnknown
+        ? '시간 미상'
+        : '${snapshot.inputLocalTime!.hour.toString().padLeft(2, '0')}:${snapshot.inputLocalTime!.minute.toString().padLeft(2, '0')}';
+    final calendar = snapshot.calendarType == SajuCalendarType.solar ? '양력' : '음력';
+    final gender = switch (controller.draft.gender) {
+      SajuGender.female => '여성',
+      SajuGender.male => '남성',
+      SajuGender.unspecified => '성별 미지정',
+    };
+    return Material(
+      key: const Key('saju-input-summary'),
+      color: colors.primarySurface,
+      elevation: 1,
+      shadowColor: colors.scrim.withValues(alpha: 0.1),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: colors.hairline),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              controller.selectedPerson?.displayName ?? '연결된 사람',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              '$calendar ${snapshot.originalInputDate} · $time',
+              style: TextStyle(color: colors.secondaryText, fontSize: 12),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              gender,
+              style: TextStyle(color: colors.mutedText, fontSize: 11),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton.icon(
+              key: const Key('saju-edit-input'),
+              onPressed: onEdit,
+              icon: const Icon(Icons.edit_outlined, size: 16),
+              label: const Text('입력 수정'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _NumberField extends StatelessWidget {
   const _NumberField({
     required this.fieldKey,
@@ -650,10 +991,9 @@ class _PolicySummary extends StatelessWidget {
 }
 
 class _ResultBoard extends StatelessWidget {
-  const _ResultBoard({required this.controller, required this.onSave});
+  const _ResultBoard({required this.controller});
 
   final SajuManseController controller;
-  final Future<void> Function() onSave;
 
   @override
   Widget build(BuildContext context) {
@@ -662,89 +1002,48 @@ class _ResultBoard extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: colors.primarySurface,
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: colors.hairline),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(22),
+        padding: EdgeInsets.all(snapshot == null ? 14 : 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '네 기둥과 여덟 글자',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: colors.primaryText,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        snapshot == null
-                            ? '계산 결과가 이 화면의 중심에 표시됩니다.'
-                            : controller.currentPersistedSnapshot == null
-                            ? '저장 전 계산 결과'
-                            : '저장 당시의 immutable snapshot',
-                        style: TextStyle(color: colors.secondaryText),
-                      ),
-                    ],
-                  ),
-                ),
-                if (controller.currentPersistedSnapshot != null)
-                  _StatusPill(
-                    label:
-                        '저장됨 · R${controller.currentPersistedSnapshot!.revisionNumber}',
-                    color: colors.success,
-                  )
-                else if (snapshot != null)
-                  _StatusPill(label: '저장 전', color: colors.warning),
-              ],
-            ),
-            const SizedBox(height: 18),
             if (snapshot == null)
-              _ResultEmpty(hasPerson: controller.selectedPerson != null)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    '네 기둥과 여덟 글자',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: colors.primaryText,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  _ResultEmpty(hasPerson: controller.selectedPerson != null),
+                ],
+              )
             else ...[
-              _FourPillarStage(snapshot: snapshot),
-              const SizedBox(height: 18),
-              _ResultFacts(snapshot: snapshot),
-              const SizedBox(height: 14),
-              _Warnings(snapshot: snapshot),
-              const SizedBox(height: 10),
-              _PolicyDetails(snapshot: snapshot),
+              SajuIntegratedNatalGrid(
+                snapshot: snapshot,
+                status: controller.currentPersistedSnapshot != null
+                    ? _StatusPill(
+                        label:
+                            '저장됨 · R${controller.currentPersistedSnapshot!.revisionNumber}',
+                        color: colors.success,
+                      )
+                    : _StatusPill(label: '저장 전', color: colors.warning),
+              ),
               if (controller.errorMessage case final message?) ...[
-                const SizedBox(height: 14),
+                const SizedBox(height: 8),
                 _InlineMessage(message: message, error: true),
               ],
               if (controller.noticeMessage case final message?) ...[
-                const SizedBox(height: 14),
+                const SizedBox(height: 8),
                 _InlineMessage(message: message),
               ],
-              const SizedBox(height: 18),
-              Align(
-                alignment: Alignment.centerRight,
-                child: FilledButton.icon(
-                  key: const Key('saju-save'),
-                  onPressed: controller.canSave ? onSave : null,
-                  icon: controller.phase == SajuMansePhase.saving
-                      ? const SizedBox.square(
-                          dimension: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        )
-                      : const Icon(Icons.bookmark_add_outlined),
-                  label: Text(
-                    controller.currentPersistedSnapshot != null
-                        ? '저장됨'
-                        : controller.phase == SajuMansePhase.saving
-                        ? '저장 중'
-                        : '명식 저장',
-                  ),
-                ),
-              ),
             ],
             if (snapshot == null && controller.errorMessage != null) ...[
               const SizedBox(height: 14),
@@ -787,278 +1086,6 @@ class _ResultEmpty extends StatelessWidget {
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: colors.primaryText,
               fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FourPillarStage extends StatelessWidget {
-  const _FourPillarStage({required this.snapshot});
-
-  final SajuChartSnapshot snapshot;
-
-  @override
-  Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final stageTop = dark ? const Color(0xFF13241F) : const Color(0xFF173E33);
-    final stageBottom = dark
-        ? const Color(0xFF0D1715)
-        : const Color(0xFF0E2A23);
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [stageTop, stageBottom],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0x669E8B60)),
-      ),
-      padding: const EdgeInsets.fromLTRB(18, 22, 18, 20),
-      child: Column(
-        children: [
-          Text(
-            snapshot.hourUnknown ? '세 기둥 · 여섯 글자' : '네 기둥 · 여덟 글자',
-            style: const TextStyle(
-              color: Color(0xFFD7C9A2),
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: _PillarCard(
-                  key: const Key('saju-pillar-hour'),
-                  pillarId: 'hour',
-                  label: '시주',
-                  entry: snapshot.hourPillar,
-                  dayStemIndex: snapshot.dayPillar.stemIndex,
-                  unknown: snapshot.hourUnknown,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _PillarCard(
-                  key: const Key('saju-pillar-day'),
-                  pillarId: 'day',
-                  label: '일주',
-                  entry: snapshot.dayPillar,
-                  dayStemIndex: snapshot.dayPillar.stemIndex,
-                  dayPillar: true,
-                  emphasized: true,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _PillarCard(
-                  key: const Key('saju-pillar-month'),
-                  pillarId: 'month',
-                  label: '월주',
-                  entry: snapshot.monthPillar,
-                  dayStemIndex: snapshot.dayPillar.stemIndex,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _PillarCard(
-                  key: const Key('saju-pillar-year'),
-                  pillarId: 'year',
-                  label: '년주',
-                  entry: snapshot.yearPillar,
-                  dayStemIndex: snapshot.dayPillar.stemIndex,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PillarCard extends StatelessWidget {
-  const _PillarCard({
-    super.key,
-    required this.pillarId,
-    required this.label,
-    required this.entry,
-    required this.dayStemIndex,
-    this.unknown = false,
-    this.dayPillar = false,
-    this.emphasized = false,
-  });
-
-  final String pillarId;
-  final String label;
-  final SexagenaryEntry? entry;
-  final int dayStemIndex;
-  final bool unknown;
-  final bool dayPillar;
-  final bool emphasized;
-
-  @override
-  Widget build(BuildContext context) {
-    final value = entry;
-    final stemRelation = value == null
-        ? null
-        : SajuTenGodCalculator.calculate(
-            dayStemIndex: dayStemIndex,
-            targetStemIndex: value.stemIndex,
-          );
-    final branchRelation = value == null
-        ? null
-        : SajuTenGodCalculator.forBranchMainQi(
-            dayStemIndex: dayStemIndex,
-            branchIndex: value.branchIndex,
-          );
-    return Container(
-      constraints: const BoxConstraints(minHeight: 374),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
-      decoration: BoxDecoration(
-        color: emphasized ? const Color(0x26E8DDBD) : const Color(0x12FFFFFF),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(
-          color: emphasized ? const Color(0xB3C7B27A) : const Color(0x3DFFFFFF),
-        ),
-      ),
-      child: Column(
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-              color: Color(0xFFD7C9A2),
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 12),
-          if (unknown)
-            const SizedBox(
-              height: 292,
-              child: Center(
-                child: Text(
-                  '시간 미상',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xFFF4F0E7),
-                    fontSize: 18,
-                    height: 1.35,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            )
-          else ...[
-            _TenGodLabel(
-              key: Key('saju-pillar-$pillarId-stem-relation'),
-              label: dayPillar ? '일간(나)' : stemRelation!.label,
-            ),
-            const SizedBox(height: 7),
-            _ElementHanjaTile(
-              key: Key('saju-pillar-$pillarId-stem'),
-              hanja: value!.hanja.substring(0, 1),
-              element: SajuStemNature.elementForStem(value.stemIndex),
-            ),
-            const SizedBox(height: 7),
-            _ElementHanjaTile(
-              key: Key('saju-pillar-$pillarId-branch'),
-              hanja: value.hanja.substring(1, 2),
-              element: SajuStemNature.elementForStem(
-                SajuBranchMainQiRegistry.stemForBranch(value.branchIndex).index,
-              ),
-            ),
-            const SizedBox(height: 7),
-            _TenGodLabel(
-              key: Key('saju-pillar-$pillarId-branch-relation'),
-              label: branchRelation!.label,
-            ),
-            const SizedBox(height: 9),
-            Text(
-              value.koreanLabel,
-              style: const TextStyle(
-                color: Color(0xFFCFD9D3),
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _TenGodLabel extends StatelessWidget {
-  const _TenGodLabel({super.key, required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) => Text(
-    label,
-    textAlign: TextAlign.center,
-    style: const TextStyle(
-      color: Color(0xFFD7C9A2),
-      fontSize: 12,
-      fontWeight: FontWeight.w800,
-    ),
-  );
-}
-
-class _ElementHanjaTile extends StatelessWidget {
-  const _ElementHanjaTile({
-    super.key,
-    required this.hanja,
-    required this.element,
-  });
-
-  final String hanja;
-  final SajuFiveElement element;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = SajuElementPalette.resolve(
-      element,
-      Theme.of(context).brightness,
-    );
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(5, 5, 5, 8),
-      decoration: BoxDecoration(
-        color: colors.background,
-        borderRadius: BorderRadius.circular(11),
-        border: Border.all(color: colors.border),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-              element.label,
-              style: TextStyle(
-                color: colors.foreground.withValues(alpha: 0.9),
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
-          Text(
-            hanja,
-            style: TextStyle(
-              color: colors.foreground,
-              fontFamily: 'ChosunGs',
-              fontFamilyFallback: const ['Malgun Gothic'],
-              fontSize: 44,
-              height: 0.92,
-              fontWeight: FontWeight.w400,
             ),
           ),
         ],
@@ -1116,34 +1143,26 @@ class _Warnings extends StatelessWidget {
   Widget build(BuildContext context) {
     if (snapshot.warnings.isEmpty) return const SizedBox.shrink();
     final colors = context.rynColors;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: colors.warning.withValues(alpha: 0.09),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: colors.warning.withValues(alpha: 0.35)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.info_outline_rounded, size: 18, color: colors.warning),
-              const SizedBox(width: 7),
-              const Text(
-                '확인할 계산 기준',
-                style: TextStyle(fontWeight: FontWeight.w800),
-              ),
-            ],
-          ),
-          const SizedBox(height: 7),
-          for (final warning in snapshot.warnings)
-            Text(
-              '• ${_warningLabel(warning)}',
-              style: TextStyle(color: colors.secondaryText, height: 1.5),
+    return Wrap(
+      spacing: 6,
+      runSpacing: 6,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        Icon(Icons.info_outline_rounded, size: 16, color: colors.warning),
+        for (final warning in snapshot.warnings)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+            decoration: BoxDecoration(
+              color: colors.warning.withValues(alpha: 0.07),
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(color: colors.warning.withValues(alpha: 0.25)),
             ),
-        ],
-      ),
+            child: Text(
+              _warningLabel(warning),
+              style: TextStyle(color: colors.secondaryText, fontSize: 11),
+            ),
+          ),
+      ],
     );
   }
 }
@@ -1172,7 +1191,7 @@ class _PolicyDetailsState extends State<_PolicyDetails> {
             borderRadius: BorderRadius.circular(10),
             onTap: () => setState(() => _expanded = !_expanded),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(vertical: 5),
               child: Row(
                 children: [
                   const Expanded(
@@ -1340,10 +1359,6 @@ class _HistoryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.rynColors;
     final snapshot = persisted.snapshot;
-    final created = DateTime.fromMicrosecondsSinceEpoch(
-      persisted.createdAtUtcUs,
-      isUtc: true,
-    ).toLocal();
     final pillars = [
       snapshot.hourPillar?.koreanLabel ?? '시간 미상',
       snapshot.dayPillar.koreanLabel,
@@ -1408,13 +1423,6 @@ class _HistoryTile extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: 10),
-              Text(
-                '${created.year}.${created.month.toString().padLeft(2, '0')}.${created.day.toString().padLeft(2, '0')}',
-                style: TextStyle(color: colors.mutedText, fontSize: 12),
-              ),
-              const SizedBox(width: 4),
-              const Icon(Icons.chevron_right_rounded),
             ],
           ),
         ),

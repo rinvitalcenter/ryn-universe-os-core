@@ -25,7 +25,7 @@ void main() {
     expect(find.text('사주 기록을 열 수 없습니다.'), findsOneWidget);
   });
 
-  testWidgets('loaded Saju destination owns natal Daeun and Seun tabs', (
+  testWidgets('loaded Saju destination owns one integrated workbench', (
     tester,
   ) async {
     final database = RynAppDatabase(NativeDatabase.memory());
@@ -43,9 +43,14 @@ void main() {
     await tester.tap(find.byKey(const Key('ryn-nav-saju')));
     await tester.pumpAndSettle();
 
-    expect(find.byKey(const Key('saju-tab-natal')), findsOneWidget);
-    expect(find.byKey(const Key('saju-tab-daeun')), findsOneWidget);
-    expect(find.byKey(const Key('saju-tab-seun')), findsOneWidget);
+    expect(find.byKey(const Key('saju-integrated-workbench')), findsOneWidget);
+    expect(find.byKey(const Key('saju-natal-section')), findsOneWidget);
+    expect(find.byKey(const Key('saju-daeun-section')), findsOneWidget);
+    expect(find.byKey(const Key('saju-seun-section')), findsOneWidget);
+    expect(find.byKey(const Key('saju-workspace-scroll')), findsOneWidget);
+    expect(find.byKey(const Key('saju-tab-natal')), findsNothing);
+    expect(find.byKey(const Key('saju-tab-daeun')), findsNothing);
+    expect(find.byKey(const Key('saju-tab-seun')), findsNothing);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pumpAndSettle();

@@ -991,6 +991,9 @@ class _RouteAwareWorkspaceCanvas extends StatelessWidget {
     UserText.navReading => const RynWorkspacePresentation.featurePage(
       bypassAppWorkspaceCap: true,
     ),
+    UserText.navSaju => const RynWorkspacePresentation.featurePage(
+      widthPolicy: RynWorkspaceWidthPolicy.adaptiveWorkbench,
+    ),
     _ => const RynWorkspacePresentation.featurePage(),
   };
 

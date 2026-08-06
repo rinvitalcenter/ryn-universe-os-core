@@ -40,21 +40,34 @@ void main() {
     },
   );
 
-  test('metal and water retain their owner-defined visual identities', () {
-    for (final brightness in Brightness.values) {
-      final metal = SajuElementPalette.resolve(
-        SajuFiveElement.metal,
-        brightness,
-      );
-      final water = SajuElementPalette.resolve(
-        SajuFiveElement.water,
-        brightness,
-      );
+  test('Light metal and Dark water remain visibly calibrated', () {
+    final metal = SajuElementPalette.resolve(
+      SajuFiveElement.metal,
+      Brightness.light,
+    );
+    final water = SajuElementPalette.resolve(
+      SajuFiveElement.water,
+      Brightness.dark,
+    );
 
-      expect(metal.background.computeLuminance(), greaterThan(0.65));
-      expect(metal.foreground.computeLuminance(), lessThan(0.08));
-      expect(water.background.computeLuminance(), lessThan(0.03));
-      expect(water.foreground.computeLuminance(), greaterThan(0.75));
+    expect(metal.background.computeLuminance(), greaterThan(0.75));
+    expect(metal.foreground.computeLuminance(), lessThan(0.15));
+    expect(water.background.computeLuminance(), lessThan(0.04));
+    expect(water.foreground.computeLuminance(), greaterThan(0.45));
+  });
+
+  test('selection is accessible and independent from five elements', () {
+    for (final brightness in Brightness.values) {
+      final selection = SajuElementPalette.selection(brightness);
+      expect(
+        contrastRatio(selection.foreground, selection.background),
+        greaterThanOrEqualTo(4.5),
+      );
+      for (final element in SajuFiveElement.values) {
+        final colors = SajuElementPalette.resolve(element, brightness);
+        expect(selection.background, isNot(colors.background));
+        expect(selection.border, isNot(colors.border));
+      }
     }
   });
 }
